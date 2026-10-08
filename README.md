@@ -1,6 +1,6 @@
 # Frightertainment website · Version 1
 
-A responsive static horror publication using the supplied Frightertainment identity and artwork. The site includes claim-sourced film records, standalone detail pages, mobile navigation, search and filters, Fright Index method, Originals sections, editorial standards, accessibility support, SEO metadata, `robots.txt` and a sitemap.
+A responsive static horror publication using the supplied Frightertainment identity and artwork. The site includes claim-sourced film records, standalone detail pages, mobile navigation, search and filters, Fright Index method, horror TV and podcast recommendation sections, editorial standards, accessibility support, SEO metadata, `robots.txt` and a sitemap.
 
 ## Preview and checks
 
@@ -35,7 +35,7 @@ The checker validates claim completeness, source URLs, territory/date scopes, ch
 
 ## Site files
 
-- `index.html` — publication home, film listings, filters, score method, trailer status and Originals sections.
+- `index.html` — publication home, film listings, filters, score method, trailer status and horror TV and podcast recommendation sections.
 - `films/<id>/index.html` — generated source-linked detail page for each film.
 - `editorial-standards.html` — verification, rights and scoring policy.
 - `data/movies.js` — hand-edited claim-level film evidence.
@@ -46,7 +46,7 @@ The checker validates claim completeness, source URLs, territory/date scopes, ch
 
 ## Branding and rights
 
-The supplied artwork moved from `Assets/` to `assets/` without image edits or recompression; SHA-256 hashes match the original Git blobs. Frightmares and When the Horror Was Real use their supplied images. Frightertainment Cinema uses a typographic treatment because no corresponding image was supplied.
+The supplied artwork moved from `Assets/` to `assets/` without image edits or recompression; SHA-256 hashes match the original Git blobs. Legacy series artwork remains archived in assets/ but is not displayed or promoted on the site. No Frightertainment productions, premieres or screening programmes are announced.
 
 ## Hosting
 
@@ -54,7 +54,7 @@ Static files publish from the repository root after editorial and rights review.
 
 ## Automated Horror Discovery (prepared, not activated)
 
-The site now includes homepage panels for annual Top 20 rankings, actual cinema showtimes, recent theatrical release dates, streaming availability, coming soon and weekly trending horror. Country-specific feed data is shown with source links and freshness. Editorially curated Frightertainment Originals and the manually checked six-film watchlist remain separate from automated feeds.
+The site now includes homepage panels for annual Top 20 rankings, actual cinema showtimes, recent theatrical release dates, streaming availability, coming soon and weekly trending horror. Country-specific feed data is shown with source links and freshness. Manually curated horror TV and podcast recommendations and the six-film watchlist remain separate from automated feeds.
 
 Annual pages are generated for the current year, three prior years and the next year by `scripts/build-pages.mjs`; rebuilding in a later year extends the sequence. `/top-20/` is the archive. Public rankings are computed from approved, permission-cleared numeric professional critic reviews. The methodology uses one contribution per critic, an equal-weight average normalized to /100, nearest-integer rounding and a minimum of three distinct critics. Unsupported or insufficient data remains pending.
 
@@ -93,3 +93,7 @@ Read [API_LICENSING.md](API_LICENSING.md) before activating any provider. It doc
 - `review_queue` retains weekly discovery candidates for administrative review.
 
 Admin endpoints require the `ADMIN_TOKEN` Worker secret and stay inactive without it. Provider API keys must be configured as Worker secrets rather than committed files or browser configuration. See the owner setup checklist in [API_LICENSING.md](API_LICENSING.md).
+
+## Editorial positioning
+
+Frightertainment currently covers independent horror discovery: source-verified film information, cinema and streaming listings when licensed feeds become available, TV recommendations, and independently produced horror podcasts. It does **not** advertise Frightertainment Originals, film productions, cinema screenings, or future podcast episodes as planned or coming soon. Recommendations must link to genuine programme or publisher sources without implying partnership, endorsement, or UK streaming availability. Film and TV posters remain text-only until per-asset rights or suitable commercial catalogue rights have been documented.
