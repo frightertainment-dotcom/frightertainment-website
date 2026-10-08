@@ -44,5 +44,7 @@ jobs:
             echo "Archive is already up to date"
           else
             git commit -m "data: expand cumulative CC0 horror film history archive"
+            git fetch origin "${{ github.ref_name }}"
+            git rebase "origin/${{ github.ref_name }}"
             git push origin HEAD:${{ github.ref_name }}
           fi
