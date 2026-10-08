@@ -101,3 +101,10 @@
 .hub-rights-note{line-height:1.7}
 @media(max-width:640px){.hub-intro{padding:14px 16px 18px!important}.hub-intro::before{background:linear-gradient(90deg,#13090ee8,#13090eb0),url('/assets/hub-haunted.svg') 65% center/cover no-repeat}.hub-intro h1{font-size:clamp(44px,10.5vw,60px)}.hub-intro>p{max-width:330px}.hub-showcase__bottom .hub-tile{min-height:165px}.hub-feature{min-height:190px}.hub-tabs a{font-size:12px}}
 @media(max-width:360px){.hub-tabs a{font-size:10px;padding:8px 3px}.hub-showcase__bottom{grid-template-columns:1fr}.hub-showcase__bottom .hub-tile{min-height:125px}.hub-tile__content{padding:14px}}
+
+.hub-art-note{margin:12px 2px 0;color:#997c81;font:600 10px/1.6 var(--font-body);letter-spacing:.1px}
+.hub-charts__top,.hub-charts__all{position:relative}
+.hub-charts__all:focus-visible{outline-offset:4px}
+.hub-rights-note a{color:#f5b6bb;text-decoration:underline}
+@media(min-width:901px){.hub-charts{min-height:520px}.hub-showcase__bottom .hub-tile{min-height:150px}}
+@media(max-width:640px){.hub-rights-note{padding-inline:4px}.hub-charts{min-height:250px}.hub-chart-row{font-size:12px}.hub-chart-row .score{font-size:12px}}
