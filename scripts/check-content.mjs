@@ -125,5 +125,8 @@ for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
   for (const record of entries || []) if (!html.includes(escapeHTML(record.title))) errors.push(kind + ': generated content missing '+record.title);
 }
 
+const calendarClient = await readFile(new URL('release-calendar.js',root),'utf8');
+if(!calendarClient.includes("claim.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
+if(!(await readFile(new URL('movies.html',root),'utf8')).includes('id="hub-release-list"')) errors.push('Release calendar is missing from the Movies page');
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
