@@ -306,7 +306,7 @@ test('imported horror vault retains thousands of indexed records and every year 
   expect(count).toBeGreaterThanOrEqual(9772);
   const year=page.locator('#horror-year-2007');
   await year.locator('summary').click();
-  expect(await year.locator('.horror-year__film').count()).toBeGreaterThan(300);
+  await expect.poll(()=>year.locator('.horror-year__film').count()).toBeGreaterThan(300);
   await expect(year.locator('.horror-year__search')).toBeVisible();
   await year.locator('.horror-year__search').fill('28 Weeks');
   await expect(year.locator('.horror-year__film:visible')).toHaveCount(1);
