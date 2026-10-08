@@ -160,3 +160,15 @@
 .hub-more{background:#831520;border:1px solid #bb333e;color:#fff;font:900 13px var(--font-display);padding:11px 22px;letter-spacing:1.2px}
 .hub-more:hover,.hub-more:focus-visible{background:#cf202e}
 .hub-more[hidden]{display:none}
+
+.hub-unranked{border-top:1px solid #49252c;margin-top:6px;padding:13px 15px 9px}
+.hub-unranked>p{font:900 11px var(--font-display);letter-spacing:1.1px;color:#d6a0a4;margin:0 0 8px}
+.hub-unranked__row{padding:7px 0;display:flex;justify-content:space-between;gap:8px;border-top:1px solid #2d2022;align-items:center}
+.hub-unranked__row>a{font:800 15px var(--font-display);color:#f0e1dc}
+.hub-unranked__row>span{font:700 9px var(--font-display);letter-spacing:.5px;color:#bd979a;white-space:nowrap}
+.hub-ranking-watchlist{padding:12px 3px 20px}
+.hub-ranking-watchlist h2{font:900 26px var(--font-display);margin:0 0 12px;color:#f3e5e0}
+.hub-ranking-watchlist__item{display:flex;gap:15px;align-items:center;justify-content:space-between;border-bottom:1px solid #402529;padding:9px 12px;margin:0}
+.hub-ranking-watchlist__item a{font:900 18px var(--font-display);color:#f2dedb}
+.hub-ranking-watchlist__item span{font:800 11px var(--font-display);color:#a99193}
+@media(max-width:620px){.hub-unranked{padding:10px}.hub-unranked__row>span{font-size:8px}.hub-ranking-watchlist__item a{font-size:15px}.hub-ranking-watchlist__item span{font-size:9px}}
