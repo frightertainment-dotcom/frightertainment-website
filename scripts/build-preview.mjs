@@ -43,5 +43,5 @@ await writeFile(new URL('_headers', destination),
 // Keep static pages free of Functions invocation charges.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]
-})+'\\n');
+}));
 console.log('Private-preview static bundle prepared in dist/ (no provider credentials, Worker code, or test data).');
