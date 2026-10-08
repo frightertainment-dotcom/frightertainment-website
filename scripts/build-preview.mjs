@@ -8,7 +8,7 @@ await mkdir(destination, { recursive: true });
 
 const publicFiles = [
   'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html', 'editorial-standards.html',
-  'app.js', 'discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'rankings-preview.js', 'horror-archive.js', 'archive-film.js',
+  'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'rankings-preview.js', 'horror-archive.js', 'archive-film.js',
   'styles.css', 'hub.css', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
