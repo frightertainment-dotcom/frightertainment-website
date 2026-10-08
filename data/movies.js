@@ -1,5 +1,5 @@
 // Studio-verified film facts and individually checked published-score editorial references.
-// No images, third-party feeds, rights-cleared Fright Index reviews, or automated score scraping.
+// External score snapshots are dated factual reporting, not live feeds or reusable Fright Index review rights.
 window.FR_MOVIES = [
   {
     "id": "other-mommy",
@@ -1318,6 +1318,78 @@ window.FR_MOVIES = [
         "kind": "weighted-critic-score",
         "url": "https://www.metacritic.com/movie/28-weeks-later/",
         "criticCount": 34,
+        "checked": "2026-10-08"
+      }
+    ]
+  },
+  {
+    "id": "28-days-later",
+    "editorialStatus": "approved",
+    "title": "28 Days Later",
+    "claims": [
+      {
+        "field": "title",
+        "label": "Title",
+        "value": "28 Days Later",
+        "sourceName": "20th Century Studios",
+        "source": "https://www.20thcenturystudios.com/movies/28-days-later",
+        "territory": "Official film information",
+        "checked": "2026-10-08"
+      },
+      {
+        "field": "releaseYear",
+        "label": "Original UK production / cinema year",
+        "value": "2002",
+        "sourceName": "BBFC",
+        "source": "https://www.bbfc.co.uk/release/28-days-later-q29sbgvjdglvbjpwwc0zmjg4ndq",
+        "territory": "United Kingdom original classification and production year; U.S. release was 2003",
+        "checked": "2026-10-08"
+      },
+      {
+        "field": "genre",
+        "label": "Genre",
+        "value": "Horror · Science fiction",
+        "sourceName": "20th Century Studios",
+        "source": "https://www.20thcenturystudios.com/movies/28-days-later",
+        "territory": "Film genre",
+        "checked": "2026-10-08"
+      },
+      {
+        "field": "director",
+        "label": "Director",
+        "value": "Danny Boyle",
+        "sourceName": "20th Century Studios",
+        "source": "https://www.20thcenturystudios.com/movies/28-days-later",
+        "territory": "Production details",
+        "checked": "2026-10-08"
+      }
+    ],
+    "poster": "",
+    "posterCredit": "",
+    "posterPermission": "",
+    "trailer": null,
+    "reviews": [],
+    "criticReferenceSnapshots": [
+      {
+        "source": "Rotten Tomatoes",
+        "label": "Critic approval",
+        "value": 87,
+        "outOf": 100,
+        "display": "87%",
+        "kind": "positive-review-percentage",
+        "url": "https://www.rottentomatoes.com/m/28_days_later",
+        "criticCount": 240,
+        "checked": "2026-10-08"
+      },
+      {
+        "source": "Metacritic",
+        "label": "Metascore",
+        "value": 73,
+        "outOf": 100,
+        "display": "73/100",
+        "kind": "weighted-critic-score",
+        "url": "https://www.metacritic.com/movie/28-days-later/",
+        "criticCount": 39,
         "checked": "2026-10-08"
       }
     ]
