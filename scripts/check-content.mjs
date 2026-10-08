@@ -32,6 +32,17 @@ for (const movie of movies) {
     if (claim.field === 'releaseDate' && (!validDay(claim.value) || /^(?:territory|release territory) (?:not stated|unconfirmed|unspecified)/i.test(claim.territory))) errors.push(`Release date needs an ISO date and a stated territory: ${movie.id}`);
     if (claim.field === 'releaseYear' && !/^20\d{2}$/.test(claim.value)) errors.push(`Release year must be a four-digit year: ${movie.id}`);
   }
+  for (const rating of movie.criticReferenceSnapshots || []) {
+    if (!['positive-review-percentage','weighted-critic-score'].includes(rating.kind) ||
+        !rating.source || !rating.label || !goodURL(rating.url) || !validDay(rating.checked) ||
+        !Number.isFinite(rating.value) || rating.value < 0 || rating.value > 100 ||
+        !Number.isInteger(rating.criticCount) || rating.criticCount < 1 ||
+        !rating.display) errors.push('Invalid individually attributed external critic snapshot: '+movie.id);
+    if (rating.permissionCleared || rating.frightIndexEligible)
+      errors.push('External aggregator snapshots must never imply a licensed Fright Index source: '+movie.id);
+  }
+  if (movie.criticReferenceSnapshots?.length > 2)
+    errors.push('More than two external publisher summaries require explicit data licensing review: '+movie.id);
   if (movie.poster && (!goodURL(movie.poster) || !movie.posterCredit || !movie.posterPermission || movie.posterLicenceStatus !== 'approved' || !goodURL(movie.posterSourcePage) || !goodURL(movie.posterPermissionEvidence) || !movie.posterUsageScope)) errors.push(`Poster artwork requires approved documented permission, evidence, source page and usage scope: ${movie.id}`);
   if (movie.trailer) {
     if (!/^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') || !['trailer', 'teaser'].includes(movie.trailer.kind) || !movie.trailer.channel || !goodURL(movie.trailer.source) || !movie.trailer.territory || !validDay(movie.trailer.checked)) errors.push(`Trailer needs an exact official upload, source, channel, territory and checked date: ${movie.id}`);
@@ -103,6 +114,14 @@ for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.
   for (const needed of ['class="hub-tabs"', 'src="/app.js"', 'id="mobile-nav"', 'href="/hub.css"'])
     if (!markup.includes(needed)) errors.push(page + ' missing required navigation or styling: ' + needed);
 }
+const movieYearsMarkup = await readFile(new URL('movies.html',root),'utf8');
+for (const required of ['id="movie-year"', 'value="older"', 'value="2025"', 'value="2026"']) {
+  if (!movieYearsMarkup.includes(required)) errors.push('Movie year filter missing '+required);
+}
+if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='releaseYear' && claim.value==='2007')))
+  errors.push('28 Weeks Later must remain in the 2007 archive, never 2026');
+if(!movies.some(movie=>movie.id==='28-years-later-bone-temple' && movie.criticReferenceSnapshots?.length===2))
+  errors.push('2026 Bone Temple must have individually attributed critic-score reference snapshots');
 const homeHub = await readFile(new URL('index.html',root),'utf8');
 if (homeHub.includes('hero-wordmark') || homeHub.includes('FRIGHTERTAINMENT ORIGINALS') || !homeHub.includes('id="hub-ranking"')) errors.push('Homepage must be compact without duplicate wordmark or unannounced productions');
 const buildSource = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
