@@ -32,7 +32,7 @@ for (const movie of movies) {
     if (claim.field === 'releaseDate' && (!validDay(claim.value) || /^(?:territory|release territory) (?:not stated|unconfirmed|unspecified)/i.test(claim.territory))) errors.push(`Release date needs an ISO date and a stated territory: ${movie.id}`);
     if (claim.field === 'releaseYear' && !/^20\d{2}$/.test(claim.value)) errors.push(`Release year must be a four-digit year: ${movie.id}`);
   }
-  if (movie.poster && (!goodURL(movie.poster) || !movie.posterCredit || !movie.posterPermission)) errors.push(`Artwork needs a source, credit and permission record: ${movie.id}`);
+  if (movie.poster && (!goodURL(movie.poster) || !movie.posterCredit || !movie.posterPermission || movie.posterLicenceStatus !== 'approved' || !goodURL(movie.posterSourcePage) || !goodURL(movie.posterPermissionEvidence) || !movie.posterUsageScope)) errors.push(`Poster artwork requires approved documented permission, evidence, source page and usage scope: ${movie.id}`);
   if (movie.trailer) {
     if (!/^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') || !['trailer', 'teaser'].includes(movie.trailer.kind) || !movie.trailer.channel || !goodURL(movie.trailer.source) || !movie.trailer.territory || !validDay(movie.trailer.checked)) errors.push(`Trailer needs an exact official upload, source, channel, territory and checked date: ${movie.id}`);
     if (!(movie.claims || []).some(claim => claim.field === 'trailer' && claim.source === movie.trailer.source && claim.checked === movie.trailer.checked)) errors.push(`Trailer needs a matching claim-level source record: ${movie.id}`);
@@ -52,11 +52,15 @@ for (const movie of movies) {
 for (const file of ['index.html', 'editorial-standards.html']) {
   const html = await readFile(new URL(file, root), 'utf8');
   if (/Assets\//.test(html)) errors.push(`${file} contains an uppercase Assets/ path`);
-  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle', 'src="/app.js"']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
+  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
   if (!html.includes(`href="top-20/${currentYear}/"`) && !html.includes(`href="/top-20/${currentYear}/"`) && !html.includes('href="top-20/"')) errors.push(`${file} is missing the annual Top 20 link`);
   for (const [, ref] of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)/g)) {
     try { await access(new URL(ref, root)); } catch { errors.push(`${file} refers to missing ${ref}`); }
   }
+}
+for (const f of ['index.html','editorial-standards.html','movies.html','tv-shows.html','podcasts.html','indie-movies.html','games.html']) {
+  const html = await readFile(new URL(f,root),'utf8');
+  if (!html.includes('src="/app.js"') && !html.includes('src="app.js"')) errors.push(f+' is missing shared JavaScript');
 }
 const top20Archive = await readFile(new URL('top-20/index.html', root), 'utf8');
 for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `href="/top-20/${currentYear}/"`, 'href="/editorial-standards.html"']) if (!top20Archive.includes(required)) errors.push(`Top 20 archive is missing ${required}`);
@@ -90,7 +94,7 @@ if (!sitemap.includes(`/top-20/${currentYear}/`)) errors.push(`${currentYear} an
 if (!sitemap.includes('/top-20/')) errors.push('Annual ranking archive missing from sitemap');
 
 const homepageEditorial = await readFile(new URL('index.html', root), 'utf8');
-if (!homepageEditorial.includes('id="horror-tv"') || !homepageEditorial.includes('id="podcasts"')) errors.push('Homepage must include television and podcast recommendations');
+if (!homepageEditorial.includes('href="/tv-shows.html"') || !homepageEditorial.includes('href="/podcasts.html"')) errors.push('Homepage must link to television and podcast pages');
 if (/FRIGHTERTAINMENT ORIGINALS|DETAILS TO BE ANNOUNCED|id="originals"|href="#originals"/i.test(homepageEditorial)) errors.push('Unannounced production/promotional claims must not appear on homepage');
 
 
