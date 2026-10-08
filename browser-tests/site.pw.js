@@ -110,3 +110,43 @@ test('homepage is compact, branded and links into distinct pages', async ({page}
   await expect(page.locator('#movie-grid')).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
 });
+
+test('navigation works between all main sections and official movie source', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.hub-tabs a[href="/movies.html"]').click();
+  await expect(page).toHaveURL(/movies\.html$/);
+  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(6);
+  const official = page.locator('.movie-card__official a').first();
+  await expect(official).toHaveAttribute('href', /^https:\/\//);
+  await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
+  await expect(page).toHaveURL(/podcasts\.html$/);
+  await expect(page.locator('main .hub-tile')).toHaveCount(3);
+  await page.locator('.hub-tabs a[href="/indie-movies.html"]').click();
+  await expect(page.locator('main .hub-catalog .hub-tile')).toHaveCount(3);
+  await expect(page.locator('main')).not.toContainText('DETAILS TO BE ANNOUNCED');
+});
+test('compact dashboard remains navigable at 320px and 768px', async ({ browser }) => {
+  for (const width of [320, 768]) {
+    const page = await browser.newPage({viewport:{width,height:820}});
+    await page.goto('/');
+    await expect(page.locator('.hub-brand img')).toBeVisible();
+    await expect(page.locator('.hub-tabs a')).toHaveCount(6);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.close();
+  }
+});
+test('film and Top 20 pages offer main-content skip links', async ({ page }) => {
+  await page.goto('/films/clayface/');
+  await expect(page.locator('.skip-link')).toHaveAttribute('href', '#main-content');
+  await expect(page.locator('#main-content')).toBeVisible();
+  await page.goto('/top-20/2026/');
+  await expect(page.locator('.skip-link')).toHaveCount(1);
+});
+test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
+  await page.goto('/');
+  const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el).backgroundImage);
+  expect(artURL).toContain('/assets/hub-haunted.svg');
+  await page.goto('/movies.html');
+  await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
+  await expect(page.locator('.movie-card__official a')).toHaveCount(6);
+});
