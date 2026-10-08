@@ -36,10 +36,12 @@
     id:'wd:'+x.qid,
     title:x.title.trim(),
     year:x.year,
-    href:x.imdbId?'https://www.imdb.com/title/'+x.imdbId+'/':'https://www.imdb.com/find/?q='+encodeURIComponent(x.title+' '+x.year)+'&s=tt',
-    linkLabel:x.imdbId?'IMDb PAGE ↗':'IMDb SEARCH ↗',
+    // Always land on our own reliable detail page first. External IMDb records
+    // can disappear, block access, or contain stale/mismatched Wikidata IDs.
+    href:'/archive-film.html?id='+encodeURIComponent(x.qid),
+    linkLabel:'FILM DETAILS',
     source:'Wikidata CC0',
-    local:false
+    local:true
   });
   const manualRecord=x=>x && /^(?:manual:[a-z0-9-]+|wd:Q[1-9][0-9]*)$/.test(x.id||'') &&
     typeof x.title==='string' && x.title.trim().length>1 &&
@@ -47,13 +49,9 @@
     /^https:\/\//.test(x.url||'');
   const normalizeManual=x=>({
     id:x.id,title:x.title.trim(),year:x.year,
-    // A verified early film uses its exact IMDb identity; its BFI source is
-    // retained in the archive's historical film reference and credits.
-    href:x.id==='manual:le-manoir-du-diable-1896'?
-      'https://www.imdb.com/title/tt0000091/':x.url,
-    linkLabel:x.id==='manual:le-manoir-du-diable-1896'?
-      'IMDb PAGE ↗':(x.sourceName||'SOURCE PAGE ↗'),
-    source:'Manually checked source',local:false
+    href:'/archive-film.html?id='+encodeURIComponent(x.id),
+    linkLabel:'FILM DETAILS',
+    source:'Manually checked source',local:true
   });
   const years=Array.from({length:currentYear-startYear+1},(_,index)=>currentYear-index);
   const grouped=new Map(years.map(y=>[y,[]]));
