@@ -172,3 +172,22 @@
 .hub-ranking-watchlist__item a{font:900 18px var(--font-display);color:#f2dedb}
 .hub-ranking-watchlist__item span{font:800 11px var(--font-display);color:#a99193}
 @media(max-width:620px){.hub-unranked{padding:10px}.hub-unranked__row>span{font-size:8px}.hub-ranking-watchlist__item a{font-size:15px}.hub-ranking-watchlist__item span{font-size:9px}}
+
+/* Separate verified film-year browsing from source-reported, non-aggregated critic ratings. */
+.hub-year-picker{display:flex;align-items:center;justify-content:space-between;gap:25px;margin:0 0 23px;padding:17px 22px;border:1px solid #633139;background:linear-gradient(115deg,#281018,#100b10)}
+.hub-year-picker h3{font:900 clamp(24px,3.3vw,39px)/1 var(--font-display);margin:7px 0}
+.hub-year-picker small{font-size:12px;color:#aa9594}
+.hub-year-picker label{display:grid;gap:6px;font:800 11px var(--font-display);letter-spacing:1px;color:#d8abb0}
+.hub-year-picker select{background:#130e10;color:#f4e3df;border:1px solid #9b404a;padding:12px;min-width:205px;font:800 14px var(--font-display)}
+.external-critic-scores{border:1px solid #5e323c;margin:11px 2px 0;background:#1c1216;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.external-critic-scores__header{grid-column:1/-1;background:#28151b;color:#e4aeb3;padding:7px 10px;font:800 10px var(--font-display);letter-spacing:.8px}
+.external-critic-scores__item{display:grid;gap:2px;align-content:start;padding:9px 12px;border-right:1px solid #5e323c;font:800 11px var(--font-display);color:#e9d7d5}
+.external-critic-scores__item:last-child{border-right:0}
+.external-critic-scores__item strong{font:900 24px var(--font-display);color:#fff5ee}
+.external-critic-scores__item:hover{background:#482128}
+.score-explainer{display:block;padding:4px 4px 5px;color:#a59294;font:500 10px/1.6 var(--font-body)}
+.external-score-empty{font:700 11px var(--font-display);color:#b1a2a0;margin:12px 2px}
+.external-score-empty a{text-decoration:underline;color:#dcb2b6}
+.film-page .external-critic-scores{max-width:530px;margin-bottom:10px}
+.film-page .external-critic-scores__item strong{font-size:32px}
+@media(max-width:700px){.hub-year-picker{padding:15px;display:grid;gap:13px}.hub-year-picker select{width:100%;max-width:100%}.external-critic-scores__item{padding:8px}.external-critic-scores__item strong{font-size:22px}}
