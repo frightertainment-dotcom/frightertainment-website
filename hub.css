@@ -108,3 +108,17 @@
 .hub-rights-note a{color:#f5b6bb;text-decoration:underline}
 @media(min-width:901px){.hub-charts{min-height:520px}.hub-showcase__bottom .hub-tile{min-height:150px}}
 @media(max-width:640px){.hub-rights-note{padding-inline:4px}.hub-charts{min-height:250px}.hub-chart-row{font-size:12px}.hub-chart-row .score{font-size:12px}}
+
+/* Poster-like editorial title artwork: no studio or distributor images are copied. */
+.movie-card__poster-fill .movie-card__placeholder{display:flex;flex-direction:column;justify-content:center;gap:15px;padding:37px 17px 24px;background:linear-gradient(175deg,#16070c75,#070507d9 90%),url('/assets/hub-haunted.svg') center/cover;transform:none}
+.movie-card__poster-fill .movie-card__placeholder>span,.movie-card__poster-fill .movie-card__placeholder>strong,.movie-card__poster-fill .movie-card__placeholder>small{position:relative;z-index:1;overflow-wrap:anywhere}
+.movie-card__poster-fill .movie-card__placeholder>.poster-mini{font:800 10px var(--font-display);letter-spacing:1.6px;color:#ecc5c9}
+.movie-card__poster-fill .movie-card__placeholder>strong{font:900 clamp(28px,3.3vw,49px)/.95 var(--font-display);text-shadow:0 3px 16px #000;max-width:100%}
+.movie-card__poster-fill .movie-card__placeholder>small{font:800 9px var(--font-display);letter-spacing:1.1px;color:#b89ba0;margin-top:10px}
+#movie-grid .movie-card:nth-child(4n+2) .movie-card__placeholder{background:linear-gradient(175deg,#0a1c2080,#06080adb 91%),url('/assets/hub-forest.svg') center/cover}
+#movie-grid .movie-card:nth-child(4n+3) .movie-card__placeholder{background:linear-gradient(175deg,#20090a80,#050508e8 90%),url('/assets/hub-door.svg') center/cover}
+#movie-grid .movie-card:nth-child(4n+4) .movie-card__placeholder{background:linear-gradient(175deg,#210a1780,#070507dc 90%),url('/assets/hub-audio.svg') center/cover}
+.hub-tile__link::after{content:"";position:absolute;inset:0}
+.hub-tile__link{z-index:2}
+.hub-tile:hover{border-color:#dd3944}
+@media(max-width:640px){.movie-card__poster-fill .movie-card__placeholder>strong{font-size:clamp(27px,6vw,42px)}}
