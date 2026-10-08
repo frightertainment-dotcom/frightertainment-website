@@ -45,8 +45,16 @@
     typeof x.title==='string' && x.title.trim().length>1 &&
     Number.isInteger(x.year) && x.year>=startYear && x.year<=currentYear &&
     /^https:\/\//.test(x.url||'');
-  const normalizeManual=x=>({id:x.id,title:x.title.trim(),year:x.year,href:x.url,
-    linkLabel:x.sourceName||'SOURCE PAGE ↗',source:'Manually checked source',local:false});
+  const normalizeManual=x=>({
+    id:x.id,title:x.title.trim(),year:x.year,
+    // A verified early film uses its exact IMDb identity; its BFI source is
+    // retained in the archive's historical film reference and credits.
+    href:x.id==='manual:le-manoir-du-diable-1896'?
+      'https://www.imdb.com/title/tt0000091/':x.url,
+    linkLabel:x.id==='manual:le-manoir-du-diable-1896'?
+      'IMDb PAGE ↗':(x.sourceName||'SOURCE PAGE ↗'),
+    source:'Manually checked source',local:false
+  });
   const years=Array.from({length:currentYear-startYear+1},(_,index)=>currentYear-index);
   const grouped=new Map(years.map(y=>[y,[]]));
   const selectSource=raw=>{
@@ -57,6 +65,10 @@
     for(const record of (raw?.manual||[])){
       if(manualRecord(record))records.set(record.id,normalizeManual(record));
     }
+    // The BFI's 1896 Le Manoir du diable is also catalogued under
+    // the English title The Haunted Castle (Wikidata Q153603).
+    // Collapse the two references to one film in the displayed year.
+    if(records.has('manual:le-manoir-du-diable-1896'))records.delete('wd:Q153603');
     // First-party film pages take priority when a title/year appears in Wikidata.
     const localKeys=new Set(officialLocal.map(x=>x.year+'|'+titleKey(x.title)));
     for(const record of records.values()){
