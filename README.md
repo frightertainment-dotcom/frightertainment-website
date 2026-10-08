@@ -1,6 +1,6 @@
 # Frightertainment website · Version 1
 
-A responsive static horror publication using the supplied Frightertainment identity and artwork. The site includes claim-sourced film records, standalone detail pages, mobile navigation, search and filters, Fright Index method, horror TV and podcast recommendation sections, editorial standards, accessibility support, SEO metadata, `robots.txt` and a sitemap.
+A responsive Frightertainment horror discovery hub. The compact homepage previews verified film information, annual charts, TV recommendations, independent horror, podcasts and games. Each category has its own page.
 
 ## Preview and checks
 
@@ -97,3 +97,9 @@ Admin endpoints require the `ADMIN_TOKEN` Worker secret and stay inactive withou
 ## Editorial positioning
 
 Frightertainment currently covers independent horror discovery: source-verified film information, cinema and streaming listings when licensed feeds become available, TV recommendations, and independently produced horror podcasts. It does **not** advertise Frightertainment Originals, film productions, cinema screenings, or future podcast episodes as planned or coming soon. Recommendations must link to genuine programme or publisher sources without implying partnership, endorsement, or UK streaming availability. Film and TV posters remain text-only until per-asset rights or suitable commercial catalogue rights have been documented.
+
+## Copyright-safe visual film links and tabbed hub
+
+Home is a compact, responsive dashboard. Separate pages: /movies.html, /tv-shows.html, /indie-movies.html, /podcasts.html, /games.html and /top-20/. No invented charts, production promises or current streaming claims. The six original manually verified films remain intact. Tabs use ordinary URLs for accessible, shareable navigation.
+
+Film cover cards are clickable visual links to local detail pages, with an additional link to the studio's original film page. Simply pointing to a webpage, hotlinking an image, using Open Graph image metadata, or providing an attribution is **not** a licence to show its poster. Only add a poster when a rightsholder permits publication or an appropriate licensed provider grants display rights. A record must have poster, posterCredit, posterPermission, posterLicenceStatus='approved', posterSourcePage, posterPermissionEvidence and posterUsageScope. The content checker rejects unapproved posters. Do not automatically mirror studio page imagery, scrape poster collections or borrow IMDb artwork. This supports an official permitted poster image in the future without relying on wholesale licences today.
