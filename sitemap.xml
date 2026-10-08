@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.frightertainment.com/</loc></url>
+  <url><loc>https://www.frightertainment.com/movies.html</loc></url>
+  <url><loc>https://www.frightertainment.com/all-horror-movies.html</loc></url>
+  <url><loc>https://www.frightertainment.com/archive-film.html</loc></url>
+  <url><loc>https://www.frightertainment.com/tv-shows.html</loc></url>
+  <url><loc>https://www.frightertainment.com/indie-movies.html</loc></url>
+  <url><loc>https://www.frightertainment.com/podcasts.html</loc></url>
+  <url><loc>https://www.frightertainment.com/games.html</loc></url>
   <url><loc>https://www.frightertainment.com/editorial-standards.html</loc></url>
   <url><loc>https://www.frightertainment.com/top-20/</loc></url>
   <url><loc>https://www.frightertainment.com/top-20/2027/</loc></url>
@@ -14,4 +21,22 @@
   <url><loc>https://www.frightertainment.com/films/victorian-psycho/</loc></url>
   <url><loc>https://www.frightertainment.com/films/werwulf/</loc></url>
   <url><loc>https://www.frightertainment.com/films/exorcist-2027/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/28-years-later/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/28-years-later-bone-temple/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/black-phone-2/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/five-nights-at-freddys-2/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/the-monkey/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/longlegs/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/together/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/heart-eyes/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/heretic/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/nosferatu/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/bring-her-back/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/send-help/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/backrooms/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/scream-7/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/insidious-out-of-the-further/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/ready-or-not-2/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/28-weeks-later/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/28-days-later/</loc></url>
 </urlset>
