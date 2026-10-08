@@ -2,6 +2,11 @@ import { test, expect } from '@playwright/test';
 
 const pages = [
   ['/', 'WELCOME'],
+  ['/movies.html','HORROR'],
+  ['/tv-shows.html','HORROR'],
+  ['/indie-movies.html','INDIE'],
+  ['/podcasts.html','HORROR'],
+  ['/games.html','HORROR'],
   ['/editorial-standards.html', 'EDITORIAL'],
   ['/top-20/', 'TOP 20'],
   ['/top-20/2026/', 'TOP 20 HORROR FILMS'],
@@ -67,14 +72,14 @@ for (const [path, heading] of [['/', 'WELCOME'], ['/top-20/2026/', 'TOP 20 HORRO
 
 test('homepage film search produces an accessible empty state', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await page.goto('/movies.html');
   await page.locator('#movie-search').fill('zz-no-match');
   await expect(page.locator('#empty-state')).toBeVisible();
   await expect(page.locator('#results-count')).toContainText('0 films');
 });
 
 test('homepage date and verified-score filters report truthful result counts', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/movies.html');
   await page.locator('[data-filter="date-tbc"]').click();
   await expect(page.locator('#results-count')).toContainText('2 films');
   await expect(page.locator('[data-filter="date-tbc"]')).toHaveAttribute('aria-pressed', 'true');
@@ -86,10 +91,22 @@ test('homepage date and verified-score filters report truthful result counts', a
 
 test('homepage recommendations do not advertise unannounced productions', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#horror-tv')).toBeVisible();
-  await expect(page.locator('#podcasts')).toBeVisible();
+  await expect(page.locator('a[href="/tv-shows.html"].active')).toHaveCount(0);
+  await expect(page.locator('#hub-ranking')).toBeVisible();
+  await expect(page.locator('a[href="/podcasts.html"]')).toBeVisible();
   await expect(page.locator('#originals')).toHaveCount(0);
-  await expect(page.locator('#horror-tv .curated-card a[href="https://www.thenosleeppodcast.com/"]')).toBeVisible();
+  await expect(page.locator('.hub-podcast a[href="/podcasts.html"]')).toBeVisible();
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
   await expect(page.locator('body')).not.toContainText('DETAILS TO BE ANNOUNCED');
+});
+
+test('homepage is compact, branded and links into distinct pages', async ({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  await expect(page.locator('.hub-brand img')).toBeVisible();
+  await expect(page.locator('.hub-tabs a')).toHaveCount(6);
+  await expect(page.locator('.hero-wordmark')).toHaveCount(0);
+  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
+  await expect(page.locator('#movie-grid')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
 });
