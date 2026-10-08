@@ -7,9 +7,9 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const publicFiles = [
-  'index.html', 'film.html', 'editorial-standards.html',
-  'app.js', 'discovery.js', 'dynamic-film.js', 'top20.js',
-  'styles.css', 'sitemap.xml'
+  'index.html', 'movies.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html', 'editorial-standards.html',
+  'app.js', 'discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js',
+  'styles.css', 'hub.css', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
   await cp(new URL(file, root), new URL(file, destination));
