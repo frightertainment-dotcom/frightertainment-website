@@ -4,7 +4,10 @@ import { createHash } from 'node:crypto';
 
 const context = { window: {} };
 runInNewContext(await readFile(new URL('../data/movies.js', import.meta.url), 'utf8'), context);
-const films = context.window.FR_MOVIES;
+// The protected manual sync covers only the original six editorial files. Expanded
+// website catalogue records are not silently granted D1 editorial approval.
+const originalIds = new Set(["other-mommy","crawlers","clayface","victorian-psycho","werwulf","exorcist-2027"]);
+const films = context.window.FR_MOVIES.filter(film => originalIds.has(film.id));
 if (films.length !== 6 || films.some(film => film.editorialStatus !== 'approved')) throw new Error('Expected all six manually approved Frightertainment film records.');
 for (const film of films) {
   if (!Array.isArray(film.claims) || !film.claims.length || film.claims.some(claim => !/^https:\/\//.test(claim.source) || !claim.checked || !claim.territory)) throw new Error(`Claim provenance check failed: ${film.id}`);
