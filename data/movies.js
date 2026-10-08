@@ -1,5 +1,5 @@
-// Studio-verified film facts and manually checked editorial critic references.
-// External score snapshots are SOURCE-REPORTED facts, not Fright Index scores, live API data or approved-for-aggregation reviews.
+// Studio-verified film facts and individually checked published-score editorial references.
+// No images, third-party feeds, rights-cleared Fright Index reviews, or automated score scraping.
 window.FR_MOVIES = [
   {
     "id": "other-mommy",
@@ -1048,7 +1048,20 @@ window.FR_MOVIES = [
     "posterCredit": "",
     "posterPermission": "",
     "trailer": null,
-    "reviews": []
+    "reviews": [],
+    "criticReferenceSnapshots": [
+      {
+        "source": "Rotten Tomatoes",
+        "label": "Critic approval",
+        "value": 86,
+        "outOf": 100,
+        "display": "86%",
+        "kind": "positive-review-percentage",
+        "url": "https://www.rottentomatoes.com/m/backrooms",
+        "criticCount": 317,
+        "checked": "2026-10-08"
+      }
+    ]
   },
   {
     "id": "scream-7",
@@ -1150,7 +1163,20 @@ window.FR_MOVIES = [
     "posterCredit": "",
     "posterPermission": "",
     "trailer": null,
-    "reviews": []
+    "reviews": [],
+    "criticReferenceSnapshots": [
+      {
+        "source": "Rotten Tomatoes",
+        "label": "Critic approval",
+        "value": 57,
+        "outOf": 100,
+        "display": "57%",
+        "kind": "positive-review-percentage",
+        "url": "https://www.rottentomatoes.com/m/insidious_out_of_the_further",
+        "criticCount": 136,
+        "checked": "2026-10-08"
+      }
+    ]
   },
   {
     "id": "ready-or-not-2",
