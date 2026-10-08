@@ -14,15 +14,17 @@
       const year=(film.claims||[]).find(c=>['releaseYear','filmYear'].includes(c.field))?.value ||
         (film.claims||[]).find(c=>c.field==='releaseDate')?.value?.slice(0,4);
       return Number(year)===yearToDisplay() && film.editorialStatus==='approved';
-    }).sort((a,b)=>a.title.localeCompare(b.title)).slice(0,5);
+    }).sort((a,b)=>(Number(Boolean(b.criticReferenceSnapshots?.length))-Number(Boolean(a.criticReferenceSnapshots?.length)))||a.title.localeCompare(b.title)).slice(0,5);
     if (!films.length)return;
     const section=document.createElement('section');section.className='hub-unranked';
-    const label=document.createElement('p');label.textContent='SOURCE-VERIFIED FILMS · NOT RANKED';
+    const label=document.createElement('p');label.textContent='SOURCE-VERIFIED FILMS · UNRANKED · EXTERNAL SCORES WHEN AVAILABLE';
     section.append(label);
     for(const film of films){
       const row=document.createElement('div');row.className='hub-unranked__row';
       const link=document.createElement('a');link.href='/films/'+encodeURIComponent(film.id)+'/';link.textContent=film.title;
-      const waiting=document.createElement('span');waiting.textContent='NO CRITIC SCORE';
+      const waiting=document.createElement('span');
+      const refs=Array.isArray(film.criticReferenceSnapshots)?film.criticReferenceSnapshots:[];
+      waiting.textContent=refs.length?refs.map(item=>item.source==='Rotten Tomatoes'?'RT '+item.display:item.source==='Metacritic'?'MC '+item.display:item.display).join(' · '):'FRIGHT INDEX PENDING';
       row.append(link,waiting);section.append(row);
     }
     root.append(section);
