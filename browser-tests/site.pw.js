@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 const pages = [
   ['/', 'WELCOME'],
   ['/movies.html','HORROR'],
+  ['/all-horror-movies.html','ALL HORROR'],
   ['/tv-shows.html','HORROR'],
   ['/indie-movies.html','INDIE'],
   ['/podcasts.html','HORROR'],
@@ -234,4 +235,62 @@ test('homepage score panel shows a compact dated comparison without claiming it 
   await expect(page.locator('.hub-preview-chart__note')).toContainText('Not licensed for public syndication');
   await expect(page.locator('#hub-ranking')).not.toContainText('RANKINGS PENDING');
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('All Horror Movies offers years 1896 through current year as initially closed accordions',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  const year=new Date().getUTCFullYear();
+  await expect(page.locator('.horror-year')).toHaveCount(year-1896+1);
+  await expect(page.locator('#horror-year-1896')).toBeVisible();
+  await expect(page.locator('#horror-year-'+year)).toBeVisible();
+  await expect(page.locator('.horror-year[open]')).toHaveCount(0);
+  await expect(page.locator('.horror-year__search')).toHaveCount(0);
+  await expect(page.getByRole('link',{name:/ALL HORROR MOVIES/}).first()).toBeVisible();
+});
+
+test('opened year has own A–Z films and searchable links, other years remain closed',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  const y=page.locator('#horror-year-2026');
+  await y.locator('summary').click();
+  await expect(y).toHaveAttribute('open','');
+  const search=y.locator('.horror-year__search');
+  await expect(search).toBeVisible();
+  await expect(y.locator('.horror-year__film')).toHaveCount(11);
+  await search.fill('bone temple');
+  await expect(y.locator('.horror-year__film:visible')).toHaveCount(1);
+  await expect(y).toContainText('28 Years Later: The Bone Temple');
+  await expect(page.locator('#horror-year-2007')).not.toHaveAttribute('open','');
+  const link=y.locator('.horror-year__film:visible a').first();
+  await expect(link).toHaveAttribute('href','/films/28-years-later-bone-temple/');
+});
+
+test('franchise archive spans 2002, 2007, 2025 and 2026 without erasing history',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  for(const [year,title] of [[2002,'28 Days Later'],[2007,'28 Weeks Later'],[2025,'28 Years Later'],[2026,'28 Years Later: The Bone Temple']]){
+    const y=page.locator('#horror-year-'+year);
+    await y.locator('summary').click();
+    await expect(y.locator('.horror-year__film-link',{hasText:title}).first()).toBeVisible();
+    await y.locator('summary').click();
+  }
+  const earliest=page.locator('#horror-year-1896');
+  await earliest.locator('summary').click();
+  await expect(earliest).toContainText('Le Manoir du diable');
+  await expect(earliest.locator('a[href*="bfi.org.uk"]').first()).toBeVisible();
+});
+
+test('year jump expands target section and search is scoped to it',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  await page.selectOption('#archive-jump','2007');
+  await expect(page.locator('#horror-year-2007')).toHaveAttribute('open','');
+  await expect(page.locator('#horror-year-2007 .horror-year__search')).toBeVisible();
+  await expect(page.locator('#horror-year-2026')).not.toHaveAttribute('open','');
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('all horror movie navigation is a sub-tab under main Movies tab',async({page})=>{
+  await page.goto('/movies.html');
+  await page.locator('.hub-subtabs a[href="/all-horror-movies.html"]').click();
+  await expect(page).toHaveURL(/all-horror-movies\.html$/);
+  await expect(page.locator('.hub-subtabs a[aria-current="page"]')).toHaveText('ALL HORROR MOVIES');
+  await expect(page.locator('.hub-tabs a[href="/movies.html"]')).toHaveClass(/active/);
 });
