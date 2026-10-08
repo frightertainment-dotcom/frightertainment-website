@@ -108,7 +108,7 @@
       nothing.hidden=count!==0;
     }
     search.addEventListener('input',()=>{window.clearTimeout(debounce);debounce=window.setTimeout(filter,75);});
-    panel.append(searchLabel,tally,list,nothing);container.append(panel);filter();
+    panel.append(tally,list,nothing);container.append(searchLabel,panel);filter();
     container.dataset.rendered='true';
   }
   function showArchive(raw){
