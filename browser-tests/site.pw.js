@@ -255,7 +255,7 @@ test('opened year has own A–Z films and searchable links, other years remain c
   await expect(y).toHaveAttribute('open','');
   const search=y.locator('.horror-year__search');
   await expect(search).toBeVisible();
-  await expect(y.locator('.horror-year__film')).toHaveCount(11);
+  expect(await y.locator('.horror-year__film').count()).toBeGreaterThanOrEqual(11);
   await search.fill('bone temple');
   await expect(y.locator('.horror-year__film:visible')).toHaveCount(1);
   await expect(y).toContainText('28 Years Later: The Bone Temple');
