@@ -81,11 +81,11 @@ test('homepage film search produces an accessible empty state', async ({ page })
 test('homepage date and verified-score filters report truthful result counts', async ({ page }) => {
   await page.goto('/movies.html');
   await page.locator('[data-filter="date-tbc"]').click();
-  await expect(page.locator('#results-count')).toContainText('18 films');
+  await expect(page.locator('#results-count')).toContainText('6 films');
   await expect(page.locator('[data-filter="date-tbc"]')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('[data-filter="reviewed"]').click();
-  await expect(page.locator('#results-count')).toContainText('0 films');
-  await expect(page.locator('#empty-state')).toBeVisible();
+  await expect(page.locator('#results-count')).toContainText('4 films');
+  await expect(page.locator('.external-critic-scores')).toHaveCount(4);
 });
 
 
@@ -117,8 +117,7 @@ test('navigation works between all main sections and official movie source', asy
   await expect(page).toHaveURL(/movies\.html$/);
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
   await page.locator('#movie-more').click();
-  await page.locator('#movie-more').click();
-  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(22);
+  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(11);
   const official = page.locator('.movie-card__official a').first();
   await expect(official).toHaveAttribute('href', /^https:\/\//);
   await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
@@ -164,8 +163,38 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
 
 test('release calendar uses source claims and does not invent live UK showtimes',async({page})=>{
   await page.goto('/movies.html');
-  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(5);
+  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(7);
   const urls=await page.locator('#hub-release-list a.hub-release-source').evaluateAll(a=>a.map(x=>x.getAttribute('href')));
   expect(urls.every(x=>x.startsWith('https://'))).toBe(true);
   await expect(page.locator('#hub-release-list')).toContainText('No UK availability inferred');
+});
+
+test('2026 is default and earlier films are under their actual original years', async ({page})=>{
+  await page.goto('/movies.html');
+  await expect(page.locator('#movie-year')).toHaveValue('2026');
+  await expect(page.locator('#results-count')).toContainText('11 films');
+  await expect(page.locator('#movie-grid')).toContainText('28 Years Later: The Bone Temple');
+  await expect(page.locator('#movie-grid')).not.toContainText('28 Weeks Later');
+  await expect(page.locator('#movie-grid')).not.toContainText('28 Years Later</');
+  await page.selectOption('#movie-year', '2025');
+  await expect(page.locator('#results-count')).toContainText('7 films');
+  await expect(page.locator('#movie-grid')).toContainText('28 Years Later');
+  await page.selectOption('#movie-year', 'older');
+  await expect(page.locator('#results-count')).toContainText('4 films');
+  await expect(page.locator('#movie-grid')).toContainText('28 Weeks Later');
+  await page.selectOption('#movie-year', 'all');
+  await expect(page.locator('#results-count')).toContainText('23 films');
+});
+
+test('Bone Temple has manually sourced external critic metrics and does not invent a Fright Index',async({page})=>{
+  await page.goto('/movies.html');
+  const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
+  await expect(card).toBeVisible();
+  await expect(card.locator('.external-critic-scores')).toContainText('91%');
+  await expect(card.locator('.external-critic-scores')).toContainText('81/100');
+  await expect(card.locator('.movie-card__score')).toContainText('FRIGHT');
+  await card.getByRole('link',{name:'28 Years Later: The Bone Temple'}).first().click();
+  await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
+  await expect(page.locator('#film-detail')).toContainText('PUBLISHED CRITIC RATINGS');
+  await expect(page.locator('#film-detail')).toContainText('91%');
 });
