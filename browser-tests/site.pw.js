@@ -93,7 +93,7 @@ test('homepage recommendations do not advertise unannounced productions', async 
   await page.goto('/');
   await expect(page.locator('.hub-showcase .hub-tv')).toBeVisible();
   await expect(page.locator('#hub-ranking')).toBeVisible();
-  await expect(page.locator('a[href="/podcasts.html"]')).toBeVisible();
+  await expect(page.locator('.hub-tabs a[href="/podcasts.html"]')).toBeVisible();
   await expect(page.locator('#originals')).toHaveCount(0);
   await expect(page.locator('.hub-podcast a[href="/podcasts.html"]')).toBeVisible();
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
