@@ -7,8 +7,8 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const publicFiles = [
-  'index.html', 'movies.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html', 'editorial-standards.html',
-  'app.js', 'discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'rankings-preview.js',
+  'index.html', 'movies.html', 'all-horror-movies.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html', 'editorial-standards.html',
+  'app.js', 'discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'rankings-preview.js', 'horror-archive.js',
   'styles.css', 'hub.css', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
@@ -19,6 +19,8 @@ for (const directory of ['assets', 'films', 'top-20']) {
 }
 await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
+await mkdir(new URL('data/archive/', destination), {recursive:true});
+await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
 
 // Prevent any staging page from being indexed, including generated film and ranking pages.
 async function markHtmlNoIndex(directory) {
