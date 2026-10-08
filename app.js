@@ -42,7 +42,7 @@
     return '<div class="external-critic-scores"><div class="external-critic-scores__header">CRITIC SCORES AT PUBLISHER · SNAPSHOT '+
       escapeHTML(entries[0].checked)+'</div>'+
       entries.map(item=>'<a class="external-critic-scores__item" href="'+escapeHTML(safeURL(item.url))+
-       '" target="_blank" rel="noopener noreferrer"><span>'+escapeHTML(item.source)+'</span><strong>'+escapeHTML(item.display)+'</strong></a>').join('')+
+       '" target="_blank" rel="noopener noreferrer"><span>'+escapeHTML(item.source)+'</span><strong>'+escapeHTML(item.display)+'</strong><small>'+escapeHTML(item.kind==='positive-review-percentage'?'Critics giving positive reviews':'Weighted critic score')+' · '+escapeHTML(item.criticCount)+' reviews</small></a>').join('')+
       '</div><small class="score-explainer">Publisher ratings have different methods, can change and are not part of the Fright Index.</small>';
   };
   const cardRelease = movie => {
