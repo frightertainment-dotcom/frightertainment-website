@@ -3,9 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build:pages": "node scripts/build-pages.mjs",
     "check": "node scripts/check-content.mjs",
+    "test": "node --test",
+    "validate:worker": "wrangler deploy --dry-run --outdir /tmp/frightertainment-worker-dry-run",
+    "worker:dev": "wrangler dev --persist-to .wrangler/discovery",
+    "worker:migrations:local": "wrangler d1 migrations apply frightertainment-discovery --local --persist-to .wrangler/discovery",
     "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "wrangler": "4.148.0"
   }
 }

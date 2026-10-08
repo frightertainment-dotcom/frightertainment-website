@@ -51,3 +51,38 @@ The supplied artwork moved from `Assets/` to `assets/` without image edits or re
 ## Hosting
 
 Static files publish from the repository root after editorial and rights review. Canonical metadata still targets `https://www.frightertainment.com/`; the public domain and hosting have not been verified or changed here. No Cloudflare or DNS settings are managed by this project.
+
+## Automated Horror Discovery (prepared, not activated)
+
+The site now includes homepage panels for annual Top 20 rankings, actual cinema showtimes, recent theatrical release dates, streaming availability, coming soon and weekly trending horror. Country-specific feed data is shown with source links and freshness. Editorially curated Frightertainment Originals and the manually checked six-film watchlist remain separate from automated feeds.
+
+Annual pages are generated for the current year, three prior years and the next year by `scripts/build-pages.mjs`; rebuilding in a later year extends the sequence. `/top-20/` is the archive. Public rankings are computed from approved, permission-cleared numeric professional critic reviews. The methodology uses one contribution per critic, an equal-weight average normalized to /100, nearest-integer rounding and a minimum of three distinct critics. Unsupported or insufficient data remains pending.
+
+The Worker in `worker/` provides a scheduled ingestion pipeline, D1 snapshots, country-scoped API, ranking history, candidate review queue, protected editorial endpoints and live no-store showtime lookup. Daily Cron refreshes feed snapshots and rankings; a weekly Cron adds unapproved horror discovery candidates to the review queue. Failed provider refreshes preserve the previous valid snapshot and are logged. The client geolocation is used only for a visitor-requested, live showtime query.
+
+### Local Worker and quality checks
+
+Requires Node.js 22 or newer. No API accounts, licences, secrets or Cloudflare setup are required to run the checks.
+
+```sh
+npm install
+npm run build:pages
+npm run check
+npm test
+npm run validate:worker
+npm run worker:migrations:local
+```
+
+`npm run validate:worker` is a Wrangler dry run, not a deploy. Synthetic fixtures live only under `test/fixtures/` and are loaded only by Node's test runner; they are never displayed or used by production Worker code. You can use `npm run worker:dev` after applying the local D1 migration.
+
+Read [API_LICENSING.md](API_LICENSING.md) before activating any provider. It documents the reviewed API terms, costs/quotas and attribution requirements, required owner actions, Worker secret names and the deliberately unset Cloudflare database ID. Commercial services are disabled by default; until licences and service configuration are present, the website reports unavailable data instead of inventing it. No Worker route, Cloudflare account setting, public domain or DNS value is changed by this repository.
+
+### Data tables
+
+- `canonical_films` stores editorially approved identity records and separately sourced release-path labels. Automated discoveries are candidates only.
+- `critic_reviews` stores one approved, licensed numeric score per critic, film and year, along with permission evidence and canonical source URL.
+- `dataset_snapshots` and `current_datasets` retain validated territory-specific provider results and atomically point to the latest valid snapshot.
+- `rank_history` records each daily score, position, critic count and date for movement labels. `update_runs` stores published, failed and skipped ingestion attempts.
+- `review_queue` retains weekly discovery candidates for administrative review.
+
+Admin endpoints require the `ADMIN_TOKEN` Worker secret and stay inactive without it. Provider API keys must be configured as Worker secrets rather than committed files or browser configuration. See the owner setup checklist in [API_LICENSING.md](API_LICENSING.md).

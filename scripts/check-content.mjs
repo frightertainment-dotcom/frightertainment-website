@@ -2,6 +2,7 @@ import { readFile, access } from 'node:fs/promises';
 import { runInNewContext } from 'node:vm';
 
 const root = new URL('../', import.meta.url);
+const currentYear = new Date().getUTCFullYear();
 const context = { window: {} };
 runInNewContext(await readFile(new URL('data/movies.js', root), 'utf8'), context);
 const movies = context.window.FR_MOVIES;
@@ -52,12 +53,31 @@ for (const file of ['index.html', 'editorial-standards.html']) {
   const html = await readFile(new URL(file, root), 'utf8');
   if (/Assets\//.test(html)) errors.push(`${file} contains an uppercase Assets/ path`);
   for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle', 'src="app.js"']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
+  if (!html.includes(`href="top-20/${currentYear}/"`) && !html.includes(`href="/top-20/${currentYear}/"`) && !html.includes('href="top-20/"')) errors.push(`${file} is missing the annual Top 20 link`);
   for (const [, ref] of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)/g)) {
     try { await access(new URL(ref, root)); } catch { errors.push(`${file} refers to missing ${ref}`); }
   }
 }
+const top20Archive = await readFile(new URL('top-20/index.html', root), 'utf8');
+for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `href="/top-20/${currentYear}/"`, 'href="/editorial-standards.html"']) if (!top20Archive.includes(required)) errors.push(`Top 20 archive is missing ${required}`);
+const rankingPages = (await import('node:fs/promises')).readdir;
+const rankingDirectories = (await rankingPages(new URL('top-20/', root), { withFileTypes: true })).filter(entry => entry.isDirectory());
+for (const directory of rankingDirectories) {
+  if (!/^\d{4}$/.test(directory.name)) continue;
+  const file = `top-20/${directory.name}/index.html`;
+  const html = await readFile(new URL(file, root), 'utf8');
+  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `data-ranking-year="${directory.name}"`, 'src="/top20.js"', 'canonical']) if (!html.includes(required)) errors.push(`${file} is missing ${required}`);
+}
+const discoveryScript = await readFile(new URL('discovery.js', root), 'utf8');
+if (discoveryScript.includes('test/fixtures')) errors.push('Production discovery client must not import test fixtures');
+const workerSource = await readFile(new URL('worker/index.js', root), 'utf8');
+if (/https?:\/\/[^\s"']*(?:API_KEY|TOKEN)=/i.test(workerSource)) errors.push('Possible provider credential embedded in Worker source');
+const apiLicensing = await readFile(new URL('API_LICENSING.md', root), 'utf8');
+for (const provider of ['TMDB', 'Watchmode', 'MovieGlu', 'Rotten Tomatoes', 'Cloudflare']) if (!apiLicensing.includes(provider)) errors.push(`API licensing notes missing ${provider}`);
 const sitemap = await readFile(new URL('sitemap.xml', root), 'utf8');
 for (const movie of movies) if (!sitemap.includes(`/films/${movie.id}/`)) errors.push(`Film missing from sitemap: ${movie.id}`);
 if (!sitemap.includes('/editorial-standards.html')) errors.push('Editorial standards page missing from sitemap');
+if (!sitemap.includes(`/top-20/${currentYear}/`)) errors.push(`${currentYear} annual Top 20 page missing from sitemap`);
+if (!sitemap.includes('/top-20/')) errors.push('Annual ranking archive missing from sitemap');
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
