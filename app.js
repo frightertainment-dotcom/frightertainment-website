@@ -19,8 +19,19 @@
     return Number.isNaN(date.valueOf()) ? '' : new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(date);
   };
   const normalise = review => typeof review.score === 'number' && typeof review.outOf === 'number' && review.outOf > 0 && review.score >= 0 && review.score <= review.outOf && safeURL(review.url) && review.source && review.checked && review.permission === "approved" ? review.score * 100 / review.outOf : null;
-  const validReviews = movie => (movie.reviews || []).filter(review => normalise(review) !== null);
-  const frightIndex = movie => { const scores = validReviews(movie).map(normalise); return scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null; };
+  const validReviews = movie => {
+    const used = new Set();
+    return (movie.reviews || []).filter(review => {
+      const key = String(review.criticId || review.criticName || review.source || '')+'|'+String(review.url || '');
+      if (!review.professionalVerified || normalise(review) === null || used.has(key)) return false;
+      used.add(key);
+      return true;
+    });
+  };
+  const frightIndex = movie => {
+    const scores = validReviews(movie).map(normalise);
+    return scores.length >= 3 ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
+  };
   const recordHasDate = movie => releaseClaims(movie).length > 0;
   const recordYear = movie => Number(firstClaim(movie, 'releaseYear')?.value || firstClaim(movie, 'filmYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
   const scoreSnapshots = movie => Array.isArray(movie.criticReferenceSnapshots) ? movie.criticReferenceSnapshots : [];
