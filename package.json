@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build:pages": "node scripts/build-pages.mjs",
+    "build:pages": "node scripts/build-pages.mjs && node scripts/build-editorial.mjs",
     "check": "node scripts/check-content.mjs",
     "test": "node --test",
     "test:browser": "playwright test",
