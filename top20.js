@@ -22,7 +22,6 @@
       const refs=Array.isArray(film.criticReferenceSnapshots)?film.criticReferenceSnapshots:[];
       badge.textContent=refs.length ? 'FRIGHT INDEX PENDING' : 'NO VERIFIED FRIGHT INDEX';
       card.append(a,badge);
-      const refs=Array.isArray(film.criticReferenceSnapshots)?film.criticReferenceSnapshots:[];
       if(refs.length){
         const sources=document.createElement('small');sources.className='hub-ranking-watchlist__refs';
         sources.textContent='Publisher scores checked '+refs[0].checked+': ';
