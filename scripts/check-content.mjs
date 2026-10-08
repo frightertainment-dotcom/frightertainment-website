@@ -147,5 +147,22 @@ for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
 const calendarClient = await readFile(new URL('release-calendar.js',root),'utf8');
 if(!calendarClient.includes("claim.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
 if(!(await readFile(new URL('movies.html',root),'utf8')).includes('id="hub-release-list"')) errors.push('Release calendar is missing from the Movies page');
+// The private trial comparison must remain explicitly gated and must never
+// appear as a licensed public RT feed or as the independently scored Fright Index.
+const previewScoreModule = await readFile(new URL('rankings-preview.js',root),'utf8');
+const rankingClient = await readFile(new URL('top20.js',root),'utf8');
+const homepageClient = await readFile(new URL('hub.js',root),'utf8');
+const annualRenderer = await readFile(new URL('scripts/build-pages.mjs',root),'utf8');
+const previewBundler = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+const homeMarkup = await readFile(new URL('index.html',root),'utf8');
+for (const [file,source] of [['home',homeMarkup],['annual renderer',annualRenderer],['preview bundler',previewBundler]]) {
+  if(!source.includes('rankings-preview.js')) errors.push(file+': preview comparisons module not linked');
+}
+if(!previewScoreModule.includes('frightertainment-private-preview') ||
+   !previewScoreModule.includes("item.source==='Rotten Tomatoes'"))
+  errors.push('Preview ranking data source or staging domain gate missing');
+if(!rankingClient.includes('helper?.preview') || !homepageClient.includes('helper?.preview'))
+  errors.push('Public-domain bypass guard on score comparison');
+
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
