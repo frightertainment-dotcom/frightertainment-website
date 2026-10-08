@@ -42,7 +42,7 @@
   };
   const grid = $('#movie-grid');
   if (grid) {
-    const state = { filter: 'all', query: '', sort: 'title' };
+    const state = { filter: 'all', query: '', sort: 'title', visible: 8 };
     const render = () => {
       const filtered = movies.filter(movie => {
         const dateKnown = recordHasDate(movie);
@@ -54,7 +54,11 @@
       filtered.sort((a, b) => state.sort === 'date'
         ? (releaseClaims(a)[0]?.value || firstClaim(a, 'releaseYear')?.value || '9999').localeCompare(releaseClaims(b)[0]?.value || firstClaim(b, 'releaseYear')?.value || '9999') || a.title.localeCompare(b.title)
         : a.title.localeCompare(b.title));
-      grid.innerHTML = filtered.map(cardMarkup).join('');
+      grid.innerHTML = filtered.slice(0,state.visible).map(cardMarkup).join('');
+      const more = $('#movie-more');
+      if (more) { more.hidden = filtered.length <= state.visible; more.textContent = `SHOW MORE FILMS (${Math.min(8, filtered.length-state.visible)} NEXT)`; }
+      const shown = $('#movie-shown');
+      if(shown) shown.textContent = `Showing ${Math.min(state.visible,filtered.length)} of ${filtered.length}`;
       $('#empty-state').hidden = filtered.length > 0;
       $('#results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'film' : 'films'}`;
       $('#total-count').textContent = String(movies.length).padStart(2, '0');
@@ -63,11 +67,13 @@
       const chip = event.target.closest('[data-filter]');
       if (!chip) return;
       state.filter = chip.dataset.filter;
+      state.visible = 8;
       $$('[data-filter]').forEach(button => { const active = button === chip; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
       render();
     });
-    $('#movie-search').addEventListener('input', event => { state.query = event.target.value; render(); });
-    $('#movie-sort').addEventListener('change', event => { state.sort = event.target.value; render(); });
+    $('#movie-search').addEventListener('input', event => { state.query = event.target.value; state.visible = 8; render(); });
+    $('#movie-sort').addEventListener('change', event => { state.sort = event.target.value; state.visible = 8; render(); });
+    $('#movie-more')?.addEventListener('click', () => { state.visible += 8; render(); });
     render();
   }
 
