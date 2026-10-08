@@ -52,7 +52,7 @@ for (const movie of movies) {
 for (const file of ['index.html', 'editorial-standards.html']) {
   const html = await readFile(new URL(file, root), 'utf8');
   if (/Assets\//.test(html)) errors.push(`${file} contains an uppercase Assets/ path`);
-  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle', 'src="app.js"']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
+  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle', 'src="/app.js"']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
   if (!html.includes(`href="top-20/${currentYear}/"`) && !html.includes(`href="/top-20/${currentYear}/"`) && !html.includes('href="top-20/"')) errors.push(`${file} is missing the annual Top 20 link`);
   for (const [, ref] of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)/g)) {
     try { await access(new URL(ref, root)); } catch { errors.push(`${file} refers to missing ${ref}`); }
@@ -92,6 +92,18 @@ if (!sitemap.includes('/top-20/')) errors.push('Annual ranking archive missing f
 const homepageEditorial = await readFile(new URL('index.html', root), 'utf8');
 if (!homepageEditorial.includes('id="horror-tv"') || !homepageEditorial.includes('id="podcasts"')) errors.push('Homepage must include television and podcast recommendations');
 if (/FRIGHTERTAINMENT ORIGINALS|DETAILS TO BE ANNOUNCED|id="originals"|href="#originals"/i.test(homepageEditorial)) errors.push('Unannounced production/promotional claims must not appear on homepage');
+
+
+for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html']) {
+  const markup = await readFile(new URL(page,root),'utf8');
+  for (const needed of ['class="hub-tabs"', 'src="/app.js"', 'id="mobile-nav"', 'href="/hub.css"'])
+    if (!markup.includes(needed)) errors.push(page + ' missing required navigation or styling: ' + needed);
+}
+const homeHub = await readFile(new URL('index.html',root),'utf8');
+if (homeHub.includes('hero-wordmark') || homeHub.includes('FRIGHTERTAINMENT ORIGINALS') || !homeHub.includes('id="hub-ranking"')) errors.push('Homepage must be compact without duplicate wordmark or unannounced productions');
+const buildSource = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html'])
+  if (!buildSource.includes("'" + page + "'")) errors.push('Preview must include ' + page);
 
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
