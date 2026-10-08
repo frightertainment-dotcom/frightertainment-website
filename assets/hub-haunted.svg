@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 730" role="img" aria-label="Original illustrated haunted house under a red moon"><defs>
+<radialGradient id="sky" cx="70%" cy="50%" r="85%"><stop stop-color="#5c1720"/><stop offset=".48" stop-color="#230c13"/><stop offset="1" stop-color="#07070b"/></radialGradient>
+<radialGradient id="moon"><stop stop-color="#efafaf"/><stop offset=".58" stop-color="#c45761"/><stop offset="1" stop-color="#6f212f"/></radialGradient>
+<linearGradient id="mist" x2="0" y2="1"><stop stop-color="#a9444c" stop-opacity=".16"/><stop offset="1" stop-color="#070609"/></linearGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="23"/></filter></defs>
+<rect width="1600" height="730" fill="url(#sky)"/><g opacity=".2" fill="#d7a7a6"><circle cx="850" cy="53" r="2"/><circle cx="1300" cy="160" r="1.6"/><circle cx="1080" cy="92" r="1"/><circle cx="790" cy="210" r="1.5"/><circle cx="1450" cy="105" r="1.5"/></g>
+<circle cx="1210" cy="240" r="155" fill="#e73845" opacity=".09" filter="url(#blur)"/><circle cx="1210" cy="240" r="103" fill="url(#moon)" opacity=".85"/>
+<path d="M0 550 90 500 182 535 283 475 400 523 505 470 625 505 700 470 790 523 910 470 1024 505 1110 464 1210 503 1320 440 1450 485 1600 430V730H0Z" fill="#0b0b10"/>
+<g stroke="#08080c" stroke-width="12" stroke-linecap="round" fill="none" opacity=".85"><path d="M970 720 975 480 920 370M975 480l78-106 14-84M975 510l-102-90-25-117M1484 730l-17-380 82-95M1467 410l-92-87-15-74M1468 480l97-68"/></g>
+<g fill="#08090e" stroke="#27181f" stroke-width="4"><path d="M965 520v-205h62v-72l74-52 73 52v42h90v-65l80-48 74 48v300z"/><path d="M1039 325l96-85 95 85v195h-191z"/><path d="M1293 254v-98h41v98z"/><path d="M1058 375h-40v145h40z"/></g>
+<g fill="#c6212e" opacity=".9"><path d="M1091 355h29v45h-29z"/><path d="M1150 354h28v45h-28z"/><path d="M1302 324h28v47h-28z"/><path d="M1361 327h29v44h-29z"/><path d="M1216 422h27v52h-27z"/></g>
+<g stroke="#1a1016" stroke-width="5"><path d="M1104 354v47M1090 378h30M1164 354v47M1150 377h28M1316 324v47M1302 348h28M1375 327v44M1361 351h29"/></g>
+<path d="M0 650c245-60 410-30 598-64 178-26 440 18 611-30 162-44 277-25 391 0v174H0z" fill="#210d16" opacity=".6"/>
+<ellipse cx="1250" cy="590" rx="600" ry="82" fill="#af263e" opacity=".12" filter="url(#blur)"/>
+<path d="M0 665c278-71 406-15 640-53 198-30 392 19 598-20 143-24 240-10 362 10v128H0z" fill="url(#mist)" opacity=".8"/>
+</svg>
