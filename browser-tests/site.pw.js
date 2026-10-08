@@ -210,3 +210,28 @@ test('four franchise instalments link to historically correct film pages',async(
   await expect(links.nth(2)).toContainText('2025');
   await expect(links.nth(3)).toContainText('2026');
 });
+
+test('private 2026 scoreboard shows a six-film sourced partial chart instead of generic pending',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/top-20/2026/');
+  await expect(page.locator('.hub-rt-chart__entry')).toHaveCount(6);
+  await expect(page.locator('#ranking-status')).toContainText('6 of 11 tracked 2026 films');
+  await expect(page.locator('#ranking-method')).toContainText('PRIVATE PREVIEW ONLY');
+  await expect(page.locator('.hub-rt-chart__entry').first()).toContainText('Send Help');
+  await expect(page.locator('.hub-rt-chart__entry').first()).toContainText('92%');
+  await expect(page.locator('.hub-rt-chart__entry').nth(1)).toContainText('The Bone Temple');
+  await expect(page.locator('.hub-rt-chart__entry').nth(1)).toContainText('91%');
+  await expect(page.locator('.hub-rt-unscored')).toContainText('5 more tracked 2026 films');
+  await expect(page.locator('.hub-rt-chart')).not.toContainText('28 Weeks Later');
+  await expect(page.locator('.hub-rt-chart')).not.toContainText('28 Years Later:');
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('homepage score panel shows a compact dated comparison without claiming it is live',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  await expect(page.locator('#hub-ranking .hub-preview-chart__entry')).toHaveCount(5);
+  await expect(page.locator('.hub-charts__top p')).toContainText('incomplete comparison');
+  await expect(page.locator('.hub-preview-chart__note')).toContainText('Not licensed for public syndication');
+  await expect(page.locator('#hub-ranking')).not.toContainText('RANKINGS PENDING');
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
