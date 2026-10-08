@@ -14,6 +14,10 @@ function decorateHubLayout(html) {
   const sectionTabs = [['/', 'HOME'], ['/movies.html','MOVIES'], ['/tv-shows.html','TV SHOWS'],
     ['/indie-movies.html','INDIE MOVIES'], ['/podcasts.html','PODCASTS'], ['/games.html','GAMES']]
     .map(([href,label]) => '<a href="' + href + '">' + label + '</a>').join('');
+  if (!html.includes('class="skip-link"')) {
+    html = html.replace(/<body([^>]*)>/, '<body$1><a class="skip-link" href="#main-content">Skip to main content</a>');
+    html = html.replace('<main class="shell film-page"', '<main id="main-content" class="shell film-page"');
+  }
   return html
     .replace(/<nav class="nav"[^>]*>[\s\S]*?<\/nav>/,
       '<nav class="hub-tabs" aria-label="Main site sections">' + sectionTabs + '</nav>')
@@ -63,6 +67,14 @@ for (const year of rankingYears) {
   await writeFile(new URL('index.html', directory), html);
 }
 
+// Roll the global navigation and homepage chart into the next year automatically.
+for (const filename of ['index.html','movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','film.html','editorial-standards.html']) {
+  const file = new URL('../' + filename, import.meta.url);
+  let source = await readFile(file, 'utf8');
+  source = source.replace(/\/top-20\/20\d{2}\//g, '/top-20/' + currentYear + '/')
+    .replace(/TOP 20 HORROR FILMS? · 20\d{2}/g, 'TOP 20 HORROR FILMS · ' + currentYear);
+  await writeFile(file, source);
+}
 const homepagePath = new URL('../index.html', import.meta.url);
 let homepage = await readFile(homepagePath, 'utf8');
 homepage = homepage.replace(/\/top-20\/\d{4}\//g, `/top-20/${currentYear}/`)
