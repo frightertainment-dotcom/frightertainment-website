@@ -201,5 +201,23 @@ if(!homeForArchive.includes('href="/all-horror-movies.html"')||
   errors.push('All Horror Movies must be accessible as a Movies subtab and homepage link');
 const siteMapArchive=await readFile(new URL('sitemap.xml',root),'utf8');
 if(!siteMapArchive.includes('/all-horror-movies.html'))errors.push('Sitemap missing all-year horror archive');
+const archiveDetailHtml = await readFile(new URL('archive-film.html',root),'utf8');
+const archiveDetailJs = await readFile(new URL('archive-film.js',root),'utf8');
+const archivePageJs = await readFile(new URL('horror-archive.js',root),'utf8');
+const stagingBundle = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+for(const file of ['archive-film.html','archive-film.js']){
+  if(!stagingBundle.includes("'"+file+"'")) errors.push('Private Pages bundle missing '+file);
+}
+if(!archiveDetailHtml.includes('id="archive-film-detail"') ||
+   !archiveDetailHtml.includes('src="/archive-film.js"'))
+  errors.push('First-party horror film detail entrypoint missing');
+if(!archivePageJs.includes("'/archive-film.html?id='") ||
+   !archivePageJs.includes("li.append(link)") ||
+   !archivePageJs.includes("link.append(node('span','horror-year__film-title'"))
+  errors.push('Archive films must use whole-card internal links rather than relying on third-party pages');
+if(!archiveDetailJs.includes("https://www.wikidata.org/wiki/") ||
+   !archiveDetailJs.includes("https://www.imdb.com/find/") ||
+   !archiveDetailJs.includes("imdbCounts"))
+  errors.push('Archive detail must offer source fallback, IMDb search and ambiguous-ID handling');
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
