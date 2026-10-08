@@ -178,7 +178,7 @@ for(const entry of vault.films||[]){
   if (!/^Q[1-9][0-9]*$/.test(entry.qid||'') || !entry.title ||
       entry.title.length>240 || !Number.isInteger(entry.year) ||
       entry.year<1896 || entry.year>new Date().getUTCFullYear()+2 ||
-      (entry.imdbId&&!/^tt\\d{7,10}$/.test(entry.imdbId)))
+      (entry.imdbId&&!/^tt\d{7,10}$/.test(entry.imdbId)))
     errors.push('Invalid archive film entry '+entry.qid);
   if(schemaSeen.has(entry.qid)) errors.push('Duplicate archive Wikidata item '+entry.qid);
   schemaSeen.add(entry.qid);
