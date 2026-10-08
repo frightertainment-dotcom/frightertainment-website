@@ -91,7 +91,7 @@ test('homepage date and verified-score filters report truthful result counts', a
 
 test('homepage recommendations do not advertise unannounced productions', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('a[href="/tv-shows.html"].active')).toHaveCount(0);
+  await expect(page.locator('.hub-showcase .hub-tv')).toBeVisible();
   await expect(page.locator('#hub-ranking')).toBeVisible();
   await expect(page.locator('a[href="/podcasts.html"]')).toBeVisible();
   await expect(page.locator('#originals')).toHaveCount(0);
