@@ -340,3 +340,22 @@
 .horror-year__film-link:hover .horror-year__film-title{text-decoration:underline;text-decoration-color:#ff4b5d;text-underline-offset:3px}
 .horror-year__film-type{pointer-events:none}
 @media(max-width:660px){.horror-year__film-link{min-height:46px;padding:9px 12px}.horror-year__film-title{font-size:16px}}
+
+
+/* Homepage should remain a compact horror dashboard, not a wall of data-provider
+ * panels. The optional source-driven feeds expand only when the reader asks. */
+.home-discovery-wrap{border:1px solid #753541;margin-top:18px;background:linear-gradient(105deg,#251017,#110b10);box-shadow:inset 0 0 30px #5c132012}
+.home-discovery-wrap__summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:15px 21px;min-height:85px}
+.home-discovery-wrap__summary::-webkit-details-marker{display:none}
+.home-discovery-wrap__summary>span:first-child{display:grid;gap:4px}
+.home-discovery-wrap__summary strong{font:900 clamp(23px,2.5vw,34px)/1 var(--font-display);color:#fff0ea;letter-spacing:.7px}
+.home-discovery-wrap__summary small{font:600 11px var(--font-body);color:#c1a5a9}
+.home-discovery-wrap__action{flex:none;font:900 12px var(--font-display);border:1px solid #bd3c4e;background:#731627;padding:10px 13px;color:#fff1ed;letter-spacing:.5px}
+.home-discovery-wrap__summary:focus-visible{outline:3px solid #ff6c7a;outline-offset:4px}
+.home-discovery-wrap__summary:hover{background:#5b1b2733}
+.home-discovery-wrap[open] .home-discovery-wrap__summary{border-bottom:1px solid #773640}
+.home-discovery-wrap[open] .home-discovery-wrap__action{background:#23121a}
+.home-discovery-wrap[open] .home-discovery-wrap__action::first-letter{color:#ff7684}
+.home-discovery-wrap .home-discovery{margin:0;padding:20px;border:0;background:transparent;box-shadow:none}
+@media(max-width:650px){.home-discovery-wrap__summary{padding:14px 13px;align-items:start;flex-wrap:wrap}.home-discovery-wrap__summary strong{font-size:24px}.home-discovery-wrap__action{font-size:11px;padding:8px 10px}.home-discovery-wrap .home-discovery{padding:12px}.home-discovery__grid{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.home-discovery-wrap__summary strong{font-size:22px}.home-discovery__grid{grid-template-columns:1fr}}
