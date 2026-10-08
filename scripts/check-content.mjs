@@ -219,5 +219,21 @@ if(!archiveDetailJs.includes("https://www.wikidata.org/wiki/") ||
    !archiveDetailJs.includes("https://www.imdb.com/find/") ||
    !archiveDetailJs.includes("imdbCounts"))
   errors.push('Archive detail must offer source fallback, IMDb search and ambiguous-ID handling');
+// The homepage discovery panel is optional but must be present and functional
+// in the protected preview. A missing JS asset silently breaks its filters.
+const homePanelHtml = await readFile(new URL('index.html',root),'utf8');
+const homePanelBundler = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+const homePanelClient = await readFile(new URL('home-discovery.js',root),'utf8');
+if(!homePanelHtml.includes('src="/home-discovery.js"') ||
+   !homePanelHtml.includes('<details class="home-discovery-wrap"') ||
+   !homePanelHtml.includes('id="home-search"') ||
+   !homePanelHtml.includes('id="home-country"'))
+  errors.push('Compact homepage discovery drawer or working client is missing');
+if(!homePanelBundler.includes("'home-discovery.js'"))
+  errors.push('Static private preview must include homepage discovery client');
+if(!homePanelClient.includes("'/api/discovery") &&
+   !homePanelClient.includes("`/api/discovery"))
+  errors.push('Homepage discovery client is not wired to the API');
+
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
