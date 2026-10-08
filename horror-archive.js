@@ -96,11 +96,14 @@
     const list=node('ul','horror-year__films');
     const rendered=items.map(item=>{
       const li=node('li','horror-year__film');
-      const link=node('a','horror-year__film-link',item.title);
+      const link=node('a','horror-year__film-link');
       link.href=item.href;
       if(!item.local){link.target='_blank';link.rel='noopener noreferrer';}
+      link.setAttribute('aria-label','View film information for '+item.title+' ('+year+')');
       const type=node('span','horror-year__film-type',item.linkLabel);
-      li.append(link,type);
+      link.append(node('span','horror-year__film-title',item.title),type);
+      // Entire card, including the right-hand FILM DETAILS label, is clickable.
+      li.append(link);
       list.append(li);
       return {li,key:titleKey(item.title)};
     });
