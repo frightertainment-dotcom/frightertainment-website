@@ -5,6 +5,10 @@
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
   const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const safeURL = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; } };
+  const licensedPoster = movie => movie.posterLicenceStatus === 'approved' &&
+    Boolean(safeURL(movie.poster) && safeURL(movie.posterSourcePage) &&
+    safeURL(movie.posterPermissionEvidence) && movie.posterCredit &&
+    movie.posterPermission && movie.posterUsageScope);
   const claimList = movie => Array.isArray(movie.claims) ? movie.claims : [];
   const claimsFor = (movie, field) => claimList(movie).filter(claim => claim.field === field);
   const firstClaim = (movie, field) => claimsFor(movie, field)[0] || null;
@@ -14,7 +18,7 @@
     const date = new Date(`${value}T12:00:00Z`);
     return Number.isNaN(date.valueOf()) ? '' : new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(date);
   };
-  const normalise = review => typeof review.score === 'number' && typeof review.outOf === 'number' && review.outOf > 0 && review.score >= 0 && review.score <= review.outOf && safeURL(review.url) && review.source && review.checked && review.permission ? review.score * 100 / review.outOf : null;
+  const normalise = review => typeof review.score === 'number' && typeof review.outOf === 'number' && review.outOf > 0 && review.score >= 0 && review.score <= review.outOf && safeURL(review.url) && review.source && review.checked && review.permission === "approved" ? review.score * 100 / review.outOf : null;
   const validReviews = movie => (movie.reviews || []).filter(review => normalise(review) !== null);
   const frightIndex = movie => { const scores = validReviews(movie).map(normalise); return scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null; };
   const recordHasDate = movie => releaseClaims(movie).length > 0;
@@ -33,8 +37,8 @@
     const genre = firstClaim(movie, 'genre')?.value || 'HORROR FILM';
     const synopsis = firstClaim(movie, 'synopsis')?.value || 'Verified film identity; further plot information has not been added.';
     const id = encodeURIComponent(movie.id);
-    return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details"><div class="movie-card__poster-fill"><div class="movie-card__placeholder">${escapeHTML(movie.title)}</div></div><span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
-      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span style="color:#827773">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '<span class="movie-card__score movie-card__score--pending">NO<br>SCORE</span>' : `<span class="movie-card__score" aria-label="Fright Index ${score} out of 100">${score}<small>/100</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div></div></article>`;
+    return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder">${escapeHTML(movie.title)}</div></div>`}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
+      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span style="color:#827773">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '<span class="movie-card__score movie-card__score--pending">NO<br>SCORE</span>' : `<span class="movie-card__score" aria-label="Fright Index ${score} out of 100">${score}<small>/100</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE ↗</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
   };
   const grid = $('#movie-grid');
   if (grid) {
@@ -110,7 +114,7 @@
         <section class="film-section"><h2>SOURCED FILM DETAILS</h2>${synopsis ? `<p class="film-page__synopsis">${escapeHTML(synopsis.value)}</p>` : ''}<ul class="source-list">${claims.map(claimMarkup).join('')}</ul></section>
         <section class="film-section"><h2>FRIGHT INDEX</h2><p class="film-score">${score === null ? '—' : `${score} / 100`}</p><p>Method: eligible critic scores are converted to /100, equally weighted, averaged and rounded to the nearest whole number. Only linked, dated scores with confirmed reuse approval are included. This comparison is not an independent critic verdict.</p><ul class="source-list">${sources}</ul></section>
         ${trailer ? `<section class="film-section"><h2>OFFICIAL TRAILER</h2><button class="button button--red" id="play-trailer">PLAY TRAILER</button><div class="video-frame" id="film-trailer" hidden></div><p>Official upload: ${escapeHTML(trailer.channel)}. <a href="${escapeHTML(safeURL(trailer.source))}" target="_blank" rel="noopener noreferrer">View primary trailer source ></a> · ${escapeHTML(trailer.territory)}</p></section>` : '<section class="film-section"><h2>TRAILER</h2><p>No exact official video upload is attached to this film record.</p></section>'}
-        ${movie.poster ? `<p class="film-credit">Artwork: ${escapeHTML(movie.posterCredit)} · ${escapeHTML(movie.posterPermission)}</p>` : ''}<p><a href="/#upcoming">← Back to film listings</a></p>`;
+        ${licensedPoster(movie) ? `<p class="film-credit">Artwork: ${escapeHTML(movie.posterCredit)} · ${escapeHTML(movie.posterPermission)}</p>` : ''}<p><a href="/#upcoming">← Back to film listings</a></p>`;
       document.title = `${movie.title} — Frightertainment`;
       const play = $('#play-trailer', page);
       if (play) play.addEventListener('click', () => {
