@@ -115,6 +115,9 @@ test('navigation works between all main sections and official movie source', asy
   await page.goto('/');
   await page.locator('.hub-tabs a[href="/movies.html"]').click();
   await expect(page).toHaveURL(/movies\.html$/);
+  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
+  await page.locator('#movie-more').click();
+  await page.locator('#movie-more').click();
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(22);
   const official = page.locator('.movie-card__official a').first();
   await expect(official).toHaveAttribute('href', /^https:\/\//);
@@ -148,7 +151,7 @@ test('homepage artwork is first-party and movie posters are not copied without p
   expect(artURL).toContain('/assets/hub-haunted.svg');
   await page.goto('/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
-  await expect(page.locator('.movie-card__official a')).toHaveCount(22);
+  await expect(page.locator('.movie-card__official a')).toHaveCount(8);
 });
 
 test('expanded TV, podcast, game and indie listings have source-linked cards', async ({page})=>{
