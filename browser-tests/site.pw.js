@@ -4,6 +4,8 @@ const pages = [
   ['/', 'WELCOME'],
   ['/movies.html','HORROR'],
   ['/all-horror-movies.html','ALL HORROR'],
+  ['/archive-film.html?id=Q166385','A Terrible Night'],
+  ['/archive-film.html?id=Q203560','1408'],
   ['/tv-shows.html','HORROR'],
   ['/indie-movies.html','INDIE'],
   ['/podcasts.html','HORROR'],
@@ -275,7 +277,7 @@ test('franchise archive spans 2002, 2007, 2025 and 2026 without erasing history'
   const earliest=page.locator('#horror-year-1896');
   await earliest.locator('summary').click();
   await expect(earliest).toContainText('Le Manoir du diable');
-  await expect(earliest.locator('a[href="https://www.imdb.com/title/tt0000091/"]').first()).toBeVisible();
+  await expect(earliest.locator('a[href="/archive-film.html?id=manual%3Ale-manoir-du-diable-1896"]')).toBeVisible();
   await expect(page.locator('.horror-archive__notes a[href*="bfi.org.uk"]')).toBeVisible();
 });
 
@@ -310,4 +312,56 @@ test('imported horror vault retains thousands of indexed records and every year 
   await expect(year.locator('.horror-year__film:visible')).toHaveCount(1);
   await expect(year.locator('a[href="/films/28-weeks-later/"]')).toBeVisible();
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('archive rows are full-size clickable links, opening reliable first-party details', async ({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/all-horror-movies.html?year=2007');
+  const year=page.locator('#horror-year-2007');
+  await expect(year).toHaveAttribute('open','');
+  const search=year.locator('input[type="search"]');
+  await search.fill('1408');
+  await expect(year.locator('.horror-year__film:visible')).toHaveCount(1);
+  const fullLink=year.locator('.horror-year__film-link:visible');
+  await expect(fullLink).toHaveAttribute('href','/archive-film.html?id=Q203560');
+  await expect(fullLink).toContainText('FILM DETAILS');
+  await fullLink.click();
+  await expect(page).toHaveURL(/archive-film\.html\?id=Q203560$/);
+  await expect(page.locator('.archive-detail__title')).toHaveText('1408');
+  await expect(page.locator('.archive-detail__fact')).toContainText(['2007','tt0450385']);
+  await expect(page.getByRole('link',{name:'OPEN IMDb TITLE'})).toHaveAttribute('href','https://www.imdb.com/title/tt0450385/');
+  await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toHaveAttribute('href',/https:\/\/www\.imdb\.com\/find\/\?/);
+  await expect(page.getByRole('link',{name:'WIKIDATA SOURCE'})).toHaveAttribute('href','https://www.wikidata.org/wiki/Q203560');
+  await page.getByRole('link',{name:'← ALL HORROR MOVIES'}).click();
+  await expect(page).toHaveURL(/all-horror-movies\.html\?year=2007/);
+  await expect(page.locator('#horror-year-2007')).toHaveAttribute('open','');
+});
+test('Wikidata film without an IMDb ID still has searchable IMDb and source links',async({page})=>{
+  await page.goto('/archive-film.html?id=Q4849038');
+  await expect(page.locator('.archive-detail__title')).toHaveText('Bakchha');
+  await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toBeVisible();
+  await expect(page.getByRole('link',{name:'OPEN IMDb TITLE'})).toHaveCount(0);
+  await expect(page.getByRole('link',{name:'WIKIDATA SOURCE'})).toHaveAttribute('href','https://www.wikidata.org/wiki/Q4849038');
+});
+test('historical and manually checked films both open Frightertainment pages with exits',async({page})=>{
+  await page.goto('/all-horror-movies.html?year=1896');
+  await page.locator('#horror-year-1896 .horror-year__film-link').filter({hasText:'Le Manoir du diable'}).click();
+  await expect(page).toHaveURL(/archive-film\.html\?id=manual%3Ale-manoir-du-diable-1896/);
+  await expect(page.locator('.archive-detail__title')).toContainText('Le Manoir du diable');
+  await expect(page.getByRole('link',{name:'FILM SOURCE'})).toHaveAttribute('href',/bfi\.org\.uk/);
+  await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toBeVisible();
+});
+test('conflicting IMDb metadata never confidently links two different films to the same IMDb ID',async({page})=>{
+  await page.goto('/archive-film.html?id=Q21015393');
+  await expect(page.locator('.archive-detail__title')).toHaveText('Zane');
+  await expect(page.getByRole('link',{name:'OPEN IMDb TITLE'})).toHaveCount(0);
+  await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toBeVisible();
+  await expect(page.getByRole('link',{name:'WIKIDATA SOURCE'})).toBeVisible();
+});
+test('invalid or unknown archive film IDs display recovery links rather than broken pages',async({page})=>{
+  for(const path of ['/archive-film.html?id=not-valid','/archive-film.html?id=Q9999999999999']){
+    await page.goto(path);
+    await expect(page.locator('.archive-detail__title')).toContainText('FILM RECORD UNAVAILABLE');
+    await expect(page.getByRole('link',{name:'← RETURN TO ALL HORROR MOVIES'})).toHaveAttribute('href','/all-horror-movies.html');
+  }
 });
