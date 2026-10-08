@@ -295,3 +295,32 @@
 .horror-year__header:focus-visible{outline:2px solid #ff5465;outline-offset:-2px}
 @media(max-width:660px){.horror-year[open]>.horror-year__header{padding-right:210px}.horror-year[open] .horror-year__count{display:none}.horror-year__search-label{right:38px;top:7px;width:155px}.horror-year__search{height:36px;min-height:36px;font-size:12px;padding:6px}}
 @media(max-width:370px){.horror-year[open]>.horror-year__header{padding-right:177px}.horror-year__search-label{width:138px;right:34px}}
+
+
+/* First-party archive film landing page: reliable destination if third-party link breaks. */
+.archive-detail-main{padding-top:20px;padding-bottom:80px;min-height:68vh}
+.archive-detail__breadcrumbs{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font:800 12px var(--font-display);letter-spacing:.6px;color:#b6a1a4;padding:12px 0 23px}
+.archive-detail__breadcrumbs a{color:#f0aab3}
+.archive-detail__breadcrumbs a:hover{text-decoration:underline}
+.archive-detail{border:1px solid #963c47;min-height:300px;background:linear-gradient(104deg,#200b13e6,#120b10db 72%),url('/assets/hub-haunted.svg') center/cover;box-shadow:0 20px 75px #0008}
+.archive-detail__content{padding:clamp(21px,4.2vw,58px);position:relative;max-width:1000px}
+.archive-detail__title{font:900 clamp(43px,6.7vw,93px)/.91 var(--font-display);color:#f9efea;margin:13px 0 15px;letter-spacing:.15px;text-wrap:balance}
+.archive-detail__label{color:#f2a3ad;font:900 15px var(--font-display);letter-spacing:1.5px;margin:0 0 24px}
+.archive-detail__facts{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 21px}
+.archive-detail__fact{background:#08070aaf;border:1px solid #6d323e;padding:12px 19px;display:grid;gap:5px;min-width:160px}
+.archive-detail__fact span{font:800 10px var(--font-display);letter-spacing:1px;color:#c4a0a5}
+.archive-detail__fact strong{font:900 27px var(--font-display);letter-spacing:1px;color:#fff0ed}
+.archive-detail__intro{color:#ddc8cb;font:500 15px/1.75 var(--font-body);max-width:740px}
+.archive-detail__actions{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}
+.archive-detail__link{display:inline-flex;align-items:center;justify-content:center;text-align:center;padding:12px 15px;min-height:46px;font:900 14px var(--font-display);letter-spacing:1px;border:1px solid #82515a;background:#180d13;color:#f1dddd}
+.archive-detail__link:hover{border-color:#f0495a;background:#4d1723}
+.archive-detail__link--main{background:#a41625;border-color:#f0354b;color:white}
+.archive-detail__link--main:hover{background:#cf1c2e}
+.archive-detail__disclaimer{color:#b59ea3;font:500 12px/1.8 var(--font-body);max-width:800px}
+.archive-detail__footer{border-top:1px solid #723341;padding-top:18px;margin-top:23px}
+.archive-detail__return{font:900 14px var(--font-display);color:#ffd3d9;letter-spacing:1px}
+.archive-detail__return:hover{text-decoration:underline}
+.archive-detail__explain{padding:28px 0 12px;max-width:900px}
+.archive-detail__explain h2{font:900 35px var(--font-display);color:#f0dcd9;margin:0 0 10px}
+.archive-detail__explain p{color:#b7a5a6;line-height:1.8;font-size:13px}
+@media(max-width:620px){.archive-detail-main{width:calc(100% - 30px);padding-top:12px}.archive-detail__title{font-size:clamp(37px,11vw,56px)}.archive-detail__facts{gap:8px}.archive-detail__fact{min-width:130px}.archive-detail__actions{display:grid;grid-template-columns:1fr}.archive-detail__link{width:100%}.archive-detail__content{padding:22px 16px}}
