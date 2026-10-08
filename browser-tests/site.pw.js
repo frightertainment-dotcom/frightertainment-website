@@ -223,7 +223,7 @@ test('private 2026 scoreboard shows a six-film sourced partial chart instead of 
   await expect(page.locator('.hub-rt-chart__entry').nth(1)).toContainText('91%');
   await expect(page.locator('.hub-rt-unscored')).toContainText('5 more tracked 2026 films');
   await expect(page.locator('.hub-rt-chart')).not.toContainText('28 Weeks Later');
-  await expect(page.locator('.hub-rt-chart')).not.toContainText('28 Years Later:');
+  await expect(page.locator('.hub-rt-chart__film').filter({hasText:/^28 Years Later$/})).toHaveCount(0);
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('homepage score panel shows a compact dated comparison without claiming it is live',async({page})=>{
