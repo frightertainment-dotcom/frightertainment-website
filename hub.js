@@ -2,7 +2,7 @@
   const root=document.querySelector('#hub-ranking');
   if(!root)return;
   const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  fetch('/api/rankings?year=2026',{headers:{accept:'application/json'}}).then(async response=>{
+  fetch('/api/rankings?year='+new Date().getUTCFullYear(),{headers:{accept:'application/json'}}).then(async response=>{
     if(!response.ok)throw new Error('Ranking API is unavailable');
     return response.json();
   }).then(data=>{
