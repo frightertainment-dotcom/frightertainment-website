@@ -36,8 +36,8 @@
     id:'wd:'+x.qid,
     title:x.title.trim(),
     year:x.year,
-    href:x.imdbId?'https://www.imdb.com/title/'+x.imdbId+'/':'https://www.wikidata.org/wiki/'+x.qid,
-    linkLabel:x.imdbId?'IMDb PAGE ↗':'WIKIDATA RECORD ↗',
+    href:x.imdbId?'https://www.imdb.com/title/'+x.imdbId+'/':'https://www.imdb.com/find/?q='+encodeURIComponent(x.title+' '+x.year)+'&s=tt',
+    linkLabel:x.imdbId?'IMDb PAGE ↗':'IMDb SEARCH ↗',
     source:'Wikidata CC0',
     local:false
   });
