@@ -68,6 +68,15 @@ for (const directory of rankingDirectories) {
   const html = await readFile(new URL(file, root), 'utf8');
   for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `data-ranking-year="${directory.name}"`, 'src="/top20.js"', 'canonical']) if (!html.includes(required)) errors.push(`${file} is missing ${required}`);
 }
+const dynamicFilm = await readFile(new URL('film.html', root), 'utf8');
+const dynamicFilmScript = await readFile(new URL('dynamic-film.js', root), 'utf8');
+if (!dynamicFilm.includes('id="mobile-nav"') || !dynamicFilm.includes('src="/dynamic-film.js"') || !dynamicFilmScript.includes('/api/films/${encodeURIComponent(id)}')) errors.push('Dynamic approved-film detail route is missing its navigation or API wiring');
+for (const movie of movies.filter(record => record.trailer)) {
+  const detailHTML = await readFile(new URL(`films/${movie.id}/index.html`, root), 'utf8');
+  if (!detailHTML.includes(`href="${escapeHTML(movie.trailer.source)}"`)) errors.push(`No-JavaScript detail page is missing the official trailer source link: ${movie.id}`);
+}
+const manualSync = await readFile(new URL('scripts/sync-manual-films.mjs', root), 'utf8');
+if (!manualSync.includes('--apply') || !manualSync.includes('FR_API_BASE') || !manualSync.includes('ADMIN_TOKEN')) errors.push('Protected manual-film synchronization support is missing');
 const discoveryScript = await readFile(new URL('discovery.js', root), 'utf8');
 if (discoveryScript.includes('test/fixtures')) errors.push('Production discovery client must not import test fixtures');
 const workerSource = await readFile(new URL('worker/index.js', root), 'utf8');

@@ -103,11 +103,13 @@ export async function refreshStreamingReleases(env, db, country, now = new Date(
   const filmByProviderId = new Map(films.map(film => [Number(film.watchmode_id), film]));
   const checkedAt = checkedToday();
   const items = rows.filter(row => row.type === 'streaming_movie_release' && row.region === country &&
-    ['scheduled', 'confirmed_available'].includes(row.verification_status) && /^\d{4}-\d{2}-\d{2}$/.test(row.release_date || ''))
+    row.title_type === 'movie' &&
+    ['scheduled', 'confirmed_available'].includes(row.verification_status) && /^\d{4}-\d{2}-\d{2}$/.test(row.release_date || '') && isCalendarDate(row.release_date))
+    .filter(row => filmByProviderId.has(Number(row.id)))
     .map(row => {
       const mapped = filmByProviderId.get(Number(row.id));
       return {
-        id: `watchmode:${row.id}:${row.region}:${row.release_date}`, filmId: mapped?.film_id || null, title: mapped?.title || row.title,
+        id: `watchmode:${row.id}:${row.region}:${row.release_date}`, filmId: mapped.film_id, title: mapped.title,
         releaseDate: row.release_date, releaseTerritory: row.region, territory: row.region,
         availabilityState: row.verification_status,
         providerId: row.provider_id, releaseMode: mapped?.release_mode || 'unconfirmed',
@@ -133,8 +135,11 @@ export async function refreshTheatricalReleases(env, db, country, now = new Date
   const { results: films = [] } = await db.prepare(`SELECT film_id, title, watchmode_id FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND watchmode_id IS NOT NULL`).all();
   const filmByProviderId = new Map(films.map(film => [Number(film.watchmode_id), film]));
   const checkedAt = checkedToday();
-  const items = rows.filter(row => ['theatrical_release', 'theatrical_movie_release'].includes(row.type) && row.region === country &&
-    row.verification_status === 'confirmed_available' && /^\d{4}-\d{2}-\d{2}$/.test(row.release_date || '') && filmByProviderId.has(Number(row.id)))
+  // Watchmode documents verification_status as null for theatrical rows; that field
+  // only describes provider-matched digital availability. Match the approved title,
+  // movie release type, requested country and valid calendar date instead.
+  const items = rows.filter(row => row.type === 'theatrical_release' && row.title_type === 'movie' && row.region === country &&
+    /^\d{4}-\d{2}-\d{2}$/.test(row.release_date || '') && isCalendarDate(row.release_date) && filmByProviderId.has(Number(row.id)))
     .map(row => ({ id: `watchmode-theatrical:${row.id}:${country}:${row.release_date}`, filmId: filmByProviderId.get(Number(row.id)).film_id, title: filmByProviderId.get(Number(row.id)).title,
       releaseDate: row.release_date, releaseTerritory: country, territory: country,
       label: 'Recent theatrical release · date verified; current showtimes not confirmed',
@@ -204,10 +209,17 @@ export async function fetchNearbyShowtimes(env, film, country, point, date) {
     sourceName: 'MovieGlu', sourceUrl: `${MOVIEGLU_BASE}/filmShowTimes/`, checkedAt: new Date().toISOString(),
     cinemas: (data.cinemas || []).map(cinema => ({
       id: cinema.cinema_id, name: cinema.cinema_name,
-      showings: (cinema.showings || []).flatMap(format => (format.times || []).map(time => ({
-        format: format.format?.name || 'Screening', startTime: time.start_time,
+      // MovieGlu returns showings as an object whose keys are screening formats.
+      showings: Object.entries(cinema.showings && typeof cinema.showings === 'object' && !Array.isArray(cinema.showings) ? cinema.showings : {})
+        .flatMap(([screeningFormat, formatData]) => (formatData?.times || []).map(time => ({
+        format: formatData.format?.name || screeningFormat || 'Screening', startTime: time.start_time,
         endTime: time.end_time || null, bookingUrl: /^https:\/\//.test(time.booking_url || '') ? time.booking_url : null
       })))
     })).filter(cinema => cinema.showings.length)
   };
+}
+
+function isCalendarDate(value) {
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(date.valueOf()) && date.toISOString().slice(0, 10) === value;
 }

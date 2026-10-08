@@ -143,10 +143,39 @@ async function handleCinema(env, request) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return json({ error: 'Valid browser geolocation is required' }, 400, { 'cache-control': 'no-store' });
   const film = await env.DB.prepare(`SELECT film_id, title, movieglu_id FROM canonical_films WHERE film_id = ? AND editorial_status = 'approved' AND horror_verified = 1`).bind(filmId).first();
   if (!film) return json({ error: 'No verified local cinema listing is available for this film' }, 404, { 'cache-control': 'no-store' });
+  const limited = await cinemaRateLimited(env, request);
+  if (limited) return json({ error: 'Showtime request limit reached. Please retry in one minute.' }, 429, { 'cache-control': 'no-store', 'retry-after': '60' });
   try {
     const result = await fetchNearbyShowtimes(env, film, country, { lat, lon }, date);
     return json(result, 200, { 'cache-control': 'no-store' });
   } catch (error) { return json({ error: safeError(error), source: 'MovieGlu', status: 'unavailable' }, 503, { 'cache-control': 'no-store' }); }
+}
+
+async function cinemaRateLimited(env, request) {
+  if (!env.CINEMA_RATE_LIMIT_SALT) throw new HttpError(503, 'Cinema lookup is not configured');
+  const address = request.headers.get('cf-connecting-ip') || 'local-development';
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.CINEMA_RATE_LIMIT_SALT), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const digest = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(address));
+  const client = [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+  const window = Math.floor(Date.now() / 60_000) * 60_000;
+  const row = await env.DB.prepare(`INSERT INTO cinema_rate_limits(client_digest, window_started, request_count) VALUES(?, ?, 1)
+    ON CONFLICT(client_digest) DO UPDATE SET request_count = CASE WHEN window_started = excluded.window_started THEN request_count + 1 ELSE 1 END,
+      window_started = excluded.window_started RETURNING request_count`).bind(client, window).first();
+  return Number(row?.request_count || 0) > 10;
+}
+
+async function handleFilmDetail(env, filmId) {
+  if (!/^[a-z0-9-]{1,100}$/.test(filmId)) return json({ error: 'Invalid film id' }, 400);
+  const film = await env.DB.prepare(`SELECT film_id AS id, title, release_year AS releaseYear, territory,
+    primary_source_name AS primarySourceName, primary_source_url AS primarySourceUrl, checked_at AS checkedAt,
+    horror_source_url AS horrorSourceUrl, release_mode AS releaseMode, release_mode_source_url AS releaseModeSourceUrl
+    FROM canonical_films WHERE film_id = ? AND editorial_status = 'approved' AND horror_verified = 1`).bind(filmId).first();
+  if (!film) return json({ error: 'No approved horror film record was found' }, 404, { 'cache-control': 'no-store' });
+  return json({ film, claims: [
+    { label: 'Film year', value: String(film.releaseYear), territory: 'As recorded by Frightertainment', sourceName: film.primarySourceName, source: film.primarySourceUrl, checked: film.checkedAt },
+    { label: 'Horror classification', value: 'Verified by editorial review', territory: 'As recorded by Frightertainment', sourceName: film.primarySourceName, source: film.horrorSourceUrl, checked: film.checkedAt },
+    ...(film.releaseMode !== 'unconfirmed' && film.releaseModeSourceUrl ? [{ label: 'Release path', value: film.releaseMode, territory: film.territory, sourceName: 'Primary source', source: film.releaseModeSourceUrl, checked: film.checkedAt }] : [])
+  ], unconfirmed: ['Territorial release date', 'Cast and crew', 'Synopsis', 'Official trailer', 'Promotional artwork'], updatedAt: film.checkedAt }, 200, { 'cache-control': 'public, max-age=300' });
 }
 async function handleCinemaFilms(env, request) {
   const country = countryOf(request, env);
@@ -190,6 +219,47 @@ async function handleAdmin(env, request, path) {
     const update = await env.DB.prepare(`UPDATE review_queue SET status = ?, reviewed_at = ?, reviewer = ? WHERE item_id = ? AND status = 'pending'`).bind(body.decision, nowIso(), String(body.reviewer || 'site-admin').slice(0, 80), body.id).run();
     if (!update.meta.changes) return json({ error: 'Pending review item not found' }, 404);
     return json({ id: body.id, status: body.decision }, 200, { 'cache-control': 'no-store' });
+  }
+  if (request.method === 'POST' && path === '/api/admin/sync-manual-films') {
+    const body = await readBody(request);
+    if (!Array.isArray(body.films) || body.films.length !== 6) return json({ error: 'Expected the six reviewed manual film records' }, 400);
+    const approvedIds = new Set(['other-mommy', 'crawlers', 'clayface', 'victorian-psycho', 'werwulf', 'exorcist-2027']);
+    if (new Set(body.films.map(film => film.id)).size !== 6 || body.films.some(film => !approvedIds.has(film.id))) return json({ error: 'The sync payload must contain each of the six reviewed records once' }, 400);
+    for (const film of body.films) {
+      if (film.editorialStatus !== 'approved' || !film.title || !Array.isArray(film.claims) || !film.claims.length) return json({ error: 'Manual film identity or prior approval is not recognized' }, 400);
+      for (const claim of film.claims) {
+        let source;
+        try { source = new URL(claim.source); } catch { return json({ error: `Source URL is missing for ${film.id}` }, 400); }
+        if (source.protocol !== 'https:' || !claim.label || !claim.value || !claim.sourceName || !claim.territory || !isISODate(claim.checked)) return json({ error: `Claim provenance is incomplete for ${film.id}` }, 400);
+      }
+    }
+    const synced = [];
+    for (const film of body.films) {
+      const serialized = JSON.stringify(film);
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(serialized));
+      const hash = [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+      const latest = await env.DB.prepare(`SELECT source_hash AS sourceHash FROM manual_film_versions WHERE film_id = ? ORDER BY synced_at DESC LIMIT 1`).bind(film.id).first();
+      if (latest?.sourceHash === hash) {
+        synced.push({ filmId: film.id, status: 'unchanged', sourceHash: hash });
+        continue;
+      }
+      const approvalStatus = latest ? 'pending-review' : 'approved';
+      await env.DB.prepare(`INSERT INTO manual_film_versions(film_id, source_hash, title, payload_json, approval_status, synced_at) VALUES(?, ?, ?, ?, ?, ?)
+        ON CONFLICT(film_id, source_hash) DO NOTHING`).bind(film.id, hash, film.title, serialized, approvalStatus, nowIso()).run();
+      synced.push({ filmId: film.id, status: approvalStatus, sourceHash: hash });
+    }
+    return json({ synced }, 200, { 'cache-control': 'no-store' });
+  }
+  if (request.method === 'GET' && path === '/api/admin/manual-film-changes') {
+    const { results } = await env.DB.prepare(`SELECT film_id AS filmId, source_hash AS sourceHash, title, payload_json AS payload, synced_at AS syncedAt
+      FROM manual_film_versions WHERE approval_status = 'pending-review' ORDER BY synced_at DESC`).all();
+    return json({ items: results.map(row => ({ ...row, payload: JSON.parse(row.payload) })) }, 200, { 'cache-control': 'no-store' });
+  }
+  if (request.method === 'POST' && path === '/api/admin/manual-film-changes/approve') {
+    const body = await readBody(request);
+    if (!body.filmId || !body.sourceHash) return json({ error: 'filmId and sourceHash are required' }, 400);
+    const result = await env.DB.prepare(`UPDATE manual_film_versions SET approval_status = 'approved' WHERE film_id = ? AND source_hash = ? AND approval_status = 'pending-review'`).bind(body.filmId, body.sourceHash).run();
+    return result.meta.changes ? json({ filmId: body.filmId, sourceHash: body.sourceHash, status: 'approved' }, 200, { 'cache-control': 'no-store' }) : json({ error: 'Pending manual film revision not found' }, 404);
   }
   if (request.method === 'POST' && path === '/api/admin/films') {
     const body = await readBody(request);
@@ -251,6 +321,7 @@ async function fetchHandler(request, env) {
   try {
     if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
     if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
+    if (path.startsWith('/api/films/') && request.method === 'GET') return await handleFilmDetail(env, decodeURIComponent(path.slice('/api/films/'.length)));
     if (path === '/api/cinema' && request.method === 'POST') return await handleCinema(env, request);
     if (path === '/api/cinema/films' && request.method === 'GET') return await handleCinemaFilms(env, request);
     if (path.startsWith('/api/admin/')) return await handleAdmin(env, request, path);
@@ -266,6 +337,7 @@ async function runScheduled(controller, env) {
   const countries = [...configuredCountries(env)];
   const tasks = [];
   if (controller.cron === '0 4 * * *') {
+    await env.DB.prepare(`DELETE FROM cinema_rate_limits WHERE window_started < ?`).bind(Date.now() - 5 * 60_000).run();
     for (const country of countries) {
       tasks.push(await refreshTask(env, 'coming-soon', country, () => refreshComingSoon(env, env.DB, country), 36 * 60 * 60 * 1000, 'cron-daily'));
       tasks.push(await refreshTask(env, 'streaming-availability', country, () => refreshStreaming(env, env.DB, country), 36 * 60 * 60 * 1000, 'cron-daily'));

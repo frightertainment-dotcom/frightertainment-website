@@ -3,6 +3,7 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const safeURL = value => { try { const url = new URL(value, location.href); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; } };
+  const filmHref = id => window.FR_MOVIES?.some(movie => movie.id === id) ? `/films/${encodeURIComponent(id)}/` : `/film.html?id=${encodeURIComponent(id)}`;
   const countrySelect = $('#discovery-country');
   if (!countrySelect) return;
   const names = { GB: 'United Kingdom', US: 'United States', CA: 'Canada', AU: 'Australia', NZ: 'New Zealand', IE: 'Ireland' };
@@ -11,7 +12,7 @@
   let query = '';
   const kinds = ['coming-soon', 'streaming-availability', 'streaming-releases', 'theatrical-releases', 'trending-horror'];
   const setState = (kind, message) => { const node = $(`[data-state="${kind}"]`); if (node) node.textContent = message; };
-  const sourceLink = item => { const url = safeURL(item.sourceUrl); return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.sourceName || 'Source')} ↗</a><small>${escapeHTML(item.territory || countrySelect.value)} · checked ${escapeHTML(item.checkedAt || 'date unavailable')}</small>` : ''; };
+  const sourceLink = item => { const url = safeURL(item.sourceUrl); return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.sourceName || 'Source')} ></a><small>${escapeHTML(item.territory || countrySelect.value)} · checked ${escapeHTML(item.checkedAt || 'date unavailable')}</small>` : ''; };
   const itemMarkup = (item, kind) => {
     const date = item.releaseDate ? ` · ${escapeHTML(item.releaseDate)} (${escapeHTML(item.releaseTerritory || item.territory || '')})` : '';
     const detail = kind === 'streaming-availability'
@@ -22,8 +23,8 @@
       : item.status === 'scheduled-release' ? `Territorial release${date}` : 'Verified listing';
     const content = `<strong>${escapeHTML(item.title)}</strong><span>${detail}${kind === 'coming-soon' ? '' : date}</span>`;
     const filmId = item.filmId && /^[a-z0-9-]+$/.test(item.filmId) ? item.filmId : '';
-    const titleMarkup = filmId ? `<a href="/films/${encodeURIComponent(filmId)}/">${content}</a>` : `<div>${content}</div>`;
-    const detailLink = filmId ? `<a href="/films/${encodeURIComponent(filmId)}/">FILM FILE</a>` : '';
+    const titleMarkup = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">${content}</a>` : `<div>${content}</div>`;
+    const detailLink = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">FILM FILE</a>` : '';
     return `<article class="discovery-item">${titleMarkup}<span class="discovery-item__source">${sourceLink(item)} ${detailLink}</span></article>`;
   };
   function render() {
@@ -62,8 +63,8 @@
       data = feed.datasets || {};
       const ranking = rankingResponse.ok ? await rankingResponse.json() : null;
       const panel = $('[data-list="rankings"]');
-      if (panel) panel.innerHTML = ranking?.items?.length ? ranking.items.map(item => `<article class="discovery-item"><div><strong><span class="ranking-position">#${item.position}</span> <a href="/films/${encodeURIComponent(item.filmId)}/">${escapeHTML(item.title)}</a></strong><span>${item.averageScore}/100 · ${item.criticCount} verified critic${item.criticCount === 1 ? '' : 's'} · ${escapeHTML(item.movementLabel)}</span></div><span class="discovery-item__source">${item.sources.map(source => { const url = safeURL(source.url); return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.publication)} ↗</a><small>${escapeHTML(source.territory)} · checked ${escapeHTML(source.checkedAt)}</small>` : ''; }).join(' ')}</span></article>`).join('') : '';
-      setState('rankings', ranking?.items?.length ? `Equal-weight normalized critic average · ${ranking.updatedAt ? `updated ${ranking.updatedAt}` : 'current calculation'} · ${ranking.pendingFilmCount || 0} eligible film records remain below the minimum.` : 'Rankings pending: fewer than three distinct verified, permission-cleared professional critic ratings are available for any film.');
+      if (panel) panel.innerHTML = ranking?.items?.length ? ranking.items.map(item => `<article class="discovery-item"><div><strong><span class="ranking-position">#${item.position}</span> <a href="${escapeHTML(filmHref(item.filmId))}">${escapeHTML(item.title)}</a></strong><span>${item.averageScore}/100 · ${item.criticCount} verified critic${item.criticCount === 1 ? '' : 's'} · ${escapeHTML(item.movementLabel)}</span></div><span class="discovery-item__source">${item.sources.map(source => { const url = safeURL(source.url); return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.publication)} ></a><small>${escapeHTML(source.territory)} · checked ${escapeHTML(source.checkedAt)}</small>` : ''; }).join(' ')}</span></article>`).join('') : '';
+      setState('rankings', ranking?.items?.length ? `Calculated from approved critic data · this recalculation does not acquire reviews · ${ranking.updatedAt ? `updated ${ranking.updatedAt}` : 'no published calculation yet'} · ${ranking.pendingFilmCount || 0} eligible film records remain below the minimum.` : 'Rankings pending: automatic calculation does not acquire critic reviews. At least three distinct verified, permission-cleared professional numeric ratings are required for each film.');
       const rankingUpdated = $('[data-updated="rankings"]');
       if (rankingUpdated) rankingUpdated.textContent = ranking?.updatedAt ? `Last updated: ${ranking.updatedAt}` : 'Last updated: no verified ranking data';
       render();
@@ -120,8 +121,8 @@
       if (!response.ok) throw new Error(payload.error?.message || payload.error || 'Showtimes are unavailable.');
       const list = $('[data-list="cinema"]');
       const source = safeURL(payload.sourceUrl);
-      const attribution = source ? `<p class="discovery-attribution"><a href="${escapeHTML(source)}" target="_blank" rel="noopener noreferrer">${escapeHTML(payload.sourceName)} showtimes ↗</a> · checked ${escapeHTML(payload.checkedAt)} · ${escapeHTML(payload.country)}</p>` : '';
-      const showings = payload.cinemas.flatMap(cinema => cinema.showings.map(showing => `<article class="discovery-item"><div><strong>${escapeHTML(cinema.name)} · ${escapeHTML(film.title)}</strong><span>${escapeHTML(showing.startTime)} · ${escapeHTML(showing.format)}</span></div>${safeURL(showing.bookingUrl) ? `<a href="${escapeHTML(safeURL(showing.bookingUrl))}" target="_blank" rel="noopener noreferrer">BOOKING ↗</a>` : ''}</article>`));
+      const attribution = source ? `<p class="discovery-attribution"><a href="${escapeHTML(source)}" target="_blank" rel="noopener noreferrer">${escapeHTML(payload.sourceName)} showtimes ></a> · checked ${escapeHTML(payload.checkedAt)} · ${escapeHTML(payload.country)}</p>` : '';
+      const showings = payload.cinemas.flatMap(cinema => cinema.showings.map(showing => `<article class="discovery-item"><div><strong>${escapeHTML(cinema.name)} · ${escapeHTML(film.title)}</strong><span>${escapeHTML(showing.startTime)} · ${escapeHTML(showing.format)}</span></div>${safeURL(showing.bookingUrl) ? `<a href="${escapeHTML(safeURL(showing.bookingUrl))}" target="_blank" rel="noopener noreferrer">BOOKING ></a>` : ''}</article>`));
       list.innerHTML = attribution + showings.join('');
       state.textContent = showings.length ? `Live showtimes · ${payload.checkedAt} · ${payload.country}` : 'The licensed source returned no current showtimes near your location.';
     } catch (error) { state.textContent = `${error.message} Location was not stored.`; }

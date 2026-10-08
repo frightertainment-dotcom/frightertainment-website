@@ -4,7 +4,7 @@ A responsive static horror publication using the supplied Frightertainment ident
 
 ## Preview and checks
 
-Requires Node.js 18 or newer and Python 3.
+Requires Node.js 22 or newer and Python 3.
 
 ```sh
 npm run build:pages
@@ -69,11 +69,18 @@ npm install
 npm run build:pages
 npm run check
 npm test
+npm run test:browser
 npm run validate:worker
 npm run worker:migrations:local
 ```
 
-`npm run validate:worker` is a Wrangler dry run, not a deploy. Synthetic fixtures live only under `test/fixtures/` and are loaded only by Node's test runner; they are never displayed or used by production Worker code. You can use `npm run worker:dev` after applying the local D1 migration.
+`npm run validate:worker` is a Wrangler dry run, not a deploy. Synthetic fixtures live only under `test/fixtures/` and are loaded only by automated tests; they are never displayed or used by production Worker code. `npm run test:browser` launches Chromium against the local static site and checks mobile navigation on the homepage, standards, archive, every generated film page, the Top 20 page and the dynamic detail shell. It checks the no-JavaScript Other Mommy and Clayface trailer links, basic horizontal overflow, search empty state and local image loading, and writes screenshots under `test-results/`. You can use `npm run worker:dev` after applying the local D1 migration.
+
+### Manual-film synchronization
+
+`data/movies.js` remains the editorial source of truth for the six existing film pages. `npm run sync:manual-films` validates and prints a dry-run summary with record hashes. After reviewing source edits, an authorized operator may run `npm run sync:manual-films -- --apply` with `FR_API_BASE` and `ADMIN_TOKEN` supplied in the process environment. The Worker stores immutable versions and source claim JSON in `manual_film_versions`; first import preserves the six existing approved records, while any changed record is stored as `pending-review` and never replaces the previously approved version. Changed records are listed through `/api/admin/manual-film-changes` and require an explicit authenticated approval. This synchronization does not create canonical provider mappings or feed a database title into discovery automatically.
+
+Only provider availability/showtime observations and explicitly licensed, territory-specific dates may refresh automatically, and only after exact IDs are editorially mapped to an approved horror film. Manual title, genre, synopsis, cast, crew, trailer, artwork, horror classification and editorial approval remain reviewed source claims. Changes to those claims are staged as a new version and require source-by-source review. See [OPERATIONS.md](OPERATIONS.md) for recovery and approval procedures.
 
 Read [API_LICENSING.md](API_LICENSING.md) before activating any provider. It documents the reviewed API terms, costs/quotas and attribution requirements, required owner actions, Worker secret names and the deliberately unset Cloudflare database ID. Commercial services are disabled by default; until licences and service configuration are present, the website reports unavailable data instead of inventing it. No Worker route, Cloudflare account setting, public domain or DNS value is changed by this repository.
 

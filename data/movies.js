@@ -4,6 +4,7 @@
 window.FR_MOVIES = [
   {
     id: 'other-mommy',
+    editorialStatus: 'approved',
     title: 'Other Mommy',
     claims: [
       { field: 'title', label: 'Title', value: 'Other Mommy', sourceName: 'Universal Pictures', source: 'https://www.universalpictures.com/movies/other-mommy/', territory: 'United States (Universal Pictures U.S. release listing)', checked: '2026-10-08' },
@@ -14,6 +15,7 @@ window.FR_MOVIES = [
   },
   {
     id: 'crawlers',
+    editorialStatus: 'approved',
     title: 'Crawlers',
     claims: [
       { field: 'title', label: 'Title', value: 'Crawlers', sourceName: 'VVS Films', source: 'https://vvsfilms.com/anz/movie/crawlers/', territory: 'ANZ regional page', checked: '2026-10-08' },
@@ -27,6 +29,7 @@ window.FR_MOVIES = [
   },
   {
     id: 'clayface',
+    editorialStatus: 'approved',
     title: 'Clayface',
     claims: [
       { field: 'title', label: 'Title', value: 'Clayface', sourceName: 'DC', source: 'https://www.dc.com/movies', territory: 'Film information; release territory cited separately', checked: '2026-10-08' },
@@ -42,6 +45,7 @@ window.FR_MOVIES = [
   },
   {
     id: 'victorian-psycho',
+    editorialStatus: 'approved',
     title: 'Victorian Psycho',
     claims: [
       { field: 'title', label: 'Title', value: 'Victorian Psycho', sourceName: 'British Council UK Films Database', source: 'https://filmsandfestivals.britishcouncil.org/projects/victorian-psycho', territory: 'Film information; no release territory specified', checked: '2026-10-08' },
@@ -58,6 +62,7 @@ window.FR_MOVIES = [
   },
   {
     id: 'werwulf',
+    editorialStatus: 'approved',
     title: 'Werwulf',
     claims: [
       { field: 'title', label: 'Title', value: 'Werwulf', sourceName: 'Focus Features', source: 'https://www.focusfeatures.com/werwulf', territory: 'Focus Features U.S. listing', checked: '2026-10-08' },
@@ -71,6 +76,7 @@ window.FR_MOVIES = [
   },
   {
     id: 'exorcist-2027',
+    editorialStatus: 'approved',
     title: 'The Exorcist: Martyrs',
     claims: [
       { field: 'title', label: 'Title', value: 'The Exorcist: Martyrs', sourceName: 'Mike Flanagan official website', source: 'https://mikeflanaganfilm.com/project/the-exorcist/', territory: 'Film information', checked: '2026-10-08' },
