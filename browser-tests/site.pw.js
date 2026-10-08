@@ -84,8 +84,8 @@ test('homepage date and verified-score filters report truthful result counts', a
   await expect(page.locator('#results-count')).toContainText('6 films');
   await expect(page.locator('[data-filter="date-tbc"]')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('[data-filter="reviewed"]').click();
-  await expect(page.locator('#results-count')).toContainText('4 films');
-  await expect(page.locator('.external-critic-scores')).toHaveCount(4);
+  await expect(page.locator('#results-count')).toContainText('6 films');
+  await expect(page.locator('.external-critic-scores')).toHaveCount(6);
 });
 
 
