@@ -231,3 +231,55 @@
 .hub-preview-chart__entry .score{color:#f5c5c8;font-size:20px;white-space:nowrap}
 @media(max-width:780px){.hub-rt-chart__entry{grid-template-columns:42px minmax(0,1fr) 72px;gap:8px;padding:13px}.hub-rt-chart__source{grid-column:2/-1;justify-self:start;margin-top:0;font-size:10px}.hub-rt-chart__rank{font-size:23px}.hub-rt-chart__score{font-size:23px;min-width:66px}.hub-rt-chart__film{font-size:20px}}
 @media(max-width:400px){.hub-rt-chart__entry{grid-template-columns:34px minmax(0,1fr) 65px;gap:6px;padding:11px 9px}.hub-rt-chart__score{font-size:21px;min-width:58px}.hub-rt-chart__film{font-size:18px}.hub-rt-chart__sub{font-size:10px}.hub-preview-chart__entry{grid-template-columns:31px minmax(0,1fr) 55px}}
+
+
+/* 1896–present Horror Vault: year accordions, in-year search, instant IMDb linking. */
+.horror-archive{padding-bottom:65px}
+.horror-archive__hero{margin-bottom:18px!important;background:linear-gradient(115deg,#180d11,#09080b);border-bottom:1px solid #613239;padding:26px 0}
+.horror-archive__hero h1{font-size:clamp(48px,7vw,103px)}
+.horror-archive__hero>p{max-width:890px}
+.hub-subtabs{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+.hub-subtabs a{font:900 14px var(--font-display);letter-spacing:1.1px;background:#130f12;border:1px solid #63363e;color:#dbc5c4;padding:12px 17px;transition:background .15s,border-color .15s}
+.hub-subtabs a.active,.hub-subtabs a[aria-current="page"],.hub-subtabs a:hover{background:#9e1825;color:#fff;border-color:#d22939}
+.horror-archive__panel{border:1px solid #70313c;background:linear-gradient(160deg,#100b0f,#0b090c);box-shadow:inset 0 0 80px #4b0c151c}
+.horror-archive__top{display:flex;align-items:end;justify-content:space-between;gap:25px;padding:28px;border-bottom:1px solid #67303a;background:radial-gradient(ellipse at 88% 10%,#871b2929,transparent 55%)}
+.horror-archive__top h2{font:900 clamp(38px,5vw,68px)/.95 var(--font-display);margin:7px 0 11px;color:#f6ebe7}
+.horror-archive__top h2 em{font-style:normal;color:#eb2736}
+.horror-archive__top p{font:700 12px/1.65 var(--font-body);color:#c6aeb2;max-width:700px;margin:0}
+.horror-archive__jump{flex:none;display:grid;gap:7px;font:900 11px var(--font-display);letter-spacing:1px;color:#daacb4}
+.horror-archive__jump select{min-width:160px;background:#1d1217;border:1px solid #a84552;color:white;padding:12px 15px;font:900 18px var(--font-display)}
+.horror-archive__source{padding:12px 26px;font:600 12px/1.65 var(--font-body);color:#b9a1a5;border-bottom:1px solid #4f2933;background:#1b1116}
+.horror-archive__source strong{color:#f5dfdd}
+.horror-archive__years{padding:7px 24px 22px}
+.horror-archive__decade{color:#f4d0ce;font:900 27px var(--font-display);letter-spacing:1.5px;margin:26px 0 8px;padding:0 2px 7px;border-bottom:1px solid #63313b}
+.horror-year{margin:4px 0;border:1px solid #4a2b32;background:#100d10;scroll-margin-top:20px}
+.horror-year[open]{border-color:#c13747;background:#1a0e13;box-shadow:0 4px 23px #0005}
+.horror-year__header{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:12px 15px;min-height:53px;transition:background .15s}
+.horror-year__header::-webkit-details-marker{display:none}
+.horror-year__header:hover,.horror-year[open]>.horror-year__header{background:linear-gradient(95deg,#6b1824,#270e15 73%)}
+.horror-year__year{font:900 27px var(--font-display);letter-spacing:1.1px;color:#fff1e9;min-width:84px}
+.horror-year__count{color:#bea2a7;font:900 11px var(--font-display);letter-spacing:.7px}
+.horror-year__chevron{margin-left:auto;color:#e63e4d;font:900 25px var(--font-display);transition:transform .18s}
+.horror-year[open] .horror-year__chevron{transform:rotate(180deg)}
+.horror-year__panel{padding:17px 18px 20px;background:linear-gradient(130deg,#221117,#0d0c10);border-top:1px solid #79313d}
+.horror-year__search-label{display:grid;gap:8px;font:900 12px var(--font-display);letter-spacing:1.1px;color:#f4c4c9;max-width:600px}
+.horror-year__search{width:100%;min-height:46px;padding:10px 14px;border:1px solid #8f414d;background:#09090c;color:#fff;font:600 14px var(--font-body);outline-offset:3px}
+.horror-year__search::placeholder{color:#8f7f84}
+.horror-year__tally{font:700 11px var(--font-body);color:#c1a8ad;margin:13px 0 10px}
+.horror-year__films{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px 12px}
+.horror-year__film{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid #472d36;background:#150f14;min-width:0;min-height:53px;transition:background .17s}
+.horror-year__film:hover{background:#3c1521;border-color:#a53d4a}
+.horror-year__film-link{font:800 15px/1.25 var(--font-display);color:#f7e8e8;overflow-wrap:anywhere}
+.horror-year__film-link:hover{text-decoration:underline;text-decoration-color:#ff4b5d;text-underline-offset:3px}
+.horror-year__film-type{flex:none;text-align:right;font:800 9px/1.25 var(--font-display);letter-spacing:.3px;color:#b78c98;max-width:62px}
+.horror-year__film[hidden],.horror-year__empty[hidden]{display:none}
+.horror-year__empty{padding:11px 13px;color:#c7aab0;border:1px dashed #6b3540}
+.horror-archive__offline{font-size:12px;color:#ffc0bd}
+.horror-archive__notes{margin:28px 0 0;padding:24px 27px;background:linear-gradient(110deg,#230e15,#0e0c10);border:1px solid #67303b}
+.horror-archive__notes h2{font:900 31px var(--font-display);margin:0 0 10px}
+.horror-archive__notes p{font:600 13px/1.75 var(--font-body);color:#c6abad;max-width:920px}
+.horror-archive__notes p a{text-decoration:underline;color:#f4a8b1}
+.horror-archive__notes .hub-tile__link{margin-top:10px}
+@media(max-width:980px){.horror-year__films{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:660px){.horror-archive{width:calc(100% - 28px);padding-bottom:35px}.horror-archive__hero{padding:18px 0}.hub-subtabs a{font-size:11px;padding:10px 11px;flex:1;text-align:center}.horror-archive__top{padding:19px;align-items:stretch;flex-direction:column;gap:15px}.horror-archive__jump{width:100%}.horror-archive__jump select{width:100%}.horror-archive__source{padding:13px 18px}.horror-archive__years{padding:7px 11px 14px}.horror-archive__decade{font-size:24px;margin-top:23px}.horror-year__header{padding:9px 11px}.horror-year__year{font-size:24px;min-width:75px}.horror-year__count{font-size:10px}.horror-year__panel{padding:15px 11px}.horror-year__films{grid-template-columns:1fr}.horror-year__film{padding:9px 12px;min-height:46px}.horror-year__film-link{font-size:16px}.horror-archive__notes{padding:19px}}
+@media(prefers-reduced-motion:reduce){.horror-year__chevron,.horror-year__film,.horror-year__header{transition:none}}
