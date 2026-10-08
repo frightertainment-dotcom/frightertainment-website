@@ -68,7 +68,7 @@ for (const year of rankingYears) {
 }
 
 // Roll the global navigation and homepage chart into the next year automatically.
-for (const filename of ['index.html','movies.html','all-horror-movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','film.html','editorial-standards.html']) {
+for (const filename of ['index.html','movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','film.html','editorial-standards.html']) {
   const file = new URL('../' + filename, import.meta.url);
   let source = await readFile(file, 'utf8');
   source = source.replace(/\/top-20\/20\d{2}\//g, '/top-20/' + currentYear + '/')
@@ -82,6 +82,6 @@ homepage = homepage.replace(/\/top-20\/\d{4}\//g, `/top-20/${currentYear}/`)
   .replace(/OF \d{4}/g, `OF ${currentYear}`);
 await writeFile(homepagePath, homepage);
 
-const locations = [`${base}/`, ...['movies.html','all-horror-movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html'].map(file => `${base}/${file}`), `${base}/editorial-standards.html`, `${base}/top-20/`, ...yearLocations, ...movies.map(movie => `${base}/films/${movie.id}/`)];
+const locations = [`${base}/`, ...['movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html'].map(file => `${base}/${file}`), `${base}/editorial-standards.html`, `${base}/top-20/`, ...yearLocations, ...movies.map(movie => `${base}/films/${movie.id}/`)];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${locations.map(location => `  <url><loc>${location}</loc></url>`).join('\n')}\n</urlset>\n`;
 await writeFile(new URL('../sitemap.xml', import.meta.url), sitemap);
