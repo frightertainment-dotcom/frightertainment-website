@@ -24,10 +24,14 @@ jobs:
       - name: Verify isolated, non-indexable preview bundle
         run: |
           test -f dist/index.html
+          test -f dist/all-horror-movies.html
+          test -f dist/horror-archive.js
+          test -f dist/data/archive/horror-films.json
           test -f dist/assets/frightertainment-brand.png
           test -f dist/films/other-mommy/index.html
           grep -q 'Disallow: /' dist/robots.txt
           grep -q 'X-Robots-Tag: noindex' dist/_headers
+          ! test -e dist/scripts
           ! test -e dist/worker
           ! test -e dist/.github
           ! test -e dist/API_LICENSING.md
