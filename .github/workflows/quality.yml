@@ -25,6 +25,8 @@ jobs:
         run: |
           test -f dist/index.html
           test -f dist/all-horror-movies.html
+          test -f dist/archive-film.html
+          test -f dist/archive-film.js
           test -f dist/horror-archive.js
           test -f dist/data/archive/horror-films.json
           test -f dist/assets/frightertainment-brand.png
