@@ -82,3 +82,15 @@ test('homepage date and verified-score filters report truthful result counts', a
   await expect(page.locator('#results-count')).toContainText('0 films');
   await expect(page.locator('#empty-state')).toBeVisible();
 });
+
+
+test('homepage recommendations do not advertise unannounced productions', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#horror-tv')).toBeVisible();
+  await expect(page.locator('#podcasts')).toBeVisible();
+  await expect(page.locator('#originals')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /the nosleep podcast/i })).toHaveCount(0);
+  await expect(page.locator('#podcasts a[href="https://www.thenosleeppodcast.com/"]')).toBeVisible();
+  await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
+  await expect(page.locator('body')).not.toContainText('DETAILS TO BE ANNOUNCED');
+});
