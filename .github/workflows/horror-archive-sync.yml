@@ -34,6 +34,12 @@ jobs:
           node-version: '22'
       - name: Import rate-limited CC0 horror records, preserving all existing films
         run: node scripts/sync-horror-archive.mjs
+      - name: Validate thousands of historical links before publishing
+        run: |
+          node --test test/archive.snapshot.test.js
+          npm run build:pages
+          npm run check
+          npm run build:preview
       - name: Commit updated reference catalogue to the same branch
         shell: bash
         run: |
