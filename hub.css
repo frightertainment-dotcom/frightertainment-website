@@ -206,3 +206,28 @@
 @media(max-width:440px){.hub-series__items{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-series__items a{border-bottom:1px solid #71333c}.hub-series__items a:nth-child(odd){border-left:0}}
 
 .external-critic-scores__item small{font:600 10px/1.4 var(--font-body);color:#bca7a8;white-space:normal}.external-critic-scores__item:hover small{color:#eee}
+
+
+/* Private source-attributed 2026 comparison — limited to manually checked
+ * publisher metrics. These are NOT Frightertainment's owned or licensed rankings. */
+.hub-rt-chart{list-style:none;padding:0;margin:18px 0 12px;border:1px solid #713039;background:linear-gradient(160deg,#190e12,#100c10)}
+.hub-rt-chart__entry{display:grid;grid-template-columns:60px minmax(0,1fr) 95px 110px;align-items:center;gap:13px;padding:16px 18px;border-bottom:1px solid #4b2931}
+.hub-rt-chart__entry:nth-child(odd){background:#2b111940}
+.hub-rt-chart__entry:last-child{border-bottom:0}
+.hub-rt-chart__rank{font:900 31px var(--font-display);color:#fb4d5c;text-shadow:0 2px 16px #e92c4244}
+.hub-rt-chart__details{min-width:0;display:flex;flex-direction:column;gap:5px}
+.hub-rt-chart__film{font:900 clamp(19px,2.3vw,28px)/1.05 var(--font-display);color:#f6e9e7}
+.hub-rt-chart__film:hover{text-decoration:underline;text-decoration-color:#ec3747;text-underline-offset:4px}
+.hub-rt-chart__sub{font:600 11px/1.4 var(--font-body);color:#ab9899}
+.hub-rt-chart__score{justify-self:end;border:1px solid #ae303e;border-radius:3px;background:radial-gradient(circle at 50% 28%,#872530,#45131c 65%,#270d13);color:#fff4ef;box-shadow:0 8px 19px #0008,inset 0 1px 0 #f5828844;min-width:80px;padding:7px 10px;text-align:center;font:900 29px/.95 var(--font-display)}
+.hub-rt-chart__source{justify-self:end;color:#efb1b8;font:900 11px var(--font-display);letter-spacing:.5px;text-decoration:underline;text-underline-offset:3px}
+.hub-rt-chart__source:hover{color:#fff}
+.hub-rt-unscored{border:1px solid #513037;margin:12px 0 25px;background:#140f12;padding:13px 16px;color:#c7b7b6}
+.hub-rt-unscored summary{cursor:pointer;font:800 16px var(--font-display);color:#edb4b6}
+.hub-rt-unscored ul{display:grid;gap:8px;padding:14px 0 0 24px;margin:0;font:600 12px var(--font-body)}
+.hub-rt-unscored a:hover{text-decoration:underline}
+.hub-preview-chart__entry{grid-template-columns:35px minmax(0,1fr) 62px}
+.hub-preview-chart__note{margin:0;padding:8px 15px 13px;color:#b19da0;font:600 10px/1.5 var(--font-body);border-top:1px solid #492c33}
+.hub-preview-chart__entry .score{color:#f5c5c8;font-size:20px;white-space:nowrap}
+@media(max-width:780px){.hub-rt-chart__entry{grid-template-columns:42px minmax(0,1fr) 72px;gap:8px;padding:13px}.hub-rt-chart__source{grid-column:2/-1;justify-self:start;margin-top:0;font-size:10px}.hub-rt-chart__rank{font-size:23px}.hub-rt-chart__score{font-size:23px;min-width:66px}.hub-rt-chart__film{font-size:20px}}
+@media(max-width:400px){.hub-rt-chart__entry{grid-template-columns:34px minmax(0,1fr) 65px;gap:6px;padding:11px 9px}.hub-rt-chart__score{font-size:21px;min-width:58px}.hub-rt-chart__film{font-size:18px}.hub-rt-chart__sub{font-size:10px}.hub-preview-chart__entry{grid-template-columns:31px minmax(0,1fr) 55px}}
