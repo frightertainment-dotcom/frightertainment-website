@@ -65,7 +65,23 @@
   };
   const grid = $('#movie-grid');
   if (grid) {
-    const state = { filter: 'all', query: '', sort: 'title', visible: 8, year: String(new Date().getUTCFullYear()) };
+    const currentYear=new Date().getUTCFullYear();
+    const state = { filter: 'all', query: '', sort: 'title', visible: 8, year: String(currentYear) };
+    const yearMenu=$('#movie-year');
+    if(yearMenu){
+      const options=[
+        {value:String(currentYear),label:currentYear+' RELEASES'},
+        {value:String(currentYear-1),label:(currentYear-1)+' RELEASES'},
+        {value:'older',label:'BEFORE '+(currentYear-1)+' · ARCHIVE'},
+        {value:'future',label:(currentYear+1)+' ONWARDS'},
+        {value:'all',label:'ALL RELEASE YEARS'}
+      ];
+      yearMenu.replaceChildren(...options.map(item=>{
+        const opt=document.createElement('option');opt.value=item.value;opt.textContent=item.label;
+        return opt;
+      }));
+      yearMenu.value=state.year;
+    }
     const render = () => {
       const filtered = movies.filter(movie => {
         const dateKnown = recordHasDate(movie);
@@ -73,7 +89,7 @@
         const filterOK = state.filter === 'all' || (state.filter === 'date-tbc' && !dateKnown) ||
           (state.filter === 'reviewed' && (hasScore || scoreSnapshots(movie).length > 0));
         const year = recordYear(movie);
-        const yearOK = state.year === 'all' || (state.year === 'older' ? year !== null && year < 2025 :
+        const yearOK = state.year === 'all' || (state.year === 'older' ? year !== null && year < currentYear-1 :
           state.year === 'future' ? year !== null && year > new Date().getUTCFullYear() :
           year === Number(state.year));
         const searchText = [movie.title, ...claimList(movie).map(claim => claim.value)].join(' ').toLocaleLowerCase();
@@ -91,7 +107,7 @@
       $('#results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'film' : 'films'}`;
       $('#total-count').textContent = String(movies.length).padStart(2, '0');
       const scope=$('#movie-year-title');
-      if (scope) scope.textContent=state.year==='all'?'ALL FILM YEARS':state.year==='older'?'BEFORE 2025':state.year==='future'?'FUTURE FILMS':state.year+' HORROR FILMS';
+      if (scope) scope.textContent=state.year==='all'?'ALL FILM YEARS':state.year==='older'?'BEFORE '+(currentYear-1):state.year==='future'?'FUTURE FILMS':state.year+' HORROR FILMS';
     };
     document.addEventListener('click', event => {
       const chip = event.target.closest('[data-filter]');
