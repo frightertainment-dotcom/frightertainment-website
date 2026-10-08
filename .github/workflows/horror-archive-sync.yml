@@ -43,6 +43,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Archive is already up to date"
           else
-            git commit -m "data: expand cumulative CC0 horror film history archive [skip ci]"
+            git commit -m "data: expand cumulative CC0 horror film history archive"
             git push origin HEAD:${{ github.ref_name }}
           fi
