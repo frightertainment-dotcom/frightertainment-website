@@ -79,3 +79,25 @@
 @media(prefers-reduced-motion:reduce){.hub-tile *,.hub-tabs a{transition:none}}
 
 .movie-card__official{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;padding:8px 3px 5px;border-top:1px solid #422a2c}.movie-card__official a{font:800 10px var(--font-display);letter-spacing:1.2px;color:#e2afb2}.movie-card__official a:hover{text-decoration:underline}.movie-card__official small{color:#867273;font-size:10px}
+
+/* Original in-house illustrated atmospheres; decorative, not film or podcast posters. */
+.hub-intro{position:relative;isolation:isolate;overflow:hidden;border:1px solid #50242a;border-left:3px solid #bb1b27;border-bottom-color:#633039;padding:22px 24px 24px!important;background:#13090e}
+.hub-intro::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,#13090ef0 0%,#13090ebf 46%,#12080b7a 100%),url('/assets/hub-haunted.svg') center 54%/cover no-repeat}
+.hub-intro::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 18% 105%,#ab182420,transparent 67%);pointer-events:none}
+.hub-intro>div,.hub-intro>p{position:relative}
+.hub-intro>p{text-shadow:0 2px 10px #000}
+.hub-feature{background:#170b10 url('/assets/hub-haunted.svg') 58% 57%/cover no-repeat;border-color:#c12a36}
+.hub-tv{background:#091417 url('/assets/hub-forest.svg') center center/cover no-repeat!important}
+.hub-podcast{background:#180912 url('/assets/hub-audio.svg') 65% center/cover no-repeat!important}
+.hub-indie{background:#170c0f url('/assets/hub-haunted.svg') 45% 58%/cover no-repeat!important}
+.hub-games{background:#110910 url('/assets/hub-door.svg') 70% center/cover no-repeat!important}
+.hub-catalog .hub-tile{background-size:cover}
+.hub-tile__wash{background:linear-gradient(90deg,#080609f4 0%,#090609de 46%,#10091060 100%)}
+.hub-tv .hub-tile__wash{background:linear-gradient(90deg,#071115ec,#061217ad 65%,transparent)}
+.hub-tile:focus-within{outline:2px solid #f24758;outline-offset:3px}
+.hub-charts{box-shadow:inset 0 0 60px #4f0b1314}
+.hub-tabs a{transition:background .2s,color .2s,box-shadow .2s}
+.hub-honest-panel{background:linear-gradient(90deg,#120a0eed 0%,#120a0e94 100%),url('/assets/hub-haunted.svg') right center/cover}
+.hub-rights-note{line-height:1.7}
+@media(max-width:640px){.hub-intro{padding:14px 16px 18px!important}.hub-intro::before{background:linear-gradient(90deg,#13090ee8,#13090eb0),url('/assets/hub-haunted.svg') 65% center/cover no-repeat}.hub-intro h1{font-size:clamp(44px,10.5vw,60px)}.hub-intro>p{max-width:330px}.hub-showcase__bottom .hub-tile{min-height:165px}.hub-feature{min-height:190px}.hub-tabs a{font-size:12px}}
+@media(max-width:360px){.hub-tabs a{font-size:10px;padding:8px 3px}.hub-showcase__bottom{grid-template-columns:1fr}.hub-showcase__bottom .hub-tile{min-height:125px}.hub-tile__content{padding:14px}}
