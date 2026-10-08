@@ -82,12 +82,20 @@
       return response.json();
     })
     .then(data=>{
+      // Wikidata can occasionally give two different films the same IMDb ID.
+      // Such identifiers cannot safely be presented as exact links.
+      const imdbCounts=new Map();
+      for(const candidate of (Array.isArray(data.films)?data.films:[])){
+        const candidateId=safeImdb(candidate.imdbId);
+        if(candidateId) imdbCounts.set(candidateId,(imdbCounts.get(candidateId)||0)+1);
+      }
+      const reliableImdb=id=>id && imdbCounts.get(id)===1?id:null;
       if(id.startsWith('Q')){
         const row=(Array.isArray(data.films)?data.films:[]).find(x=>x.qid===id);
         if(!row || typeof row.title!=='string' || !Number.isInteger(row.year)){
           error('This record is not in the current archive. It might have been corrected. Try searching by year again.');return;
         }
-        render({title:row.title,year:row.year,imdbId:safeImdb(row.imdbId),qid:row.qid});
+        render({title:row.title,year:row.year,imdbId:reliableImdb(safeImdb(row.imdbId)),qid:row.qid});
         return;
       }
       const row=(Array.isArray(data.manual)?data.manual:[]).find(x=>x.id===id);
