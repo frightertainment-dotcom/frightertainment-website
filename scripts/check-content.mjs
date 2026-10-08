@@ -90,3 +90,7 @@ if (!sitemap.includes(`/top-20/${currentYear}/`)) errors.push(`${currentYear} an
 if (!sitemap.includes('/top-20/')) errors.push('Annual ranking archive missing from sitemap');
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
+
+const homepageEditorial = await readFile(new URL('index.html', root), 'utf8');
+if (!homepageEditorial.includes('id="horror-tv"') || !homepageEditorial.includes('id="podcasts"')) errors.push('Homepage must include television and podcast recommendations');
+if (/FRIGHTERTAINMENT ORIGINALS|DETAILS TO BE ANNOUNCED|id="originals"|href="#originals"/i.test(homepageEditorial)) errors.push('Unannounced production/promotional claims must not appear on homepage');
