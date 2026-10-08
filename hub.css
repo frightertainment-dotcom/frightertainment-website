@@ -137,3 +137,20 @@
  .hub-ranking__empty strong{font-size:18px}
  .hub-chart-row{padding:8px 12px}
 }
+
+/* Release calendar: studio dates are independently sourced, not live theatre showtimes */
+.hub-release-calendar{padding:23px 0 48px}
+.hub-release-head{display:flex;gap:20px;align-items:end;justify-content:space-between;border-top:1px solid #513037;padding-top:25px;margin-bottom:13px}
+.hub-release-head h2{font:900 clamp(34px,4.5vw,62px)/.96 var(--font-display);margin:8px 0 0}
+.hub-release-head h2 em{font-style:normal;color:#e62431}
+.hub-release-head>p{max-width:500px;color:#aa9b96;font-size:12px;margin:0 0 5px}
+.hub-release-list{border:1px solid #4e2932;background:#120e0f}
+.hub-release-meta{padding:13px 17px;margin:0;color:#ac9494;background:#1a1013;font:600 11px var(--font-body)}
+.hub-release-row{display:grid;grid-template-columns:120px minmax(0,1fr) 95px 67px;gap:14px;align-items:center;padding:14px 17px;border-top:1px solid #3c272d}
+.hub-release-row time{font:900 16px var(--font-display);color:#f3e3e1}
+.hub-release-row>div>a{display:block;font:900 17px var(--font-display);color:#f2e9e6}
+.hub-release-row small{display:block;color:#ad9492;font-size:11px;overflow-wrap:anywhere}
+.hub-release-state{font:900 10px var(--font-display);color:#f1adb2}
+.hub-release-source{font:800 11px var(--font-display);color:#e4b6b7}
+.hub-release-source:hover,.hub-release-row>div>a:hover{text-decoration:underline}
+@media(max-width:700px){.hub-release-head{display:block}.hub-release-head>p{margin-top:10px}.hub-release-row{grid-template-columns:105px minmax(0,1fr);gap:7px 12px;padding:13px}.hub-release-row .hub-release-state{grid-column:1}.hub-release-row .hub-release-source{grid-column:2;justify-self:start}.hub-release-row time{font-size:14px}.hub-release-row>div>a{font-size:15px}}
