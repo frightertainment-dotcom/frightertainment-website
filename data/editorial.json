@@ -1,0 +1,226 @@
+{
+  "tv-shows": [
+    {
+      "id": "tv-shows-0",
+      "title": "Marianne",
+      "category": "SUPERNATURAL · FRENCH HORROR",
+      "description": "A horror novelist returns home to confront the presence haunting her stories.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/80217779",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "tv-shows-1",
+      "title": "Archive 81",
+      "category": "FOUND FOOTAGE · MYSTERY",
+      "description": "An archivist restores tapes and becomes drawn into a missing filmmaker's story.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/80222802",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "tv-shows-2",
+      "title": "The Fall of the House of Usher",
+      "category": "GOTHIC · FAMILY HORROR",
+      "description": "A wealthy family's legacy collapses amid strange deaths.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/81414665",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "tv-shows-3",
+      "title": "The Haunting of Bly Manor",
+      "category": "GOTHIC · GHOST STORY",
+      "description": "A new arrival at a manor uncovers generations of secrets.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/81237854",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "tv-shows-4",
+      "title": "Kingdom",
+      "category": "PERIOD · ZOMBIE HORROR",
+      "description": "A crown prince faces a spreading, terrifying plague.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/80180171",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "tv-shows-5",
+      "title": "Guillermo del Toro's Cabinet of Curiosities",
+      "category": "HORROR · ANTHOLOGY",
+      "description": "Eight unsettling stories from different horror filmmakers.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://qr.netflix.com/gb/title/80209229",
+      "checkedAt": "2026-10-08"
+    }
+  ],
+  "podcasts": [
+    {
+      "id": "podcasts-0",
+      "title": "Old Gods of Appalachia",
+      "category": "FOLK HORROR · ANTHOLOGY",
+      "description": "Ancient dread beneath the Appalachian mountains.",
+      "sourceName": "DeepNerd Media",
+      "sourceUrl": "https://podcasts.apple.com/gb/podcast/old-gods-of-appalachia/id1485435369",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "podcasts-1",
+      "title": "The Silt Verses",
+      "category": "WEIRD FICTION · AUDIO DRAMA",
+      "description": "Rogue worshippers travel a river haunted by strange gods.",
+      "sourceName": "The Silt Verses",
+      "sourceUrl": "https://www.thesiltverses.com/listen-now",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "podcasts-2",
+      "title": "Lore",
+      "category": "FOLKLORE · DARK HISTORY",
+      "description": "Real-world legends and unsettling historical tales narrated by Aaron Mahnke.",
+      "sourceName": "Lore",
+      "sourceUrl": "https://www.lorepodcast.com/episodes",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "podcasts-3",
+      "title": "Unwell",
+      "category": "GOTHIC · AUDIO DRAMA",
+      "description": "A boarding house and the strange mysteries of a small Ohio town.",
+      "sourceName": "Audacious Machine Creative",
+      "sourceUrl": "https://www.unwellpodcast.com/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "podcasts-4",
+      "title": "I Am in Eskew",
+      "category": "SURREAL HORROR · AUDIO DRAMA",
+      "description": "Disorienting tales from a city that refuses to behave normally.",
+      "sourceName": "The Silt Verses creators",
+      "sourceUrl": "https://www.iamineskew.com/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "podcasts-5",
+      "title": "The White Vault",
+      "category": "SURVIVAL · AUDIO DRAMA",
+      "description": "A research expedition discovers something in an isolated Arctic station.",
+      "sourceName": "Fool & Scholar",
+      "sourceUrl": "https://thewhitevault.com/",
+      "checkedAt": "2026-10-08"
+    }
+  ],
+  "games": [
+    {
+      "id": "games-0",
+      "title": "Phasmophobia",
+      "category": "GHOST HUNTING · CO-OP",
+      "description": "Investigate hauntings with friends and try to survive.",
+      "sourceName": "Kinetic Games",
+      "sourceUrl": "https://www.kineticgames.co.uk/phasmophobia",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "games-1",
+      "title": "Alan Wake 2",
+      "category": "SURVIVAL · PSYCHOLOGICAL HORROR",
+      "description": "A writer's nightmare and a murder investigation collide.",
+      "sourceName": "Remedy",
+      "sourceUrl": "https://www.remedygames.com/games/alan-wake-2",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "games-2",
+      "title": "Dead Space",
+      "category": "SCI-FI · SURVIVAL HORROR",
+      "description": "An engineer explores a derelict spacecraft filled with horrors.",
+      "sourceName": "Electronic Arts",
+      "sourceUrl": "https://www.ea.com/games/dead-space",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "games-3",
+      "title": "Silent Hill 2",
+      "category": "PSYCHOLOGICAL · SURVIVAL HORROR",
+      "description": "Return to a fogbound town shaped by grief and dread.",
+      "sourceName": "Konami",
+      "sourceUrl": "https://www.konami.com/games/us/en/topics/2440/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "games-4",
+      "title": "Amnesia: The Dark Descent",
+      "category": "FIRST-PERSON · SURVIVAL HORROR",
+      "description": "Uncover the horrors within the halls of Castle Brennenburg.",
+      "sourceName": "Frictional Games",
+      "sourceUrl": "https://frictionalgames.com/games/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "games-5",
+      "title": "Amnesia: Rebirth",
+      "category": "NARRATIVE · SURVIVAL HORROR",
+      "description": "A journey through the desert leads into disturbing darkness.",
+      "sourceName": "Frictional Games",
+      "sourceUrl": "https://frictionalgames.com/games/",
+      "checkedAt": "2026-10-08"
+    }
+  ],
+  "indie-movies": [
+    {
+      "id": "indie-movies-0",
+      "title": "Longlegs",
+      "category": "INDEPENDENT DISTRIBUTION · OCCULT HORROR",
+      "description": "An FBI investigation becomes entangled with the occult.",
+      "sourceName": "NEON",
+      "sourceUrl": "/films/longlegs/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "indie-movies-1",
+      "title": "The Monkey",
+      "category": "INDEPENDENT DISTRIBUTION · CURSED OBJECT",
+      "description": "A wind-up toy brings a string of dreadful deaths.",
+      "sourceName": "NEON",
+      "sourceUrl": "/films/the-monkey/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "indie-movies-2",
+      "title": "Together",
+      "category": "INDEPENDENT DISTRIBUTION · BODY HORROR",
+      "description": "A couple encounters a nightmarish force in the countryside.",
+      "sourceName": "NEON",
+      "sourceUrl": "/films/together/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "indie-movies-3",
+      "title": "Heretic",
+      "category": "INDEPENDENT DISTRIBUTION · PSYCHOLOGICAL",
+      "description": "Two visitors become trapped in a dangerous test of faith.",
+      "sourceName": "A24",
+      "sourceUrl": "/films/heretic/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "indie-movies-4",
+      "title": "Bring Her Back",
+      "category": "INDEPENDENT DISTRIBUTION · OCCULT HORROR",
+      "description": "Siblings uncover a terrifying ritual at their foster home.",
+      "sourceName": "A24",
+      "sourceUrl": "/films/bring-her-back/",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "indie-movies-5",
+      "title": "Nosferatu",
+      "category": "SPECIALTY DISTRIBUTION · GOTHIC HORROR",
+      "description": "A new gothic interpretation of the vampire legend.",
+      "sourceName": "Focus Features",
+      "sourceUrl": "/films/nosferatu/",
+      "checkedAt": "2026-10-08"
+    }
+  ]
+}
