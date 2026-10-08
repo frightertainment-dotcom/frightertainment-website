@@ -109,5 +109,21 @@ const buildSource = await readFile(new URL('scripts/build-preview.mjs',root),'ut
 for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html'])
   if (!buildSource.includes("'" + page + "'")) errors.push('Preview must include ' + page);
 
+const editorialData = JSON.parse(await readFile(new URL('data/editorial.json', root), 'utf8'));
+for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
+  const entries = editorialData[kind];
+  if (!Array.isArray(entries) || entries.length < 6) errors.push(kind + ': insufficient sourced editorial recommendations');
+  const ids = new Set();
+  for (const record of entries || []) {
+    if (ids.has(record.id)) errors.push(kind + ': duplicate entry '+record.id);
+    ids.add(record.id);
+    if (!record.title || !record.description || !record.category || !record.sourceName ||
+        !validDay(record.checkedAt) || !(/^(https:\/\/[^\s]+|\/films\/[a-z0-9-]+\/)$/).test(record.sourceUrl||''))
+      errors.push(kind + ': incomplete editorial record '+record.id);
+  }
+  const html = await readFile(new URL(kind+'.html',root),'utf8');
+  for (const record of entries || []) if (!html.includes(escapeHTML(record.title))) errors.push(kind + ': generated content missing '+record.title);
+}
+
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
