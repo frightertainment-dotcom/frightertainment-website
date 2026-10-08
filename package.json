@@ -1,0 +1,11 @@
+{
+  "name": "frightertainment-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:pages": "node scripts/build-pages.mjs",
+    "check": "node scripts/check-content.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}

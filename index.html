@@ -1,81 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-GB">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#090909">
-  <meta name="description" content="Frightertainment: the horror release calendar. Discover upcoming horror movies, official trailers, synopses and transparent critic score comparisons.">
+  <meta name="description" content="Frightertainment is an independent horror publication covering upcoming films, critic reviews and original series.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Frightertainment — Your Next Nightmare Starts Here">
-  <meta property="og:description" content="Upcoming horror movies, release dates, official trailers and the Frightertainment review index.">
+  <meta property="og:title" content="Frightertainment — Independent Horror Culture">
+  <meta property="og:description" content="Upcoming horror films, sourced reviews and Frightertainment Originals.">
   <meta property="og:url" content="https://www.frightertainment.com/">
   <meta property="og:image" content="https://www.frightertainment.com/assets/frightertainment-brand.png">
+  <link rel="canonical" href="https://www.frightertainment.com/">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-  <title>Upcoming Horror Movies &amp; Trailers — Frightertainment</title>
+  <title>Frightertainment — Independent Horror Culture</title>
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <a class="skip-link" href="#upcoming">Skip to upcoming films</a>
+  <a class="skip-link" href="#upcoming">Skip to film listings</a>
   <div class="red-thread" aria-hidden="true"></div>
-  <div class="microbar"><div class="shell microbar__inner"><span><span class="pulse-dot"></span> YOUR FIX OF FEAR. NO SLEEP REQUIRED.</span><span>INDEPENDENT HORROR CULTURE <span class="microbar__separator">//</span> EST. 2026</span></div></div>
+  <div class="microbar"><div class="shell microbar__inner"><span><span class="pulse-dot"></span> YOUR FIX OF FEAR. NO SLEEP REQUIRED.</span><span>INDEPENDENT HORROR CULTURE <span class="microbar__separator">//</span> FRIGHTERTAINMENT</span></div></div>
   <header class="header" id="top"><div class="shell header__inner">
-    <a class="brand" href="#top" aria-label="Frightertainment homepage"><img src="assets/frightertainment-brand.png" alt="Frightertainment"></a>
-    <nav class="nav" aria-label="Main navigation">
-      <a href="#upcoming" class="nav-active">UPCOMING</a>
-      <a href="#review-index">FRIGHT INDEX</a>
-      <a href="#trailers">TRAILERS</a>
-      <a href="#about">ABOUT</a>
-    </nav>
+    <a class="brand" href="index.html" aria-label="Frightertainment homepage"><img src="assets/frightertainment-brand.png" alt="Frightertainment"></a>
+    <nav class="nav" aria-label="Main navigation"><a href="#upcoming">FILMS</a><a href="#review-index">FRIGHT INDEX</a><a href="#originals">ORIGINALS</a><a href="#about">ABOUT</a></nav>
     <a href="#upcoming" class="header__action"><span>EXPLORE FILMS</span><span aria-hidden="true">↗</span></a>
     <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button>
-  </div>
-  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden>
-    <a href="#upcoming">UPCOMING RELEASES</a><a href="#review-index">FRIGHT INDEX</a><a href="#trailers">WATCH TRAILERS</a><a href="#about">ABOUT</a>
-  </nav></header>
+  </div><nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden><a href="#upcoming">FILM LISTINGS</a><a href="#review-index">FRIGHT INDEX</a><a href="#originals">ORIGINALS</a><a href="#about">ABOUT</a></nav></header>
   <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero__grain" aria-hidden="true"></div>
-      <div class="hero__light" aria-hidden="true"></div>
-      <div class="shell hero__inner">
-        <div class="hero__copy">
-          <div class="eyebrow"><span class="eyebrow__line"></span> THE HEADLINER <span class="eyebrow__slash">/</span> OCTOBER 2026</div>
-          <div class="hero__overline">THE NEXT NIGHTMARE IS CLOSER THAN YOU THINK</div>
-          <h1 id="hero-title">FEAR HAS<br>A NEW <em>FACE.</em></h1>
-          <p class="hero__description">A child's imaginary friend looks exactly like her mother. Unfortunately, some doors should never be opened.</p>
-          <div class="hero__meta"><span><strong>09 OCT</strong> 2026</span><span class="meta-divider"></span><span>SUPERNATURAL HORROR</span><span class="meta-divider"></span><span>IN CINEMAS</span></div>
-          <div class="hero__actions"><button class="button button--red" data-open-movie="other-mommy"><span>EXPLORE THE FILM</span><span aria-hidden="true">↗</span></button><button class="button button--outline" data-watch="other-mommy"><span class="play-mini">▶</span> WATCH TRAILER</button></div>
-          <p class="hero__source">Featuring <em>Other Mommy</em> (2026) · Universal Pictures</p>
-        </div>
-        <div class="hero__art" aria-label="Poster for Other Mommy">
-          <div class="hero__poster-glow"></div>
-          <div class="poster-frame poster-frame--hero" data-poster="other-mommy"><div class="poster-fallback poster-fallback--other"><span>AN UNWELCOME<br>PRESENCE</span><strong>OTHER<br>MOMMY</strong></div><img src="https://static.cinemagia.ro/img/db/movie/33/25/539/other-mommy-617341l.jpg" alt="Other Mommy promotional poster" decoding="async" referrerpolicy="no-referrer"></div>
-          <div class="hero__side-label">01 <span></span> FEATURED RELEASE</div>
-          <div class="hero__poster-tag"><span class="small-red-square"></span> NEW THIS WEEK</div>
-        </div>
+    <section class="hero" aria-labelledby="hero-title"><div class="hero__grain" aria-hidden="true"></div><div class="shell hero__inner">
+      <div class="hero__copy"><div class="eyebrow"><span class="eyebrow__line"></span> INDEPENDENT HORROR CULTURE</div><div class="hero__overline">FILMS. STORIES. THE THINGS THAT STAY WITH YOU.</div>
+        <h1 id="hero-title">WELCOME<br>TO THE <em>DARK.</em></h1><p class="hero__description">A home for horror obsessives. Explore film leads, transparent critic scores and original Frightertainment series.</p>
+        <div class="hero__actions"><a class="button button--red" href="#upcoming">BROWSE FILMS <span aria-hidden="true">↗</span></a><a class="button button--outline" href="#originals">DISCOVER ORIGINALS</a></div>
+        <p class="hero__source">Film details are published only after verification. Unconfirmed leads are labelled.</p>
       </div>
-      <div class="hero__bottom"><div class="shell hero__bottom-inner"><span>01 / THE HUNT FOR HORROR STARTS HERE</span><a href="#upcoming">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a></div></div>
-    </section>
-    <section class="ticker" aria-label="Horror cinema slogan"><div class="shell ticker__inner"><span>THE DARKNESS IS CALLING</span><span class="ticker-cross">✳</span><span>FIND YOUR NEXT NIGHTMARE</span><span class="ticker-cross">✳</span><span>THE DARKNESS IS CALLING</span></div></section>
+      <div class="hero__art" aria-hidden="true"><div class="hero__poster-glow"></div><div class="hero__poster-tag"><span class="small-red-square"></span> HORROR, INDEPENDENTLY</div><div class="hero-wordmark">FRIGHT<br><em>ERTAINMENT</em></div></div>
+    </div><div class="hero__bottom"><div class="shell hero__bottom-inner"><span>FILM CULTURE FOR THE FEARLESS</span><a href="#upcoming">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a></div></div></section>
+    <div class="ticker" aria-label="Horror cinema slogan"><div class="shell ticker__inner"><span>THE DARKNESS IS CALLING</span><span class="ticker-cross" aria-hidden="true">✳︎</span><span>FIND YOUR NEXT NIGHTMARE</span><span class="ticker-cross" aria-hidden="true">✳︎</span><span>THE DARKNESS IS CALLING</span></div></div>
     <section class="releases shell" id="upcoming" aria-labelledby="upcoming-title">
-      <div class="section-head"><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> THE RELEASE CALENDAR / 2026—2027</div><h2 id="upcoming-title">COMING <em>FOR YOU.</em></h2><p>Confirmed horror releases worth keeping on your radar. Dates shown are announced theatrical dates and may vary by country.</p></div><div class="section-head__stamp">THE WATCHLIST <span>VOL. 001</span></div></div>
-      <div class="filter-area">
-        <div class="filter-chips" role="group" aria-label="Filter movies"><button class="chip active" data-filter="all" aria-pressed="true">ALL RELEASES <span id="total-count">06</span></button><button class="chip" data-filter="2026" aria-pressed="false">2026</button><button class="chip" data-filter="2027" aria-pressed="false">2027</button><button class="chip" data-filter="rated" aria-pressed="false">WITH SCORES</button></div>
-        <div class="filter-tools"><label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search movies</span><input type="search" id="movie-search" placeholder="SEARCH THE DARKNESS..." autocomplete="off"></label><label class="sort-wrap"><span class="sr-only">Sort movies</span><select id="movie-sort"><option value="date">SOONEST FIRST</option><option value="title">A — Z</option><option value="score">HIGHEST FRIGHT INDEX</option></select></label></div>
+      <div class="section-head"><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> PRIMARY-SOURCE FILM FILES</div><h2 id="upcoming-title">THE <em>WATCHLIST.</em></h2><p>Claims below link to their source, checked date and release territory. A film with no confirmed market date is labelled.</p></div><div class="section-head__stamp">FILM FILES <span id="total-count">00</span></div></div>
+      <div class="filter-area"><div class="filter-chips" role="group" aria-label="Filter film listings"><button class="chip active" data-filter="all" aria-pressed="true">ALL FILMS</button><button class="chip" data-filter="date-tbc" aria-pressed="false">DATE UNCONFIRMED</button><button class="chip" data-filter="reviewed" aria-pressed="false">WITH VERIFIED SCORES</button></div>
+        <div class="filter-tools"><span id="results-count" class="results-count" aria-live="polite">6 films</span><label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search film titles and sourced details</span><input type="search" id="movie-search" placeholder="SEARCH FILMS AND DETAILS..." autocomplete="off"></label><label class="sort-wrap"><span class="sr-only">Sort film listings</span><select id="movie-sort"><option value="title">TITLE A — Z</option><option value="date">RELEASE DATE</option></select></label></div>
       </div>
-      <div id="movie-grid" class="movie-grid" aria-live="polite"></div>
-      <div class="empty-state" id="empty-state" hidden><strong>NOTHING LURKING HERE.</strong><p>Try another search or filter.</p></div>
-      <div class="under-grid"><span>DATES AND SCORES ARE EDITORIAL SNAPSHOTS, NOT LIVE FEEDS.</span><a href="#about">HOW THIS SITE WORKS ↗</a></div>
+      <div id="movie-grid" class="movie-grid" aria-live="polite" aria-busy="false"></div>
+      <div class="empty-state" id="empty-state" hidden><strong>NO LISTINGS FOUND.</strong><p>Try another title or filter.</p></div>
+      <div class="under-grid"><span>DATES, PLOTS, ARTWORK, TRAILERS AND REVIEWS ARE ADDED AFTER CHECKING SOURCES.</span><a href="editorial-standards.html">EDITORIAL STANDARDS ↗</a></div>
     </section>
-    <section class="index-section" id="review-index" aria-labelledby="index-title"><div class="shell index-section__inner"><div class="index-section__heading"><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> CRITIC SCORES, WITHOUT THE GUESSWORK</div><h2 id="index-title">THE FRIGHTERTAINMENT<br><em>FRIGHT INDEX.</em></h2><p>A single quick-reference number built from linked, published critic scores. Every included score is shown, so you can judge the verdict for yourself.</p><button class="inline-link" data-open-movie="victorian-psycho">SEE A REAL SCORE BREAKDOWN <span>↗</span></button></div><div class="index-demo" id="index-demo"><div class="index-demo__top"><span>SCORING EXAMPLE / VICTORIAN PSYCHO</span><span>AS CHECKED 08 OCT 2026</span></div><div class="index-demo__body"><div class="score-dial"><div><strong id="demo-score">—</strong><span>OUT OF 100</span></div></div><div class="index-demo__right"><div class="demo-row"><span>ROTTEN TOMATOES</span><strong>81%</strong></div><div class="demo-rule"></div><div class="demo-row"><span>METACRITIC</span><strong>52 / 100</strong></div><div class="demo-rule"></div><div class="demo-row demo-row--total"><span>FRIGHT INDEX</span><strong id="demo-index">—</strong></div></div></div><div class="index-demo__footer">TWO VERIFIED SOURCES <span class="tiny-dot"></span> DIFFERENT CRITIC METHODOLOGIES <span class="tiny-dot"></span> EQUAL WEIGHT PER SOURCE</div></div></div></section>
-    <section class="trailer-section shell" id="trailers" aria-labelledby="trailer-title"><div class="section-head section-head--compact"><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> STRAIGHT FROM THE STUDIOS</div><h2 id="trailer-title">PRESS <em>PLAY.</em></h2><p>Official trailers. No recycled fan edits or misleading cuts.</p></div></div><div class="trailer-feature"><button id="feature-trailer" class="trailer-feature__image" data-watch="clayface" aria-label="Watch the official Clayface trailer"><div class="trailer-feature__visual"><span>CLAYFACE</span><small>THE BODY IS ONLY THE BEGINNING</small></div><div class="play-ring"><span>▶</span></div></button><div class="trailer-feature__copy"><span class="label-red">OFFICIAL TRAILER</span><h3>CLAYFACE</h3><div class="trailer-feature__meta">DC STUDIOS <span>•</span> 23 OCT 2026</div><p>One terrible transformation. A rising star becomes something far more frightening than a face in the mirror.</p><button class="inline-link" data-watch="clayface">WATCH THE TRAILER <span>↗</span></button></div></div></section>
-    <section class="manifesto" id="about"><div class="shell manifesto__inner"><div class="manifesto__brand"><img src="assets/frightertainment-brand.png" alt="Frightertainment"><span>FOR THE LOVE OF THE FEAR.</span></div><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> INDEPENDENT. OBSESSED. UNAFRAID.</div><h2>HORROR ISN'T A GENRE.<br><em>IT'S AN OBSESSION.</em></h2><p>Frightertainment is an independent home for horror obsessives — tracking the new nightmares, the cult favourites and the voices that keep the genre alive. No paid score placement. No invented reviews. Just horror.</p><p class="manifesto__fine">The Fright Index is an editorial comparison of selected critic metrics. Rotten Tomatoes' percentage of positive reviews and Metacritic's weighted review score measure different things; our average is a convenience index, not a scientific consensus or an endorsement by any review outlet.</p></div></div></section>
+    <section class="index-section" id="review-index" aria-labelledby="index-title"><div class="shell index-section__inner"><div class="index-section__heading"><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> CRITIC SCORES, WITHOUT THE GUESSWORK</div><h2 id="index-title">THE FRIGHTERTAINMENT<br><em>FRIGHT INDEX.</em></h2><p>Only published, linked critic scores that pass verification and reuse checks are included. No entries currently meet that standard.</p></div><div class="index-demo index-demo--empty"><div class="index-demo__top"><span>FRIGHT INDEX / CURRENT STATUS</span><span>NO SCORES PUBLISHED</span></div><div class="index-demo__empty"><strong>—</strong><span>NO VERIFIED SCORES</span></div><p class="index-demo__footer">When available, eligible scores are scaled to /100 and averaged equally, then rounded to the nearest whole number. Each source and its date checked will be shown. Aggregator percentages and weighted critic scores measure different things; the index is a comparison aid, not a consensus.</p></div></div></section>
+    <section class="trailer-section shell" id="trailers" aria-labelledby="trailer-title"><div class="section-head section-head--compact"><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> OFFICIAL UPLOADS ONLY</div><h2 id="trailer-title">TRAILERS, <em>VERIFIED.</em></h2><p>Official video embeds load only when you choose to play one. Each upload links to its original source.</p></div></div><div class="verified-trailers" id="trailer-grid" aria-live="polite"><div class="video-frame video-frame__empty-block"><div class="video-frame__empty">LOADING VERIFIED TRAILERS<span>Studio and distributor uploads only.</span></div></div></div></section>
+    <section class="originals-section" id="originals" aria-labelledby="originals-title"><div class="shell"><div class="section-head"><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> MADE BY FRIGHTERTAINMENT</div><h2 id="originals-title">FRIGHTERTAINMENT <em>ORIGINALS.</em></h2><p>Explore the publication’s original series. Episode, screening and release information will appear when confirmed.</p></div></div><div class="originals-grid">
+      <article class="original-card"><img src="assets/frightmares.png" alt="Frightmares series artwork" loading="lazy"><h3>FRIGHTMARES</h3><p>Originals series. Programming details unconfirmed.</p><span class="original-status">DETAILS TO BE ANNOUNCED</span></article>
+      <article class="original-card"><img src="assets/when-horror-was-real.png" alt="When the Horror Was Real series artwork" loading="lazy"><h3>WHEN THE HORROR WAS REAL</h3><p>Originals series. Programming details unconfirmed.</p><span class="original-status">DETAILS TO BE ANNOUNCED</span></article>
+      <article class="original-card original-card--cinema"><div class="original-card__cinema" aria-hidden="true">FRIGHTERTAINMENT<br><em>CINEMA</em></div><h3>FRIGHTERTAINMENT CINEMA</h3><p>Originals series. Screening details unconfirmed.</p><span class="original-status">DETAILS TO BE ANNOUNCED</span></article>
+    </div></div></section>
+    <section class="manifesto" id="about"><div class="shell manifesto__inner"><div class="manifesto__brand"><img src="assets/frightertainment-brand.png" alt="Frightertainment"><span>FOR THE LOVE OF THE FEAR.</span></div><div><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> INDEPENDENT. OBSESSED. UNAFRAID.</div><h2>HORROR IS AN<br><em>OBSESSION.</em></h2><p>Frightertainment is an independent home for horror culture, upcoming films and original series. Film facts, images, dates, trailers and scores belong here only when their sources have been checked.</p><p class="manifesto__fine">Read our <a href="editorial-standards.html">editorial and verification standards</a>. Rights and permission are checked before third-party material is republished.</p></div></div></section>
   </main>
-  <footer class="footer"><div class="shell footer__main"><div><a href="#top" class="footer__brand"><img src="assets/frightertainment-white.png" alt="Frightertainment"></a><p>YOUR NEXT NIGHTMARE STARTS HERE.</p></div><div class="footer__links"><a href="#upcoming">UPCOMING MOVIES</a><a href="#review-index">FRIGHT INDEX</a><a href="#trailers">TRAILERS</a><a href="#about">ABOUT</a></div></div><div class="shell footer__bottom"><span>© <span id="year">2026</span> FRIGHTERTAINMENT. INDEPENDENT HORROR EDITORIAL.</span><span>FILM ARTWORK BELONGS TO ITS RESPECTIVE RIGHTS HOLDERS. TRAILERS PLAY VIA YOUTUBE.</span></div></footer>
-  <dialog id="movie-dialog" class="movie-dialog" aria-label="Movie details"><div id="dialog-inner"></div></dialog>
+  <footer class="footer"><div class="shell footer__main"><div><a href="#top" class="footer__brand"><img src="assets/frightertainment-white.png" alt="Frightertainment"></a><p>YOUR NEXT NIGHTMARE STARTS HERE.</p></div><div class="footer__links"><a href="#upcoming">FILM LISTINGS</a><a href="#review-index">FRIGHT INDEX</a><a href="#originals">ORIGINALS</a><a href="editorial-standards.html">EDITORIAL STANDARDS</a></div></div><div class="shell footer__bottom"><span>© <span id="year">2026</span> FRIGHTERTAINMENT. INDEPENDENT HORROR EDITORIAL.</span><span>FILM DETAILS SHOWN ONLY WHEN VERIFIED.</span></div></footer>
   <script src="data/movies.js"></script><script src="app.js"></script>
 </body>
 </html>

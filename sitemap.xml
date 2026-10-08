@@ -1,2 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://www.frightertainment.com/</loc></url></urlset>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.frightertainment.com/</loc></url>
+  <url><loc>https://www.frightertainment.com/editorial-standards.html</loc></url>
+  <url><loc>https://www.frightertainment.com/films/other-mommy/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/crawlers/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/clayface/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/victorian-psycho/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/werwulf/</loc></url>
+  <url><loc>https://www.frightertainment.com/films/exorcist-2027/</loc></url>
+</urlset>

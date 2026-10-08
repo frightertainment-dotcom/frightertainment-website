@@ -1,65 +1,53 @@
-# FRIGHTERTAINMENT — Website starter (October 2026)
+# Frightertainment website · Version 1
 
-A real responsive static website ready to put on a hosting service. This is a *first version* — not yet connected to an automated film database, a review data licence, or a content management system.
+A responsive static horror publication using the supplied Frightertainment identity and artwork. The site includes claim-sourced film records, standalone detail pages, mobile navigation, search and filters, Fright Index method, Originals sections, editorial standards, accessibility support, SEO metadata, `robots.txt` and a sitemap.
 
-## What works
-- Live interactive filtering by year, review availability, title/genre, and sorting
-- Six editorial release pages in pop-up dialogs with synopses and source links
-- Four confirmed official YouTube trailer IDs; the player loads on click (privacy-enhanced embedding)
-- Movie posters where an external preview image exists; a designed on-brand fallback where not
-- Source-linked reviewer scores, normalised to /100 and averaged automatically (currently one film has two recorded scores)
-- Mobile navigation, accessible dialogs, search, responsive layout and proper metadata
-- Brand images are taken from the uploaded Frightertainment assets in their original high resolution and tightly cropped to transparency — no blurry AI re-rendering
+## Preview and checks
 
-## Preview locally
-You can open `index.html` directly in Chrome/Edge or use a local web server:
+Requires Node.js 18 or newer and Python 3.
 
-```bash
-cd frightertainment-site
-python3 -m http.server 8080
-```
-Then visit http://localhost:8080
-
-## Add or update a movie
-Edit `data/movies.js`. Copy an object from `window.FR_MOVIES` and change its `id`, `title`, `release` (YYYY-MM-DD), `year`, `genre`, `country`, `studio`, `director`, `synopsis`, `teaser`, `poster`, `posterTheme`, `official`, `dateSource`, `trailerId`, `trailerChannel`, and `reviews` fields. The trailer ID is the part of a YouTube URL after `watch?v=`. Empty strings mean no media available. Only use confirmed official uploads, not fan trailers.
-
-For a verified review, add a review object:
-
-```js
-reviews: [
-  {
-    source: 'Example Reviewer',
-    score: 7.5,
-    outOf: 10,
-    display: '7.5 / 10',
-    type: 'Editorial review',
-    url: 'https://example.com/movie-review',
-    checked: '2026-10-08'
-  }
-]
+```sh
+npm run build:pages
+npm run check
+npm run serve
 ```
 
-A `7.5/10` rating becomes `75/100`. The Fright Index is the equally weighted arithmetic mean of the eligible source scores, rounded to the nearest whole number. It does not blend audience and critic scores. **Do not add unverified results or remove links/attribution.** Metacritic and Rotten Tomatoes measure different concepts; the index is a convenience comparison, not an independent critic verdict.
+Open <http://localhost:8080>. Use a local server to test clean `/films/<id>/` pages and navigation.
 
-## Publish at www.frightertainment.com
-1. First ensure you own `frightertainment.com` via a domain registrar. This project cannot buy or transfer a domain for you.
-2. Create a project in **Cloudflare Pages** or **Netlify** and upload the contents of this folder. No build command is required; the output directory is `/` for manual direct uploads.
-3. Open the host's **Custom domains** settings, add both `frightertainment.com` and `www.frightertainment.com`. Follow the host-provided DNS instructions at your registrar. Avoid blindly pasting DNS entries: values depend on your host.
-4. Choose whether `www` or the bare domain will be canonical and set the redirect in your host settings. Switch on managed HTTPS (usually automatic).
-5. Test mobile, search, trailer playback, score links, domain and SSL.
+## Film records
 
-The `www.frightertainment.com` address shown in page metadata is a **target**; the domain has not been configured or published by generating these files.
+Edit `data/movies.js`. The six film titles and the displayed details now have claim-level source records. Each `claims` entry includes `field`, `label`, `value`, `sourceName`, `source`, `territory` and `checked` (`YYYY-MM-DD`). Store theatrical dates as ISO dates only where the primary source supports both the date and territory. Keep festival years and film years separate from territory-specific theatrical dates. The pages show each source, the territory scope and check date next to its supported claim.
 
-## Important publishing and licensing checks
-- **Movie posters:** The live prototype references editorial preview poster images served on other sites; we have *not* obtained sublicensing rights. Images may fail due to hotlink restrictions, and you must replace them with authorised promotional assets/press-kit sources, observing the publisher's terms, before any public/commercial release. Empty poster slots show branded title art instead. Do not treat finding an image online as permission to host it.
-- **Rotten Tomatoes:** RT has a licensing request process for use of its scores/trademarks/APIs, including source attribution and links. We cannot assume a right to republish or scrape scores. Verify with RT before launching with their scores displayed. https://www.rottentomatoes.com/help_desk/licensing
-- **Metacritic, IGN and other reviewers:** Check their terms and request approval where needed for score republication. Do not automate scraping. If permission is unclear, show an outbound link to the primary review page instead of copying a score.
-- **Trailers:** Official YouTube trailer links are embedded in a player only when visitors press play, subject to uploader embedding settings. Keep YouTube branding and terms intact.
-- **Release dates:** Editorial snapshots can change, and worldwide release dates differ. Cite the studio or a dependable primary source and check them before publication.
-- **Email, publishing editor, auto updates:** No back-end or account login is included yet. To have a true publish-from-dashboard workflow, connect a CMS in the next version.
+For information not present in the source, omit the claim. The interface identifies a missing exact release date or territory rather than filling the gap. The records do not contain critic scores or promotional posters. An official trailer is added only when its exact video ID, official upload channel and primary source are verified.
 
-## Where to go next
-- Connect a CMS (for instance Sanity, Directus, or a Git-based CMS) so posts/movies/reviews are added through an admin dashboard.
-- Get properly licensed movie metadata and poster feeds or studio press access.
-- Add individually indexed movie URLs for SEO, news posts, review editorial guidelines, newsletters, analytics and schema markup.
-- Add a user-facing editorial 'last checked' field and UK-specific release date where it differs from US.
+Reviews must link to the primary review and include `source`, `score`, `outOf`, `display`, `type`, `url`, `checked`, `territory` and `permission`. Scores are normalized to /100, equally weighted, averaged and rounded to the nearest whole number. Audience ratings are excluded. If score reuse permission is unclear, link the review without copying its score.
+
+Only add poster artwork when source, credit and `posterPermission` are documented. Image search does not grant republication rights. The content checker rejects artwork without those fields.
+
+After editing records, regenerate static detail pages and the sitemap, then validate:
+
+```sh
+npm run build:pages
+npm run check
+```
+
+The checker validates claim completeness, source URLs, territory/date scopes, checked dates, media/review gates, mobile navigation markup on every page, generated detail content, sitemap entries and local asset paths. Review the site at desktop and mobile widths and test keyboard navigation and links before publishing.
+
+## Site files
+
+- `index.html` — publication home, film listings, filters, score method, trailer status and Originals sections.
+- `films/<id>/index.html` — generated source-linked detail page for each film.
+- `editorial-standards.html` — verification, rights and scoring policy.
+- `data/movies.js` — hand-edited claim-level film evidence.
+- `assets/` — original supplied brand and series images. Directory case is intentionally lowercase and must stay that way.
+- `scripts/build-pages.mjs` — generate film pages and `sitemap.xml`.
+- `scripts/check-content.mjs` — validate evidence and generated files.
+- `robots.txt`, `sitemap.xml`, `_headers` — crawl and host guidance.
+
+## Branding and rights
+
+The supplied artwork moved from `Assets/` to `assets/` without image edits or recompression; SHA-256 hashes match the original Git blobs. Frightmares and When the Horror Was Real use their supplied images. Frightertainment Cinema uses a typographic treatment because no corresponding image was supplied.
+
+## Hosting
+
+Static files publish from the repository root after editorial and rights review. Canonical metadata still targets `https://www.frightertainment.com/`; the public domain and hosting have not been verified or changed here. No Cloudflare or DNS settings are managed by this project.
