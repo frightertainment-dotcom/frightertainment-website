@@ -164,5 +164,42 @@ if(!previewScoreModule.includes('frightertainment-private-preview') ||
 if(!rankingClient.includes('helper?.preview') || !homepageClient.includes('helper?.preview'))
   errors.push('Public-domain bypass guard on score comparison');
 
+// The long-lived horror catalogue MUST be additive and separate from the weekly charts.
+const vault = JSON.parse(await readFile(new URL('data/archive/horror-films.json',root),'utf8'));
+const vaultHTML = await readFile(new URL('all-horror-movies.html',root),'utf8');
+const vaultJS = await readFile(new URL('horror-archive.js',root),'utf8');
+const vaultUpdater = await readFile(new URL('scripts/sync-horror-archive.mjs',root),'utf8');
+const vaultWorkflow = await readFile(new URL('.github/workflows/horror-archive-sync.yml',root),'utf8');
+const previewBuild=await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+const schemaSeen=new Set();
+if(vault.schemaVersion!==1 || !Array.isArray(vault.films) || !Array.isArray(vault.manual))
+  errors.push('Archive must have a valid, cumulative CC0 snapshot schema');
+for(const entry of vault.films||[]){
+  if (!/^Q[1-9][0-9]*$/.test(entry.qid||'') || !entry.title ||
+      entry.title.length>240 || !Number.isInteger(entry.year) ||
+      entry.year<1896 || entry.year>new Date().getUTCFullYear()+2 ||
+      (entry.imdbId&&!/^tt\\d{7,10}$/.test(entry.imdbId)))
+    errors.push('Invalid archive film entry '+entry.qid);
+  if(schemaSeen.has(entry.qid)) errors.push('Duplicate archive Wikidata item '+entry.qid);
+  schemaSeen.add(entry.qid);
+}
+for(const need of ['id="archive-years"','id="archive-jump"','src="/horror-archive.js"','ALL HORROR MOVIES'])
+  if(!vaultHTML.includes(need))errors.push('Year-by-year film archive HTML missing '+need);
+if(!vaultJS.includes('renderYearContents')||!vaultJS.includes("type='search'")&&!vaultJS.includes("search.type='search'"))
+  errors.push('All Horror Movies must lazily render A–Z results and provide per-year searches');
+if(!vaultUpdater.includes('existing=new Map')||!vaultUpdater.includes('Insufficient complete response'))
+  errors.push('Long-lived archive updater must preserve prior records and reject partial import');
+if(!vaultWorkflow.includes('contents: write')||!vaultWorkflow.includes('refresh-request.json'))
+  errors.push('Archive weekly workflow and prompt-friendly refresh trigger are missing');
+if(!previewBuild.includes("'all-horror-movies.html'")||!previewBuild.includes("'horror-archive.js'")||
+   !previewBuild.includes('data/archive/horror-films.json'))
+  errors.push('Archive missing from private Pages deployment bundle');
+const homeForArchive=await readFile(new URL('index.html',root),'utf8');
+const moviesForArchive=await readFile(new URL('movies.html',root),'utf8');
+if(!homeForArchive.includes('href="/all-horror-movies.html"')||
+   !moviesForArchive.includes('href="/all-horror-movies.html"'))
+  errors.push('All Horror Movies must be accessible as a Movies subtab and homepage link');
+const siteMapArchive=await readFile(new URL('sitemap.xml',root),'utf8');
+if(!siteMapArchive.includes('/all-horror-movies.html'))errors.push('Sitemap missing all-year horror archive');
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
