@@ -13,13 +13,26 @@
     }).sort((a,b)=>a.title.localeCompare(b.title)).slice(0,20);
     if(!films.length)return;
     const section=document.createElement('section');section.className='hub-ranking-watchlist';
-    const heading=document.createElement('h2');heading.textContent='Source-verified films awaiting ratings (unranked)';
+    const heading=document.createElement('h2');heading.textContent='Source-verified films awaiting a Fright Index ranking (unranked)';
     section.append(heading);
     for(const film of films){
       const card=document.createElement('p');card.className='hub-ranking-watchlist__item';
       const a=document.createElement('a');a.href=filmHref(film.id);a.textContent=film.title;
-      const badge=document.createElement('span');badge.textContent='NOT YET RANKED';
-      card.append(a,badge);section.append(card);
+      const badge=document.createElement('span');
+      const refs=Array.isArray(film.criticReferenceSnapshots)?film.criticReferenceSnapshots:[];
+      badge.textContent=refs.length ? 'FRIGHT INDEX PENDING' : 'NO VERIFIED FRIGHT INDEX';
+      card.append(a,badge);
+      const refs=Array.isArray(film.criticReferenceSnapshots)?film.criticReferenceSnapshots:[];
+      if(refs.length){
+        const sources=document.createElement('small');sources.className='hub-ranking-watchlist__refs';
+        sources.textContent='Publisher scores checked '+refs[0].checked+': ';
+        for(const item of refs){
+          const rating=document.createElement('a');rating.href=item.url;rating.textContent=item.source+' '+item.display;
+          rating.target='_blank';rating.rel='noopener noreferrer';sources.append(rating);
+        }
+        card.append(sources);
+      }
+      section.append(card);
     }
     list.replaceChildren(section);
   }
