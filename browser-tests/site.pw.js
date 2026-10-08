@@ -275,7 +275,8 @@ test('franchise archive spans 2002, 2007, 2025 and 2026 without erasing history'
   const earliest=page.locator('#horror-year-1896');
   await earliest.locator('summary').click();
   await expect(earliest).toContainText('Le Manoir du diable');
-  await expect(earliest.locator('a[href*="bfi.org.uk"]').first()).toBeVisible();
+  await expect(earliest.locator('a[href="https://www.imdb.com/title/tt0000091/"]').first()).toBeVisible();
+  await expect(page.locator('.horror-archive__notes a[href*="bfi.org.uk"]')).toBeVisible();
 });
 
 test('year jump expands target section and search is scoped to it',async({page})=>{
@@ -293,4 +294,20 @@ test('all horror movie navigation is a sub-tab under main Movies tab',async({pag
   await expect(page).toHaveURL(/all-horror-movies\.html$/);
   await expect(page.locator('.hub-subtabs a[aria-current="page"]')).toHaveText('ALL HORROR MOVIES');
   await expect(page.locator('.hub-tabs a[href="/movies.html"]')).toHaveClass(/active/);
+});
+
+test('imported horror vault retains thousands of indexed records and every year in mobile UI',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  const counter=page.locator('#archive-summary');
+  await expect(counter).toContainText('indexed film links');
+  const count=await counter.evaluate(el=>Number((el.textContent.match(/[0-9,]+/)||['0'])[0].replaceAll(',','')));
+  expect(count).toBeGreaterThanOrEqual(9772);
+  const year=page.locator('#horror-year-2007');
+  await year.locator('summary').click();
+  expect(await year.locator('.horror-year__film').count()).toBeGreaterThan(300);
+  await expect(year.locator('.horror-year__search')).toBeVisible();
+  await year.locator('.horror-year__search').fill('28 Weeks');
+  await expect(year.locator('.horror-year__film:visible')).toHaveCount(1);
+  await expect(year.locator('a[href="/films/28-weeks-later/"]')).toBeVisible();
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
