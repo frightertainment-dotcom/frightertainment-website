@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-08",
+  "source": "Wikidata CC0 structured data and individually checked Frightertainment editorial records",
+  "sourceUrl": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+  "coverage": "Growing subset, not complete worldwide horror filmography",
+  "films": [],
+  "manual": [
+    {
+      "id": "manual:le-manoir-du-diable-1896",
+      "title": "Le Manoir du diable (The House of the Devil)",
+      "year": 1896,
+      "url": "https://www.bfi.org.uk/film/903dde01-68ea-536a-9be3-471d59cf83bb/le-manoir-du-diable",
+      "sourceName": "BFI film record",
+      "checked": "2026-10-08"
+    }
+  ]
+}
