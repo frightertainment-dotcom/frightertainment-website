@@ -158,3 +158,11 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
     await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(6);
   }
 });
+
+test('release calendar uses source claims and does not invent live UK showtimes',async({page})=>{
+  await page.goto('/movies.html');
+  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(4);
+  const urls=await page.locator('#hub-release-list a.hub-release-source').evaluateAll(a=>a.map(x=>x.getAttribute('href')));
+  expect(urls.every(x=>x.startsWith('https://'))).toBe(true);
+  await expect(page.locator('#hub-release-list')).toContainText('No UK availability inferred');
+});
