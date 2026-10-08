@@ -146,3 +146,11 @@ The first-party archive film page shows the catalogue title/year and offers: the
 All local film cards and archive film pages are served as static first-party files, so the 9,772-item catalogue can be browsed without relying on availability of a third-party website. Tests exercise examples across years, film cards with and without IMDb IDs, manual records, duplicate IDs, invalid IDs and the back link into the opened release year.
 
 **Limitation:** Frightertainment cannot guarantee external IMDb or source pages will always be reachable, and validation of the syntactic IMDb ID cannot guarantee its owner identity. Keep fallback search and original Wikidata sources available. Do not describe all external URLs as individually verified.
+
+## Homepage automatic discovery (October 2026)
+
+The `index.html` homepage intentionally keeps the existing compact Frightertainment horror dashboard as the first/main visual experience. The source-linked cinema, streaming, upcoming, trends and Top 20 data panels from `home-discovery.js` are inside an accessible **closed-by-default** `details.home-discovery-wrap` immediately below the showcase. Users can open them as needed; do not expand them into a long vertically scrolling homepage by default. Film lists and the complete 1896–present horror archive remain separate Movies sub-tabs.
+
+**Do not omit `home-discovery.js` from `scripts/build-preview.mjs`**: this once resulted in an apparently present but non-functional homepage discovery/search panel on the Cloudflare private preview. The build, content checks and browser tests now require the file to be included. Successful static HTML generation or unit tests by themselves are not proof that the browser client was shipped. GitHub Actions installs Chromium and executes Playwright independently of whether local/agent Chromium download succeeded.
+
+Country selections must only advertise territories for which a licensed source has been approved. Empty/pending states remain visible when those licences or records are unavailable; do not invent availability or live rankings. The private homepage preview and public frightertainment.com are different deployments; avoid merging/deploying production without owner approval.
