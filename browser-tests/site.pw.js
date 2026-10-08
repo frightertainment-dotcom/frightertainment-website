@@ -81,7 +81,7 @@ test('homepage film search produces an accessible empty state', async ({ page })
 test('homepage date and verified-score filters report truthful result counts', async ({ page }) => {
   await page.goto('/movies.html');
   await page.locator('[data-filter="date-tbc"]').click();
-  await expect(page.locator('#results-count')).toContainText('2 films');
+  await expect(page.locator('#results-count')).toContainText('18 films');
   await expect(page.locator('[data-filter="date-tbc"]')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('[data-filter="reviewed"]').click();
   await expect(page.locator('#results-count')).toContainText('0 films');
@@ -115,7 +115,7 @@ test('navigation works between all main sections and official movie source', asy
   await page.goto('/');
   await page.locator('.hub-tabs a[href="/movies.html"]').click();
   await expect(page).toHaveURL(/movies\.html$/);
-  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(6);
+  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(22);
   const official = page.locator('.movie-card__official a').first();
   await expect(official).toHaveAttribute('href', /^https:\/\//);
   await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
@@ -148,5 +148,5 @@ test('homepage artwork is first-party and movie posters are not copied without p
   expect(artURL).toContain('/assets/hub-haunted.svg');
   await page.goto('/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
-  await expect(page.locator('.movie-card__official a')).toHaveCount(6);
+  await expect(page.locator('.movie-card__official a')).toHaveCount(22);
 });
