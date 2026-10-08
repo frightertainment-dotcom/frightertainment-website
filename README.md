@@ -135,3 +135,14 @@ When the owner says **"Update the Frightertainment horror archive"**, edit `data
 `data/archive/horror-films.json.manual` is reserved for verified, manually sourced special cases and historic titles absent from Wikidata. It is retained untouched across weekly importer runs. Report missing/incorrect films via Frightertainment's archive correction email link and verify before adding entries.
 
 Scalability: Year panels render their film rows on first opening, not all years simultaneously. All records stay in the static JSON on every rebuild; editing the weekly Top 20 or adding featured movies **never resets old-year records**. Preserve titles from cinema, direct-to-video, physical media, streaming and VOD when Wikidata classifies them as horror, but only label distribution modes with independent credible evidence. No IMDb scraping or unauthorised API access.
+
+
+## Reliable links for the all-year horror archive
+
+As of October 2026, the 9,772-item historical archive no longer sends a visitor directly to third-party IMDb URLs by tapping a film entry. Each complete **year/film card**, including its right-hand label, opens a first-party `/archive-film.html?id=Q...` record (or `/films/<id>/` for the 24 fully sourced editorial films). This is deliberate: some Wikidata IMDb IDs are stale or mismatched, while IMDb can block requests or third-party browsing independently of our website.
+
+The first-party archive film page shows the catalogue title/year and offers: the exact IMDb title link **only** if a plausible non-conflicting Wikidata P345 ID exists, an IMDb title-search fallback, and a Wikidata source link. Manual entries show their independent film-source link, e.g. the 1896 BFI film record. Two conflicting Wikidata films that share an IMDb ID are not given a misleading direct IMDb link; visitors can search IMDb instead.
+
+All local film cards and archive film pages are served as static first-party files, so the 9,772-item catalogue can be browsed without relying on availability of a third-party website. Tests exercise examples across years, film cards with and without IMDb IDs, manual records, duplicate IDs, invalid IDs and the back link into the opened release year.
+
+**Limitation:** Frightertainment cannot guarantee external IMDb or source pages will always be reachable, and validation of the syntactic IMDb ID cannot guarantee its owner identity. Keep fallback search and original Wikidata sources available. Do not describe all external URLs as individually verified.
