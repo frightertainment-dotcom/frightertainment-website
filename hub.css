@@ -324,3 +324,14 @@
 .archive-detail__explain h2{font:900 35px var(--font-display);color:#f0dcd9;margin:0 0 10px}
 .archive-detail__explain p{color:#b7a5a6;line-height:1.8;font-size:13px}
 @media(max-width:620px){.archive-detail-main{width:calc(100% - 30px);padding-top:12px}.archive-detail__title{font-size:clamp(37px,11vw,56px)}.archive-detail__facts{gap:8px}.archive-detail__fact{min-width:130px}.archive-detail__actions{display:grid;grid-template-columns:1fr}.archive-detail__link{width:100%}.archive-detail__content{padding:22px 16px}}
+
+
+/* Clickable surface encompasses the complete film row, not only its title. */
+.horror-year__film{display:block;padding:0}
+.horror-year__film-link{display:flex;width:100%;min-height:53px;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;text-decoration:none}
+.horror-year__film-title{font:800 15px/1.25 var(--font-display);overflow-wrap:anywhere;flex:1;min-width:0}
+.horror-year__film-link:hover,.horror-year__film-link:focus-visible{background:#3c1521}
+.horror-year__film-link:focus-visible{outline:2px solid #ff5665;outline-offset:-2px}
+.horror-year__film-link:hover .horror-year__film-title{text-decoration:underline;text-decoration-color:#ff4b5d;text-underline-offset:3px}
+.horror-year__film-type{pointer-events:none}
+@media(max-width:660px){.horror-year__film-link{min-height:46px;padding:9px 12px}.horror-year__film-title{font-size:16px}}
