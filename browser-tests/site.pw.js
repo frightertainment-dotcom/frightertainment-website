@@ -365,3 +365,53 @@ test('invalid or unknown archive film IDs display recovery links rather than bro
     await expect(page.getByRole('link',{name:'← RETURN TO ALL HORROR MOVIES'})).toHaveAttribute('href','/all-horror-movies.html');
   }
 });
+
+test('homepage retains compact horror dashboard and hides optional source feeds until expanded',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  const drawer=page.locator('.home-discovery-wrap');
+  await expect(drawer).toBeVisible();
+  await expect(drawer).not.toHaveAttribute('open','');
+  await expect(page.locator('.hub-dashboard')).toBeVisible();
+  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
+  await expect(page.locator('.home-discovery__grid')).toBeHidden();
+  await drawer.locator('summary').click();
+  await expect(drawer).toHaveAttribute('open','');
+  await expect(page.locator('#home-search')).toBeVisible();
+  await expect(page.locator('#home-country')).toHaveValue('GB');
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('optional live data drawer searches attributed verified feed results when APIs provide them',async({page})=>{
+  const datasets={
+    'theatrical-releases':{
+      items:[{title:'Test Haunted House Film',provider:'UK cinema',territory:'GB',
+        sourceName:'Sample Studio',sourceUrl:'https://example.com/haunted',
+        releaseDate:'2026-10-11',releaseTerritory:'GB',checkedAt:'2026-10-08'}],
+      updatedAt:'2026-10-08T12:00:00.000Z',status:'current'
+    },
+    'streaming-releases':{
+      items:[{title:'Test Fright Stream',provider:'UK streaming',territory:'GB',
+        sourceName:'Sample Distributor',sourceUrl:'https://example.com/stream',
+        releaseMode:'unconfirmed',checkedAt:'2026-10-08'}],
+      updatedAt:'2026-10-08T12:00:00.000Z',status:'current'
+    }
+  };
+  await page.route('**/api/discovery?country=GB',route=>route.fulfill({
+    status:200,contentType:'application/json',body:JSON.stringify({country:'GB',datasets})
+  }));
+  await page.route('**/api/rankings?year=*',route=>route.fulfill({
+    status:200,contentType:'application/json',body:JSON.stringify({items:[],updatedAt:null})
+  }));
+  await page.goto('/');
+  await page.locator('.home-discovery-wrap summary').click();
+  await expect(page.locator('[data-home-list="theatrical-releases"]')).toContainText('Test Haunted House Film');
+  await expect(page.locator('[data-home-list="streaming-releases"]')).toContainText('Test Fright Stream');
+  await expect(page.locator('[data-home-updated="theatrical-releases"]')).toContainText('Last updated');
+  await expect(page.locator('#home-attribution')).toContainText('Sample Studio');
+  await page.locator('#home-search').fill('fright stream');
+  await expect(page.locator('[data-home-list="theatrical-releases"] article')).toHaveCount(0);
+  await expect(page.locator('[data-home-list="streaming-releases"] article')).toHaveCount(1);
+  await page.locator('#home-search').fill('');
+  await expect(page.locator('[data-home-list="theatrical-releases"] article')).toHaveCount(1);
+});
