@@ -10,6 +10,8 @@ const pages = [
   ['/editorial-standards.html', 'EDITORIAL'],
   ['/top-20/', 'TOP 20'],
   ['/top-20/2026/', 'TOP 20 HORROR FILMS'],
+  ['/films/28-days-later/', '28 Days Later'],
+  ['/films/28-weeks-later/', '28 Weeks Later'],
   ['/films/other-mommy/', 'Other Mommy'],
   ['/films/crawlers/', 'Crawlers'],
   ['/films/clayface/', 'Clayface'],
@@ -180,10 +182,10 @@ test('2026 is default and earlier films are under their actual original years', 
   await expect(page.locator('#results-count')).toContainText('7 films');
   await expect(page.locator('#movie-grid')).toContainText('28 Years Later');
   await page.selectOption('#movie-year', 'older');
-  await expect(page.locator('#results-count')).toContainText('4 films');
+  await expect(page.locator('#results-count')).toContainText('5 films');
   await expect(page.locator('#movie-grid')).toContainText('28 Weeks Later');
   await page.selectOption('#movie-year', 'all');
-  await expect(page.locator('#results-count')).toContainText('23 films');
+  await expect(page.locator('#results-count')).toContainText('24 films');
 });
 
 test('Bone Temple has manually sourced external critic metrics and does not invent a Fright Index',async({page})=>{
@@ -197,4 +199,14 @@ test('Bone Temple has manually sourced external critic metrics and does not inve
   await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
   await expect(page.locator('#film-detail')).toContainText('PUBLISHED CRITIC RATINGS');
   await expect(page.locator('#film-detail')).toContainText('91%');
+});
+
+test('four franchise instalments link to historically correct film pages',async({page})=>{
+  await page.goto('/movies.html');
+  const links=page.locator('.hub-series__items a');
+  await expect(links).toHaveCount(4);
+  await expect(links.nth(0)).toContainText('2002');
+  await expect(links.nth(1)).toContainText('2007');
+  await expect(links.nth(2)).toContainText('2025');
+  await expect(links.nth(3)).toContainText('2026');
 });
