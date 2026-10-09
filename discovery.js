@@ -17,8 +17,8 @@
     const date = item.releaseDate ? ` · ${escapeHTML(item.releaseDate)} (${escapeHTML(item.releaseTerritory || item.territory || '')})` : '';
     const detail = kind === 'streaming-availability'
       ? `${escapeHTML(item.provider || 'Service')} · ${escapeHTML(item.availability || 'Availability')}${item.price == null ? '' : ` · ${escapeHTML(item.price)}`}`
-      : kind === 'trending-horror' ? 'Weekly platform popularity · not a score'
-      : kind === 'streaming-releases' ? `${item.releaseMode === 'unconfirmed' ? 'Release path unconfirmed' : escapeHTML(item.releaseMode)}${item.availabilityState === 'scheduled' ? ' · scheduled' : ' · confirmed available'}`
+      : kind === 'trending-horror' ? (data[kind]?.status==='editorial'?'Recent UK streaming arrival · editorial':'Weekly platform popularity · not a score')
+      : kind === 'streaming-releases' ? `${item.releaseMode === 'unconfirmed' ? 'Release path unconfirmed' : escapeHTML(item.releaseMode)}${item.availabilityState === 'scheduled' ? ' · scheduled' : item.availabilityState === 'editorial' ? ' · announced addition' : ' · available'}`
       : kind === 'theatrical-releases' ? escapeHTML(item.label || 'Recent theatrical release · showtimes unconfirmed')
       : item.status === 'scheduled-release' ? `Territorial release${date}` : 'Verified listing';
     const content = `<strong>${escapeHTML(item.title)}</strong><span>${detail}${kind === 'coming-soon' ? '' : date}</span>`;
@@ -50,28 +50,77 @@
     const sources = [...new Set(kinds.flatMap(kind => (data[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
     $('#discovery-attribution').textContent = sources.length ? `Sources: ${sources.join(', ')}. Every listing links to its source and states its territory and check date.` : 'Find more films and viewing options.';
   }
-  async function load() {
-    const country = countrySelect.value;
-    for (const kind of kinds) setState(kind, 'Finding available listings…');
-    try {
-      const [feedResponse, rankingResponse] = await Promise.all([
-        fetch(`/api/discovery?country=${encodeURIComponent(country)}`, { headers: { accept: 'application/json' } }),
-        fetch('/api/rankings?year=2026', { headers: { accept: 'application/json' } })
-      ]);
-      if (!feedResponse.ok) throw new Error(`Discovery service returned ${feedResponse.status}`);
-      const feed = await feedResponse.json();
-      data = feed.datasets || {};
-      const ranking = rankingResponse.ok ? await rankingResponse.json() : null;
-      const panel = $('[data-list="rankings"]');
-      if (panel) panel.innerHTML = ranking?.items?.length ? ranking.items.map(item => `<article class="discovery-item"><div><strong><span class="ranking-position">#${item.position}</span> <a href="${escapeHTML(filmHref(item.filmId))}">${escapeHTML(item.title)}</a></strong><span>${item.averageScore}/100 · ${item.criticCount} verified critic${item.criticCount === 1 ? '' : 's'} · ${escapeHTML(item.movementLabel)}</span></div><span class="discovery-item__source">${item.sources.map(source => { const url = safeURL(source.url); return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.publication)} ></a><small>${escapeHTML(source.territory)} · checked ${escapeHTML(source.checkedAt)}</small>` : ''; }).join(' ')}</span></article>`).join('') : '';
-      setState('rankings', ranking?.items?.length ? `Calculated from approved critic data · this recalculation does not acquire reviews · ${ranking.updatedAt ? `updated ${ranking.updatedAt}` : 'no published calculation yet'} · ${ranking.pendingFilmCount || 0} eligible film records remain below the minimum.` : 'Rankings pending: automatic calculation does not acquire critic reviews. At least three distinct verified, permission-cleared professional numeric ratings are required for each film.');
-      const rankingUpdated = $('[data-updated="rankings"]');
-      if (rankingUpdated) rankingUpdated.textContent = ranking?.updatedAt ? `Last updated: ${ranking.updatedAt}` : 'Last updated: no verified ranking data';
-      render();
-    } catch {
-      for (const kind of kinds) setState(kind, 'Automated listings are not active. Licensed data, credentials and service configuration are still required.');
-      setState('rankings', 'Rankings pending: the verified review dataset is not connected.');
+
+  const ageDays=date=>(Date.now()-Date.parse(date+'T00:00:00Z'))/86400000;
+  const shape=x=>({
+    title:x.title,provider:x.service,releaseDate:x.date,releaseTerritory:'GB',
+    territory:'GB',sourceName:x.sourceName,sourceUrl:x.sourceUrl,checkedAt:x.checkedAt,
+    status:x.date>new Date().toISOString().slice(0,10)?'scheduled-release':'announced-arrival',
+    releaseMode:x.category==='streaming'?'Subscription streaming':'other',
+    availabilityState:x.date>new Date().toISOString().slice(0,10)?'scheduled':'editorial',
+    label:x.category==='cinema'?'UK cinema release date · screenings depend on location':'Editorial release notice'
+  });
+  const overlayEditorial=editorial=>{
+    if(editorial?.country!=='GB'||!Array.isArray(editorial.items))return;
+    const today=new Date().toISOString().slice(0,10);
+    const safe=editorial.items.filter(x=>x.country==='GB'&&/^https:\/\//.test(x.sourceUrl||''));
+    const replacements={
+      'theatrical-releases':safe.filter(x=>x.category==='cinema'&&x.date<=today&&ageDays(x.checkedAt)<=14),
+      'streaming-releases':safe.filter(x=>x.category==='streaming'&&x.date<=today&&ageDays(x.date)<=28),
+      'coming-soon':safe.filter(x=>x.category==='streaming'&&x.date>today&&ageDays(x.date)>=-30),
+      'trending-horror':safe.filter(x=>x.category==='streaming'&&x.date<=today&&ageDays(x.date)<=28)
+    };
+    for(const [kind,items] of Object.entries(replacements)){
+      if(data[kind]?.items?.length)continue;
+      data[kind]={
+        status:'editorial',items:items.sort((a,b)=>kind==='coming-soon'?
+          a.date.localeCompare(b.date):b.date.localeCompare(a.date)).map(shape),
+        updatedAt:editorial.updatedAt,checkedAt:editorial.updatedAt?.slice(0,10)
+      };
     }
+  };
+  async function load() {
+    const country=countrySelect.value;
+    const year=new Date().getUTCFullYear();
+    for(const kind of kinds)setState(kind,'Checking new horror titles…');
+    const [feed,ranking,editorial]=await Promise.all([
+      fetch('/api/discovery?country='+encodeURIComponent(country),{headers:{accept:'application/json'}})
+        .then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch('/api/rankings?year='+year,{headers:{accept:'application/json'}})
+        .then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch('/data/editorial-releases.json',{headers:{accept:'application/json'}})
+        .then(r=>r.ok?r.json():null).catch(()=>null)
+    ]);
+    data=feed?.datasets||{};
+    overlayEditorial(editorial);
+    const panel=$('[data-list="rankings"]');
+    let ranked=ranking?.items||[];
+    let preview=false;
+    if(!ranked.length&&window.FrightertainmentPreviewRankings?.preview){
+      ranked=window.FrightertainmentPreviewRankings.build(window.FR_MOVIES||[],year).ranked;
+      preview=true;
+    }
+    if(panel){
+      panel.innerHTML=ranked.slice(0,6).map(item=>{
+        const filmId=item.filmId||item.id;
+        const href=filmHref(filmId);
+        const score=preview?item.score:item.averageScore;
+        const source=preview ? '<a href="'+escapeHTML(safeURL(item.sourceUrl))+'" target="_blank" rel="noopener noreferrer">RT SOURCE ↗</a>' :
+          (item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' ↗</a>').join(' ');
+        return '<article class="discovery-item"><div><strong><span class="ranking-position">#'+
+          escapeHTML(item.position)+'</span> <a href="'+escapeHTML(href)+'">'+escapeHTML(item.title)+'</a></strong>'+
+          '<span>'+escapeHTML(score)+(preview?'% publisher critics · editorial snapshot':'/100 · professional critics')+
+          '</span></div><span class="discovery-item__source">'+source+'</span></article>';
+      }).join('');
+    }
+    setState('rankings',preview ?
+      'Private preview · checked Rotten Tomatoes percentages; not the Fright Index.' :
+      ranked.length?'Critic chart based on source-verified professional reviews.':
+      'New critic ratings will appear here when available.');
+    const rankingUpdated=$('[data-updated="rankings"]');
+    if(rankingUpdated)rankingUpdated.textContent=preview?'Publisher figures checked 8 Oct 2026':
+      ranking?.updatedAt?'Updated '+ranking.updatedAt:'Awaiting new scores';
+    render();
   }
   countrySelect.addEventListener('change', () => {
     chosenPoint = null;
