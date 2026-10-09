@@ -57,7 +57,7 @@
     if(film.sourceUrl)buttons.append(link('FILM SOURCE ↗',film.sourceUrl));
     card.append(buttons);
     const note=make('p','archive-detail__disclaimer',
-      'IMDb title IDs are provided by Wikidata and can become outdated, incorrect or unavailable in some regions. If the direct link does not work, use IMDb search or the source record above.');
+      'IMDb link not working? Try the title search or source link.');
     card.append(note);
     const bottom=make('div','archive-detail__footer');
     bottom.append(link('← ALL HORROR MOVIES','/all-horror-movies.html?year='+film.year,
