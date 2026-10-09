@@ -262,5 +262,31 @@ if(!yearChart.includes('20-data.ranked.length')||!yearChart.includes('AWAITING A
 if(!curatedFilmRenderer.includes('filmHeroMarkup(movie)'))
   errors.push('Source-backed cinematic film hero must render even without JavaScript');
 
+// Source-checked editorial release bulletin is distinct from paid provider feeds.
+const drop=JSON.parse(await readFile(new URL('data/editorial-releases.json',root),'utf8'));
+const dropClient=await readFile(new URL('release-brief.js',root),'utf8');
+const dropBundler=await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+const dropHome=await readFile(new URL('index.html',root),'utf8');
+const dropMovies=await readFile(new URL('movies.html',root),'utf8');
+if(drop.schemaVersion!==1 || drop.country!=='GB' || !Array.isArray(drop.items) ||
+   drop.items.length<20) errors.push('UK release bulletin missing source-verified horror announcements');
+const dropIds=new Set();
+for(const item of drop.items||[]){
+  if(!item.id||dropIds.has(item.id))errors.push('Missing or duplicate UK release id '+item.id);
+  dropIds.add(item.id);
+  if(!['cinema','streaming','vod'].includes(item.category) || !item.title ||
+     !validDay(item.date) || !validDay(item.checkedAt) || item.country!=='GB' ||
+     !item.service || !item.sourceName || !goodURL(item.sourceUrl) ||
+     !['announced-arrival','release-listing','listed-now'].includes(item.availability))
+    errors.push('Invalid source-checked UK release listing '+item.id);
+}
+if(!dropClient.includes('daysAgo(x.date)<=28') ||
+   !dropClient.includes('sourceUrl') ||
+   !dropClient.includes('advanced-discovery'))errors.push('UK release bulletin filters or deep-linking missing');
+if(!dropBundler.includes("'release-brief.js'")||
+   !dropBundler.includes("'data/editorial-releases.json'"))errors.push('Release bulletin assets not bundled in Cloudflare preview');
+if(!dropHome.includes('data-release-brief')||!dropMovies.includes('data-release-brief'))
+  errors.push('Release bulletin missing from homepage or Movies tab');
+
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
