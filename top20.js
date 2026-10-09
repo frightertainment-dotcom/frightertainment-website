@@ -84,7 +84,7 @@
         const pending=[...unscored];
         const seen=new Set([...already,...unscored.map(x=>titleKey(x.title))]);
         const extra=candidates.filter(x=>x.year===Number(year) && typeof x.title==='string' &&
-            /^Q[1-9]\\d*$/.test(x.qid||'') && (!x.imdbId || /^tt\\d{7,10}$/.test(x.imdbId)))
+            /^Q[1-9]\d*$/.test(x.qid||'') && (!x.imdbId || /^tt\d{7,10}$/.test(x.imdbId)))
           .sort((a,b)=>a.title.localeCompare(b.title,'en',{numeric:true,sensitivity:'base'}));
         for(const film of extra){
           if(pending.length>=Math.max(0,20-data.ranked.length)) break;
