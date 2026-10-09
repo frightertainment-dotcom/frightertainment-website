@@ -442,7 +442,7 @@ test('curated studio films have atmospheric original poster artwork, crew and so
   await page.setViewportSize({width:390,height:844});
   await page.goto('/films/victorian-psycho/');
   await expect(page.locator('.fr-movie-hero')).toBeVisible();
-  await expect(page.locator('.fr-movie-hero__art')).toContainText('VICTORIAN PSYCHO');
+  await expect(page.locator('.fr-movie-hero__art')).toContainText('Victorian Psycho');
   await expect(page.locator('.fr-movie-hero__art')).toContainText('ORIGINAL EDITORIAL ARTWORK');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('DIRECTED BY');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('FEATURED CAST');
