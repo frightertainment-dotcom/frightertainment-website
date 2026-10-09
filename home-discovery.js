@@ -22,7 +22,7 @@
       node.innerHTML = items.map(item => {
         if (kind === 'rankings') {
           const links = (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} →</a>` : '').join(' ');
-          const scoreLabel=`${escape(item.averageScore)}/100 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
+          const scoreLabel=`Fright Rating ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
           return `<article><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${scoreLabel}</span><small>${links}</small></article>`;
         }
         const date = item.releaseDate ? ` · ${escape(item.releaseDate)} (${escape(item.releaseTerritory || item.territory || '')})` : '';

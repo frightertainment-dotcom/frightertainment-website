@@ -48,6 +48,29 @@ jobs:
       - run: npm run test:browser
       - run: npm run validate:worker
       - run: npm run worker:migrations:local
+      - name: Build the indexable public bundle independently of preview
+        run: npm run build:production
+      - run: npm run check:published
+      - name: Verify public launch bundle is limited, secured and indexable
+        run: |
+          test -f dist/index.html
+          test -f dist/movies.html
+          test -f dist/tv-shows.html
+          test -f dist/indie-movies.html
+          test -f dist/podcasts.html
+          test -f dist/games.html
+          test -f dist/films/other-mommy/index.html
+          test -f dist/top-20/2026/index.html
+          test -f dist/sitemap.xml
+          test -f dist/_routes.json
+          grep -q 'Sitemap: https://www.frightertainment.com/sitemap.xml' dist/robots.txt
+          ! grep -qi 'noindex' dist/_headers
+          ! grep -qi 'Disallow: /' dist/robots.txt
+          ! test -e dist/rankings-preview.js
+          ! test -e dist/worker
+          ! test -e dist/scripts
+          ! test -e dist/.github
+          ! test -e dist/API_LICENSING.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:
