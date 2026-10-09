@@ -42,6 +42,8 @@ jobs:
           npm run build:preview
       - name: Commit updated reference catalogue to the same branch
         shell: bash
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
         run: |
           git config user.name "frightertainment-archive-bot"
           git config user.email "frightertainment-archive-bot@users.noreply.github.com"
@@ -50,7 +52,7 @@ jobs:
             echo "Archive is already up to date"
           else
             git commit -m "data: expand cumulative CC0 horror film history archive"
-            git fetch origin "${{ github.ref_name }}"
-            git rebase "origin/${{ github.ref_name }}"
-            git push origin HEAD:${{ github.ref_name }}
+            git fetch origin "refs/heads/${TARGET_BRANCH}"
+            git rebase "origin/${TARGET_BRANCH}"
+            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
           fi

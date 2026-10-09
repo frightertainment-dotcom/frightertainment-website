@@ -22,9 +22,7 @@
       node.innerHTML = items.map(item => {
         if (kind === 'rankings') {
           const links = (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} →</a>` : '').join(' ');
-          const scoreLabel=payloads.previewRankings ?
-            `Rotten Tomatoes positive critic percentage ${escape(item.averageScore)}% · ${escape(item.criticCount)} publisher reviews · manually checked` :
-            `${escape(item.averageScore)}/100 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
+          const scoreLabel=`${escape(item.averageScore)}/100 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
           return `<article><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${scoreLabel}</span><small>${links}</small></article>`;
         }
         const date = item.releaseDate ? ` · ${escape(item.releaseDate)} (${escape(item.releaseTerritory || item.territory || '')})` : '';
@@ -34,23 +32,21 @@
       }).join('');
       if (updated) {
         const time = kind === 'rankings' ? payloads.rankingsUpdatedAt : payloads[kind]?.updatedAt;
-        updated.textContent = time ? `Last updated: ${new Date(time).toLocaleString('en-GB')} · ${payloads[kind]?.status === 'stale' ? 'stale data' : 'verified snapshot'}` : 'Last updated: no verified data';
-      }
-      if(kind==='rankings' && payloads.previewRankings && state){
-        state.textContent='Private comparison of manually checked publisher percentages — NOT an automatically licensed critic Top 20.';
+        const stale = kind === 'rankings' ? payloads.rankingsStale : payloads[kind]?.status === 'stale';
+        updated.textContent = time ? `${kind === 'rankings' ? 'Last published ranking' : 'Last updated'}: ${new Date(time).toLocaleString('en-GB')} · ${stale ? 'stale data' : 'verified snapshot'}` : kind === 'rankings' ? 'Last successful ranking: none' : 'Last updated: no verified data';
       }
       if (items.length && state && payloads[kind]?.status==='editorial') {
         state.textContent='From UK release announcements, with dates and source links.';
       }
       if (!items.length && !query) {
         const empty = kind === 'rankings'
-          ? 'More rated horror films will appear here.'
+          ? payloads.rankingsStale ? 'Ranking data is stale; no current verified chart is available.' : 'Critic ranking pending: verified critic scores are not yet available.'
           : kind === 'theatrical-releases' ? 'No recent cinema listings here yet.'
           : kind === 'streaming-releases' ? 'No additional streaming listings yet.'
           : kind === 'coming-soon' ? 'No upcoming releases in this feed.'
           : 'No current popularity chart.';
         state.textContent = empty;
-      } else if (items.length && state && payloads[kind]?.status!=='editorial' && !(kind==='rankings'&&payloads.previewRankings)) state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
+      } else if (items.length && state && payloads[kind]?.status!=='editorial') state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
     }
     const sources = [...new Set(kinds.flatMap(kind => (payloads[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
     document.querySelector('#home-attribution').textContent = sources.length
@@ -104,18 +100,8 @@
     payloads=discovery?.datasets||{};
     rankingItems=Array.isArray(rankings?.items)?rankings.items:[];
     payloads.rankingsUpdatedAt=rankings?.updatedAt||null;
+    payloads.rankingsStale=rankings?.stale===true;
     populateEditorial(editorial);
-    const preview=window.FrightertainmentPreviewRankings;
-    if(!rankingItems.length&&preview?.preview){
-      const local=preview.build(window.FR_MOVIES||[],rankingYear);
-      rankingItems=local.ranked.map(item=>({
-        title:item.title,position:item.position,averageScore:item.score,
-        criticCount:item.reviewCount,movementLabel:'Manually checked publisher snapshot',
-        sources:[{publication:'Rotten Tomatoes source',url:item.sourceUrl}]
-      }));
-      payloads.previewRankings=true;
-      payloads.rankingsUpdatedAt=local.lastChecked;
-    }
     render();
   }
   country.addEventListener('change', load);

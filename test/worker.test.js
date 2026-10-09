@@ -1,16 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../worker/index.js';
+import { onRequest } from '../functions/api/[[path]].js';
 
 test('health endpoint returns JSON without a data binding', async () => {
   const response = await worker.fetch(new Request('https://site.test/api/health'), {});
   assert.equal(response.status, 200);
+  assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
+  assert.equal(response.headers.get('x-frame-options'), 'DENY');
+  assert.match(response.headers.get('content-security-policy'), /default-src 'none'/);
+  assert.equal(response.headers.get('access-control-allow-origin'), null);
   assert.equal((await response.json()).status, 'ok');
+});
+
+test('Pages Functions unavailable responses apply the API security headers too', async () => {
+  const response = await onRequest({ request: new Request('https://site.test/api/health'), env: {} });
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
+  assert.equal(response.headers.get('x-frame-options'), 'DENY');
+  assert.match(response.headers.get('content-security-policy'), /frame-ancestors 'none'/);
 });
 
 test('admin endpoints reject requests without an owner secret', async () => {
   const response = await worker.fetch(new Request('https://site.test/api/admin/review-queue'), { DB: {} });
   assert.equal(response.status, 401);
+});
+
+test('film detail endpoint rejects malformed and path-shaped identifiers safely', async () => {
+  for (const id of ['%2Fadmin', '%E0%A4%A', '..']) {
+    const response = await worker.fetch(new Request(`https://site.test/api/films/${id}`), { DB: {} });
+    assert.ok([400, 404].includes(response.status));
+  }
 });
 
 test('unsupported country is rejected before database access', async () => {

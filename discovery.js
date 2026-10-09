@@ -94,32 +94,22 @@
     data=feed?.datasets||{};
     overlayEditorial(editorial);
     const panel=$('[data-list="rankings"]');
-    let ranked=ranking?.items||[];
-    let preview=false;
-    if(!ranked.length&&window.FrightertainmentPreviewRankings?.preview){
-      ranked=window.FrightertainmentPreviewRankings.build(window.FR_MOVIES||[],year).ranked;
-      preview=true;
-    }
+    const ranked=Array.isArray(ranking?.items)?ranking.items:[];
     if(panel){
       panel.innerHTML=ranked.slice(0,6).map(item=>{
         const filmId=item.filmId||item.id;
         const href=filmHref(filmId);
-        const score=preview?item.score:item.averageScore;
-        const source=preview ? '<a href="'+escapeHTML(safeURL(item.sourceUrl))+'" target="_blank" rel="noopener noreferrer">RT SOURCE ↗</a>' :
-          (item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' ↗</a>').join(' ');
+        const source=(item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' ↗</a>').join(' ');
         return '<article class="discovery-item"><div><strong><span class="ranking-position">#'+
           escapeHTML(item.position)+'</span> <a href="'+escapeHTML(href)+'">'+escapeHTML(item.title)+'</a></strong>'+
-          '<span>'+escapeHTML(score)+(preview?'% publisher critics · editorial snapshot':'/100 · professional critics')+
+          '<span>'+escapeHTML(item.averageScore)+'/100 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel)+
           '</span></div><span class="discovery-item__source">'+source+'</span></article>';
       }).join('');
     }
-    setState('rankings',preview ?
-      'Private preview · checked Rotten Tomatoes percentages; not the Fright Index.' :
-      ranked.length?'Critic chart based on source-verified professional reviews.':
-      'New critic ratings will appear here when available.');
+    setState('rankings',ranked.length?'Critic chart based on source-verified professional reviews.':
+      'Critic ranking pending: permission-cleared professional review data is not yet available.');
     const rankingUpdated=$('[data-updated="rankings"]');
-    if(rankingUpdated)rankingUpdated.textContent=preview?'Publisher figures checked 8 Oct 2026':
-      ranking?.updatedAt?'Updated '+ranking.updatedAt:'Awaiting new scores';
+    if(rankingUpdated)rankingUpdated.textContent=ranking?.updatedAt?'Last ranking snapshot: '+ranking.updatedAt:'Last successful ranking: none';
     render();
   }
   countrySelect.addEventListener('change', () => {

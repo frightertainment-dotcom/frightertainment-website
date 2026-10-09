@@ -34,17 +34,6 @@
   };
   const recordHasDate = movie => releaseClaims(movie).length > 0;
   const recordYear = movie => Number(firstClaim(movie, 'releaseYear')?.value || firstClaim(movie, 'filmYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
-  const scoreSnapshots = movie => Array.isArray(movie.criticReferenceSnapshots) ? movie.criticReferenceSnapshots : [];
-  const externalScoreHTML = movie => {
-    const entries = scoreSnapshots(movie).filter(item => item && /^https:\/\//.test(item.url) &&
-      /^(positive-review-percentage|weighted-critic-score)$/.test(item.kind) && item.checked && Number.isFinite(item.value));
-    if (!entries.length) return '<p class="external-score-empty">External critic scores not yet checked · <a href="/editorial-standards.html">How ratings work</a></p>';
-    return '<div class="external-critic-scores"><div class="external-critic-scores__header">CRITIC SCORES AT PUBLISHER · SNAPSHOT '+
-      escapeHTML(entries[0].checked)+'</div>'+
-      entries.map(item=>'<a class="external-critic-scores__item" href="'+escapeHTML(safeURL(item.url))+
-       '" target="_blank" rel="noopener noreferrer"><span>'+escapeHTML(item.source)+'</span><strong>'+escapeHTML(item.display)+'</strong><small>'+escapeHTML(item.kind==='positive-review-percentage'?'Critics giving positive reviews':'Weighted critic score')+' · '+escapeHTML(item.criticCount)+' reviews</small></a>').join('')+
-      '</div><small class="score-explainer">Publisher ratings have different methods, can change and are not part of the Fright Index.</small>';
-  };
   const cardRelease = movie => {
     const claims = releaseClaims(movie);
     if (claims.length === 1) return `${prettyDate(claims[0].value)} · ${claims[0].territory}`;
@@ -59,18 +48,12 @@
     const cast=firstClaim(movie,'cast')?.value;
     const synopsis=firstClaim(movie,'synopsis')?.value ||
       'Explore the verified film information and original source links below. Additional story details will appear after editorial checks.';
-    const rt=scoreSnapshots(movie).find(x=>x.source==='Rotten Tomatoes'&&
-      x.kind==='positive-review-percentage'&&Number.isInteger(x.value)&&x.value>=0&&x.value<=100);
-    const privatePreview=/frightertainment-private-preview\.pages\.dev$/.test(location.hostname) ||
-      ['localhost','127.0.0.1'].includes(location.hostname);
     return '<section class="fr-movie-hero" aria-label="Film overview">'+
       '<div class="fr-movie-hero__art" role="img" aria-label="Original Frightertainment title artwork, not an official movie poster">'+
       '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
       '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
       '<strong>'+escapeHTML(movie.title)+'</strong>'+
-      '<small>FRIGHTERTAINMENT ARTWORK</small>'+
-      (privatePreview&&rt?'<div class="fr-movie-hero__score"><span>CRITICS</span><strong>'+
-        rt.value+'%</strong><small>SOURCE: RT · DATED</small></div>':'')+'</div>'+
+      '<small>FRIGHTERTAINMENT ARTWORK</small></div>'+
       '<div class="fr-movie-hero__info"><span class="hub-eyebrow">WELCOME TO THE HORROR FILE</span>'+
       '<h1>'+escapeHTML(movie.title)+'</h1>'+
       '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+
@@ -90,7 +73,7 @@
     const synopsis = firstClaim(movie, 'synopsis')?.value || 'Verified film identity; further plot information has not been added.';
     const id = encodeURIComponent(movie.id);
     return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder"><span class="poster-mini">FRIGHTERTAINMENT FILM FILE</span><strong>${escapeHTML(movie.title)}</strong><small>FRIGHTERTAINMENT ART</small></div></div>`}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
-      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span style="color:#827773">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '<span class="movie-card__score movie-card__score--pending">FRIGHT<br>PENDING</span>' : `<span class="movie-card__score" aria-label="Fright Index ${score} out of 100">${score}<small>/100</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div>${externalScoreHTML(movie)}<div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE ↗</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
+      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '<span class="movie-card__score movie-card__score--pending">FRIGHT<br>PENDING</span>' : `<span class="movie-card__score" aria-label="Fright Index ${score} out of 100">${score}<small>/100</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE ↗</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
   };
   const grid = $('#movie-grid');
   if (grid) {
@@ -116,7 +99,7 @@
         const dateKnown = recordHasDate(movie);
         const hasScore = frightIndex(movie) !== null;
         const filterOK = state.filter === 'all' || (state.filter === 'date-tbc' && !dateKnown) ||
-          (state.filter === 'reviewed' && (hasScore || scoreSnapshots(movie).length > 0));
+          (state.filter === 'reviewed' && hasScore);
         const year = recordYear(movie);
         const yearOK = state.year === 'all' || (state.year === 'older' ? year !== null && year < currentYear-1 :
           state.year === 'future' ? year !== null && year > new Date().getUTCFullYear() :
@@ -194,7 +177,7 @@
       const synopsis = firstClaim(movie, 'synopsis');
       page.innerHTML = `${movieHeroMarkup(movie)}<p class="film-status">${escapeHTML(marketNote)} Facts below are linked individually to their source, territory scope and check date. A missing release date means the cited source did not confirm one for a stated market.</p>
         <section class="film-section"><h2>SOURCED FILM DETAILS</h2>${synopsis ? `<p class="film-page__synopsis">${escapeHTML(synopsis.value)}</p>` : ''}<ul class="source-list">${claims.map(claimMarkup).join('')}</ul></section>
-        <section class="film-section"><h2>PUBLISHED CRITIC RATINGS</h2>${externalScoreHTML(movie)}<p>Published critic scores from the linked sources. Figures may change.</p></section>
+        <section class="film-section"><h2>FRIGHT INDEX STATUS</h2><p>Pending: no permission-cleared, comparable professional critic ratings are available for this film.</p><p><a href="/editorial-standards.html">Read how the Fright Index is calculated.</a></p></section>
         <section class="film-section"><h2>FRIGHT INDEX</h2><p class="film-score">${score === null ? '—' : `${score} / 100`}</p><p>Find out how Frightertainment scores movies in our editorial standards.</p><ul class="source-list">${sources}</ul></section>
         ${trailer ? `<section class="film-section"><h2>OFFICIAL TRAILER</h2><button class="button button--red" id="play-trailer">PLAY TRAILER</button><div class="video-frame" id="film-trailer" hidden></div><p>Official upload: ${escapeHTML(trailer.channel)}. <a href="${escapeHTML(safeURL(trailer.source))}" target="_blank" rel="noopener noreferrer">View primary trailer source ></a> · ${escapeHTML(trailer.territory)}</p></section>` : '<section class="film-section"><h2>TRAILER</h2><p>No official trailer linked yet.</p></section>'}
         ${licensedPoster(movie) ? `<p class="film-credit">Artwork: ${escapeHTML(movie.posterCredit)} · ${escapeHTML(movie.posterPermission)}</p>` : ''}<p><a href="/movies.html#upcoming">← Back to film listings</a></p>`;

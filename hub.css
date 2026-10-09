@@ -1,13 +1,23 @@
 /* Frightertainment hub: compact dashboard, consistent page typography and responsive navigation */
-.hub-body{background:radial-gradient(ellipse at 60% 0,rgba(95,14,21,.18),transparent 55%),#080708;min-height:100vh}
+/* Shared section environments. Accent values meet contrast needs against charcoal surfaces. */
+:root{--font-horror:'Bebas Neue',var(--font-display)}
+body[data-theme="home"]{--red:#e54752;--red-dark:#861c29;--hair:#4a292d;--art-hue:0deg}
+body[data-theme="movies"]{--red:#91c2a0;--red-dark:#426d50;--hair:#30473a;--art-hue:115deg}
+body[data-theme="tv"]{--red:#91c8e7;--red-dark:#3a6f8a;--hair:#2d4656;--art-hue:185deg}
+body[data-theme="indie"]{--red:#e6a16c;--red-dark:#89502e;--hair:#513b30;--art-hue:25deg}
+body[data-theme="podcasts"]{--red:#c4a0ed;--red-dark:#7455a0;--hair:#49385e;--art-hue:270deg}
+body[data-theme="games"]{--red:#7fc2ff;--red-dark:#3a77a6;--hair:#304b61;--art-hue:205deg}
+.hub-body{background:radial-gradient(ellipse at 60% 0,color-mix(in srgb,var(--red) 12%,transparent),transparent 55%),#080708;min-height:100vh}
+.hub-body .red-thread{background:var(--red)}
+.hub-body .pulse-dot{background:var(--red);box-shadow:0 0 10px var(--red)}
 .hub-header{height:auto;position:relative;background:#070607;border-bottom:1px solid #64262b;z-index:52}
 .hub-header__inside{display:grid;grid-template-columns:minmax(170px,245px) minmax(0,1fr) auto;align-items:center;gap:18px;min-height:88px;padding-block:9px}
 .hub-brand{height:66px;width:min(100%,245px)}
 .hub-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch;min-width:0}
 .hub-tabs a{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;color:#d7cecb;font:800 clamp(11px,1.12vw,15px) var(--font-display);letter-spacing:.8px;border:1px solid #413235;border-right:0;min-height:48px;padding:8px 6px;background:#120d0f;transition:background .2s,color .2s,border-color .2s}
 .hub-tabs a:last-child{border-right:1px solid #413235}
-.hub-tabs a.active,.hub-tabs a[aria-current="page"]{background:#321218;color:#fff;border-color:#8b2630}
-.hub-tabs a.active::after,.hub-tabs a[aria-current="page"]::after{content:"";position:absolute;left:8px;right:8px;bottom:4px;height:2px;background:#f03643}
+.hub-tabs a.active,.hub-tabs a[aria-current="page"]{background:color-mix(in srgb,var(--red) 19%,#120d0f);color:#fff;border-color:var(--red-dark)}
+.hub-tabs a.active::after,.hub-tabs a[aria-current="page"]::after{content:"";position:absolute;left:8px;right:8px;bottom:4px;height:2px;background:var(--red)}
 .hub-header .hub-menu-toggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid #724447;background:#28181a;padding:11px;min-width:46px;height:48px;flex:none}
 .hub-menu-toggle span{height:2px;width:21px;background:#eee}
 .hub-extra-nav{position:absolute;right:max(calc((100vw - 1320px)/2),30px);top:calc(100% - 1px);left:auto;width:min(250px,90vw);background:#130e10;border:1px solid #70313a;display:grid;box-shadow:0 15px 45px #000d}
@@ -18,11 +28,13 @@
 .hub-intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:24px;align-items:center;margin-bottom:16px;padding:7px 0 13px;border-bottom:1px solid #3e292c}
 .hub-eyebrow,.hub-kicker{font:900 11px/1.3 var(--font-display);letter-spacing:1.8px;color:#e3a4a8;text-transform:uppercase}
 .hub-intro h1,.hub-page-intro h1{font:900 clamp(36px,3.1vw,44px)/.98 var(--font-display);letter-spacing:-.2px;margin:6px 0;color:#f5eeeb}
-.hub-intro h1 em,.hub-page-intro h1 em,.hub-charts h2 em{font-style:normal;color:#ef3944}
+.hub-intro h1 em,.hub-page-intro h1 em,.hub-charts h2 em{font-style:normal;color:var(--red)}
 .hub-intro>p{max-width:500px;margin:0;color:#d0c2c1;font-size:15px;line-height:1.6}
 .hub-dashboard.hub-showcase{position:relative;display:grid;grid-template-columns:minmax(0,1.625fr) minmax(340px,1fr);grid-template-areas:"feature ." "support .";align-items:start;gap:16px;min-width:0}
-.hub-feature{grid-area:feature;min-height:320px}
-.hub-showcase__bottom{grid-area:support;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;min-width:0}
+.hub-dashboard.hub-showcase>.hub-feature{grid-area:feature}
+.hub-feature{min-height:320px}
+.hub-showcase__bottom{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;min-width:0}
+.hub-dashboard.hub-showcase>.hub-showcase__bottom{grid-area:support}
 .hub-tile{position:relative;min-width:0;isolation:isolate;overflow:hidden;border:1px solid #87252e;background:#120d10;min-height:150px;display:flex;align-items:flex-end;transition:border-color .22s,transform .22s}
 .hub-tile::before{content:"";position:absolute;inset:0;z-index:-2;background-position:center;background-size:cover;transform:scale(1);transition:transform .36s ease,filter .36s ease}
 .hub-tile::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 78% 15%,#d0182c22,transparent 62%)}
@@ -78,7 +90,7 @@
 .hub-section-jumps a:hover{background:#92202b}
 .hub-section .releases,.hub-section .trailer-section{padding-top:38px;padding-bottom:55px}
 .hub-section .index-section{padding:60px 0}
-.hub-catalog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:23px}
+.hub-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;margin-bottom:23px}
 .hub-catalog .hub-tile{min-height:285px}
 .hub-catalog .hub-tile h3{font-size:clamp(27px,3vw,40px)}
 .hub-rights-note{font-size:12px;line-height:1.7;color:#aa9393;margin:10px 0 65px}
@@ -115,7 +127,7 @@
  .hub-showcase__bottom .hub-tile{min-height:175px}
  .hub-chart-row:nth-child(n+6){display:none}
  .hub-ranking__state{padding:18px}
- .hub-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hub-catalog{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
 }
 @media(max-width:640px){
  .hub-header__inside,.hub-main,.hub-page-intro{width:calc(100% - 32px)}
@@ -141,8 +153,6 @@
  .hub-charts h2{font-size:clamp(28px,8vw,33px)}
  .hub-charts__top p{font-size:13px}
  .hub-chart-row{grid-template-columns:32px minmax(0,1fr) 58px;padding:9px 12px;font-size:13px}
- .hub-preview-chart__entry{grid-template-columns:32px minmax(0,1fr) 58px}
- .hub-preview-chart__note{font-size:11px}
  .hub-charts__all{margin:9px 11px 4px;font-size:12px}
  .hub-charts__foot{font-size:10px}
  .hub-bottom-strip{flex-direction:column;align-items:flex-start;font-size:10px}
@@ -238,18 +248,8 @@
 .hub-year-picker small{font-size:12px;color:#aa9594}
 .hub-year-picker label{display:grid;gap:6px;font:800 11px var(--font-display);letter-spacing:1px;color:#d8abb0}
 .hub-year-picker select{background:#130e10;color:#f4e3df;border:1px solid #9b404a;padding:12px;min-width:205px;font:800 14px var(--font-display)}
-.external-critic-scores{border:1px solid #5e323c;margin:11px 2px 0;background:#1c1216;display:grid;grid-template-columns:1fr 1fr;gap:0}
-.external-critic-scores__header{grid-column:1/-1;background:#28151b;color:#e4aeb3;padding:7px 10px;font:800 10px var(--font-display);letter-spacing:.8px}
-.external-critic-scores__item{display:grid;gap:2px;align-content:start;padding:9px 12px;border-right:1px solid #5e323c;font:800 11px var(--font-display);color:#e9d7d5}
-.external-critic-scores__item:last-child{border-right:0}
-.external-critic-scores__item strong{font:900 24px var(--font-display);color:#fff5ee}
-.external-critic-scores__item:hover{background:#482128}
 .score-explainer{display:block;padding:4px 4px 5px;color:#a59294;font:500 10px/1.6 var(--font-body)}
-.external-score-empty{font:700 11px var(--font-display);color:#b1a2a0;margin:12px 2px}
-.external-score-empty a{text-decoration:underline;color:#dcb2b6}
-.film-page .external-critic-scores{max-width:530px;margin-bottom:10px}
-.film-page .external-critic-scores__item strong{font-size:32px}
-@media(max-width:700px){.hub-year-picker{padding:15px;display:grid;gap:13px}.hub-year-picker select{width:100%;max-width:100%}.external-critic-scores__item{padding:8px}.external-critic-scores__item strong{font-size:22px}}
+@media(max-width:700px){.hub-year-picker{padding:15px;display:grid;gap:13px}.hub-year-picker select{width:100%;max-width:100%}}
 
 /* Franchise history spotlight: release chronology, never mistaken for current releases. */
 .hub-series{display:grid;grid-template-columns:minmax(190px,.55fr) minmax(0,1.45fr);border:1px solid #613039;background:linear-gradient(112deg,#231017,#100c0e);margin-top:12px;margin-bottom:16px}
@@ -264,32 +264,7 @@
 @media(max-width:900px){.hub-series{display:block}.hub-series__intro{padding:12px 15px}.hub-series__items{border-top:1px solid #71333c}.hub-series__items a{padding:12px 8px}.hub-series__items strong{font-size:14px}}
 @media(max-width:440px){.hub-series__items{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-series__items a{border-bottom:1px solid #71333c}.hub-series__items a:nth-child(odd){border-left:0}}
 
-.external-critic-scores__item small{font:600 10px/1.4 var(--font-body);color:#bca7a8;white-space:normal}.external-critic-scores__item:hover small{color:#eee}
 
-
-/* Private source-attributed 2026 comparison — limited to manually checked
- * publisher metrics. These are NOT Frightertainment's owned or licensed rankings. */
-.hub-rt-chart{list-style:none;padding:0;margin:18px 0 12px;border:1px solid #713039;background:linear-gradient(160deg,#190e12,#100c10)}
-.hub-rt-chart__entry{display:grid;grid-template-columns:60px minmax(0,1fr) 95px 110px;align-items:center;gap:13px;padding:16px 18px;border-bottom:1px solid #4b2931}
-.hub-rt-chart__entry:nth-child(odd){background:#2b111940}
-.hub-rt-chart__entry:last-child{border-bottom:0}
-.hub-rt-chart__rank{font:900 31px var(--font-display);color:#fb4d5c;text-shadow:0 2px 16px #e92c4244}
-.hub-rt-chart__details{min-width:0;display:flex;flex-direction:column;gap:5px}
-.hub-rt-chart__film{font:900 clamp(19px,2.3vw,28px)/1.05 var(--font-display);color:#f6e9e7}
-.hub-rt-chart__film:hover{text-decoration:underline;text-decoration-color:#ec3747;text-underline-offset:4px}
-.hub-rt-chart__sub{font:600 11px/1.4 var(--font-body);color:#ab9899}
-.hub-rt-chart__score{justify-self:end;border:1px solid #ae303e;border-radius:3px;background:radial-gradient(circle at 50% 28%,#872530,#45131c 65%,#270d13);color:#fff4ef;box-shadow:0 8px 19px #0008,inset 0 1px 0 #f5828844;min-width:80px;padding:7px 10px;text-align:center;font:900 29px/.95 var(--font-display)}
-.hub-rt-chart__source{justify-self:end;color:#efb1b8;font:900 11px var(--font-display);letter-spacing:.5px;text-decoration:underline;text-underline-offset:3px}
-.hub-rt-chart__source:hover{color:#fff}
-.hub-rt-unscored{border:1px solid #513037;margin:12px 0 25px;background:#140f12;padding:13px 16px;color:#c7b7b6}
-.hub-rt-unscored summary{cursor:pointer;font:800 16px var(--font-display);color:#edb4b6}
-.hub-rt-unscored ul{display:grid;gap:8px;padding:14px 0 0 24px;margin:0;font:600 12px var(--font-body)}
-.hub-rt-unscored a:hover{text-decoration:underline}
-.hub-preview-chart__entry{grid-template-columns:35px minmax(0,1fr) 62px}
-.hub-preview-chart__note{margin:0;padding:8px 15px 13px;color:#b19da0;font:600 11px/1.5 var(--font-body);border-top:1px solid #492c33}
-.hub-preview-chart__entry .score{color:#f5c5c8;font-size:20px;white-space:nowrap}
-@media(max-width:780px){.hub-rt-chart__entry{grid-template-columns:42px minmax(0,1fr) 72px;gap:8px;padding:13px}.hub-rt-chart__source{grid-column:2/-1;justify-self:start;margin-top:0;font-size:10px}.hub-rt-chart__rank{font-size:23px}.hub-rt-chart__score{font-size:23px;min-width:66px}.hub-rt-chart__film{font-size:20px}}
-@media(max-width:400px){.hub-rt-chart__entry{grid-template-columns:34px minmax(0,1fr) 65px;gap:6px;padding:11px 9px}.hub-rt-chart__score{font-size:21px;min-width:58px}.hub-rt-chart__film{font-size:18px}.hub-rt-chart__sub{font-size:10px}.hub-preview-chart__entry{grid-template-columns:31px minmax(0,1fr) 55px}}
 
 
 /* 1896–present Horror Vault: year accordions, in-year search, instant IMDb linking. */
@@ -438,37 +413,29 @@
 .archive-detail__related>.archive-detail__return{display:inline-block}
 @media(max-width:800px){.archive-detail__metadata-grid,.archive-detail__related-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:490px){.archive-detail__metadata-grid,.archive-detail__related-list{grid-template-columns:1fr}.archive-detail__metadata-item{padding:12px}.archive-detail__related-link{padding:12px;min-height:44px;font-size:16px}}
-/* Twenty tracked films, but only films with eligible published critic scores are ranked. */
-.hub-rt-coverage{padding:15px 20px;margin-bottom:18px}
-.hub-rt-coverage h2{font:900 26px var(--font-display);color:#eed0d3;margin:0 0 6px}
-.hub-rt-coverage>p{font:600 13px/1.55 var(--font-body);color:#d0b2b7;margin:4px 0 15px}
-.hub-rt-coverage ul{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px;padding:0;margin:0}
-.hub-rt-coverage__row{display:grid;gap:3px;background:#1c1117;border:1px solid #4d313a;padding:12px}
-.hub-rt-coverage__row a{font:900 16px var(--font-display);color:#f4dfe0}
-.hub-rt-coverage__row span{font:600 10px/1.45 var(--font-body);color:#ac969d}
-@media(max-width:600px){.hub-rt-coverage ul{grid-template-columns:1fr}.hub-rt-coverage{padding:12px}}
+
 
 
 /* Curated horror film files: original cinematic art, sourced facts and a
    privately displayed publisher reference badge (never an RT trademark logo). */
 .fr-movie-hero{display:grid;grid-template-columns:minmax(190px,.46fr) minmax(0,.84fr);gap:clamp(18px,3.2vw,48px);padding:20px 0 27px;border-bottom:1px solid #68323e;margin-bottom:20px;align-items:stretch}
-.fr-movie-hero__art{position:relative;display:flex;flex-direction:column;justify-content:center;gap:15px;min-height:410px;overflow:hidden;border:1px solid #994151;padding:clamp(20px,2.7vw,35px);color:#fcecef;background:radial-gradient(ellipse at 28% 15%,#ad273d57,transparent 50%),radial-gradient(ellipse at 85% 85%,#8c122538,transparent 45%),repeating-linear-gradient(128deg,transparent 0 18px,#fff1 18px 19px),linear-gradient(140deg,#30111b,#0b0a0e 70%);box-shadow:8px 17px 39px #0009,inset 0 0 80px #951a2422}
+.fr-movie-hero__art{position:relative;display:flex;flex-direction:column;justify-content:center;gap:15px;min-height:410px;overflow:hidden;border:1px solid color-mix(in srgb,var(--red) 68%,#333);padding:clamp(20px,2.7vw,35px);color:#fcecef;background:radial-gradient(ellipse at 28% 15%,color-mix(in srgb,var(--red) 36%,transparent),transparent 50%),radial-gradient(ellipse at 85% 85%,color-mix(in srgb,var(--red) 20%,transparent),transparent 45%),repeating-linear-gradient(128deg,transparent 0 18px,#fff1 18px 19px),linear-gradient(140deg,color-mix(in srgb,var(--red) 28%,#0d0b0d),#0b0a0e 70%);box-shadow:8px 17px 39px #0009,inset 0 0 80px color-mix(in srgb,var(--red) 15%,transparent)}
 .fr-movie-hero__art::before{content:"";position:absolute;inset:8px;border:1px solid #ffacb11c;pointer-events:none}
 .fr-movie-hero__art::after{content:"✶";position:absolute;top:-23px;right:-5px;font-size:170px;color:#d52b3921;line-height:1;pointer-events:none}
 .fr-movie-hero__studio{position:absolute;top:25px;left:25px;font:900 12px var(--font-display);letter-spacing:1.1px;color:#fcbec5}
-.fr-movie-hero__year{font:900 49px var(--font-display);color:#ff515c}
+.fr-movie-hero__year{font:900 49px var(--font-display);color:var(--red)}
 .fr-movie-hero__art>strong{font:900 clamp(42px,5.3vw,83px)/.85 var(--font-display);color:#fff8f5;overflow-wrap:anywhere;text-transform:uppercase;text-shadow:1px 4px 0 #0008,0 9px 25px #b71a3059}
 .fr-movie-hero__art>small{font:800 10px var(--font-display);letter-spacing:.7px;color:#bdb0b0}
 .fr-movie-hero__info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(5px,2vw,25px) 0}
 .fr-movie-hero__info h1{font:900 clamp(42px,5.6vw,83px)/.9 var(--font-display);margin:12px 0 15px;color:#fff1ed;text-wrap:balance}
-.fr-movie-hero__genre{font:900 17px var(--font-display);color:#ed4c60;text-transform:uppercase;letter-spacing:1.5px}
+.fr-movie-hero__genre{font:900 17px var(--font-display);color:var(--red);text-transform:uppercase;letter-spacing:1.5px}
 .fr-movie-hero__synopsis{font:500 15px/1.8 var(--font-body);color:#d0b9bf;max-width:670px;margin:14px 0}
 .fr-movie-hero__facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;margin-top:15px}
 .fr-movie-hero__facts>div{border-top:1px solid #5a313c;padding:11px 0;display:grid;gap:5px}
-.fr-movie-hero__facts span{font:900 11px var(--font-display);color:#e45a6c;letter-spacing:1px}
+.fr-movie-hero__facts span{font:900 11px var(--font-display);color:var(--red);letter-spacing:1px}
 .fr-movie-hero__facts strong{font:700 14px/1.4 var(--font-body);color:#efe0e0}
-.fr-movie-hero__browse{display:inline-block;font:900 13px var(--font-display);margin-top:17px;padding:12px 14px;border:1px solid #be4251;background:#4a1d2b;color:#fff0f0}
-.fr-movie-hero__browse:hover{background:#9d2536}
+.fr-movie-hero__browse{display:inline-block;font:900 13px var(--font-display);margin-top:17px;padding:12px 14px;border:1px solid var(--red-dark);background:color-mix(in srgb,var(--red) 20%,#100d0f);color:#fff0f0}
+.fr-movie-hero__browse:hover{background:color-mix(in srgb,var(--red) 42%,#100d0f)}
 .fr-movie-hero__score{position:absolute;right:12px;bottom:12px;width:105px;height:105px;border-radius:50%;transform:rotate(8deg);background:radial-gradient(circle,#4e131f 43%,#8b1b2d 64%,#2e0b12 75%);box-shadow:0 8px 25px #000c,inset 0 0 0 5px #b43341,inset 0 0 0 8px #1c0b10;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff4ef}
 .fr-movie-hero__score>span{font:900 12px var(--font-display);letter-spacing:1px}
 .fr-movie-hero__score>strong{font:900 34px var(--font-display)}
@@ -515,3 +482,44 @@ a.release-brief__title:hover{text-decoration:underline}
 .movie-advanced[open]>.movie-advanced__summary{border-bottom:1px solid #713a45}
 .movie-advanced>.discovery-section{margin:0;padding:20px 18px;background:transparent}
 @media(max-width:620px){.movie-advanced__summary{padding:14px;align-items:start}.movie-advanced__summary strong{font-size:24px}.movie-advanced__summary small{font-size:11px}.movie-advanced__summary>span:last-child{font-size:10px;padding:8px;flex:none}.movie-advanced>.discovery-section{padding:12px}}
+
+/* Theme accents apply to each existing section without changing its content or artwork. */
+.hub-tabs a.active,.hub-tabs a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--red)}
+.hub-body button:focus-visible,.hub-body a:focus-visible,.hub-body input:focus-visible,.hub-body select:focus-visible{outline-color:var(--red)}
+.hub-section .hub-page-intro{border-color:color-mix(in srgb,var(--red) 45%,#453038)}
+.hub-section .hub-page-intro h1,.hub-section .hub-page-intro h1 em{font-family:var(--font-horror,var(--font-display))}
+.hub-section .hub-eyebrow,.hub-section .hub-kicker{color:var(--red)}
+.hub-section .hub-subtabs a.active,.hub-section .hub-subtabs a[aria-current="page"],.hub-section .hub-section-jumps a:hover{border-color:var(--red);color:#fff}
+.hub-section .hub-subtabs a.active,.hub-section .hub-subtabs a[aria-current="page"]{background:color-mix(in srgb,var(--red) 24%,#120d0f)}
+.hub-section .hub-section-jumps a{border-color:color-mix(in srgb,var(--red) 42%,#653038)}
+.hub-section .hub-catalog .hub-tile{border-color:color-mix(in srgb,var(--red) 45%,#413235)}
+.hub-section .hub-catalog .hub-tile::after{background:radial-gradient(ellipse at 80% 20%,color-mix(in srgb,var(--red) 24%,transparent),transparent 62%)}
+.hub-section .hub-catalog .hub-feature::before{filter:hue-rotate(var(--art-hue)) saturate(.82)}
+.hub-section .hub-catalog .hub-tile__link{border-color:var(--red);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--red) 15%,transparent)}
+.hub-section .hub-catalog .hub-tile__link:hover,.hub-section .hub-catalog .hub-tile__link:focus-visible{background:color-mix(in srgb,var(--red) 32%,#120d0f)}
+.hub-section .hub-editorial-more__head h2 em,.hub-section .section-head h2 em{color:var(--red)}
+.hub-section .release-brief,.hub-section .movie-advanced{border-color:color-mix(in srgb,var(--red) 45%,#473033);background:linear-gradient(114deg,color-mix(in srgb,var(--red) 15%,#160c10),#100b10)}
+.hub-section .release-brief__checked,.hub-section .release-brief__subtitle,.hub-section .release-brief__source,.hub-section .release-brief__empty{color:color-mix(in srgb,var(--red) 72%,#fff)}
+.hub-section .release-brief__tabs{border-color:color-mix(in srgb,var(--red) 40%,#602c36)}
+.hub-section .release-brief__tab{border-color:color-mix(in srgb,var(--red) 42%,#6b3a42);color:#eee2e5}
+.hub-section .release-brief__tab.active,.hub-section .release-brief__tab:hover{background:color-mix(in srgb,var(--red) 45%,#240f14);border-color:var(--red)}
+.hub-section .release-brief__item{border-color:color-mix(in srgb,var(--red) 24%,#502a33)}
+.hub-section .film-score,.hub-section .ranking-row__place strong,.hub-section .ranking-row__score strong,.hub-section .ranking-position{color:var(--red)}
+.hub-section .discovery-section .section-head h2 em,.hub-section .discovery-panel__head h3 em{color:var(--red)}
+.hub-section .fr-movie-hero__art{filter:saturate(.82)}
+.hub-section .verified-trailer{border-color:var(--red-dark);box-shadow:0 0 24px color-mix(in srgb,var(--red) 10%,transparent)}
+.hub-section .verified-trailer__screen{background:radial-gradient(ellipse at 50% 48%,color-mix(in srgb,var(--red) 27%,#120d0f),#100d0e 76%)}
+.hub-section .verified-trailer__screen::before{content:"";position:absolute;inset:10px;border:1px solid color-mix(in srgb,var(--red) 55%,transparent);pointer-events:none;z-index:1}
+.hub-section .verified-trailer__screen::after{content:"OFFICIAL YOUTUBE TRAILER · CLICK TO PLAY";position:absolute;z-index:1;top:17px;left:20px;color:#f5f0ec;font:800 10px var(--font-display);letter-spacing:1px;text-shadow:0 1px 6px #000;pointer-events:none}
+.hub-section .verified-trailer__screen>button{z-index:2}
+.hub-section .verified-trailer__frame{z-index:4}
+.hub-section .verified-trailer__meta h3{color:#faf3ef}
+.hub-section .verified-trailer__meta>a{color:var(--red)}
+.film-page .fr-movie-hero__info h1,.film-page__inner>h1{font-family:var(--font-horror,var(--font-display))}
+@media(max-width:640px){
+ .hub-section .section-head h2{font-size:clamp(38px,12vw,55px);letter-spacing:0;overflow-wrap:anywhere}
+ .hub-section .index-section h2{font-size:clamp(32px,10vw,52px);letter-spacing:0;overflow-wrap:anywhere;line-height:.95}
+ .hub-section .discovery-section .section-head__stamp{display:grid;justify-items:start;gap:7px;max-width:100%;transform:none;white-space:normal}
+ .hub-section .discovery-section .section-head__stamp select{width:min(100%,180px);max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){.hub-body *,.hub-body *::before,.hub-body *::after{scroll-behavior:auto;animation-duration:.01ms;animation-iteration-count:1;transition-duration:.01ms}}

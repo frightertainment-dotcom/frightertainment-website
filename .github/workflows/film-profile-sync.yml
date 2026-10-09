@@ -41,6 +41,8 @@ jobs:
           npm run build:preview
       - name: Save sourced profile metadata without deleting old films
         shell: bash
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
         run: |
           git config user.name "frightertainment-archive-bot"
           git config user.email "frightertainment-archive-bot@users.noreply.github.com"
@@ -49,7 +51,7 @@ jobs:
             echo "No updated profile data"
           else
             git commit -m "data: expand sourced horror film profiles"
-            git fetch origin "${{ github.ref_name }}"
-            git rebase "origin/${{ github.ref_name }}"
-            git push origin HEAD:${{ github.ref_name }}
+            git fetch origin "refs/heads/${TARGET_BRANCH}"
+            git rebase "origin/${TARGET_BRANCH}"
+            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
           fi

@@ -1,44 +1,44 @@
 # Frightertainment staging automation and editorial operations
 
-This document describes the **private staging deployment**, not the public domain or an approved commercial data feed.
+Read-only Cloudflare status verified on **9 October 2026**. This describes the private preview and staging Worker only. It does not describe a production deployment or an approved commercial data feed.
 
-## Deployed staging components (8 October 2026)
+## Verified staging components
 
-- Cloudflare Pages project: `frightertainment-private-preview`. Branch alias: `codex-frightertainment-v1.frightertainment-private-preview.pages.dev`. Cloudflare Access restricts preview subdomains to the owner account. Git integration: branch `codex/frightertainment-v1` only; production deployments from `main` disabled.
-- Pages Functions at `functions/api/[[path]].js` send API requests to the first-party Worker router in `worker/index.js`. A separate staging D1 database is bound as `DB` in **preview** configuration only. Other static requests do not invoke the Worker.
-- Scheduler Worker: `frightertainment-staging-daily`, independent of production domains and with `workers.dev` disabled. Its Cron Trigger is `0 4 * * *`, meaning every day at **04:00 UTC**. It is bound only to the staging database and runs the SQL calculation in `worker/staging-rankings.js`. This schedule has been created and its database binding checked; future scheduled executions must still be observed in Worker logs.
-- Staging D1 migrations `0001_initial.sql` and `0002_manual_sync_and_cinema_limits.sql` have been applied. Twenty initially source-matched and editorially verified film records were imported into `canonical_films`. Additional movies appear in static site records. No critic reviews were imported or fabricated.
-- An explicit read-only source-driven release calendar (`release-calendar.js`) updates its future/past status on page view. Release territory is displayed and cinema/showtime availability is **not inferred**.
-- Editorial catalogues (`data/editorial.json`) provide separate TV, podcast, game and independent-film recommendations. Entries are expanded to source-linked HTML by `scripts/build-editorial.mjs`.
+- Cloudflare Pages project: `frightertainment-private-preview`. Its production branch is `main`, production deployments are disabled, and preview deployments are enabled for `codex/frightertainment-v1`. Cloudflare Access protects the preview. The latest successful preview deployment observed during this review was built from the branch's starting commit `a8f7b78` at 07:18 UTC on 9 October 2026. A new push to the branch triggers another preview deployment. This task therefore must not push its changes or update PR #1 with a new head until the owner authorizes that deployment.
+- Pages Function API requests use the `frightertainment-staging-discovery` D1 binding in preview. The separate deployed Worker `frightertainment-staging-daily` has `workers.dev` disabled and runs `0 4 * * *` (daily at 04:00 UTC). It is bound to the same staging D1 and calculates rankings from already approved reviews; it does not acquire critic reviews.
+- Read-only D1 queries on 9 October 2026 confirmed 20 rows in `canonical_films`, all flagged horror-verified/editorially approved, including 10 with `release_year=2026`; `critic_reviews` has 0 rows, `rank_history` has 0 rows and `dataset_snapshots` has 0 rows. The 04:00 UTC scheduled run completed with `status='published'` at `2026-10-09T04:00:48.518Z` and no error code. This was a successful empty ranking calculation, not a populated ranking or a provider refresh.
+- The repository's `wrangler.jsonc` describes a separate local Worker named `frightertainment-discovery` and uses an all-zero D1 ID placeholder. It is not the deployed staging Worker and is not deployable as configured. Do not replace the placeholder or point local work at a production database without owner action.
+- Weekly archive/profile workflows are defined in GitHub Actions. Their scheduled runs are conditioned on the default branch, so their schedules are not active from this development branch. A manual or branch push run is not proof of the scheduled production job.
 
-## Correctness and source rights
+## Ranking integrity and provider status
 
-The **Top 20** shows genuine ranked films **only** after at least three distinct professional numeric critic ratings for each film have their source, identity, score, date and re-use permission individually verified and approved. The current D1 seed includes **zero approved numeric critic reviews**, so Top 20 remains **pending**. The clearly labelled unranked film watchlist is a separate editorial discovery aid.
+The public-facing 2026 chart remains pending until each film has at least three distinct eligible professional numeric critic reviews whose identity, publication, primary source, dates and reuse permission are verified and approved. D1 currently has no review rows, so there are no ranked films, no prior positions and no valid ranking movements. The 20 canonical staging records must not be described as 20 rated films.
 
-The daily scheduler **recalculates approved ratings; it does not acquire scores**. No legal free, unattended professional-review feed has yet been approved. Do not copy Rotten Tomatoes Tomatometer percentages, Metacritic weighted scores, reviews, images, provider rating APIs or user ratings into this equal-mean critic average unless permitted and methodologically consistent. Do not invent chart positions.
+No licensed unattended critic-review feed is connected. The deployed staging Cron calculates eligible ranking data already in D1; it does not scrape critic websites or fetch ratings. There are also no activated licensed MovieGlu cinema/showtime, Watchmode streaming, or TMDB discovery/trending feeds. Empty and pending states are the correct public presentation until rights, accounts and credentials are approved.
 
-Owner setup needed before **new** critic reviews can publish:
-1. Confirm permission to republish each numeric review score or secure an appropriately licensed critic-data feed. Preserve permission evidence and primary review URL.
-2. Set a strong `ADMIN_TOKEN` secret in **preview environment only** through Cloudflare, not in Git or browser code.
-3. Use protected admin submission `POST /api/admin/reviews`; each valid submission is staged for review, and `POST /api/admin/reviews/approve` requires explicit editorial approval.
-4. Confirm data in D1 and wait until the next scheduled ranking run (or use a reviewed manual recovery process) before interpreting daily rank changes.
+Before any provider is enabled, obtain written permission for the intended commercial site and territories, confirm attribution/cache/retention rules and quotas, add only server-side secrets, verify exact canonical ID mappings, and test a complete valid feed plus failure recovery. No account, licence, credentials or paid integration is activated by this work.
 
-Provider flags and credentials for MovieGlu, Watchmode, and TMDB are deliberately absent. Cinema showtimes and country-specific streaming availability remain unavailable until commercial terms, relevant territory rights, permitted imagery and API secrets are approved. **No new payments or subscriptions are authorised.**
+## Owner setup before production activation
+
+1. Secure permission-cleared critic score data (a licensed feed or individually evidenced numeric reviews) and document the applicable reuse rights. Do not scrape Rotten Tomatoes, IMDb, Metacritic or publisher sites.
+2. Approve commercial terms for each intended availability or discovery provider and territory. See `API_LICENSING.md` for the provider review and cost references.
+3. Provision a separate production Worker and D1 database, apply migrations, verify bindings and access policy, and configure production secrets through Cloudflare. Keep the preview database separate. Do not use the local zero UUID as a real database ID.
+4. Configure only licensed countries, provider credentials, attribution notices, quota controls and approved film/provider mappings. Do not enable poster or other artwork fields without separate usage rights.
+5. Run and observe the production job, verify the source timestamp and last-good behavior, then separately authorize any production deployment. A successful staging Cron run is not proof of production execution.
 
 ## Validation and troubleshooting
 
-Use `npm run build:pages && npm run check && npm test && npm run test:browser` and monitor GitHub Actions on the latest commit. Pages deploys have a separate Cloudflare success/failure state; a successful GitHub Actions build alone does not prove a successful Pages deployment. Inspect the Cloudflare build logs if a deployment fails.
+For local checks, run `npm run validate:worker`, `npm run worker:migrations:local`, `npm test` and `npm run test:browser`. Wrangler dry-run validation does not deploy. The local migration command uses local state and does not modify Cloudflare resources.
 
-Example read-only D1 queries from an account-authorised environment:
+For an owner-authorized staging or production incident, inspect Worker observability logs and recent `update_runs` rows. Useful read-only D1 queries include:
 
 ```sql
 SELECT COUNT(*) AS film_count FROM canonical_films;
-SELECT COUNT(*) AS eligible_reviews FROM critic_reviews
-  WHERE status='approved' AND permission_cleared=1 AND professional_verified=1;
-SELECT release_year, COUNT(*) AS ranked_count, MAX(ranked_at) AS updated_at
-  FROM rank_history GROUP BY release_year;
+SELECT COUNT(*) AS review_count FROM critic_reviews;
 SELECT task, status, started_at, error_code
   FROM update_runs ORDER BY started_at DESC LIMIT 20;
+SELECT release_year, COUNT(*) AS ranked_rows, MAX(ranked_at) AS latest_ranked_at
+  FROM rank_history GROUP BY release_year ORDER BY release_year DESC;
 ```
 
-Never expose private admin tokens in Pages JavaScript; never point the preview binding to a production database. The public domain and DNS must not change without owner approval.
+Do not manually edit a public payload or delete a last-good snapshot to make a panel look current. For provider-backed data, a failed refresh must keep the previous valid snapshot and report its stale state. New horror discovery candidates require editorial review before publication. Review changes to film claims source-by-source; do not silently rewrite historical evidence.

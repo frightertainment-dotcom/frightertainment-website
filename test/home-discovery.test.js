@@ -17,7 +17,7 @@ test('homepage exposes all five automated horror discovery panels and safe pendi
   assert.match(html, /home-discovery\.js/);
   assert.match(script, /api\/discovery\?country=/);
   assert.match(script, /api\/rankings\?year=/);
-  assert.match(script, /More rated horror films will appear here/);
+  assert.match(script, /Critic ranking pending: verified critic scores are not yet available/);
   assert.match(script, /Release path unconfirmed/);
   assert.match(script, /safeUrl/);
 });

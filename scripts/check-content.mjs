@@ -20,6 +20,7 @@ for (const movie of movies) {
   if (!movie.id || !/^[a-z0-9-]+$/.test(movie.id)) errors.push(`Invalid film id: ${movie.id}`);
   if (ids.has(movie.id)) errors.push(`Duplicate film id: ${movie.id}`);
   ids.add(movie.id);
+  if (Object.hasOwn(movie, 'criticReferenceSnapshots')) errors.push(`Unlicensed publisher score data must not be shipped in the public film catalogue: ${movie.id}`);
   if (!movie.title?.trim()) errors.push(`Missing title: ${movie.id}`);
   if (!Array.isArray(movie.claims) || movie.claims.length === 0) errors.push(`No claim evidence: ${movie.id}`);
   const titles = (movie.claims || []).filter(claim => claim.field === 'title');
@@ -32,17 +33,6 @@ for (const movie of movies) {
     if (claim.field === 'releaseDate' && (!validDay(claim.value) || /^(?:territory|release territory) (?:not stated|unconfirmed|unspecified)/i.test(claim.territory))) errors.push(`Release date needs an ISO date and a stated territory: ${movie.id}`);
     if (claim.field === 'releaseYear' && !/^20\d{2}$/.test(claim.value)) errors.push(`Release year must be a four-digit year: ${movie.id}`);
   }
-  for (const rating of movie.criticReferenceSnapshots || []) {
-    if (!['positive-review-percentage','weighted-critic-score'].includes(rating.kind) ||
-        !rating.source || !rating.label || !goodURL(rating.url) || !validDay(rating.checked) ||
-        !Number.isFinite(rating.value) || rating.value < 0 || rating.value > 100 ||
-        !Number.isInteger(rating.criticCount) || rating.criticCount < 1 ||
-        !rating.display) errors.push('Invalid individually attributed external critic snapshot: '+movie.id);
-    if (rating.permissionCleared || rating.frightIndexEligible)
-      errors.push('External aggregator snapshots must never imply a licensed Fright Index source: '+movie.id);
-  }
-  if (movie.criticReferenceSnapshots?.length > 2)
-    errors.push('More than two external publisher summaries require explicit data licensing review: '+movie.id);
   if (movie.poster && (!goodURL(movie.poster) || !movie.posterCredit || !movie.posterPermission || movie.posterLicenceStatus !== 'approved' || !goodURL(movie.posterSourcePage) || !goodURL(movie.posterPermissionEvidence) || !movie.posterUsageScope)) errors.push(`Poster artwork requires approved documented permission, evidence, source page and usage scope: ${movie.id}`);
   if (movie.trailer) {
     if (!/^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') || !['trailer', 'teaser'].includes(movie.trailer.kind) || !movie.trailer.channel || !goodURL(movie.trailer.source) || !movie.trailer.territory || !validDay(movie.trailer.checked)) errors.push(`Trailer needs an exact official upload, source, channel, territory and checked date: ${movie.id}`);
@@ -114,14 +104,25 @@ for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.
   for (const needed of ['class="hub-tabs"', 'src="/app.js"', 'id="mobile-nav"', 'href="/hub.css"'])
     if (!markup.includes(needed)) errors.push(page + ' missing required navigation or styling: ' + needed);
 }
+for (const [page, theme] of Object.entries({
+  'index.html':'home','movies.html':'movies','all-horror-movies.html':'movies','archive-film.html':'movies',
+  'film.html':'movies','tv-shows.html':'tv','indie-movies.html':'indie','podcasts.html':'podcasts','games.html':'games'
+})) {
+  const markup = await readFile(new URL(page, root), 'utf8');
+  if (!markup.includes(`data-theme="${theme}"`)) errors.push(`${page} is missing its ${theme} theme token`);
+}
+for (const path of ['top-20/2026/index.html','films/28-years-later-bone-temple/index.html']) {
+  const markup = await readFile(new URL(path, root), 'utf8');
+  if (!markup.includes('data-theme="movies"')) errors.push(`${path} must use the Movies environment`);
+}
 const movieYearsMarkup = await readFile(new URL('movies.html',root),'utf8');
 for (const required of ['id="movie-year"', 'value="older"', 'value="2025"', 'value="2026"']) {
   if (!movieYearsMarkup.includes(required)) errors.push('Movie year filter missing '+required);
 }
 if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='releaseYear' && claim.value==='2007')))
   errors.push('28 Weeks Later must remain in the 2007 archive, never 2026');
-if(!movies.some(movie=>movie.id==='28-years-later-bone-temple' && movie.criticReferenceSnapshots?.length===2))
-  errors.push('2026 Bone Temple must have individually attributed critic-score reference snapshots');
+if(!movies.some(movie=>movie.id==='28-years-later-bone-temple' && Array.isArray(movie.reviews)))
+  errors.push('Bone Temple film record must retain its independent Fright Index review list');
 const homeHub = await readFile(new URL('index.html',root),'utf8');
 if (homeHub.includes('hero-wordmark') || homeHub.includes('FRIGHTERTAINMENT ORIGINALS') || !homeHub.includes('id="hub-ranking"')) errors.push('Homepage must be compact without duplicate wordmark or unannounced productions');
 const buildSource = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
@@ -147,22 +148,15 @@ for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
 const calendarClient = await readFile(new URL('release-calendar.js',root),'utf8');
 if(!calendarClient.includes("claim.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
 if(!(await readFile(new URL('movies.html',root),'utf8')).includes('id="hub-release-list"')) errors.push('Release calendar is missing from the Movies page');
-// The private trial comparison must remain explicitly gated and must never
-// appear as a licensed public RT feed or as the independently scored Fright Index.
-const previewScoreModule = await readFile(new URL('rankings-preview.js',root),'utf8');
-const rankingClient = await readFile(new URL('top20.js',root),'utf8');
-const homepageClient = await readFile(new URL('hub.js',root),'utf8');
-const annualRenderer = await readFile(new URL('scripts/build-pages.mjs',root),'utf8');
-const previewBundler = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
-const homeMarkup = await readFile(new URL('index.html',root),'utf8');
-for (const [file,source] of [['home',homeMarkup],['annual renderer',annualRenderer],['preview bundler',previewBundler]]) {
-  if(!source.includes('rankings-preview.js')) errors.push(file+': preview comparisons module not linked');
+// No private publisher-score payload or fallback renderer may enter public assets.
+for (const file of ['data/movies.js','app.js','hub.js','home-discovery.js','discovery.js','top20.js','index.html','movies.html','scripts/build-pages.mjs','scripts/build-preview.mjs']) {
+  const source = await readFile(new URL(file, root), 'utf8');
+  if (source.includes('criticReferenceSnapshots') || source.includes('FrightertainmentPreviewRankings'))
+    errors.push(`${file} still contains a private publisher-score payload or renderer`);
 }
-if(!previewScoreModule.includes('frightertainment-private-preview') ||
-   !previewScoreModule.includes("item.source==='Rotten Tomatoes'"))
-  errors.push('Preview ranking data source or staging domain gate missing');
-if(!rankingClient.includes('helper?.preview') || !homepageClient.includes('helper?.preview'))
-  errors.push('Public-domain bypass guard on score comparison');
+const rankingPreviewPath = new URL('rankings-preview.js', root);
+try { await access(rankingPreviewPath); errors.push('Private publisher-score comparison module must not ship with the public website'); }
+catch {}
 
 // The long-lived horror catalogue MUST be additive and separate from the weekly charts.
 const vault = JSON.parse(await readFile(new URL('data/archive/horror-films.json',root),'utf8'));
@@ -257,8 +251,8 @@ for(const [qid,entry] of Object.entries(profileCache.records||{})){
 if(!profileBundler.includes('data/archive/profiles.json') ||
    !profileScript.includes('data/archive/profiles.json'))
   errors.push('Source-enriched horror profiles missing from archive reader or private Pages bundle');
-if(!yearChart.includes('20-data.ranked.length')||!yearChart.includes('AWAITING A VERIFIED CRITIC SCORE'))
-  errors.push('Annual chart must show 20 tracked films without fabricating missing ratings');
+if(!yearChart.includes('showUnrankedVerifiedFilms')||!yearChart.includes("label.textContent = 'UNRANKED'"))
+  errors.push('Annual chart must keep unranked, source-verified films separate from earned ranking positions');
 if(!curatedFilmRenderer.includes('filmHeroMarkup(movie)'))
   errors.push('Source-backed cinematic film hero must render even without JavaScript');
 

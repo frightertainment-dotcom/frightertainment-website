@@ -15,14 +15,22 @@ async function htmlFiles(directory) {
   return files;
 }
 
-test('all directly served HTML pages declare the shared Barlow Condensed and DM Sans stylesheet', async () => {
+test('all directly served HTML pages declare the shared display and body fonts', async () => {
   const files = await htmlFiles(process.cwd());
   assert.ok(files.length > 0);
   for (const file of files) {
     const html = await readFile(file, 'utf8');
     assert.match(html, /fonts\.googleapis\.com\/css2\?family=Barlow\+Condensed/, `${file} must load Barlow Condensed directly`);
+    assert.match(html, /family=Bebas\+Neue/, `${file} must load the OFL-licensed display face directly`);
     assert.match(html, /family=DM\+Sans/, `${file} must load DM Sans directly`);
   }
+});
+
+test('section and film display typography uses the licensed horror display face with a safe fallback', async () => {
+  const css = await readFile(join(process.cwd(), 'hub.css'), 'utf8');
+  assert.match(css, /--font-horror:'Bebas Neue',var\(--font-display\)/);
+  assert.match(css, /\.hub-section \.hub-page-intro h1[^\n]*font-family:var\(--font-horror,var\(--font-display\)\)/);
+  assert.match(css, /\.film-page \.fr-movie-hero__info h1[^\n]*font-family:var\(--font-horror,var\(--font-display\)\)/);
 });
 
 test('generated film detail templates present a synopsis once and retain the sourced claim list', async () => {
@@ -33,6 +41,6 @@ test('generated film detail templates present a synopsis once and retain the sou
     assert.equal((html.match(/class="fr-movie-hero__synopsis"/g) || []).length, 1, `${file} should show its overview once`);
     assert.doesNotMatch(html, /class="film-page__synopsis"/, `${file} should not repeat its synopsis in a second prominent block`);
     assert.match(html, /class="source-list"/, `${file} must retain the sourced claim list`);
-    assert.match(html, /This comparison is not an independent critic verdict/, `${file} must retain the Fright Index source distinction`);
+    assert.match(html, /at least three distinct professional critics and reuse permission are verified/, `${file} must retain Fright Index eligibility requirements`);
   }
 });

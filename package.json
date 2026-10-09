@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build:pages": "node scripts/build-pages.mjs && node scripts/build-editorial.mjs",
-    "check": "node scripts/check-content.mjs",
+    "check": "node scripts/check-content.mjs && node scripts/check-links.mjs",
     "test": "node --test",
     "test:browser": "playwright test",
     "sync:manual-films": "node scripts/sync-manual-films.mjs",
@@ -20,6 +20,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
-    "wrangler": "4.148.0"
+    "wrangler": "4.149.0"
   }
 }

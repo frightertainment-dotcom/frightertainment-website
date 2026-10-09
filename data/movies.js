@@ -467,30 +467,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 88,
-        "outOf": 100,
-        "display": "88%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/28_years_later",
-        "criticCount": 399,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 77,
-        "outOf": 100,
-        "display": "77/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/28-years-later/",
-        "criticCount": 56,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "28-years-later-bone-temple",
@@ -566,30 +542,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 91,
-        "outOf": 100,
-        "display": "91%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/28_years_later_the_bone_temple",
-        "criticCount": 351,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 81,
-        "outOf": 100,
-        "display": "81/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/28-years-later-the-bone-temple/",
-        "criticCount": 58,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "black-phone-2",
@@ -629,30 +581,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 72,
-        "outOf": 100,
-        "display": "72%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/black_phone_2",
-        "criticCount": 197,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 61,
-        "outOf": 100,
-        "display": "61/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/black-phone-2/",
-        "criticCount": 37,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "five-nights-at-freddys-2",
@@ -1004,30 +932,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 92,
-        "outOf": 100,
-        "display": "92%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/send_help",
-        "criticCount": 301,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 75,
-        "outOf": 100,
-        "display": "75/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/send-help/",
-        "criticCount": 40,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "backrooms",
@@ -1067,19 +971,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 86,
-        "outOf": 100,
-        "display": "86%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/backrooms",
-        "criticCount": 317,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "scream-7",
@@ -1119,30 +1010,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 30,
-        "outOf": 100,
-        "display": "30%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/scream_7",
-        "criticCount": 227,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 35,
-        "outOf": 100,
-        "display": "35/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/scream-7/",
-        "criticCount": 42,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "insidious-out-of-the-further",
@@ -1182,19 +1049,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 57,
-        "outOf": 100,
-        "display": "57%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/insidious_out_of_the_further",
-        "criticCount": 136,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "ready-or-not-2",
@@ -1234,30 +1088,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 75,
-        "outOf": 100,
-        "display": "75%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/ready_or_not_2_here_i_come",
-        "criticCount": 227,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 58,
-        "outOf": 100,
-        "display": "58/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/ready-or-not-2-here-i-come/",
-        "criticCount": 34,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "28-weeks-later",
@@ -1315,30 +1145,6 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 73,
-        "outOf": 100,
-        "display": "73%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/28_weeks_later",
-        "criticCount": 199,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 78,
-        "outOf": 100,
-        "display": "78/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/28-weeks-later/",
-        "criticCount": 34,
-        "checked": "2026-10-08"
-      }
-    ]
   },
   {
     "id": "28-days-later",
@@ -1387,29 +1193,5 @@ window.FR_MOVIES = [
     "posterPermission": "",
     "trailer": null,
     "reviews": [],
-    "criticReferenceSnapshots": [
-      {
-        "source": "Rotten Tomatoes",
-        "label": "Critic approval",
-        "value": 87,
-        "outOf": 100,
-        "display": "87%",
-        "kind": "positive-review-percentage",
-        "url": "https://www.rottentomatoes.com/m/28_days_later",
-        "criticCount": 240,
-        "checked": "2026-10-08"
-      },
-      {
-        "source": "Metacritic",
-        "label": "Metascore",
-        "value": 73,
-        "outOf": 100,
-        "display": "73/100",
-        "kind": "weighted-critic-score",
-        "url": "https://www.metacritic.com/movie/28-days-later/",
-        "criticCount": 39,
-        "checked": "2026-10-08"
-      }
-    ]
   }
 ];

@@ -8,7 +8,7 @@ await mkdir(destination, { recursive: true });
 
 const publicFiles = [
   'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html', 'editorial-standards.html',
-  'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'rankings-preview.js', 'horror-archive.js', 'archive-film.js',
+  'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-archive.js', 'archive-film.js',
   'styles.css', 'hub.css', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
@@ -42,8 +42,10 @@ await markHtmlNoIndex(destination);
 
 await writeFile(new URL('robots.txt', destination),
   'User-agent: *\nDisallow: /\n');
-await writeFile(new URL('_headers', destination),
-  '/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Cache-Control: no-store\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n  Permissions-Policy: camera=(), microphone=(), geolocation=(self)\n');
+const sharedHeaders = await readFile(new URL('_headers', root), 'utf8');
+if (!sharedHeaders.startsWith('/*')) throw new Error('Shared security headers are missing the Pages _headers rule');
+await writeFile(new URL('_headers', destination), sharedHeaders.replace('/*',
+  '/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Cache-Control: no-store'));
 // Keep static pages free of Functions invocation charges.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]

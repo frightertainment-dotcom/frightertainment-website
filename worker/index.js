@@ -6,7 +6,15 @@ import {
   refreshStreaming, refreshStreamingReleases, refreshTheatricalReleases, refreshTrending
 } from './providers.js';
 
-const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8', 'x-content-type-options': 'nosniff' };
+const JSON_HEADERS = {
+  'content-type': 'application/json; charset=utf-8',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'no-referrer',
+  'strict-transport-security': 'max-age=31536000',
+  'content-security-policy': "default-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+  'permissions-policy': 'camera=(), microphone=(), geolocation=()'
+};
 const countryPattern = /^[A-Z]{2}$/;
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const nowIso = () => new Date().toISOString();
@@ -321,7 +329,13 @@ async function fetchHandler(request, env) {
   try {
     if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
     if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
-    if (path.startsWith('/api/films/') && request.method === 'GET') return await handleFilmDetail(env, decodeURIComponent(path.slice('/api/films/'.length)));
+    if (path.startsWith('/api/films/') && request.method === 'GET') {
+      let filmId;
+      try { filmId = decodeURIComponent(path.slice('/api/films/'.length)); }
+      catch { throw new HttpError(400, 'Invalid film identifier'); }
+      if (!/^[A-Za-z0-9-]{1,80}$/.test(filmId)) throw new HttpError(400, 'Invalid film identifier');
+      return await handleFilmDetail(env, filmId);
+    }
     if (path === '/api/cinema' && request.method === 'POST') return await handleCinema(env, request);
     if (path === '/api/cinema/films' && request.method === 'GET') return await handleCinemaFilms(env, request);
     if (path.startsWith('/api/admin/')) return await handleAdmin(env, request, path);
