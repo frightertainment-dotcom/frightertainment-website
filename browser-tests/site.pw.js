@@ -443,7 +443,7 @@ test('curated studio films have atmospheric original poster artwork, crew and so
   await page.goto('/films/victorian-psycho/');
   await expect(page.locator('.fr-movie-hero')).toBeVisible();
   await expect(page.locator('.fr-movie-hero__art')).toContainText('Victorian Psycho');
-  await expect(page.locator('.fr-movie-hero__art')).toContainText('ORIGINAL EDITORIAL ARTWORK');
+  await expect(page.locator('.fr-movie-hero__art')).toContainText('FRIGHTERTAINMENT ARTWORK');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('DIRECTED BY');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('FEATURED CAST');
   await expect(page.locator('.fr-movie-hero__browse')).toHaveAttribute('href','/all-horror-movies.html?year=2026');
