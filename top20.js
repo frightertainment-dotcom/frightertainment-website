@@ -68,18 +68,55 @@
       item.append(rank,details,score,source);chart.append(item);
     }
     list.replaceChildren(chart);
-    if(data.unscored.length){
-      const other=document.createElement('details');other.className='hub-rt-unscored';
-      const summary=document.createElement('summary');
-      summary.textContent=data.unscored.length+' more tracked '+year+' films without a checked RT figure';
-      other.append(summary);
-      const extra=document.createElement('ul');
-      for(const item of data.unscored) {
-        const li=document.createElement('li');const link=document.createElement('a');
-        link.href=filmHref(item.id);link.textContent=item.title;li.append(link);extra.append(li);
-      }
-      other.append(extra);list.append(other);
-    }
+    // Build a 20-film watchlist around the actually rated films. The fourteen
+    // additional titles are NEVER given false scores or numbered rank positions.
+    // This uses our cumulative CC0 archive, so weekly film imports expand rather
+    // than erase the pool and previously scored films keep their place.
+    const titleKey = t => String(t||'').normalize('NFKC').toLocaleLowerCase('en-GB').replace(/[^a-z0-9]/g,'');
+    const already=new Set(data.ranked.map(item=>titleKey(item.title)));
+    const unscored=data.unscored.filter(x=>!already.has(titleKey(x.title))).map(item=>({
+      id:item.id,title:item.title,href:filmHref(item.id),source:'Frightertainment studio-verified film file'
+    }));
+    fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
+      .then(async response=>response.ok ? response.json():null)
+      .then(archive=>{
+        const candidates=Array.isArray(archive?.films)?archive.films:[];
+        const pending=[...unscored];
+        const seen=new Set([...already,...unscored.map(x=>titleKey(x.title))]);
+        const extra=candidates.filter(x=>x.year===Number(year) && typeof x.title==='string' &&
+            /^Q[1-9]\\d*$/.test(x.qid||'') && (!x.imdbId || /^tt\\d{7,10}$/.test(x.imdbId)))
+          .sort((a,b)=>a.title.localeCompare(b.title,'en',{numeric:true,sensitivity:'base'}));
+        for(const film of extra){
+          if(pending.length>=Math.max(0,20-data.ranked.length)) break;
+          const key=titleKey(film.title);
+          if(!key||seen.has(key))continue;
+          seen.add(key);
+          pending.push({id:film.qid,title:film.title,
+            href:'/archive-film.html?id='+encodeURIComponent(film.qid),source:'Wikidata CC0 film identity · IMDb link on film page'});
+        }
+        const other=document.createElement('section');other.className='hub-rt-unscored hub-rt-coverage';
+        const header=document.createElement('h2');header.textContent='AWAITING A VERIFIED CRITIC SCORE';
+        const note=document.createElement('p');
+        note.textContent=pending.length+' more tracked '+year+
+          ' films. Not ranked: no approved comparable critic score is available. Their inclusion is not a rating or recommendation.';
+        other.append(header,note);
+        const extraList=document.createElement('ul');
+        for(const item of pending){
+          const li=document.createElement('li');li.className='hub-rt-coverage__row';
+          const link=document.createElement('a');link.href=item.href;link.textContent=item.title;
+          const desc=document.createElement('span');desc.textContent='— AWAITING SCORE · '+item.source;
+          li.append(link,desc);extraList.append(li);
+        }
+        other.append(extraList);
+        list.querySelector('.hub-rt-coverage')?.remove();
+        list.append(other);
+        status.textContent=data.ranked.length+' scored films + '+pending.length+
+          ' awaiting verified ratings · '+(data.ranked.length+pending.length)+
+          ' tracked '+year+' horror titles. Only the scored films have ranking positions.';
+        updated.textContent+=' · Film candidate pool updated from cumulative horror archive.';
+      }).catch(()=>{
+        status.textContent+=' Other films are temporarily unavailable from the archive.';
+      });
     return true;
   }
 
