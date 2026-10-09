@@ -52,6 +52,35 @@
     const year = firstClaim(movie, 'releaseYear') || firstClaim(movie, 'filmYear');
     return year ? `${escapeHTML(year.value)} · film year; local availability unconfirmed` : 'Release date and territory unconfirmed';
   };
+  const movieHeroMarkup = movie => {
+    const year=recordYear(movie)||'YEAR TBC';
+    const genre=firstClaim(movie,'genre')?.value||'Horror cinema';
+    const director=firstClaim(movie,'director')?.value;
+    const cast=firstClaim(movie,'cast')?.value;
+    const synopsis=firstClaim(movie,'synopsis')?.value ||
+      'Explore the verified film information and original source links below. Additional story details will appear after editorial checks.';
+    const rt=scoreSnapshots(movie).find(x=>x.source==='Rotten Tomatoes'&&
+      x.kind==='positive-review-percentage'&&Number.isInteger(x.value)&&x.value>=0&&x.value<=100);
+    const privatePreview=/frightertainment-private-preview\\.pages\\.dev$/.test(location.hostname) ||
+      ['localhost','127.0.0.1'].includes(location.hostname);
+    return '<section class="fr-movie-hero" aria-label="Film overview">'+
+      '<div class="fr-movie-hero__art" role="img" aria-label="Original Frightertainment title artwork, not an official movie poster">'+
+      '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
+      '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
+      '<strong>'+escapeHTML(movie.title)+'</strong>'+
+      '<small>ORIGINAL EDITORIAL ARTWORK · NO OFFICIAL POSTER</small>'+
+      (privatePreview&&rt?'<div class="fr-movie-hero__score"><span>CRITICS</span><strong>'+
+        rt.value+'%</strong><small>SOURCE: RT · DATED</small></div>':'')+'</div>'+
+      '<div class="fr-movie-hero__info"><span class="hub-eyebrow">WELCOME TO THE HORROR FILE</span>'+
+      '<h1>'+escapeHTML(movie.title)+'</h1>'+
+      '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+
+      '<p class="fr-movie-hero__synopsis">'+escapeHTML(synopsis)+'</p>'+
+      '<div class="fr-movie-hero__facts">'+
+      (director?'<div><span>DIRECTED BY</span><strong>'+escapeHTML(director)+'</strong></div>':'')+
+      (cast?'<div><span>FEATURED CAST</span><strong>'+escapeHTML(cast)+'</strong></div>':'')+
+      '</div><a class="fr-movie-hero__browse" href="/all-horror-movies.html?year='+encodeURIComponent(year)+'">EXPLORE MORE HORROR FROM '+escapeHTML(year)+' ↗</a>'+
+      '</div></section>';
+  };
   const cardMarkup = movie => {
     const score = frightIndex(movie);
     const dates = releaseClaims(movie);
@@ -163,7 +192,7 @@
       const sources = reviews.length ? reviews.map(review => `<li class="film-claim"><div><strong>${escapeHTML(review.source)}</strong><p>${escapeHTML(review.display || `${review.score}/${review.outOf}`)} · ${escapeHTML(review.type || 'Critic score')}</p><small>CHECKED ${escapeHTML(review.checked)} · ${escapeHTML(review.territory || 'Territory not stated')}</small></div><a href="${escapeHTML(safeURL(review.url))}" target="_blank" rel="noopener noreferrer">Review source ></a></li>`).join('') : '<li class="film-claim"><div><strong>No eligible critic scores</strong><p>No verified, permission-cleared critic ratings are available.</p></div></li>';
       const marketNote = dates.length ? dates.map(claim => `${prettyDate(claim.value)} (${claim.territory})`).join('; ') : releaseYear ? `Release year ${escapeHTML(releaseYear.value)}; ${escapeHTML(releaseYear.territory)}.` : 'A territory-specific release date has not been confirmed.';
       const synopsis = firstClaim(movie, 'synopsis');
-      page.innerHTML = `<div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> PRIMARY-SOURCE FILM FILE</div><h1>${escapeHTML(movie.title)}</h1><p class="film-status">${escapeHTML(marketNote)} Facts below are linked individually to their source, territory scope and check date. A missing release date means the cited source did not confirm one for a stated market.</p>
+      page.innerHTML = `${movieHeroMarkup(movie)}<p class="film-status">${escapeHTML(marketNote)} Facts below are linked individually to their source, territory scope and check date. A missing release date means the cited source did not confirm one for a stated market.</p>
         <section class="film-section"><h2>SOURCED FILM DETAILS</h2>${synopsis ? `<p class="film-page__synopsis">${escapeHTML(synopsis.value)}</p>` : ''}<ul class="source-list">${claims.map(claimMarkup).join('')}</ul></section>
         <section class="film-section"><h2>PUBLISHED CRITIC RATINGS</h2>${externalScoreHTML(movie)}<p>Separately attributed editorial snapshots from the linked publishers, not live updates or Frightertainment scores.</p></section>
         <section class="film-section"><h2>FRIGHT INDEX</h2><p class="film-score">${score === null ? '—' : `${score} / 100`}</p><p>Method: eligible critic scores are converted to /100, equally weighted, averaged and rounded to the nearest whole number. Only linked, dated scores with confirmed reuse approval are included. This comparison is not an independent critic verdict.</p><ul class="source-list">${sources}</ul></section>
