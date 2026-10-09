@@ -24,6 +24,9 @@ jobs:
       - name: Verify isolated, non-indexable preview bundle
         run: |
           test -f dist/index.html
+          test -f dist/release-brief.js
+          test -f dist/data/editorial-releases.json
+          grep -q 'data-release-brief' dist/index.html
           test -f dist/home-discovery.js
           grep -q 'src="/home-discovery.js"' dist/index.html
           test -f dist/all-horror-movies.html
