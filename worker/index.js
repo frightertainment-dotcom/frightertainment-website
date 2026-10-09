@@ -1,6 +1,10 @@
 import {
-  averageReviews, buildAnnualRanking, isHTTPS, isISOAlpha2, isISODate, MINIMUM_CRITICS, normalizeReview, validateDataset
+  isHTTPS, isISOAlpha2, isISODate, MINIMUM_CRITICS, normalizeReview, validateDataset
 } from '../src/core.js';
+import {
+  createAnnualRankingPayload, hasRankingSchema,
+  listRankingYears, publishAnnualRankingSnapshot, RANKING_METHOD
+} from './ranking-snapshots.js';
 import {
   discoverHorrorCandidates, fetchNearbyShowtimes, refreshComingSoon,
   refreshStreaming, refreshStreamingReleases, refreshTheatricalReleases, refreshTrending
@@ -91,59 +95,23 @@ async function recordCandidates(env, candidates, country) {
   return statements.length;
 }
 
-async function refreshRankingHistory(env, year) {
-  const [{ results: films }, { results: reviews }] = await Promise.all([
-    env.DB.prepare(`SELECT film_id AS id, title, film_year AS filmYear FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND film_year = ?`).bind(year).all(),
-    env.DB.prepare(`SELECT film_id AS filmId, film_year AS filmYear, critic_id AS criticId, critic_name AS criticName, publication, publication_url AS publicationUrl, review_url AS reviewUrl,
-      score, score_out_of AS scoreOutOf, territory, published_at AS publishedAt, checked_at AS checkedAt, (permission_cleared = 1) AS permissionCleared, (professional_verified = 1) AS professionalVerified,
-      'numeric-professional-review' AS ratingKind FROM critic_reviews WHERE status = 'approved' AND permission_cleared = 1 AND professional_verified = 1 AND film_year = ?`).bind(year).all()
-  ]);
-  let snapshotStorage = true;
-  let previousSnapshot = null;
-  try { previousSnapshot = await env.DB.prepare(`SELECT ranked_at AS rankedAt FROM annual_ranking_snapshots WHERE film_year = ? AND ranked_at < ? ORDER BY ranked_at DESC LIMIT 1`).bind(year, today()).first(); }
-  catch { snapshotStorage = false; log('ranking_snapshot_migration_required', { year }); }
-  const priorDate = previousSnapshot?.rankedAt || (await env.DB.prepare(`SELECT MAX(ranked_at) AS rankedAt FROM rank_history WHERE release_year = ? AND ranked_at < ?`).bind(year, today()).first())?.rankedAt;
-  const { results: prior = [] } = priorDate
-    ? await env.DB.prepare(`SELECT film_id AS filmId, position FROM rank_history WHERE release_year = ? AND ranked_at = ?`).bind(year, priorDate).all()
-    : { results: [] };
-  const ranking = buildAnnualRanking(films, reviews, year, prior);
-  const date = today();
-  const publishedAt = nowIso();
-  const pending = films.filter(film => averageReviews(reviews.filter(review => review.filmId === film.id)).status === 'pending').length;
-  const payload = {
-    year, status: ranking.length ? 'ranked' : 'pending', minimumCritics: MINIMUM_CRITICS,
-    methodology: 'Equal-weight average of distinct, permission-cleared, verified professional numeric critic ratings normalized to /100; rounded to the nearest whole point. Audience scores and aggregator percentages are excluded.',
-    updatedAt: publishedAt, rankedFilms: ranking.length, pendingFilmCount: pending,
-    items: ranking.map(row => ({
-      filmId: row.filmId, title: row.title, position: row.position, averageScore: row.average, criticCount: row.criticCount,
-      movement: row.movement, movementLabel: row.movementLabel,
-      sources: row.reviews.map(review => ({ critic: review.criticName, publication: review.publication, url: review.reviewUrl, territory: review.territory, checkedAt: review.checkedAt }))
-    }))
-  };
-  const rows = ranking.map(row => env.DB.prepare(`INSERT INTO rank_history(release_year, film_id, position, average_score, critic_count, ranked_at)
-    VALUES(?, ?, ?, ?, ?, ?) ON CONFLICT(release_year, film_id, ranked_at) DO UPDATE SET position = excluded.position, average_score = excluded.average_score, critic_count = excluded.critic_count`)
-    .bind(year, row.filmId, row.position, row.average, row.criticCount, date));
-  if (snapshotStorage) rows.unshift(env.DB.prepare(`INSERT INTO annual_ranking_snapshots(film_year, ranked_at, published_at, result_count, payload_json)
-    VALUES(?, ?, ?, ?, ?) ON CONFLICT(film_year, ranked_at) DO UPDATE SET published_at = excluded.published_at, result_count = excluded.result_count, payload_json = excluded.payload_json`)
-    .bind(year, date, publishedAt, ranking.length, JSON.stringify(payload)));
-  if (rows.length) await env.DB.batch(rows);
-  return ranking.length;
-}
-
 async function handleRanking(env, request) {
   const yearValue = new URL(request.url).searchParams.get('year') || String(new Date().getUTCFullYear());
   const year = Number(yearValue);
   if (!Number.isInteger(year) || year < 1888 || year > new Date().getUTCFullYear() + 2) return json({ error: 'Invalid ranking year' }, 400);
-  let snapshots = [];
-  try {
-    ({ results: snapshots = [] } = await env.DB.prepare(`SELECT ranked_at AS rankedAt, published_at AS publishedAt, payload_json AS payload
-      FROM annual_ranking_snapshots WHERE film_year = ? ORDER BY ranked_at DESC LIMIT 30`).bind(year).all());
-  } catch { log('ranking_snapshot_migration_required', { year }); }
+  if (!(await hasRankingSchema(env.DB))) {
+    return json({ year, status: 'pending', minimumCritics: MINIMUM_CRITICS, methodology: RANKING_METHOD,
+      rankedFilms: 0, pendingFilmCount: 0, pendingFilms: [], items: [], updatedAt: null,
+      rankingSchemaStatus: 'migration-required' }, 200, { 'cache-control': 'no-store' });
+  }
+  const { results: snapshots = [] } = await env.DB.prepare(`SELECT ranked_at AS rankedAt, published_at AS publishedAt, result_count AS resultCount, payload_json AS payload
+    FROM annual_ranking_snapshots WHERE film_year = ? ORDER BY ranked_at DESC LIMIT 30`).bind(year).all();
   for (let index = 0; index < snapshots.length; index++) {
     const snapshot = snapshots[index];
     let payload;
     try { payload = JSON.parse(snapshot.payload); } catch { continue; }
-    if (payload?.year !== year || !Array.isArray(payload.items) || !Number.isInteger(payload.rankedFilms) || payload.rankedFilms !== payload.items.length) continue;
+    if (payload?.year !== year || !Array.isArray(payload.items) || !Number.isInteger(payload.rankedFilms) ||
+      payload.rankedFilms !== payload.items.length || Number(snapshot.resultCount) !== payload.items.length) continue;
     const seenFilms = new Set();
     const seenPositions = new Set();
     const valid = payload.items.every(item => {
@@ -159,25 +127,9 @@ async function handleRanking(env, request) {
     return json({ ...payload, updatedAt: snapshot.publishedAt, stale: index > 0 || !Number.isFinite(freshness) || freshness < Date.now() - 36 * 60 * 60 * 1000 }, 200,
       { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
   }
-  const [{ results: films }, { results: reviews }, { results: prior }, { results: history }] = await Promise.all([
-    env.DB.prepare(`SELECT film_id AS id, title, film_year AS filmYear FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND film_year = ? ORDER BY title`).bind(year).all(),
-    env.DB.prepare(`SELECT film_id AS filmId, film_year AS filmYear, critic_id AS criticId, critic_name AS criticName, publication, publication_url AS publicationUrl, review_url AS reviewUrl,
-      score, score_out_of AS scoreOutOf, territory, published_at AS publishedAt, checked_at AS checkedAt, (permission_cleared = 1) AS permissionCleared, (professional_verified = 1) AS professionalVerified,
-      'numeric-professional-review' AS ratingKind FROM critic_reviews WHERE status = 'approved' AND permission_cleared = 1 AND professional_verified = 1 AND film_year = ? ORDER BY published_at`).bind(year).all(),
-    env.DB.prepare(`SELECT film_id AS filmId, position FROM rank_history WHERE release_year = ? AND ranked_at < ? ORDER BY ranked_at DESC`).bind(year, today()).all(),
-    env.DB.prepare(`SELECT MAX(ranked_at) AS rankedAt FROM rank_history WHERE release_year = ?`).bind(year).first()
-  ]);
-  const previousByFilm = new Map();
-  for (const row of prior) if (!previousByFilm.has(row.filmId)) previousByFilm.set(row.filmId, row.position);
-  const ranking = buildAnnualRanking(films, reviews, year, [...previousByFilm].map(([filmId, position]) => ({ filmId, position })));
-  const pending = films.filter(film => averageReviews(reviews.filter(review => review.filmId === film.id)).status === 'pending').length;
-  return json({ year, status: ranking.length ? 'ranked' : 'pending', minimumCritics: Number(env.MINIMUM_CRITICS) || 3,
-    methodology: 'Equal-weight average of distinct, permission-cleared, verified professional numeric critic ratings normalized to /100; rounded to the nearest whole point. Audience scores and aggregator percentages are excluded.',
-    updatedAt: history?.rankedAt || null, rankedFilms: ranking.length, pendingFilmCount: pending, items: ranking.map(row => ({
-      filmId: row.filmId, title: row.title, position: row.position, averageScore: row.average, criticCount: row.criticCount,
-      movement: row.movement, movementLabel: row.movementLabel,
-      sources: row.reviews.map(review => ({ critic: review.criticName, publication: review.publication, url: review.reviewUrl, territory: review.territory, checkedAt: review.checkedAt }))
-    })) });
+  const payload = await createAnnualRankingPayload(env.DB, year);
+  return json({ ...payload, updatedAt: null, snapshotStatus: 'awaiting-first-scheduled-snapshot', stale: false }, 200,
+    { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
 }
 
 async function handleDiscovery(env, request) {
@@ -474,16 +426,26 @@ async function runScheduled(controller, env) {
       tasks.push(await refreshTask(env, 'theatrical-releases', country, () => refreshTheatricalReleases(env, env.DB, country), 36 * 60 * 60 * 1000, 'cron-daily'));
       tasks.push(await refreshTask(env, 'trending-horror', country, () => refreshTrending(env, country), 36 * 60 * 60 * 1000, 'cron-daily'));
     }
-    const { results: years } = await env.DB.prepare(`SELECT DISTINCT film_year AS year FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND film_year IS NOT NULL UNION SELECT ? AS year`).bind(new Date().getUTCFullYear()).all();
-    for (const row of years) {
+    if (!(await hasRankingSchema(env.DB))) {
       const startedAt = nowIso();
-      try {
-        const count = await refreshRankingHistory(env, row.year);
-        await logRun(env.DB, `ranking-${row.year}`, '', 'cron-daily', 'published', startedAt, null, count);
-      } catch (error) {
-        const issue = safeError(error);
-        try { await logRun(env.DB, `ranking-${row.year}`, '', 'cron-daily', 'failed', startedAt, issue); } catch {}
-        log('ranking_snapshot_failed', { year: row.year, error: issue });
+      const issue = { code: 'migration_required', message: 'film_year and annual_ranking_snapshots are not available' };
+      try { await logRun(env.DB, 'annual-rankings', '', 'cron-daily', 'skipped', startedAt, issue); } catch {}
+      log('ranking_schema_migration_required');
+      tasks.push({ task: 'annual-rankings', status: 'skipped', reason: 'migration-required' });
+    } else {
+      const runAt = new Date();
+      for (const year of await listRankingYears(env.DB, runAt.getUTCFullYear())) {
+        const startedAt = runAt.toISOString();
+        try {
+          const payload = await publishAnnualRankingSnapshot(env.DB, year, runAt, 'cron-daily');
+          tasks.push({ task: `ranking-${year}`, status: 'published', count: payload?.rankedFilms || 0 });
+          log('ranking_snapshot_published', { year, rankedFilms: payload?.rankedFilms || 0 });
+        } catch (error) {
+          const issue = safeError(error);
+          try { await logRun(env.DB, `ranking-${year}`, '', 'cron-daily', 'failed', startedAt, issue); } catch {}
+          log('ranking_snapshot_failed_last_good_retained', { year, error: issue });
+          tasks.push({ task: `ranking-${year}`, status: 'failed', error: issue });
+        }
       }
     }
   } else if (controller.cron === '0 5 * * 1') {
