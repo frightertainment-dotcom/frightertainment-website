@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@600;700;800&display=swap');
 /* Frightertainment hub: a shared system with six deliberately different horror rooms. */
 :root{--font-horror:'Cormorant Garamond',Georgia,serif}
 body[data-theme="home"]{--red:#ee5965;--red-dark:#901f2a;--hair:#51282e;--art-hue:0deg;--world:#10070a;--surface-world:#150b0e;--surface-raised:#1b0d12;--edge:#79303a;--world-glow:#a4142b}
-body[data-theme="movies"]{--red:#a6d2ae;--red-dark:#496f51;--hair:#30483a;--art-hue:115deg;--world:#07100c;--surface-world:#0c1711;--surface-raised:#112016;--edge:#42624a;--world-glow:#255d39;--font-room:'Cormorant Garamond',Georgia,serif}
+body[data-theme="movies"]{--red:#a6d2ae;--red-dark:#496f51;--hair:#30483a;--art-hue:115deg;--world:#07100c;--surface-world:#0c1711;--surface-raised:#112016;--edge:#42624a;--world-glow:#255d39;--font-room:'Grenze Gotisch',Georgia,serif}
 body[data-theme="tv"]{--red:#b4e4f5;--red-dark:#477d9b;--hair:#283e56;--art-hue:185deg;--world:#080c17;--surface-world:#0c1220;--surface-raised:#101a2a;--edge:#3d5a77;--world-glow:#214e82;--font-room:'Barlow Condensed',Impact,sans-serif}
-body[data-theme="indie"]{--red:#f1b078;--red-dark:#96542e;--hair:#513a2e;--art-hue:25deg;--world:#120b08;--surface-world:#1a100b;--surface-raised:#21140d;--edge:#77482e;--world-glow:#a84620;--font-room:'Cormorant Garamond',Georgia,serif}
+body[data-theme="indie"]{--red:#f1b078;--red-dark:#96542e;--hair:#513a2e;--art-hue:25deg;--world:#120b08;--surface-world:#1a100b;--surface-raised:#21140d;--edge:#77482e;--world-glow:#a84620;--font-room:'Grenze Gotisch',Georgia,serif}
 body[data-theme="podcasts"]{--red:#d1b2f3;--red-dark:#7858a7;--hair:#49385e;--art-hue:270deg;--world:#0d0713;--surface-world:#140c1c;--surface-raised:#1b1028;--edge:#644583;--world-glow:#6e36a4;--font-room:'Cormorant Garamond',Georgia,serif}
 body[data-theme="games"]{--red:#80b5ff;--red-dark:#365cae;--hair:#29395f;--art-hue:205deg;--world:#070a16;--surface-world:#0b1020;--surface-raised:#111a2d;--edge:#3c5e9a;--world-glow:#244fda;--font-room:'Barlow Condensed',Impact,sans-serif}
 .hub-body{position:relative;isolation:isolate;background:radial-gradient(ellipse at 70% -10%,color-mix(in srgb,var(--world-glow) 22%,transparent),transparent 54%),var(--world,#080708);min-height:100vh}
@@ -868,3 +869,6 @@ body[data-theme="movies"] .movie-card__placeholder::after{content:"";position:ab
  @keyframes vault-arrive{from{opacity:.75;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 }
 @media(prefers-reduced-motion:reduce){.hub-vault-portal,.hub-vault-portal__links a,.horror-vault-search__result{animation:none;transition:none}}
+
+/* Gothic headlines use the original SIL-OFL typeface; body text stays a readable sans serif. */
+body[data-theme="movies"] .hub-vault-portal h2,body[data-theme="movies"] .hub-page-intro h1,body[data-theme="indie"] .hub-page-intro h1{font-family:'Grenze Gotisch',Georgia,serif;font-weight:700}
