@@ -218,13 +218,15 @@ test('private 2026 scoreboard shows a six-film sourced partial chart instead of 
   await page.setViewportSize({width:390,height:844});
   await page.goto('/top-20/2026/');
   await expect(page.locator('.hub-rt-chart__entry')).toHaveCount(6);
-  await expect(page.locator('#ranking-status')).toContainText('6 of 11 tracked 2026 films');
+  await expect(page.locator('#ranking-status')).toContainText('6 scored films + 14 awaiting verified ratings');
   await expect(page.locator('#ranking-method')).toContainText('PRIVATE PREVIEW ONLY');
   await expect(page.locator('.hub-rt-chart__entry').first()).toContainText('Send Help');
   await expect(page.locator('.hub-rt-chart__entry').first()).toContainText('92%');
   await expect(page.locator('.hub-rt-chart__entry').nth(1)).toContainText('The Bone Temple');
   await expect(page.locator('.hub-rt-chart__entry').nth(1)).toContainText('91%');
-  await expect(page.locator('.hub-rt-unscored')).toContainText('5 more tracked 2026 films');
+  await expect(page.locator('.hub-rt-coverage__row')).toHaveCount(14);
+  await expect(page.locator('.hub-rt-coverage')).toContainText('14 more tracked 2026 films');
+  await expect(page.locator('.hub-rt-coverage')).not.toContainText('28 Weeks Later');
   await expect(page.locator('.hub-rt-chart')).not.toContainText('28 Weeks Later');
   await expect(page.locator('.hub-rt-chart__film').filter({hasText:/^28 Years Later$/})).toHaveCount(0);
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -414,4 +416,48 @@ test('optional live data drawer searches attributed verified feed results when A
   await expect(page.locator('[data-home-list="streaming-releases"] article')).toHaveCount(1);
   await page.locator('#home-search').fill('');
   await expect(page.locator('[data-home-list="theatrical-releases"] article')).toHaveCount(1);
+});
+
+test('sourced archive film page includes six same-year discoveries and optional CC0 film biography',async({page})=>{
+  await page.route('**/data/archive/profiles.json',route=>route.fulfill({status:200,
+    contentType:'application/json',body:JSON.stringify({schemaVersion:1,records:{
+      Q203560:{qid:'Q203560',title:'1408',year:2007,description:'2007 American supernatural horror film',
+        checkedAt:'2026-10-09',runtimeMinutes:104,sourceUrl:'https://www.wikidata.org/wiki/Q203560',
+        directors:[{name:'Mikael Håfström',qid:'Q255247'}],
+        cast:[{name:'John Cusack',qid:'Q10450'}],
+        genres:[{name:'horror film',qid:'Q200092'}],countries:[{name:'United States',qid:'Q30'}]
+      }
+    }})
+  }));
+  await page.goto('/archive-film.html?id=Q203560');
+  await expect(page.locator('.archive-detail__title')).toHaveText('1408');
+  await expect(page.locator('.archive-detail__metadata')).toContainText('BEHIND THE FEAR');
+  await expect(page.locator('.archive-detail__metadata')).toContainText('Mikael Håfström');
+  await expect(page.locator('.archive-detail__metadata')).toContainText('John Cusack');
+  await expect(page.locator('.archive-detail__metadata')).toContainText('104 minutes');
+  await expect(page.locator('.archive-detail__related-link')).toHaveCount(6);
+  await expect(page.locator('.archive-detail__related')).toContainText('MORE HORROR FROM 2007');
+});
+test('curated studio films have atmospheric original poster artwork, crew and sourced synopsis on mobile',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/films/victorian-psycho/');
+  await expect(page.locator('.fr-movie-hero')).toBeVisible();
+  await expect(page.locator('.fr-movie-hero__art')).toContainText('VICTORIAN PSYCHO');
+  await expect(page.locator('.fr-movie-hero__art')).toContainText('ORIGINAL EDITORIAL ARTWORK');
+  await expect(page.locator('.fr-movie-hero__facts')).toContainText('DIRECTED BY');
+  await expect(page.locator('.fr-movie-hero__facts')).toContainText('FEATURED CAST');
+  await expect(page.locator('.fr-movie-hero__browse')).toHaveAttribute('href','/all-horror-movies.html?year=2026');
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('top twenty candidate pool uses 2026 horror archive and does not fabricate missing critic ranks',async({page})=>{
+  await page.goto('/top-20/2026/');
+  await expect(page.locator('.hub-rt-chart__entry')).toHaveCount(6);
+  await expect(page.locator('.hub-rt-coverage__row')).toHaveCount(14);
+  const scored=await page.locator('.hub-rt-chart__score').allTextContents();
+  expect(scored).toEqual(['92%','91%','86%','75%','57%','30%']);
+  const count=await page.locator('.hub-rt-chart__entry, .hub-rt-coverage__row').count();
+  expect(count).toBe(20);
+  await expect(page.locator('.hub-rt-coverage')).toContainText('Not ranked: no approved comparable critic score');
+  const last=page.locator('.hub-rt-coverage__row').last().locator('a');
+  await expect(last).toHaveAttribute('href',/^(\/archive-film\.html\?id=Q\d+|\/films\/[a-z0-9-]+\/)$/);
 });
