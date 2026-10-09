@@ -151,7 +151,7 @@ test('film and Top 20 pages offer main-content skip links', async ({ page }) => 
 });
 test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
   await page.goto('/');
-  const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el).backgroundImage);
+  const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').backgroundImage);
   expect(artURL).toContain('/assets/hub-haunted.svg');
   await page.goto('/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
@@ -539,4 +539,128 @@ test('opened Movies discovery links source-checked current and future horror eve
   await expect(page.locator('[data-list="coming-soon"]')).toContainText('Jitters');
   await expect(page.locator('[data-list="trending-horror"]')).toContainText('Shudder');
   await expect(page.locator('[data-state="rankings"]')).toContainText('Private preview');
+});
+
+
+test('homepage composition stays ordered and usable across the approved viewport widths', async ({ browser }) => {
+  for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) {
+    const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
+    await page.goto('/');
+    await expect(page.locator('.hub-tabs a')).toHaveCount(6);
+    for (let index = 0; index < 6; index++) await expect(page.locator('.hub-tabs a').nth(index)).toBeVisible();
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const layout = await page.evaluate(() => {
+      const feature = document.querySelector('.hub-feature').getBoundingClientRect();
+      const chart = document.querySelector('.hub-charts').getBoundingClientRect();
+      const support = document.querySelector('.hub-showcase__bottom').getBoundingClientRect();
+      return {
+        featureTop: feature.top,
+        featureLeft: feature.left,
+        featureBottom: feature.bottom,
+        chartTop: chart.top,
+        chartBottom: chart.bottom,
+        chartLeft: chart.left,
+        supportTop: support.top,
+        desktopColumns: getComputedStyle(document.querySelector('.hub-dashboard')).gridTemplateColumns,
+        supportColumns: getComputedStyle(document.querySelector('.hub-showcase__bottom')).gridTemplateColumns
+      };
+    });
+    if (width <= 900) {
+      expect(layout.featureTop).toBeLessThan(layout.chartTop);
+      expect(layout.chartTop).toBeLessThan(layout.supportTop);
+    } else {
+      expect(Math.abs(layout.featureTop - layout.chartTop)).toBeLessThan(2);
+      expect(layout.featureLeft).toBeLessThan(layout.chartLeft);
+      expect(layout.supportTop).toBeLessThan(layout.chartBottom);
+      expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
+    }
+    if (width <= 360) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(1);
+    if (width >= 390 && width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
+    if (width === 390) {
+      expect(layout.featureTop).toBeGreaterThanOrEqual(300);
+      expect(layout.featureTop).toBeLessThanOrEqual(420);
+      await expect(page.locator('.hub-feature h3')).toBeInViewport();
+      await expect(page.locator('.hub-feature .hub-tile__link')).toBeInViewport();
+    }
+    await page.close();
+  }
+});
+
+test('homepage ranking loading resolves to a clear pending state when no eligible data exists', async ({ page }) => {
+  await page.route('**/rankings-preview.js', route => route.fulfill({ contentType: 'application/javascript', body: 'window.FrightertainmentPreviewRankings = { preview: false };' }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [] }) }));
+  await page.goto('/');
+  const ranking = page.locator('#hub-ranking');
+  await expect(ranking).toHaveAttribute('aria-busy', 'false');
+  await expect(ranking).not.toContainText('Loading critic ranking');
+  await expect(ranking).toContainText('Critic ranking pending');
+  await expect(ranking).toContainText('Verified critic scores are not yet available.');
+});
+
+test('stale rankings retain the last valid rows and label their status', async ({ page }) => {
+  await page.route('**/rankings-preview.js', route => route.fulfill({ contentType: 'application/javascript', body: 'window.FrightertainmentPreviewRankings = { preview: false };' }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ stale: true, items: [{ filmId: 'clayface', title: 'Last Verified Horror', position: 1, averageScore: 77 }] }) }));
+  await page.goto('/');
+  const ranking = page.locator('#hub-ranking');
+  await expect(ranking).toHaveAttribute('aria-busy', 'false');
+  await expect(ranking.locator('.hub-chart-row')).toContainText('Last Verified Horror');
+  await expect(ranking).toContainText('Showing the last valid ranking');
+  await expect(ranking).toContainText('out of date');
+});
+
+test('homepage ranking failure resolves to a clear unavailable state', async ({ page }) => {
+  await page.route('**/rankings-preview.js', route => route.fulfill({ contentType: 'application/javascript', body: 'window.FrightertainmentPreviewRankings = { preview: false };' }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 503, body: 'Unavailable' }));
+  await page.goto('/');
+  const ranking = page.locator('#hub-ranking');
+  await expect(ranking).toHaveAttribute('aria-busy', 'false');
+  await expect(ranking).not.toContainText('Loading critic ranking');
+  await expect(ranking).toContainText('Ranking unavailable');
+  await expect(ranking).toContainText('could not be refreshed');
+});
+
+test('direct page loads declare the shared Frightertainment typefaces', async ({ page }) => {
+  for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/editorial-standards.html', '/all-horror-movies.html']) {
+    await page.goto(path);
+    const fontHref = await page.locator('link[rel="stylesheet"][href*="fonts.googleapis.com/css2"]').getAttribute('href');
+    expect(fontHref).toContain('Barlow+Condensed');
+    expect(fontHref).toContain('DM+Sans');
+  }
+});
+
+test('reduced-motion preference disables homepage transitions and artwork zoom', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const transitionDuration = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').transitionDuration);
+  expect(transitionDuration.split(',').every(value => parseFloat(value) === 0)).toBe(true);
+});
+
+test('homepage review screenshots use the same local checked preview dataset', async ({ browser }) => {
+  const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  await desktop.goto('/');
+  await expect(desktop.locator('.hub-preview-chart__entry')).toHaveCount(6);
+  await desktop.screenshot({ path: 'test-results/design-refinement/after-desktop-first.png' });
+  await desktop.screenshot({ path: 'test-results/design-refinement/after-desktop-full.png', fullPage: true });
+  await desktop.close();
+
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+  await mobile.goto('/');
+  await expect(mobile.locator('.hub-preview-chart__entry')).toHaveCount(5);
+  await mobile.screenshot({ path: 'test-results/design-refinement/after-mobile-first.png' });
+  await mobile.screenshot({ path: 'test-results/design-refinement/after-mobile-full.png', fullPage: true });
+  await mobile.close();
+
+  const narrow = await browser.newPage({ viewport: { width: 320, height: 844 }, reducedMotion: 'reduce' });
+  await narrow.goto('/');
+  await narrow.screenshot({ path: 'test-results/design-refinement/after-mobile-320.png', fullPage: true });
+  await narrow.close();
+});
+
+test('pending ranking review screenshot contains no synthetic public score rows', async ({ page }) => {
+  await page.route('**/rankings-preview.js', route => route.fulfill({ contentType: 'application/javascript', body: 'window.FrightertainmentPreviewRankings = { preview: false };' }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [] }) }));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
+  await page.screenshot({ path: 'test-results/design-refinement/after-ranking-pending.png', fullPage: true });
 });

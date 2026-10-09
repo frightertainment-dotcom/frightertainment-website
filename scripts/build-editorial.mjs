@@ -24,7 +24,7 @@ for (const category of collections) {
       '<p>'+esc(item.description)+'</p><a class="hub-tile__link" href="'+esc(item.sourceUrl)+'"'+
       (external?' target="_blank" rel="noopener noreferrer"':'')+'>SOURCE: '+esc(item.sourceName)+' ↗</a></div></article>';
   }).join('\n');
-  const section=markers.start+'\n<section class="hub-editorial-more" aria-label="More verified '+esc(category)+' recommendations"><div class="hub-editorial-more__head"><h2>MORE TO <em>EXPLORE.</em></h2><p>Editor-selected, source-linked recommendations. Regional availability is not assumed.</p></div>'+
+  const section=markers.start+'\n<section class="hub-editorial-more" aria-label="More verified '+esc(category)+' recommendations"><div class="hub-editorial-more__head"><h2>MORE TO <em>EXPLORE.</em></h2><p>More horror to discover.</p></div>'+
   '<div class="hub-catalog hub-catalog--expanded">'+cards+'</div></section>\n'+markers.end;
   const file=new URL(category+'.html',root);
   let html=await readFile(file,'utf8');

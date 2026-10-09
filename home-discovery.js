@@ -21,7 +21,7 @@
       items = items.filter(item => `${item.title || ''} ${item.provider || ''}`.toLocaleLowerCase().includes(query)).slice(0, 4);
       node.innerHTML = items.map(item => {
         if (kind === 'rankings') {
-          const links = (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} ↗</a>` : '').join(' ');
+          const links = (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} →</a>` : '').join(' ');
           const scoreLabel=payloads.previewRankings ?
             `Rotten Tomatoes positive critic percentage ${escape(item.averageScore)}% · ${escape(item.criticCount)} publisher reviews · manually checked` :
             `${escape(item.averageScore)}/100 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
@@ -30,7 +30,7 @@
         const date = item.releaseDate ? ` · ${escape(item.releaseDate)} (${escape(item.releaseTerritory || item.territory || '')})` : '';
         const extra = kind === 'streaming-releases' ? (item.releaseMode === 'unconfirmed' ? 'Release path unconfirmed' : escape(item.releaseMode)) : kind === 'trending-horror' ? (payloads[kind]?.status==='editorial'?'Recently added to UK horror streaming':'Weekly popularity · not a score') : '';
         const href = safeUrl(item.sourceUrl);
-        return `<article><strong>${escape(item.title)}</strong><span>${escape(item.provider || item.status || extra)}${date}</span><small>${href ? `<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(item.sourceName || 'Source')} ↗</a>` : ''} · ${escape(item.territory)} · checked ${escape(item.checkedAt)}</small></article>`;
+        return `<article><strong>${escape(item.title)}</strong><span>${escape(item.provider || item.status || extra)}${date}</span><small>${href ? `<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(item.sourceName || 'Source')} →</a>` : ''} · ${escape(item.territory)} · checked ${escape(item.checkedAt)}</small></article>`;
       }).join('');
       if (updated) {
         const time = kind === 'rankings' ? payloads.rankingsUpdatedAt : payloads[kind]?.updatedAt;

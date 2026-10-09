@@ -74,7 +74,7 @@ npm run validate:worker
 npm run worker:migrations:local
 ```
 
-`npm run validate:worker` is a Wrangler dry run, not a deploy. Synthetic fixtures live only under `test/fixtures/` and are loaded only by automated tests; they are never displayed or used by production Worker code. `npm run test:browser` launches Chromium against the local static site and checks mobile navigation on the homepage, standards, archive, every generated film page, the Top 20 page and the dynamic detail shell. It checks the no-JavaScript Other Mommy and Clayface trailer links, basic horizontal overflow, search empty state and local image loading, and writes screenshots under `test-results/`. You can use `npm run worker:dev` after applying the local D1 migration.
+`npm run validate:worker` is a Wrangler dry run, not a deploy. Synthetic fixtures live only under `test/fixtures/` and are loaded only by automated tests; they are never displayed or used by production Worker code. `npm run test:browser` launches Chromium against the local static site and checks mobile navigation on the homepage, standards, archive, every generated film page, the Top 20 page and the dynamic detail shell. It checks the no-JavaScript Other Mommy and Clayface trailer links, horizontal overflow at 320–1920px, the feature → chart → supporting-card order, pending and unavailable ranking states, shared typography declarations, reduced-motion behavior, search empty state and local image loading. Matching local preview screenshots are written under ignored `test-results/design-refinement/`; the quality workflow uploads `test-results/` as its `browser-review` artifact. You can use `npm run worker:dev` after applying the local D1 migration.
 
 ### Manual-film synchronization
 

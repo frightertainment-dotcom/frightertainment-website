@@ -73,7 +73,7 @@
         const title=make(href?'a':'strong','release-brief__title',item.title);
         if(href)title.href=href;
         main.append(title,make('span','release-brief__subtitle',detailMessage(item,selected.value)));
-        const src=make('a','release-brief__source','SOURCE ↗');src.href=item.sourceUrl;src.target='_blank';src.rel='noopener noreferrer';
+        const src=make('a','release-brief__source','SOURCE →');src.href=item.sourceUrl;src.target='_blank';src.rel='noopener noreferrer';
         src.setAttribute('aria-label','Read original source for '+item.title);
         row.append(main,src);content.append(row);
       }

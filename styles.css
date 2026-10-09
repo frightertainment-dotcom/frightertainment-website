@@ -39,3 +39,5 @@
 .curated-disclaimer{color:#92827f;font-size:12px;line-height:1.7;margin:26px 0 0}
 @media(max-width:950px){.curated-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.curated-grid{grid-template-columns:1fr}.curated-card{min-height:220px;padding:21px}.recommendations-section{padding:58px 0 70px}.curated-subhead{margin-top:55px}}
+
+@media(max-width:640px){.movie-card__headline{min-width:0}.movie-card__headline h3{flex:1;min-width:0;overflow-wrap:anywhere}.movie-card__score{flex:none}.movie-card__score--pending{letter-spacing:.3px}}
