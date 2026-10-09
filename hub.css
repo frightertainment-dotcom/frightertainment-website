@@ -417,3 +417,27 @@
 @media(max-width:850px){.fr-movie-hero{grid-template-columns:1fr 1fr;gap:20px}.fr-movie-hero__art{min-height:360px}.fr-movie-hero__info h1{font-size:45px}.fr-movie-hero__art>strong{font-size:50px}}
 @media(max-width:660px){.fr-movie-hero{grid-template-columns:1fr;margin-bottom:17px;padding-top:9px}.fr-movie-hero__art{min-height:340px;aspect-ratio:1.15}.fr-movie-hero__info{padding:8px 2px}.fr-movie-hero__info h1{font-size:clamp(40px,11vw,60px)}.fr-movie-hero__art>strong{font-size:clamp(47px,12vw,77px)}.fr-movie-hero__score{width:91px;height:91px}.fr-movie-hero__facts{grid-template-columns:1fr 1fr}}
 @media(max-width:390px){.fr-movie-hero__art{min-height:300px;padding:17px}.fr-movie-hero__studio{top:18px;left:18px}.fr-movie-hero__facts{grid-template-columns:1fr}}
+
+
+/* Compact horror release bulletin. Four filters, four titles max per filter.
+   Source links remain visible; outdated availability is never called "now". */
+.release-brief{margin-top:19px;margin-bottom:20px;border:1px solid #75343e;background:linear-gradient(114deg,#230e16,#110b0f);padding:18px 19px 11px;box-shadow:0 11px 27px #0005}
+.release-brief__head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:14px}
+.release-brief__heading{font:900 clamp(25px,3.4vw,40px)/1 var(--font-display);color:#fff0ed;letter-spacing:.6px}
+.release-brief__checked{font:800 11px var(--font-display);letter-spacing:.7px;color:#dbabb1}
+.release-brief__tabs{display:flex;flex-wrap:wrap;gap:7px;padding-bottom:12px;border-bottom:1px solid #602c36}
+.release-brief__tab{font:900 11px var(--font-display);letter-spacing:.7px;border:1px solid #6b3a42;background:#1b1016;color:#edc5c9;padding:10px 13px;min-height:38px;cursor:pointer}
+.release-brief__tab.active,.release-brief__tab:hover{background:#aa2030;border-color:#ff465c;color:white}
+.release-brief__tab:focus-visible{outline:2px solid #fba7b2;outline-offset:3px}
+.release-brief__items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px 12px}
+.release-brief__item{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:11px;padding:11px 5px;border-bottom:1px solid #502a33}
+.release-brief__item-main{display:grid;min-width:0;gap:4px}
+.release-brief__title{font:900 18px/1.12 var(--font-display);color:#f5e7e7}
+a.release-brief__title:hover{text-decoration:underline}
+.release-brief__subtitle{font:600 11px/1.4 var(--font-body);color:#c3a0a6}
+.release-brief__source{flex:none;font:900 10px var(--font-display);color:#e99eaa;letter-spacing:.5px;text-decoration:underline;text-underline-offset:2px}
+.release-brief__source:hover{color:white}
+.release-brief__note{color:#b39da0;font:600 10px/1.4 var(--font-body);margin:10px 4px 0}
+.release-brief__empty{padding:18px 4px;color:#c7a1a7;font:700 13px var(--font-body)}
+.release-brief--movies{margin-top:4px;margin-bottom:24px}
+@media(max-width:700px){.release-brief{padding:13px 12px 9px}.release-brief__items{grid-template-columns:1fr}.release-brief__tab{flex:1;min-width:calc(50% - 5px);font-size:11px}.release-brief__item{padding:11px 4px}.release-brief__title{font-size:17px}.release-brief__checked{font-size:9px}}
