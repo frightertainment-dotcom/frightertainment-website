@@ -1,0 +1,55 @@
+name: Enrich horror movie profile details
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '35 7 * * 1'
+  push:
+    branches: ['codex/frightertainment-v1']
+    paths:
+      - '.github/workflows/film-profile-sync.yml'
+      - 'scripts/sync-archive-profiles.mjs'
+      - 'data/archive/profile-refresh-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-metadata-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  enrich-film-profiles:
+    if: github.event_name != 'schedule' || github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Merge Wikidata CC0 metadata into existing movie profiles
+        run: node scripts/sync-archive-profiles.mjs
+      - name: Validate data retention and preview content
+        run: |
+          node --test test/archive.snapshot.test.js test/film-profiles.test.js
+          npm run build:pages
+          npm run check
+          npm run build:preview
+      - name: Save sourced profile metadata without deleting old films
+        shell: bash
+        run: |
+          git config user.name "frightertainment-archive-bot"
+          git config user.email "frightertainment-archive-bot@users.noreply.github.com"
+          git add data/archive/profiles.json
+          if git diff --cached --quiet; then
+            echo "No updated profile data"
+          else
+            git commit -m "data: expand sourced horror film profiles"
+            git fetch origin "${{ github.ref_name }}"
+            git rebase "origin/${{ github.ref_name }}"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
