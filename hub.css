@@ -388,3 +388,32 @@
 .hub-rt-coverage__row a{font:900 16px var(--font-display);color:#f4dfe0}
 .hub-rt-coverage__row span{font:600 10px/1.45 var(--font-body);color:#ac969d}
 @media(max-width:600px){.hub-rt-coverage ul{grid-template-columns:1fr}.hub-rt-coverage{padding:12px}}
+
+
+/* Curated horror film files: original cinematic art, sourced facts and a
+   privately displayed publisher reference badge (never an RT trademark logo). */
+.fr-movie-hero{display:grid;grid-template-columns:minmax(190px,.46fr) minmax(0,.84fr);gap:clamp(18px,3.2vw,48px);padding:20px 0 27px;border-bottom:1px solid #68323e;margin-bottom:20px;align-items:stretch}
+.fr-movie-hero__art{position:relative;display:flex;flex-direction:column;justify-content:center;gap:15px;min-height:410px;overflow:hidden;border:1px solid #994151;padding:clamp(20px,2.7vw,35px);color:#fcecef;background:radial-gradient(ellipse at 28% 15%,#ad273d57,transparent 50%),radial-gradient(ellipse at 85% 85%,#8c122538,transparent 45%),repeating-linear-gradient(128deg,transparent 0 18px,#fff1 18px 19px),linear-gradient(140deg,#30111b,#0b0a0e 70%);box-shadow:8px 17px 39px #0009,inset 0 0 80px #951a2422}
+.fr-movie-hero__art::before{content:"";position:absolute;inset:8px;border:1px solid #ffacb11c;pointer-events:none}
+.fr-movie-hero__art::after{content:"✶";position:absolute;top:-23px;right:-5px;font-size:170px;color:#d52b3921;line-height:1;pointer-events:none}
+.fr-movie-hero__studio{position:absolute;top:25px;left:25px;font:900 12px var(--font-display);letter-spacing:1.1px;color:#fcbec5}
+.fr-movie-hero__year{font:900 49px var(--font-display);color:#ff515c}
+.fr-movie-hero__art>strong{font:900 clamp(42px,5.3vw,83px)/.85 var(--font-display);color:#fff8f5;overflow-wrap:anywhere;text-transform:uppercase;text-shadow:1px 4px 0 #0008,0 9px 25px #b71a3059}
+.fr-movie-hero__art>small{font:800 10px var(--font-display);letter-spacing:.7px;color:#bdb0b0}
+.fr-movie-hero__info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(5px,2vw,25px) 0}
+.fr-movie-hero__info h1{font:900 clamp(42px,5.6vw,83px)/.9 var(--font-display);margin:12px 0 15px;color:#fff1ed;text-wrap:balance}
+.fr-movie-hero__genre{font:900 17px var(--font-display);color:#ed4c60;text-transform:uppercase;letter-spacing:1.5px}
+.fr-movie-hero__synopsis{font:500 15px/1.8 var(--font-body);color:#d0b9bf;max-width:670px;margin:14px 0}
+.fr-movie-hero__facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;margin-top:15px}
+.fr-movie-hero__facts>div{border-top:1px solid #5a313c;padding:11px 0;display:grid;gap:5px}
+.fr-movie-hero__facts span{font:900 11px var(--font-display);color:#e45a6c;letter-spacing:1px}
+.fr-movie-hero__facts strong{font:700 14px/1.4 var(--font-body);color:#efe0e0}
+.fr-movie-hero__browse{display:inline-block;font:900 13px var(--font-display);margin-top:17px;padding:12px 14px;border:1px solid #be4251;background:#4a1d2b;color:#fff0f0}
+.fr-movie-hero__browse:hover{background:#9d2536}
+.fr-movie-hero__score{position:absolute;right:12px;bottom:12px;width:105px;height:105px;border-radius:50%;transform:rotate(8deg);background:radial-gradient(circle,#4e131f 43%,#8b1b2d 64%,#2e0b12 75%);box-shadow:0 8px 25px #000c,inset 0 0 0 5px #b43341,inset 0 0 0 8px #1c0b10;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff4ef}
+.fr-movie-hero__score>span{font:900 12px var(--font-display);letter-spacing:1px}
+.fr-movie-hero__score>strong{font:900 34px var(--font-display)}
+.fr-movie-hero__score>small{font:800 8px var(--font-display)}
+@media(max-width:850px){.fr-movie-hero{grid-template-columns:1fr 1fr;gap:20px}.fr-movie-hero__art{min-height:360px}.fr-movie-hero__info h1{font-size:45px}.fr-movie-hero__art>strong{font-size:50px}}
+@media(max-width:660px){.fr-movie-hero{grid-template-columns:1fr;margin-bottom:17px;padding-top:9px}.fr-movie-hero__art{min-height:340px;aspect-ratio:1.15}.fr-movie-hero__info{padding:8px 2px}.fr-movie-hero__info h1{font-size:clamp(40px,11vw,60px)}.fr-movie-hero__art>strong{font-size:clamp(47px,12vw,77px)}.fr-movie-hero__score{width:91px;height:91px}.fr-movie-hero__facts{grid-template-columns:1fr 1fr}}
+@media(max-width:390px){.fr-movie-hero__art{min-height:300px;padding:17px}.fr-movie-hero__studio{top:18px;left:18px}.fr-movie-hero__facts{grid-template-columns:1fr}}
