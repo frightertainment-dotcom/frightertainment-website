@@ -350,7 +350,7 @@ test('public film pages expose no private publisher snapshots and keep the Frigh
   await card.getByRole('link',{name:'28 Years Later: The Bone Temple'}).first().click();
   await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
   await expect(page.locator('#film-detail')).toContainText('FRIGHT RATING');
-  await expect(page.locator('#film-detail')).toContainText('Pending: no permission-cleared');
+  await expect(page.locator('#film-detail')).toContainText('PENDING /10');
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
 
