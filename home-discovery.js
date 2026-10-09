@@ -22,7 +22,10 @@
       node.innerHTML = items.map(item => {
         if (kind === 'rankings') {
           const links = (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} ↗</a>` : '').join(' ');
-          return `<article><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${escape(item.averageScore)}/100 · ${escape(item.criticCount)} verified critics · ${escape(item.movementLabel)}</span><small>${links}</small></article>`;
+          const scoreLabel=payloads.previewRankings ?
+            `Rotten Tomatoes positive critic percentage ${escape(item.averageScore)}% · ${escape(item.criticCount)} publisher reviews · manually checked` :
+            `${escape(item.averageScore)}/100 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
+          return `<article><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${scoreLabel}</span><small>${links}</small></article>`;
         }
         const date = item.releaseDate ? ` · ${escape(item.releaseDate)} (${escape(item.releaseTerritory || item.territory || '')})` : '';
         const extra = kind === 'streaming-releases' ? (item.releaseMode === 'unconfirmed' ? 'Release path unconfirmed' : escape(item.releaseMode)) : kind === 'trending-horror' ? 'Weekly popularity · not a score' : '';
@@ -33,6 +36,9 @@
         const time = kind === 'rankings' ? payloads.rankingsUpdatedAt : payloads[kind]?.updatedAt;
         updated.textContent = time ? `Last updated: ${new Date(time).toLocaleString('en-GB')} · ${payloads[kind]?.status === 'stale' ? 'stale data' : 'verified snapshot'}` : 'Last updated: no verified data';
       }
+      if(kind==='rankings' && payloads.previewRankings && state){
+        state.textContent='Private comparison of manually checked publisher percentages — NOT an automatically licensed critic Top 20.';
+      }
       if (!items.length && !query) {
         const empty = kind === 'rankings'
           ? 'Rankings pending: films need at least three distinct, permission-cleared professional numeric critic ratings.'
@@ -41,7 +47,7 @@
           : kind === 'coming-soon' ? 'No licensed upcoming release data is available for this country.'
           : 'No licensed weekly trend data is available.';
         state.textContent = empty;
-      } else if (items.length && state) state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
+      } else if (items.length && state && !(kind==='rankings'&&payloads.previewRankings)) state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
     }
     const sources = [...new Set(kinds.flatMap(kind => (payloads[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
     document.querySelector('#home-attribution').textContent = sources.length
@@ -61,6 +67,19 @@
       const ranking = rankingResponse.ok ? await rankingResponse.json() : null;
       rankingItems = ranking?.items || [];
       payloads.rankingsUpdatedAt = ranking?.updatedAt || null;
+      // Protected preview comparison is distinct from the licensed critic service.
+      // No automated RT data collection or mixed score calculations occur here.
+      const preview=window.FrightertainmentPreviewRankings;
+      if(!rankingItems.length && preview?.preview){
+        const local=preview.build(window.FR_MOVIES||[],rankingYear);
+        rankingItems=local.ranked.map(item=>({
+          title:item.title,position:item.position,averageScore:item.score,
+          criticCount:item.reviewCount,movementLabel:'Manually checked publisher snapshot',
+          sources:[{publication:'Rotten Tomatoes source',url:item.sourceUrl}]
+        }));
+        payloads.previewRankings=true;
+        payloads.rankingsUpdatedAt=local.lastChecked;
+      }
       if (!rankingItems.length && ranking?.updatedAt) document.querySelector('[data-home-updated="rankings"]').textContent = `Last updated: ${ranking.updatedAt} · ranking remains pending`;
     } catch {
       payloads = {};
