@@ -359,3 +359,32 @@
 .home-discovery-wrap .home-discovery{margin:0;padding:20px;border:0;background:transparent;box-shadow:none}
 @media(max-width:650px){.home-discovery-wrap__summary{padding:14px 13px;align-items:start;flex-wrap:wrap}.home-discovery-wrap__summary strong{font-size:24px}.home-discovery-wrap__action{font-size:11px;padding:8px 10px}.home-discovery-wrap .home-discovery{padding:12px}.home-discovery__grid{grid-template-columns:1fr 1fr}}
 @media(max-width:420px){.home-discovery-wrap__summary strong{font-size:22px}.home-discovery__grid{grid-template-columns:1fr}}
+
+
+/* CC0-powered editorial film vault; no copyrighted posters or fabricated ratings. */
+.archive-detail__related,.archive-detail__metadata{padding:24px clamp(18px,4vw,45px);background:linear-gradient(135deg,#200e15,#100d12);border:1px solid #5c2d38;border-top:0}
+.archive-detail__metadata{border-top:1px solid #713745;background:linear-gradient(110deg,#25101b,#111016)}
+.archive-detail__metadata h2,.archive-detail__related h2{font:900 clamp(26px,4vw,45px)/1.03 var(--font-display);color:#f9e5e5;margin:6px 0 15px}
+.archive-detail__description{font:600 14px/1.65 var(--font-body);color:#dbc3c6;max-width:780px}
+.archive-detail__metadata-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}
+.archive-detail__metadata-item{padding:15px;background:#130d14;border:1px solid #59313b;min-width:0;display:flex;flex-wrap:wrap;align-content:start;gap:7px}
+.archive-detail__metadata-item h3{flex-basis:100%;margin:0 0 4px;font:900 12px var(--font-display);color:#f4b5bd;letter-spacing:1px}
+.archive-detail__metadata-person{display:inline-flex;align-items:center;padding:5px 9px;background:#3a1723;border:1px solid #78323e;color:#f9e6e5;font:800 13px var(--font-display)}
+.archive-detail__metadata-person:hover{background:#67212e;text-decoration:underline}
+.archive-detail__metadata-item>strong{font:900 20px var(--font-display);color:#fff}
+.archive-detail__metadata-credit{font:600 11px/1.5 var(--font-body);color:#bb9fa5;margin:14px 0}
+.archive-detail__related-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:13px 0 22px}
+.archive-detail__related-link{display:flex;align-items:center;padding:14px;min-height:55px;font:900 17px/1.1 var(--font-display);color:#f9e2e2;background:#22121a;border:1px solid #6d3844}
+.archive-detail__related-link:hover{border-color:#f05364;background:#4a1725}
+.archive-detail__related>.archive-detail__return{display:inline-block}
+@media(max-width:800px){.archive-detail__metadata-grid,.archive-detail__related-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:490px){.archive-detail__metadata-grid,.archive-detail__related-list{grid-template-columns:1fr}.archive-detail__metadata-item{padding:12px}.archive-detail__related-link{padding:12px;min-height:44px;font-size:16px}}
+/* Twenty tracked films, but only films with eligible published critic scores are ranked. */
+.hub-rt-coverage{padding:15px 20px;margin-bottom:18px}
+.hub-rt-coverage h2{font:900 26px var(--font-display);color:#eed0d3;margin:0 0 6px}
+.hub-rt-coverage>p{font:600 13px/1.55 var(--font-body);color:#d0b2b7;margin:4px 0 15px}
+.hub-rt-coverage ul{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px;padding:0;margin:0}
+.hub-rt-coverage__row{display:grid;gap:3px;background:#1c1117;border:1px solid #4d313a;padding:12px}
+.hub-rt-coverage__row a{font:900 16px var(--font-display);color:#f4dfe0}
+.hub-rt-coverage__row span{font:600 10px/1.45 var(--font-body);color:#ac969d}
+@media(max-width:600px){.hub-rt-coverage ul{grid-template-columns:1fr}.hub-rt-coverage{padding:12px}}
