@@ -27,14 +27,15 @@ test('admin endpoints reject requests without an owner secret', async () => {
   assert.equal(response.status, 401);
 });
 
-test('ranking API serves an atomic last-good snapshot and labels a fallback snapshot stale', async () => {
+test('ranking API serves the last valid annual snapshot and labels a corrupt newer fallback stale', async () => {
   const chart = { year: 2026, status: 'ranked', minimumCritics: 3, rankedFilms: 1, pendingFilmCount: 0,
-    items: [{ filmId: 'clayface', title: 'Verified Film', position: 1, averageScore: 82, criticCount: 3, sources: [] }] };
+    items: [{ filmId: 'verified-fixture', title: 'Verified Fixture Film', position: 1, averageScore: 82, criticCount: 3, sources: [] }] };
   const DB = { prepare(sql) { return { bind() { return this; }, async all() {
-    if (!sql.includes('annual_ranking_snapshots')) throw new Error(`Unexpected query: ${sql}`);
+    if (sql.includes('LIMIT 0')) return { results: [] };
+    if (!sql.includes('FROM annual_ranking_snapshots')) throw new Error(`Unexpected query: ${sql}`);
     return { results: [
-      { rankedAt: '2026-10-09', publishedAt: '2026-10-09T04:00:00.000Z', payload: '{invalid' },
-      { rankedAt: '2026-10-08', publishedAt: '2026-10-08T04:00:00.000Z', payload: JSON.stringify(chart) }
+      { rankedAt: '2026-10-09', publishedAt: '2026-10-09T04:00:00.000Z', resultCount: 1, payload: '{invalid' },
+      { rankedAt: '2026-10-08', publishedAt: '2026-10-08T04:00:00.000Z', resultCount: 1, payload: JSON.stringify(chart) }
     ] };
   } }; } };
   const response = await worker.fetch(new Request('https://site.test/api/rankings?year=2026'), { DB });
@@ -42,15 +43,14 @@ test('ranking API serves an atomic last-good snapshot and labels a fallback snap
   const payload = await response.json();
   assert.equal(payload.stale, true);
   assert.equal(payload.updatedAt, '2026-10-08T04:00:00.000Z');
-  assert.equal(payload.items[0].title, 'Verified Film');
+  assert.equal(payload.items[0].title, 'Verified Fixture Film');
 });
 
-test('daily ranking scheduler writes an empty or populated snapshot atomically with position history', async () => {
+test('daily ranking scheduler atomically writes a snapshot and calculates movement from the previous snapshot', async () => {
   const batches = [];
   const film = { id: 'fixture-film-a', title: 'Fixture Ranked Horror', filmYear: 2026 };
-  const reviews = [
-    ['critic-a', 4], ['critic-b', 5], ['critic-c', 3]
-  ].map(([criticId, score], index) => ({
+  const priorChart = { year: 2026, rankedFilms: 1, items: [{ filmId: film.id, position: 2 }] };
+  const reviews = [ ['critic-a', 4], ['critic-b', 5], ['critic-c', 3] ].map(([criticId, score], index) => ({
     filmId: film.id, filmYear: 2026, criticId, criticName: `Critic ${index + 1}`, publication: 'Fixture Review',
     publicationUrl: 'https://review.example.test/about', reviewUrl: `https://review.example.test/${index + 1}`,
     score, scoreOutOf: 5, territory: 'GB', publishedAt: `2026-10-0${index + 1}`, checkedAt: '2026-10-09',
@@ -58,23 +58,20 @@ test('daily ranking scheduler writes an empty or populated snapshot atomically w
   }));
   const DB = { prepare(sql) {
     return { sql, values: [], bind(...values) { this.values = values; return this; }, async all() {
+      if (sql.includes('LIMIT 0')) return { results: [] };
       if (sql.includes('SELECT DISTINCT film_year')) return { results: [{ year: 2026 }] };
+      if (sql.includes('FROM annual_ranking_snapshots')) return { results: [{ rankedAt: '2026-10-08', payload: JSON.stringify(priorChart) }] };
       if (sql.includes('FROM canonical_films') && sql.includes('film_year = ?')) return { results: [film] };
-      if (sql.includes('FROM critic_reviews') && sql.includes('status = \'approved\'')) return { results: reviews };
-      if (sql.includes('FROM rank_history') && sql.includes('ranked_at = ?')) return { results: [{ filmId: film.id, position: 2 }] };
-      if (sql.includes('annual_ranking_snapshots')) return { results: [] };
+      if (sql.includes('FROM critic_reviews') && sql.includes("status = 'approved'")) return { results: reviews };
       return { results: [] };
-    }, async first() {
-      if (sql.includes('annual_ranking_snapshots')) return { rankedAt: '2026-10-08' };
-      if (sql.includes('MAX(ranked_at)')) return { rankedAt: '2026-10-08' };
-      return null;
     }, async run() { return { meta: { changes: 1 } }; } };
   }, async batch(statements) { batches.push(statements); } };
   const tasks = await worker.scheduled({ cron: '0 4 * * *' }, { DB, DEFAULT_COUNTRY: 'GB', DISCOVERY_COUNTRIES: 'GB' });
-  const rankingBatch = batches.find(batch => batch.some(statement => statement.sql.includes('annual_ranking_snapshots')));
-  assert.ok(rankingBatch);
-  assert.equal(rankingBatch.some(statement => statement.sql.includes('rank_history')), true);
-  const snapshot = rankingBatch.find(statement => statement.sql.includes('annual_ranking_snapshots'));
+  const rankingBatch = batches.find(batch => batch.some(statement => statement.sql.includes('INSERT INTO annual_ranking_snapshots')));
+  assert.ok(rankingBatch, 'An atomic annual-snapshot batch is required');
+  assert.equal(rankingBatch.some(statement => statement.sql.includes('rank_history')), false, 'No legacy release-year position history');
+  assert.equal(rankingBatch.some(statement => statement.sql.includes('INSERT INTO update_runs')), true, 'Snapshot and success log share a batch');
+  const snapshot = rankingBatch.find(statement => statement.sql.includes('INSERT INTO annual_ranking_snapshots'));
   const payload = JSON.parse(snapshot.values[4]);
   assert.equal(payload.rankedFilms, 1);
   assert.equal(payload.items[0].movementLabel, 'UP 1');
