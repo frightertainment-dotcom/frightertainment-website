@@ -314,12 +314,19 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
   await expect(page.locator('a[href="https://qr.netflix.com/gb/title/80209229"]')).toHaveCount(0);
 });
 
-test('release calendar uses source claims and does not invent live UK showtimes',async({page})=>{
+test('upcoming release calendar excludes historical and already released films',async({page})=>{
   await page.goto('/movies.html');
-  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(8);
-  const urls=await page.locator('#hub-release-list a.hub-release-source').evaluateAll(a=>a.map(x=>x.getAttribute('href')));
-  expect(urls.every(x=>x.startsWith('https://'))).toBe(true);
-  await expect(page.locator('#hub-release-list')).toContainText('No UK availability inferred');
+  const calendar=page.locator('#hub-release-list');
+  await expect(calendar.locator('.hub-release-row').first()).toBeVisible();
+  const rows=await calendar.locator('.hub-release-row').evaluateAll(nodes=>
+    nodes.map(row=>({title:row.querySelector('div>a')?.textContent||'',date:row.querySelector('time')?.getAttribute('datetime')||'',url:row.querySelector('.hub-release-source')?.getAttribute('href')||''})));
+  const today=new Date().toISOString().slice(0,10);
+  expect(rows.length).toBeGreaterThan(0);
+  expect(rows.every(row=>row.date>today&&row.url.startsWith('https://'))).toBe(true);
+  expect(rows.map(row=>row.title)).not.toContain('28 Weeks Later');
+  expect(rows.map(row=>row.title)).not.toContain('28 Years Later: The Bone Temple');
+  await expect(calendar).not.toContainText('DATE PASSED');
+  await expect(calendar).not.toContainText('2007');
 });
 
 test('2026 is default and earlier films are under their actual original years', async ({page})=>{
@@ -383,6 +390,30 @@ test('homepage score panel shows a compact pending state without unlicensed comp
   await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
   await expect(page.locator('#hub-ranking')).not.toContainText('%');
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('Movies leads clearly to the complete 9,700-film vault rather than presenting 24 as the whole library',async({page})=>{
+  await page.goto('/movies.html');
+  await expect(page.getByRole('heading',{name:/EVERY YEAR/})).toBeVisible();
+  await expect(page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]')).toBeVisible();
+  await expect(page.locator('#review-index')).toHaveCount(0);
+  await expect(page.locator('.hub-series')).toHaveCount(0);
+  await page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]').click();
+  await expect(page).toHaveURL(/all-horror-movies\.html$/);
+  await expect(page.locator('#archive-summary')).toContainText('9,');
+});
+
+test('global horror vault search finds historical titles without opening every year',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  const search=page.locator('#archive-global-search');
+  await expect(search).toBeVisible();
+  await search.fill('28 Weeks Later');
+  const results=page.locator('#archive-global-results');
+  await expect(results).toContainText('28 Weeks Later');
+  await expect(results).toContainText('2007');
+  await expect(results.locator('a').first()).toHaveAttribute('href','/films/28-weeks-later/');
+  await page.locator('#archive-global-clear').click();
+  await expect(results).toBeHidden();
 });
 
 test('All Horror Movies offers years 1896 through current year as initially closed accordions',async({page})=>{
