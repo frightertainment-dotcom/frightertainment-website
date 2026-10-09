@@ -235,5 +235,32 @@ if(!homePanelClient.includes("'/api/discovery") &&
    !homePanelClient.includes("`/api/discovery"))
   errors.push('Homepage discovery client is not wired to the API');
 
+// CC0 profile expansion and the twenty-film eligible-score distinction.
+const profileCache=JSON.parse(await readFile(new URL('data/archive/profiles.json',root),'utf8'));
+const profileBundler=await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
+const yearChart=await readFile(new URL('top20.js',root),'utf8');
+const profileScript=await readFile(new URL('archive-film.js',root),'utf8');
+const curatedFilmRenderer=await readFile(new URL('scripts/build-pages.mjs',root),'utf8');
+if(profileCache.schemaVersion!==1||!profileCache.records||typeof profileCache.records!=='object')
+  errors.push('Cumulative CC0 profile store is unavailable');
+for(const [qid,entry] of Object.entries(profileCache.records||{})){
+  if(!/^Q[1-9]\\d*$/.test(qid)||entry.qid!==qid||
+     entry.sourceUrl!=='https://www.wikidata.org/wiki/'+qid ||
+     !validDay(entry.checkedAt))
+    errors.push('Invalid sourced profile '+qid);
+  for(const kind of ['directors','cast','genres','countries']){
+    if(!entry[kind])continue;
+    if(!Array.isArray(entry[kind])||entry[kind].some(x=>!x.name||!/^Q[1-9]\\d*$/.test(x.qid||'')))
+      errors.push('Invalid CC0 property '+qid+'/'+kind);
+  }
+}
+if(!profileBundler.includes('data/archive/profiles.json') ||
+   !profileScript.includes('data/archive/profiles.json'))
+  errors.push('Source-enriched horror profiles missing from archive reader or private Pages bundle');
+if(!yearChart.includes('20-data.ranked.length')||!yearChart.includes('AWAITING A VERIFIED CRITIC SCORE'))
+  errors.push('Annual chart must show 20 tracked films without fabricating missing ratings');
+if(!curatedFilmRenderer.includes('filmHeroMarkup(movie)'))
+  errors.push('Source-backed cinematic film hero must render even without JavaScript');
+
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
