@@ -50,6 +50,7 @@ jobs:
       - run: npm run worker:migrations:local
       - name: Build the indexable public bundle independently of preview
         run: npm run build:production
+      - run: npm run check:published
       - name: Verify public launch bundle is limited, secured and indexable
         run: |
           test -f dist/index.html
