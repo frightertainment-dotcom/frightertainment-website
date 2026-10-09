@@ -45,7 +45,7 @@
         };
         setState(kind, messages[kind]);
       } else if (dataSet.status === 'stale') setState(kind, `Showing last verified ${dataSet.checkedAt || 'unknown'} data; refresh failed and this information may have expired.`);
-      else setState(kind, items.length ? kind === 'trending-horror' ? `${items.length} titles in the global weekly list (title language follows the selected region).` : `${items.length} verified ${items.length === 1 ? 'listing' : 'listings'} for ${names[countrySelect.value]}.` : 'No verified listings are available for this country and search.');
+      else setState(kind, items.length ? kind === 'trending-horror' ? (dataSet.status==='editorial'?`${items.length} recent UK horror additions.`:`${items.length} titles in the global weekly list.`) : `${items.length} verified ${items.length === 1 ? 'listing' : 'listings'} for ${names[countrySelect.value]}.` : 'No verified listings are available for this country and search.');
     }
     const sources = [...new Set(kinds.flatMap(kind => (data[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
     $('#discovery-attribution').textContent = sources.length ? `Sources: ${sources.join(', ')}. Every listing links to its source and states its territory and check date.` : 'Find more films and viewing options.';
