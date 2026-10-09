@@ -1,0 +1,81 @@
+name: Website quality
+
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/frightertainment-v1']
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:pages
+      - run: npm run check
+      - run: npm run build:preview
+      - name: Verify isolated, non-indexable preview bundle
+        run: |
+          test -f dist/index.html
+          test -f dist/release-brief.js
+          test -f dist/data/editorial-releases.json
+          grep -q 'data-release-brief' dist/index.html
+          test -f dist/home-discovery.js
+          grep -q 'src="/home-discovery.js"' dist/index.html
+          test -f dist/all-horror-movies.html
+          test -f dist/archive-film.html
+          test -f dist/archive-film.js
+          test -f dist/horror-archive.js
+          test -f dist/data/archive/horror-films.json
+          test -f dist/data/archive/profiles.json
+          test -f dist/assets/frightertainment-brand.png
+          test -f dist/films/other-mommy/index.html
+          grep -q 'Disallow: /' dist/robots.txt
+          grep -q 'X-Robots-Tag: noindex' dist/_headers
+          ! test -e dist/scripts
+          ! test -e dist/worker
+          ! test -e dist/.github
+          ! test -e dist/API_LICENSING.md
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npm run validate:worker
+      - run: npm run worker:migrations:local
+      - name: Build the indexable public bundle independently of preview
+        run: npm run build:production
+      - run: npm run check:published
+      - name: Verify public launch bundle is limited, secured and indexable
+        run: |
+          test -f dist/index.html
+          test -f dist/movies.html
+          test -f dist/tv-shows.html
+          test -f dist/indie-movies.html
+          test -f dist/podcasts.html
+          test -f dist/games.html
+          test -f dist/films/other-mommy/index.html
+          test -f dist/top-20/2026/index.html
+          test -f dist/sitemap.xml
+          test -f dist/_routes.json
+          grep -q 'Sitemap: https://www.frightertainment.com/sitemap.xml' dist/robots.txt
+          ! grep -qi 'noindex' dist/_headers
+          ! grep -qi 'Disallow: /' dist/robots.txt
+          ! test -e dist/rankings-preview.js
+          ! test -e dist/worker
+          ! test -e dist/scripts
+          ! test -e dist/.github
+          ! test -e dist/API_LICENSING.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-review
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore

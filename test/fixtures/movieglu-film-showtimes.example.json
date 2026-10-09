@@ -1,0 +1,24 @@
+{
+  "film": { "film_id": 12345, "film_name": "Fixture Film" },
+  "cinemas": [
+    {
+      "cinema_id": 9001,
+      "cinema_name": "Fixture Cinema",
+      "showings": {
+        "Standard": {
+          "film_id": 12345,
+          "film_name": "Fixture Film",
+          "times": [
+            { "start_time": "18:30", "end_time": "20:36" },
+            { "start_time": "21:00", "end_time": "23:06" }
+          ]
+        },
+        "3D": {
+          "film_id": 12345,
+          "film_name": "Fixture Film",
+          "times": [{ "start_time": "19:15", "end_time": "21:21" }]
+        }
+      }
+    }
+  ]
+}

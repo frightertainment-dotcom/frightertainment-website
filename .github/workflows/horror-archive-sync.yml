@@ -1,0 +1,58 @@
+name: Update horror film history archive
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly once this workflow is present on the default branch.
+    - cron: '15 6 * * 1'
+  push:
+    branches: ['codex/frightertainment-v1']
+    paths:
+      - '.github/workflows/horror-archive-sync.yml'
+      - 'scripts/sync-horror-archive.mjs'
+      - 'data/archive/refresh-request.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: horror-archive-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh-archive:
+    if: github.event_name != 'schedule' || github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/frightertainment-v1
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Import rate-limited CC0 horror records, preserving all existing films
+        run: node scripts/sync-horror-archive.mjs
+      - name: Validate thousands of historical links before publishing
+        run: |
+          node --test test/archive.snapshot.test.js
+          npm run build:pages
+          npm run check
+          npm run build:preview
+      - name: Propose updated reference catalogue on staging branch
+        shell: bash
+        env:
+          TARGET_BRANCH: codex/frightertainment-v1
+        run: |
+          git config user.name "frightertainment-archive-bot"
+          git config user.email "frightertainment-archive-bot@users.noreply.github.com"
+          git add data/archive/horror-films.json
+          if git diff --cached --quiet; then
+            echo "Archive is already up to date"
+          else
+            git commit -m "data: expand cumulative CC0 horror film history archive"
+            git fetch origin "refs/heads/${TARGET_BRANCH}"
+            git rebase "origin/${TARGET_BRANCH}"
+            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          fi
