@@ -11,7 +11,7 @@ const target=new URL('data/archive/profiles.json',root);
 const cache=JSON.parse(await readFile(target,'utf8'));
 if(!cache.records || cache.schemaVersion!==1)throw Error('Profile cache schema mismatch');
 const current=new Date().getUTCFullYear();
-const all=(archive.films||[]).filter(x=>/^Q[1-9]\\d*$/.test(x.qid||''));
+const all=(archive.films||[]).filter(x=>/^Q[1-9]\d*$/.test(x.qid||''));
 const recent=all.filter(x=>x.year>=current-1).sort((a,b)=>b.year-a.year||a.qid.localeCompare(b.qid));
 const older=all.filter(x=>x.year<current-1).sort((a,b)=>b.year-a.year||a.qid.localeCompare(b.qid));
 const pending=[...recent.filter(x=>!cache.records[x.qid]),...older.filter(x=>!cache.records[x.qid])].slice(0,450);
@@ -51,7 +51,7 @@ async function getEntities(ids,props='labels|descriptions|claims'){
 const idProp=(entity,prop,limit=6)=>[...(entity?.claims?.[prop]||[])]
   .filter(x=>x.rank!=='deprecated')
   .map(x=>x.mainsnak?.datavalue?.value?.id)
-  .filter(x=>/^Q[1-9]\\d*$/.test(x||'')).slice(0,limit);
+  .filter(x=>/^Q[1-9]\d*$/.test(x||'')).slice(0,limit);
 const entities=await getEntities(pending.map(x=>x.qid));
 const ids=new Set();
 for(const entity of Object.values(entities)){
@@ -61,7 +61,7 @@ const labels=await getEntities([...ids],'labels');
 const enLabel=id=>labels[id]?.labels?.en?.value || '';
 const toPeople=(entity,prop,limit)=>idProp(entity,prop,limit)
  .map(id=>({name:enLabel(id),qid:id}))
- .filter(x=>x.name&&!/^Q\\d+$/.test(x.name)).slice(0,limit);
+ .filter(x=>x.name&&!/^Q\d+$/.test(x.name)).slice(0,limit);
 const generated={};const checked=new Date().toISOString().slice(0,10);
 for(const film of pending){
   const entity=entities[film.qid];
@@ -90,5 +90,5 @@ if(!Object.keys(generated).length)throw Error('No valid source-profile records r
 cache.records={...cache.records,...generated};
 cache.updatedAt=new Date().toISOString();
 cache.lastSync={requested:pending.length,enriched:Object.keys(generated).length,total:Object.keys(cache.records).length};
-await writeFile(target,JSON.stringify(cache,null,2)+'\\n');
+await writeFile(target,JSON.stringify(cache,null,2)+'\n');
 console.log('Cumulative CC0 film profiles enriched:',JSON.stringify(cache.lastSync));
