@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../worker/index.js';
-import { calculateDailyRanking } from '../worker/staging-rankings.js';
+import stagingRankingWorker, { calculateDailyRanking } from '../worker/staging-rankings.js';
 import { onRequest } from '../functions/api/[[path]].js';
 
 test('health endpoint returns JSON without a data binding', async () => {
@@ -138,8 +138,69 @@ test('failed daily ranking batch retains the last valid snapshot and logs failur
   async batch() { throw new Error('forced isolated batch failure'); } };
   const result = await calculateDailyRanking(DB, new Date('2026-10-09T04:00:00.000Z'));
   assert.equal(result.snapshots[0].status, 'failed');
+  assert.equal(result.status, 'failed');
+  assert.equal(result.failedYears, 1);
+  assert.equal(result.publishedYears, 0);
   assert.match(failedLog[8], /forced isolated batch failure/);
   assert.equal(prior.items[0].position, 1);
+});
+
+test('staging daily ranking reports partial when one year publishes and another fails', async () => {
+  const batches = [];
+  const failureLogs = [];
+  const DB = { prepare(sql) {
+    return {
+      sql,
+      values: [],
+      bind(...values) { this.values = values; return this; },
+      async all() {
+        if (sql.includes('LIMIT 0')) return { results: [] };
+        if (sql.includes('SELECT DISTINCT film_year')) return { results: [{ year: 2025 }, { year: 2026 }] };
+        if (sql.includes('FROM canonical_films') && sql.includes('film_year = ?')) {
+          return { results: [{ id: `film-${this.values[0]}`, title: `Verified ${this.values[0]} Film`, filmYear: this.values[0] }] };
+        }
+        if (sql.includes('FROM critic_reviews')) return { results: [] };
+        if (sql.includes('annual_ranking_snapshots')) return { results: [] };
+        return { results: [] };
+      },
+      async run() { failureLogs.push(this.values); return { meta: { changes: 1 } }; }
+    };
+  }, async batch(statements) {
+    const snapshot = statements.find(statement => statement.sql.includes('annual_ranking_snapshots'));
+    if (snapshot.values[0] === 2026) throw new Error('forced 2026 snapshot failure');
+    batches.push(statements);
+  } };
+  const originalLog = console.log;
+  const scheduledEvents = [];
+  console.log = value => scheduledEvents.push(JSON.parse(value));
+  let result;
+  try {
+    result = await stagingRankingWorker.scheduled({}, { DB });
+  } finally {
+    console.log = originalLog;
+  }
+  assert.equal(batches.length, 1);
+  assert.deepEqual(result.snapshots.map(row => [row.year, row.status]), [[2025, 'published'], [2026, 'failed']]);
+  assert.equal(result.status, 'partial');
+  assert.equal(result.publishedYears, 1);
+  assert.equal(result.failedYears, 1);
+  assert.equal(failureLogs.length, 1);
+  assert.equal(scheduledEvents.at(-1).event, 'daily_staging_rankings_run');
+  assert.equal(scheduledEvents.at(-1).status, 'partial');
+  assert.equal(scheduledEvents.at(-1).publishedYears, 1);
+  assert.equal(scheduledEvents.at(-1).failedYears, 1);
+});
+
+test('staging daily ranking does not report published when no annual snapshot is created', async () => {
+  const DB = { prepare(sql) { return { bind() { return this; }, async all() {
+    if (sql.includes('LIMIT 0')) return { results: [] };
+    if (sql.includes('SELECT DISTINCT film_year')) return { results: [] };
+    return { results: [] };
+  } }; } };
+  const result = await calculateDailyRanking(DB, new Date('2026-10-09T04:00:00.000Z'));
+  assert.equal(result.status, 'failed');
+  assert.equal(result.publishedYears, 0);
+  assert.deepEqual(result.snapshots, []);
 });
 test('film detail endpoint rejects malformed and path-shaped identifiers safely', async () => {
   for (const id of ['%2Fadmin', '%E0%A4%A', '..']) {

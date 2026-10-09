@@ -30,7 +30,8 @@ export async function calculateDailyRanking(db, now = new Date()) {
   for (const year of years) {
     try {
       const payload = await publishAnnualRankingSnapshot(db, year, now, 'cron-staging');
-      snapshots.push({ year, rankedRows: payload?.rankedFilms || 0, status: 'published' });
+      if (!payload) throw new Error(`Annual ranking snapshot for ${year} was not created`);
+      snapshots.push({ year, rankedRows: payload.rankedFilms, status: 'published' });
     } catch (error) {
       const issue = errorDetails(error);
       try { await logRun(db, { task: `ranking-${year}`, status: 'failed', startedAt, finishedAt: new Date().toISOString(), error: issue }); }
@@ -39,14 +40,31 @@ export async function calculateDailyRanking(db, now = new Date()) {
       log('staging_ranking_snapshot_failed_last_good_retained', { year, error: issue });
     }
   }
-  return { updatedAt: now.toISOString(), rankedRows: snapshots.reduce((total, row) => total + row.rankedRows, 0), status: 'published', snapshots, method };
+  const publishedYears = snapshots.filter(row => row.status === 'published').length;
+  const failedYears = snapshots.filter(row => row.status === 'failed').length;
+  const status = publishedYears === 0 ? 'failed' : failedYears === 0 ? 'published' : 'partial';
+  return {
+    updatedAt: now.toISOString(),
+    rankedRows: snapshots.reduce((total, row) => total + row.rankedRows, 0),
+    publishedYears,
+    failedYears,
+    status,
+    snapshots,
+    method
+  };
 }
 
 export default {
   async scheduled(_controller, env, _ctx) {
     try {
       const result = await calculateDailyRanking(env.DB);
-      log('daily_staging_rankings_updated', { rankedRows: result.rankedRows, status: result.status, years: result.snapshots?.map(row => row.year) || [] });
+      log('daily_staging_rankings_run', {
+        rankedRows: result.rankedRows,
+        publishedYears: result.publishedYears || 0,
+        failedYears: result.failedYears || 0,
+        status: result.status,
+        years: result.snapshots?.map(row => row.year) || []
+      });
       return result;
     } catch (error) {
       log('daily_staging_rankings_failed', { reason: errorDetails(error).message });
