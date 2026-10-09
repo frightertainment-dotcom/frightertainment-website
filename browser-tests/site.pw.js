@@ -168,7 +168,7 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
 
 test('release calendar uses source claims and does not invent live UK showtimes',async({page})=>{
   await page.goto('/movies.html');
-  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(7);
+  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(8);
   const urls=await page.locator('#hub-release-list a.hub-release-source').evaluateAll(a=>a.map(x=>x.getAttribute('href')));
   expect(urls.every(x=>x.startsWith('https://'))).toBe(true);
   await expect(page.locator('#hub-release-list')).toContainText('No UK availability inferred');
@@ -500,4 +500,18 @@ test('release bulletin never invents current streaming entries after data become
   await expect(bulletin).not.toContainText('Old UK Film');
   await expect(bulletin).toContainText('No recent verified listings');
   await expect(bulletin).toContainText('awaiting the next editorial check');
+});
+
+test('Movies has a compact secondary tools drawer, deep-linked cinema tools expand',async({page})=>{
+  await page.goto('/movies.html');
+  const drawer=page.locator('.movie-advanced');
+  await expect(drawer).toBeVisible();
+  await expect(drawer).not.toHaveAttribute('open','');
+  await expect(page.locator('.release-brief--movies')).toBeVisible();
+  await expect(page.locator('#cinema-panel')).toBeHidden();
+  await page.goto('/movies.html#cinema-panel');
+  await expect(drawer).toHaveAttribute('open','');
+  await expect(page.locator('#cinema-panel')).toBeVisible();
+  await page.setViewportSize({width:390,height:844});
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
