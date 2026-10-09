@@ -41,18 +41,18 @@
       }
       if (!items.length && !query) {
         const empty = kind === 'rankings'
-          ? 'Rankings pending: films need at least three distinct, permission-cleared professional numeric critic ratings.'
-          : kind === 'theatrical-releases' ? 'No recent territorial release dates are verified. A release date alone does not confirm showtimes.'
-          : kind === 'streaming-releases' ? 'No licensed digital release data is available for this country.'
-          : kind === 'coming-soon' ? 'No licensed upcoming release data is available for this country.'
-          : 'No licensed weekly trend data is available.';
+          ? 'More rated horror films will appear here.'
+          : kind === 'theatrical-releases' ? 'No recent cinema listings here yet.'
+          : kind === 'streaming-releases' ? 'No additional streaming listings yet.'
+          : kind === 'coming-soon' ? 'No upcoming releases in this feed.'
+          : 'No current popularity chart.';
         state.textContent = empty;
       } else if (items.length && state && !(kind==='rankings'&&payloads.previewRankings)) state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
     }
     const sources = [...new Set(kinds.flatMap(kind => (payloads[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
     document.querySelector('#home-attribution').textContent = sources.length
-      ? `Automated sources: ${sources.join(', ')}. Each listing links to its source and shows its territory and check date.`
-      : 'No automatic data is active. Source attribution and check dates will appear with verified listings.';
+      ? `Sources: ${sources.join(', ')}. Each listing links to its source and shows its territory and check date.`
+      : 'Explore more horror and viewing options.';
   }
   async function load() {
     const query = encodeURIComponent(country.value);
