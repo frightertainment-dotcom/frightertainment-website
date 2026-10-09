@@ -283,11 +283,13 @@ if(!dropBundler.includes("'release-brief.js'")||
 if(!dropHome.includes('data-release-brief')||!dropMovies.includes('data-release-brief'))
   errors.push('Release bulletin missing from homepage or Movies tab');
 
-if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
-else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
-
-// A removed public page must not be reintroduced in navigation, generated files, or the sitemap.
+// A removed public page must not return after generating the site.
 for (const file of ['index.html','movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','film.html','archive-film.html','all-horror-movies.html','top-20/index.html']) {
   const markup = await readFile(new URL(file, root), 'utf8');
-  if (/href=["']\\/?editorial-standards\\.html["']/i.test(markup)) errors.push(file + ' links to removed Editorial Standards page');
+  if (/href=["']\/?editorial-standards\.html["']/i.test(markup)) errors.push(file + ' links to removed Editorial Standards page');
 }
+try { await access(new URL('editorial-standards.html', root)); errors.push('Removed Editorial Standards page still exists in the website source'); }
+catch { /* Correct: the standalone public document is absent. */ }
+
+if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
+else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
