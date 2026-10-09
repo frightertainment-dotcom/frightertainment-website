@@ -31,6 +31,7 @@ jobs:
           test -f dist/archive-film.js
           test -f dist/horror-archive.js
           test -f dist/data/archive/horror-films.json
+          test -f dist/data/archive/profiles.json
           test -f dist/assets/frightertainment-brand.png
           test -f dist/films/other-mommy/index.html
           grep -q 'Disallow: /' dist/robots.txt
