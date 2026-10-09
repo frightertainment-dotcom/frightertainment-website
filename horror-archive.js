@@ -78,6 +78,37 @@
       entries.sort((a,b)=>collator.compare(a.title,b.title)||collator.compare(a.id,b.id));
     }
   };
+  function enableVaultSearch(){
+    const field=document.getElementById('archive-global-search');
+    const results=document.getElementById('archive-global-results');
+    const status=document.getElementById('archive-global-status');
+    const clear=document.getElementById('archive-global-clear');
+    if(!field||!results||!status||!clear)return;
+    const all=Array.from(grouped.values()).flat();
+    let timer=0;
+    const render=()=>{
+      const q=titleKey(field.value);
+      clear.hidden=!q;
+      results.replaceChildren();
+      if(q.length<2){results.hidden=true;status.textContent=q?'Type at least two characters to search.':'Or select any year below for an A–Z list.';return;}
+      const matches=all.filter(x=>titleKey(x.title).includes(q)).sort((a,b)=>collator.compare(a.title,b.title)||b.year-a.year);
+      const limit=75;
+      const shown=matches.slice(0,limit);
+      status.textContent=matches.length.toLocaleString('en-GB')+' matching film'+(matches.length===1?'':'s')+
+        (matches.length>limit?' · Showing the first '+limit.toString():'');
+      results.hidden=false;
+      for(const film of shown){
+        const a=document.createElement('a');
+        a.href=film.href;
+        a.className='horror-vault-search__result';
+        a.append(node('strong','',film.title),node('span','',film.year+' · FILM DETAILS →'));
+        results.append(a);
+      }
+      if(!matches.length)results.append(node('p','horror-year__empty','No matching film found. Try an alternative title.'));
+    };
+    field.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,90);});
+    clear.addEventListener('click',()=>{field.value='';render();field.focus();});
+  }
   const node=(tag,className,text)=>{
     const n=document.createElement(tag);
     if(className)n.className=className;
@@ -126,6 +157,7 @@
   }
   function showArchive(raw){
     selectSource(raw);
+    enableVaultSearch();
     const total=Array.from(grouped.values()).reduce((n,entries)=>n+entries.length,0);
     const yearsWithFilms=Array.from(grouped.values()).filter(entries=>entries.length).length;
     const stamp=typeof raw?.updatedAt==='string'&&/^\d{4}-\d{2}-\d{2}/.test(raw.updatedAt)?
