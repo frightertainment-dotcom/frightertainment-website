@@ -461,3 +461,43 @@ test('top twenty candidate pool uses 2026 horror archive and does not fabricate 
   const last=page.locator('.hub-rt-coverage__row').last().locator('a');
   await expect(last).toHaveAttribute('href',/^(\/archive-film\.html\?id=Q\d+|\/films\/[a-z0-9-]+\/)$/);
 });
+
+test('verified UK horror release bulletin shows new streaming dates and source links',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  const bulletin=page.locator('[data-release-brief]').first();
+  await expect(bulletin.locator('.release-brief__item')).toHaveCount(4);
+  await expect(bulletin).toContainText('V/H/S/Mixtape');
+  await expect(bulletin).toContainText('Shudder UK');
+  await expect(bulletin.locator('a.release-brief__source').first()).toHaveAttribute('href',/letterboxd/);
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('UK release bulletin separates cinema and home-media listings from streaming',async({page})=>{
+  await page.goto('/movies.html');
+  const widget=page.locator('[data-release-brief]');
+  await widget.getByRole('button',{name:'IN CINEMAS'}).click();
+  await expect(widget).toContainText('Other Mommy');
+  await expect(widget).toContainText('Resident Evil');
+  await expect(widget).not.toContainText('Shudder UK');
+  await widget.getByRole('button',{name:'BUY OR RENT'}).click();
+  await expect(widget).toContainText('28 Years Later: The Bone Temple');
+  await expect(widget).toContainText('Insidious: Out of the Further');
+  await widget.getByRole('button',{name:'COMING NEXT'}).click();
+  await expect(widget).toContainText('Jitters');
+  await expect(widget.locator('.release-brief__item')).toHaveCount(4);
+});
+test('release bulletin never invents current streaming entries after data becomes stale',async({page})=>{
+  await page.route('**/data/editorial-releases.json',route=>route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({updatedAt:'2026-01-01T12:00:00Z',items:[
+      {id:'old-1',category:'streaming',title:'Old UK Film',year:2025,country:'GB',
+       service:'Shudder',date:'2026-01-01',checkedAt:'2026-01-01',
+       sourceName:'Shudder UK',sourceUrl:'https://example.com/old'}
+    ]})
+  }));
+  await page.goto('/');
+  const bulletin=page.locator('[data-release-brief]').first();
+  await expect(bulletin).not.toContainText('Old UK Film');
+  await expect(bulletin).toContainText('No recent verified listings');
+  await expect(bulletin).toContainText('awaiting the next editorial check');
+});
