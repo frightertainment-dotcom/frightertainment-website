@@ -20,7 +20,7 @@ export async function onRequest(context) {
     if (context.request.method === 'GET' && url.pathname === '/api/rankings') {
       const requested = url.searchParams.get('year') || String(new Date().getUTCFullYear());
       const year = Number(requested);
-      if (!/^\\d{4}$/.test(requested) || !Number.isInteger(year) ||
+      if (!/^\d{4}$/.test(requested) || !Number.isInteger(year) ||
           year < 1888 || year > new Date().getUTCFullYear() + 2) {
         return new Response(JSON.stringify({ error: 'Invalid ranking year' }), { status: 400, headers });
       }
