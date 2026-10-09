@@ -175,7 +175,7 @@
       title.href = filmHref(item.filmId);
       const score = document.createElement('span');
       score.className = 'score';
-      score.textContent = item.averageScore + '/100';
+      score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
       const meta = document.createElement('div');
       meta.className = 'chart-meta';
       const count = document.createElement('span');
