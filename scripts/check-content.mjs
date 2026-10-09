@@ -148,7 +148,9 @@ for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
 
 const calendarClient = await readFile(new URL('release-calendar.js',root),'utf8');
 if(!calendarClient.includes("claim.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
+if(!calendarClient.includes('claim.value>today')) errors.push('Upcoming release calendar must exclude historical and already-passed release dates');
 if(!(await readFile(new URL('movies.html',root),'utf8')).includes('id="hub-release-list"')) errors.push('Release calendar is missing from the Movies page');
+if((await readFile(new URL('movies.html',root),'utf8')).includes('id="review-index"')) errors.push('Do not show an empty rating methodology panel to visitors');
 // No private publisher-score payload or fallback renderer may enter public assets.
 for (const file of ['data/movies.js','app.js','hub.js','home-discovery.js','discovery.js','top20.js','index.html','movies.html','scripts/build-pages.mjs','scripts/build-preview.mjs']) {
   const source = await readFile(new URL(file, root), 'utf8');
@@ -178,7 +180,7 @@ for(const entry of vault.films||[]){
   if(schemaSeen.has(entry.qid)) errors.push('Duplicate archive Wikidata item '+entry.qid);
   schemaSeen.add(entry.qid);
 }
-for(const need of ['id="archive-years"','id="archive-jump"','src="/horror-archive.js"','ALL HORROR MOVIES'])
+for(const need of ['id="archive-years"','id="archive-jump"','id="archive-global-search"','src="/horror-archive.js"','ALL HORROR MOVIES'])
   if(!vaultHTML.includes(need))errors.push('Year-by-year film archive HTML missing '+need);
 if(!vaultJS.includes('renderYearContents')||!vaultJS.includes("type='search'")&&!vaultJS.includes("search.type='search'"))
   errors.push('All Horror Movies must lazily render A–Z results and provide per-year searches');
@@ -191,6 +193,7 @@ if(!previewBuild.includes("'all-horror-movies.html'")||!previewBuild.includes("'
   errors.push('Archive missing from private Pages deployment bundle');
 const homeForArchive=await readFile(new URL('index.html',root),'utf8');
 const moviesForArchive=await readFile(new URL('movies.html',root),'utf8');
+if(!moviesForArchive.includes('class="shell hub-vault-portal"')) errors.push('Movies landing page must prominently link into the full Horror Vault');
 if(!homeForArchive.includes('href="/all-horror-movies.html"')||
    !moviesForArchive.includes('href="/all-horror-movies.html"'))
   errors.push('All Horror Movies must be accessible as a Movies subtab and homepage link');
