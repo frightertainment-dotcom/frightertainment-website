@@ -9,7 +9,7 @@
     const source = safeURL(claim.source);
     return `<li class="film-claim"><div><strong>${escapeHTML(claim.label)}</strong><p>${escapeHTML(claim.value)}</p><small>TERRITORY: ${escapeHTML(claim.territory)} · CHECKED ${escapeHTML(claim.checked)}</small></div>${source ? `<a href="${escapeHTML(source)}" target="_blank" rel="noopener noreferrer">${escapeHTML(claim.sourceName)} ></a>` : ''}</li>`;
   };
-  const common = '<section class="film-section"><h2>FRIGHT INDEX</h2><p class="film-score">—</p><p>Automatic ranking calculation does not acquire critic reviews. No score is published until three distinct, professional, permission-cleared numeric critic ratings are verified.</p></section>';
+  const common = '<section class="film-section"><h2>FRIGHT RATING</h2><p class="film-score">PENDING /10</p><p>A Fright Rating appears when at least three verified, eligible professional critic reviews are available.</p></section>';
   if (!/^[a-z0-9-]{1,100}$/.test(id)) { root.innerHTML = '<h1>FILM FILE</h1><p class="film-status">A valid approved film link is required.</p><p><a href="/">← Frightertainment homepage</a></p>'; return; }
   const curated = window.FR_MOVIES?.find(movie => movie.id === id);
   if (curated) { location.replace(`/films/${encodeURIComponent(id)}/`); return; }
