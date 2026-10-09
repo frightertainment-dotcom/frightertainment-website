@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: codex/frightertainment-v1
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
@@ -40,10 +40,10 @@ jobs:
           npm run build:pages
           npm run check
           npm run build:preview
-      - name: Commit updated reference catalogue to the same branch
+      - name: Propose updated reference catalogue on staging branch
         shell: bash
         env:
-          TARGET_BRANCH: ${{ github.ref_name }}
+          TARGET_BRANCH: codex/frightertainment-v1
         run: |
           git config user.name "frightertainment-archive-bot"
           git config user.email "frightertainment-archive-bot@users.noreply.github.com"
