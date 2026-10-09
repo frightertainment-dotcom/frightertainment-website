@@ -836,7 +836,7 @@ test('direct page loads declare the shared Frightertainment typefaces', async ({
     expect(fontHref).toContain('DM+Sans');
   }
   await page.goto('/movies.html');
-  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Cormorant Garamond');
+  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Grenze Gotisch');
 });
 
 test('reduced-motion preference disables homepage transitions and artwork zoom', async ({ page }) => {
