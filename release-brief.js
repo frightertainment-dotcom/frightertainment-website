@@ -6,6 +6,16 @@
   'use strict';
   const panels=[...document.querySelectorAll('[data-release-brief]')];
   if(!panels.length)return;
+  // Deep links into the cinema/streaming tools should reveal the collapsed
+  // panel automatically, preserving links from the homepage and navigation.
+  const openLinkedTools=()=>{
+    const drawer=document.getElementById('advanced-discovery');
+    if(!drawer)return;
+    const hash=location.hash?.slice(1);
+    if(hash && (hash==='discovery' || drawer.querySelector('#'+hash)))drawer.open=true;
+  };
+  openLinkedTools();
+  window.addEventListener('hashchange',openLinkedTools);
   const now=new Date().toISOString().slice(0,10);
   const daysAgo=iso=>(Date.parse(now+'T00:00:00Z')-Date.parse(iso+'T00:00:00Z'))/86400000;
   const fmt=iso=>new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',day:'numeric',month:'short'}).format(new Date(iso+'T12:00:00Z'));
