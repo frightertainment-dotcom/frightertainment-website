@@ -19,12 +19,20 @@ for (const category of collections) {
     unique.add(item.id);
     const variant=arts[(index++)%arts.length];
     const external=item.sourceUrl.startsWith('https://');
-    return '<article class="hub-tile '+variant+'"><div class="hub-tile__wash" aria-hidden="true"></div>'+
+    const longTitle=item.title.length>24?' hub-tile--long-title':'';
+    return '<article class="hub-tile '+variant+longTitle+'"><div class="hub-tile__wash" aria-hidden="true"></div>'+
       '<div class="hub-tile__content"><span class="hub-kicker">'+esc(item.category)+'</span><h3>'+esc(item.title)+'</h3>'+
       '<p>'+esc(item.description)+'</p><a class="hub-tile__link" href="'+esc(item.sourceUrl)+'"'+
-      (external?' target="_blank" rel="noopener noreferrer"':'')+'>SOURCE: '+esc(item.sourceName)+' ↗</a></div></article>';
+      (external?' target="_blank" rel="noopener noreferrer"':'')+'>SOURCE: '+esc(item.sourceName)+'</a></div></article>';
   }).join('\n');
-  const section=markers.start+'\n<section class="hub-editorial-more" aria-label="More verified '+esc(category)+' recommendations"><div class="hub-editorial-more__head"><h2>MORE TO <em>EXPLORE.</em></h2><p>More horror to discover.</p></div>'+
+  const destination={
+    'tv-shows':['AFTER THE FINAL EPISODE','Stories that linger after the screen goes dark.'],
+    'podcasts':['KEEP THE LIGHTS OFF','Dark stories selected for late-night listening.'],
+    'indie-movies':['THE FESTIVAL CUT','Independent nightmares with a voice of their own.'],
+    'games':['MORE WORLDS AFTER DARK','Further descents into survival horror.']
+  }[category];
+  const words=destination[0].split(' ');
+  const section=markers.start+'\n<section class="hub-editorial-more" aria-label="More verified '+esc(category)+' recommendations"><div class="hub-editorial-more__head"><h2>'+esc(words.slice(0,-1).join(' '))+' <em>'+esc(words.at(-1))+'.</em></h2><p>'+esc(destination[1])+'</p></div>'+
   '<div class="hub-catalog hub-catalog--expanded">'+cards+'</div></section>\n'+markers.end;
   const file=new URL(category+'.html',root);
   let html=await readFile(file,'utf8');

@@ -185,7 +185,7 @@ test('navigation works between all main sections and official movie source', asy
 test('compact dashboard remains navigable at 320px and 768px', async ({ browser }) => {
   for (const width of [320, 768]) {
     const page = await browser.newPage({viewport:{width,height:820}});
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('.hub-brand img')).toBeVisible();
     await expect(page.locator('.hub-tabs a')).toHaveCount(6);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -214,19 +214,70 @@ test('all six section themes and navigation fit the requested viewport widths', 
   }
   await page.close();
 });
-test('section catalog cards stay in their three-column grid when using the featured artwork class', async ({ page }) => {
+test('TV, indie, podcast and games landings use distinct desktop compositions', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  for (const route of ['/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html']) {
+  for (const route of ['/tv-shows.html', '/podcasts.html']) {
     await page.goto(route);
     const cards = page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile');
     await expect(cards.first()).toBeVisible();
     const boxes = await cards.evaluateAll(nodes => nodes.map(node => {
-      const { x, y, width } = node.getBoundingClientRect();
-      return { x, y, width };
+      const { x, y, width, height } = node.getBoundingClientRect();
+      return { x, y, width, height };
     }));
-    expect(boxes.every(box => box.width > 350), `${route} should fill the catalog width`).toBe(true);
-    expect(Math.max(...boxes.map(box => box.y)) - Math.min(...boxes.map(box => box.y)), `${route} primary cards should share a row`).toBeLessThan(2);
+    expect(boxes.length).toBe(3);
+    expect(boxes[0].width).toBeGreaterThan(boxes[1].width);
+    expect(boxes[0].height).toBeGreaterThan(boxes[1].height);
+    expect(Math.abs(boxes[1].x - boxes[2].x), `${route} secondary cards should stack in one column`).toBeLessThan(2);
+    expect(boxes[2].y).toBeGreaterThan(boxes[1].y);
   }
+  await page.goto('/games.html');
+  const gameBoxes = await page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile').evaluateAll(nodes => nodes.map(node => {
+    const { x, y, width, height } = node.getBoundingClientRect();
+    return { x, y, width, height };
+  }));
+  expect(gameBoxes).toHaveLength(2);
+  expect(gameBoxes[0].width).toBeGreaterThan(gameBoxes[1].width);
+  expect(gameBoxes[0].height).toBeGreaterThan(gameBoxes[1].height);
+  expect(gameBoxes[1].x).toBeGreaterThan(gameBoxes[0].x);
+  await page.goto('/indie-movies.html');
+  const indieBoxes = await page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile').evaluateAll(nodes => nodes.map(node => {
+    const { x, y, width, height } = node.getBoundingClientRect();
+    return { x, y, width, height };
+  }));
+  expect(indieBoxes).toHaveLength(3);
+  expect(Math.max(...indieBoxes.map(box => box.width)) - Math.min(...indieBoxes.map(box => box.width))).toBeLessThan(2);
+  expect(indieBoxes[1].y).toBeGreaterThan(indieBoxes[0].y + 15);
+  expect(indieBoxes[1].height).toBeGreaterThan(indieBoxes[0].height);
+});
+test('narrow section cards keep readable copy, natural titles and visible external-link icons', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const route of ['/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html']) {
+    await page.goto(route);
+    const paragraphs = page.locator('main > .hub-catalog:not(.hub-catalog--expanded) .hub-tile p');
+    for (const paragraph of await paragraphs.all()) {
+      expect(await paragraph.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
+    }
+    const titles = page.locator('main > .hub-catalog:not(.hub-catalog--expanded) .hub-tile h3');
+    for (const title of await titles.all()) {
+      const metrics = await title.evaluate(el => ({ scroll: el.scrollWidth, client: el.clientWidth, right: el.getBoundingClientRect().right }));
+      expect(metrics.scroll).toBeLessThanOrEqual(metrics.client + 1);
+      expect(metrics.right).toBeLessThanOrEqual(390);
+    }
+    const external = page.locator('main > .hub-catalog:not(.hub-catalog--expanded) a[target="_blank"]').first();
+    if (await external.count()) {
+      const icon = await external.evaluate(el => ({ content: getComputedStyle(el, '::before').content, mask: getComputedStyle(el, '::before').maskImage }));
+      expect(icon.content).toBe('""');
+      expect(icon.mask).toContain('data:image/svg+xml');
+    }
+    const externalTileAction = page.locator('main > .hub-catalog:not(.hub-catalog--expanded) .hub-tile__link[target="_blank"]').first();
+    if (await externalTileAction.count()) {
+      expect(await externalTileAction.evaluate(el => getComputedStyle(el, '::after').position)).toBe('absolute');
+      expect(await externalTileAction.evaluate(el => getComputedStyle(el, '::after').inset)).toBe('0px');
+    }
+  }
+  await page.goto('/movies.html');
+  await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
+  expect(await page.locator('#movie-grid .movie-card__text').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
 });
 test('mobile homepage keeps the featured film before the chart and supporting cards after it', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -257,6 +308,11 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
     await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(6);
     await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(6);
   }
+  await page.goto('/podcasts.html');
+  await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
+  await page.goto('/tv-shows.html');
+  await expect(page.locator('a[href="https://www.netflix.com/gb/title/80209229"]')).toBeVisible();
+  await expect(page.locator('a[href="https://qr.netflix.com/gb/title/80209229"]')).toHaveCount(0);
 });
 
 test('release calendar uses source claims and does not invent live UK showtimes',async({page})=>{
@@ -390,9 +446,9 @@ test('all horror movie navigation is a sub-tab under main Movies tab',async({pag
 });
 
 test('imported horror vault retains thousands of indexed records and every year in mobile UI',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await page.goto('/all-horror-movies.html', { waitUntil: 'domcontentloaded' });
   const counter=page.locator('#archive-summary');
-  await expect(counter).toContainText('indexed film links');
+  await expect(counter).toContainText('indexed film links', { timeout: 15000 });
   const count=await counter.evaluate(el=>Number((el.textContent.match(/[0-9,]+/)||['0'])[0].replaceAll(',','')));
   expect(count).toBeGreaterThanOrEqual(9772);
   const year=page.locator('#horror-year-2007');
@@ -697,6 +753,8 @@ test('homepage slow chart scroll uses only validated ranking rows and pauses for
   await expect(list.locator('.hub-chart-row')).toHaveCount(10);
   await expect(list.locator('.hub-chart-row .movement').first()).toHaveAttribute('aria-label', 'Position movement new');
   await expect(control).toBeVisible();
+  const scrollRange = await list.evaluate(element => element.scrollHeight - element.clientHeight);
+  expect(scrollRange).toBeGreaterThanOrEqual(80);
   const before = await list.evaluate(element => element.scrollTop);
   await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(before + 2);
   await control.focus();
@@ -808,6 +866,7 @@ test('six themed environments and review pages have desktop and mobile browser e
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await page.locator('main').waitFor();
+    if (name === 'home') await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
     await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
     await page.screenshot({ path: `${out}/${name}-desktop-full.png`, fullPage: true });
     if (name === 'home') await page.locator('.hub-charts').screenshot({ path: `${out}/homepage-chart-desktop.png` });
@@ -820,6 +879,7 @@ test('six themed environments and review pages have desktop and mobile browser e
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await page.locator('main').waitFor();
+    if (name === 'movie-archive') await expect(page.locator('#archive-summary')).toContainText('indexed film links', { timeout: 15000 });
     await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
     await page.screenshot({ path: `${out}/${name}-desktop-full.png`, fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });

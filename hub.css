@@ -1,11 +1,11 @@
 /* Frightertainment hub: a shared system with six deliberately different horror rooms. */
 :root{--font-horror:'Cormorant Garamond',Georgia,serif}
 body[data-theme="home"]{--red:#ee5965;--red-dark:#901f2a;--hair:#51282e;--art-hue:0deg;--world:#10070a;--surface-world:#150b0e;--surface-raised:#1b0d12;--edge:#79303a;--world-glow:#a4142b}
-body[data-theme="movies"]{--red:#a6d2ae;--red-dark:#496f51;--hair:#30483a;--art-hue:115deg;--world:#07100c;--surface-world:#0c1711;--surface-raised:#112016;--edge:#42624a;--world-glow:#255d39}
-body[data-theme="tv"]{--red:#b4e4f5;--red-dark:#477d9b;--hair:#283e56;--art-hue:185deg;--world:#080c17;--surface-world:#0c1220;--surface-raised:#101a2a;--edge:#3d5a77;--world-glow:#214e82}
-body[data-theme="indie"]{--red:#f1b078;--red-dark:#96542e;--hair:#513a2e;--art-hue:25deg;--world:#120b08;--surface-world:#1a100b;--surface-raised:#21140d;--edge:#77482e;--world-glow:#a84620}
-body[data-theme="podcasts"]{--red:#d1b2f3;--red-dark:#7858a7;--hair:#49385e;--art-hue:270deg;--world:#0d0713;--surface-world:#140c1c;--surface-raised:#1b1028;--edge:#644583;--world-glow:#6e36a4}
-body[data-theme="games"]{--red:#80b5ff;--red-dark:#365cae;--hair:#29395f;--art-hue:205deg;--world:#070a16;--surface-world:#0b1020;--surface-raised:#111a2d;--edge:#3c5e9a;--world-glow:#244fda}
+body[data-theme="movies"]{--red:#a6d2ae;--red-dark:#496f51;--hair:#30483a;--art-hue:115deg;--world:#07100c;--surface-world:#0c1711;--surface-raised:#112016;--edge:#42624a;--world-glow:#255d39;--font-room:'Cormorant Garamond',Georgia,serif}
+body[data-theme="tv"]{--red:#b4e4f5;--red-dark:#477d9b;--hair:#283e56;--art-hue:185deg;--world:#080c17;--surface-world:#0c1220;--surface-raised:#101a2a;--edge:#3d5a77;--world-glow:#214e82;--font-room:'Barlow Condensed',Impact,sans-serif}
+body[data-theme="indie"]{--red:#f1b078;--red-dark:#96542e;--hair:#513a2e;--art-hue:25deg;--world:#120b08;--surface-world:#1a100b;--surface-raised:#21140d;--edge:#77482e;--world-glow:#a84620;--font-room:'Cormorant Garamond',Georgia,serif}
+body[data-theme="podcasts"]{--red:#d1b2f3;--red-dark:#7858a7;--hair:#49385e;--art-hue:270deg;--world:#0d0713;--surface-world:#140c1c;--surface-raised:#1b1028;--edge:#644583;--world-glow:#6e36a4;--font-room:'Cormorant Garamond',Georgia,serif}
+body[data-theme="games"]{--red:#80b5ff;--red-dark:#365cae;--hair:#29395f;--art-hue:205deg;--world:#070a16;--surface-world:#0b1020;--surface-raised:#111a2d;--edge:#3c5e9a;--world-glow:#244fda;--font-room:'Barlow Condensed',Impact,sans-serif}
 .hub-body{position:relative;isolation:isolate;background:radial-gradient(ellipse at 70% -10%,color-mix(in srgb,var(--world-glow) 22%,transparent),transparent 54%),var(--world,#080708);min-height:100vh}
 .hub-body::before{content:"";position:absolute;z-index:-1;inset:0 0 auto;height:min(100vh,900px);pointer-events:none;opacity:.34;background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--world-glow) 16%,transparent),transparent 65%)}
 body[data-theme="home"].hub-body::before{background:radial-gradient(ellipse at 83% 8%,#95162927,transparent 42%),repeating-linear-gradient(135deg,#ffffff03 0 1px,transparent 1px 18px)}
@@ -62,7 +62,7 @@ body[data-theme="games"].hub-body::before{background:radial-gradient(ellipse at 
 .hub-indie .hub-tile__wash{background:linear-gradient(90deg,#170b0de8 0%,#160d0e9e 55%,#160d0e30 100%)}
 .hub-games .hub-tile__wash{background:linear-gradient(90deg,#080c10e8 0%,#090e12a8 54%,#090e1230 100%)}
 .hub-tile__content{padding:21px 24px;position:relative;z-index:1;max-width:100%}
-.hub-tile h3{font:900 clamp(25px,2.4vw,38px)/.98 var(--font-display);margin:8px 0;color:#fff3ee;letter-spacing:.2px;text-shadow:0 3px 14px #000;overflow-wrap:anywhere}
+.hub-tile h3{font:900 clamp(25px,2.4vw,38px)/.98 var(--font-display);margin:8px 0;color:#fff3ee;letter-spacing:.2px;text-shadow:0 3px 14px #000;overflow-wrap:normal;word-break:normal;hyphens:auto;text-wrap:balance}
 .hub-feature h3{font-size:clamp(52px,4.35vw,64px);max-width:850px}
 .hub-tile p{font-size:15px;line-height:1.5;color:#eee1dd;margin:0 0 14px;max-width:400px;text-shadow:0 2px 8px #000}
 .hub-tile__link{position:relative;display:inline-flex;align-items:center;gap:16px;border:1px solid #da3540;min-height:42px;padding:9px 12px;color:#fff0ed;font:800 12px var(--font-display);letter-spacing:1.2px;background:#180c10d9}
@@ -213,6 +213,7 @@ body[data-theme="games"].hub-body::before{background:radial-gradient(ellipse at 
 .hub-tile__link::after{content:"";position:absolute;inset:0}
 .hub-tile__link{z-index:2}
 .hub-tile:hover{border-color:#dd3944}
+.hub-body a[target="_blank"]::before{content:"";display:inline-block;flex:none;width:12px;height:12px;margin-inline-end:7px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M9 2h5v5M14 2 7 9M12 9v4H3V4h4' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
 @media(max-width:640px){.movie-card__poster-fill .movie-card__placeholder>strong{font-size:clamp(27px,6vw,42px)}}
 
 /* Release calendar: studio dates are independently sourced, not live theatre showtimes */
@@ -506,7 +507,7 @@ a.release-brief__title:hover{text-decoration:underline}
 .hub-body button:focus-visible,.hub-body a:focus-visible,.hub-body input:focus-visible,.hub-body select:focus-visible{outline:2px solid var(--red);outline-offset:3px;box-shadow:0 0 0 4px color-mix(in srgb,var(--world) 55%,transparent)}
 .hub-intro{border-color:var(--hair)}
 .hub-eyebrow,.hub-kicker{color:var(--red)}
-.hub-intro h1,.hub-page-intro h1,.hub-charts h2,.hub-tile h3,.hub-section .section-head h2,.hub-section .index-section h2,.hub-honest-panel h2,.hub-editorial-more__head h2,.movie-card__placeholder>strong,.fr-movie-hero__info h1,.film-page__inner>h1{font-family:var(--font-horror,var(--font-display));font-weight:700;letter-spacing:.025em}
+.hub-intro h1,.hub-page-intro h1,.hub-charts h2,.hub-tile h3,.hub-section .section-head h2,.hub-section .index-section h2,.hub-honest-panel h2,.hub-editorial-more__head h2,.movie-card__placeholder>strong,.fr-movie-hero__info h1,.film-page__inner>h1{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-weight:700;letter-spacing:.025em}
 .hub-intro h1{font-size:clamp(37px,4vw,54px);line-height:.96}
 .hub-intro h1 em,.hub-page-intro h1 em,.hub-charts h2 em,.hub-section .section-head h2 em,.hub-section .index-section h2 em,.hub-section .hub-editorial-more__head h2 em{font-style:normal;color:var(--red);text-shadow:0 0 24px color-mix(in srgb,var(--red) 21%,transparent)}
 .hub-intro>p,.hub-page-intro>p{color:#d5d4d2}
@@ -530,6 +531,29 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .hub-subtabs a,.hub-section .hub-section-jumps a{min-height:42px;padding:10px 13px;border:1px solid color-mix(in srgb,var(--red) 45%,var(--edge));background:color-mix(in srgb,var(--surface-world) 86%,#090909);font:800 12px var(--font-display);letter-spacing:.8px;transition:border-color .2s,background .2s,color .2s}
 .hub-section .hub-subtabs a:hover,.hub-section .hub-section-jumps a:hover,.hub-section .hub-subtabs a.active,.hub-section .hub-subtabs a[aria-current="page"]{border-color:var(--red);background:color-mix(in srgb,var(--red) 23%,var(--surface-world));color:#fff}
 .hub-section .hub-catalog{gap:17px}
+.hub-section main>.hub-catalog:not(.hub-catalog--expanded){align-items:stretch}
+/* Each editorial room gets its own composition, not just its own accent. */
+body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-rows:repeat(2,minmax(275px,auto));gap:14px}
+body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:first-child{grid-row:1/span 2;min-height:570px}
+body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:not(:first-child){min-height:278px}
+body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile::before{background-position:68% center}
+body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded) .hub-tile__wash::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.23;background:repeating-linear-gradient(0deg,transparent 0 7px,#c3edff14 8px 9px);mask-image:linear-gradient(90deg,#000,transparent 85%)}
+body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(355px,auto);align-items:start;gap:14px}
+body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile{min-height:355px;border-top:2px solid var(--red)}
+body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:nth-child(2){min-height:405px;transform:translateY(22px)}
+body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile::before{background-position:72% center;filter:hue-rotate(var(--art-hue)) saturate(.72) contrast(1.12)}
+body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile::after{background:linear-gradient(180deg,#160e0b12 20%,#100a09d9 100%),repeating-linear-gradient(90deg,transparent 0 31px,#f7bd8a08 32px 33px)}
+body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);grid-template-rows:repeat(2,minmax(265px,auto));gap:14px}
+body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:first-child{grid-row:1/span 2;min-height:545px}
+body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:not(:first-child){min-height:265px}
+body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile::after{background:radial-gradient(ellipse at 83% 43%,#b68af01c,transparent 35%),linear-gradient(0deg,#0c0712e0,transparent 65%)}
+body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile::before{background-position:68% center}
+body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:first-child .hub-tile__content{border-left:2px solid color-mix(in srgb,var(--red) 72%,transparent);margin:18px 20px;padding:14px 16px;background:linear-gradient(90deg,#100917c9,transparent)}
+body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);grid-template-rows:repeat(2,minmax(250px,auto));gap:14px}
+body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:first-child{grid-row:1/span 2;min-height:515px}
+body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:not(:first-child){min-height:250px}
+body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile{clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,18px 100%,0 calc(100% - 18px))}
+body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded) .hub-tile__wash::after{content:"";position:absolute;inset:16px;border:1px solid #a8d4ff30;pointer-events:none;background:linear-gradient(90deg,transparent 49.8%,#9dd5ff12 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,#9dd5ff12 50%,transparent 50.2%);background-size:36px 36px;mask-image:linear-gradient(135deg,#000,transparent 82%)}
 .hub-section .hub-catalog .hub-tile{min-height:300px;border:1px solid color-mix(in srgb,var(--edge) 78%,var(--red));background:var(--surface-world);box-shadow:inset 0 1px #fff1,0 15px 35px #0004;transition:transform .24s,border-color .24s,box-shadow .24s}
 .hub-section .hub-catalog .hub-tile::after{background:radial-gradient(ellipse at 82% 12%,color-mix(in srgb,var(--red) 18%,transparent),transparent 55%),linear-gradient(0deg,#050708b8,transparent 62%)}
 .hub-section .hub-catalog .hub-tile__wash{background:linear-gradient(90deg,color-mix(in srgb,var(--world) 84%,transparent) 0%,color-mix(in srgb,var(--world) 51%,transparent) 52%,transparent 100%)}
@@ -545,11 +569,11 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .hub-catalog .hub-games::before{filter:hue-rotate(var(--art-hue)) saturate(.92)}
 .hub-section .hub-editorial-more{padding-top:44px}
 .hub-section .hub-editorial-more__head{border-top:1px solid var(--hair);padding-top:24px}
-.hub-section .hub-editorial-more__head h2,.hub-section .section-head h2,.hub-section .index-section h2{font-family:var(--font-horror,var(--font-display));font-weight:700;letter-spacing:.025em}
+.hub-section .hub-editorial-more__head h2,.hub-section .section-head h2,.hub-section .index-section h2{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-weight:700;letter-spacing:.025em}
 .hub-section .section-head h2,.hub-section .index-section h2{line-height:.92}
 .hub-section .release-brief,.hub-section .movie-advanced,.hub-section .hub-honest-panel{border-color:var(--edge);background:linear-gradient(120deg,color-mix(in srgb,var(--world-glow) 18%,var(--surface-world)),var(--surface-world) 72%);box-shadow:inset 0 1px #fff1,0 16px 40px #0003}
 .hub-section .release-brief__head{border-color:var(--hair)}
-.hub-section .release-brief__heading,.hub-section .movie-advanced__summary strong{font-family:var(--font-horror,var(--font-display));font-weight:700;letter-spacing:.03em}
+.hub-section .release-brief__heading,.hub-section .movie-advanced__summary strong{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-weight:700;letter-spacing:.03em}
 .hub-section .release-brief__checked,.hub-section .release-brief__subtitle,.hub-section .release-brief__source,.hub-section .release-brief__empty{color:#e0d9e1}
 .hub-section .release-brief__tabs,.hub-section .release-brief__item{border-color:var(--hair)}
 .hub-section .release-brief__tab{border-color:var(--edge);color:#f0ecee;background:var(--surface-raised)}
@@ -558,7 +582,7 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .release-brief__subtitle,.hub-section .release-brief__note{color:#d0c6cc}
 .hub-section .release-brief__source{color:var(--red)}
 .hub-section .hub-release-head{border-color:var(--hair)}
-.hub-section .hub-release-head h2,.hub-section .hub-series__intro strong,.hub-section .hub-year-picker h3{font-family:var(--font-horror,var(--font-display));letter-spacing:.025em}
+.hub-section .hub-release-head h2,.hub-section .hub-series__intro strong,.hub-section .hub-year-picker h3{font-family:var(--font-room,var(--font-horror,var(--font-display)));letter-spacing:.025em}
 .hub-section .hub-release-list,.hub-section .hub-series,.hub-section .hub-year-picker,.hub-section .hub-honest-panel{border-color:var(--edge);background:linear-gradient(135deg,color-mix(in srgb,var(--world-glow) 12%,var(--surface-world)),var(--surface-world) 75%)}
 .hub-section .hub-release-row,.hub-section .hub-series__items a{border-color:var(--hair)}
 .hub-section .hub-release-row time,.hub-section .hub-release-row>div>a,.hub-section .hub-series__items strong{color:#f7f1f0}
@@ -573,15 +597,15 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .movie-card__placeholder>.poster-mini{color:var(--red);font:800 10px var(--font-display);letter-spacing:.24em}
 .hub-section .movie-card__placeholder>small{color:#e0d4d0;font:700 10px var(--font-display);letter-spacing:.18em}
 .hub-section .movie-card__date{border-left-color:var(--red);background:#090a0bee;color:#fff}
-.hub-section .movie-card__body h3,.hub-section .movie-card h3{font-family:var(--font-horror,var(--font-display));font-weight:700;letter-spacing:.01em}
+.hub-section .movie-card__body h3,.hub-section .movie-card h3{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-weight:700;letter-spacing:.01em}
 .hub-section .movie-card__eyebrow,.hub-section .movie-card__footer,.hub-section .movie-card__text{color:#d0ccca}
 .hub-section .movie-card__score{border-color:var(--edge);color:var(--red)}
 .hub-section .film-score,.hub-section .ranking-row__place strong,.hub-section .ranking-row__score strong,.hub-section .ranking-position{color:var(--red)}
 .hub-section .fr-movie-hero{border:1px solid var(--edge);background:linear-gradient(125deg,var(--surface-world),var(--world));box-shadow:0 18px 42px #0005}
 .hub-section .fr-movie-hero__art{filter:saturate(.9);border-color:var(--red-dark);box-shadow:inset 0 0 70px color-mix(in srgb,var(--world-glow) 25%,transparent)}
-.hub-section .fr-movie-hero__info h1{font-family:var(--font-horror,var(--font-display));line-height:.93}
+.hub-section .fr-movie-hero__info h1{font-family:var(--font-room,var(--font-horror,var(--font-display)));line-height:.93}
 .hub-section .film-section,.hub-section .film-status{border-color:var(--hair);background:color-mix(in srgb,var(--surface-world) 84%,transparent)}
-.hub-section .film-section h2{font-family:var(--font-horror,var(--font-display));font-weight:700;color:var(--red);letter-spacing:.04em}
+.hub-section .film-section h2{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-weight:700;color:var(--red);letter-spacing:.04em}
 .hub-section .film-claim,.hub-section .source-list li,.hub-section .ranking-row{border-color:var(--hair)}
 .hub-section .film-claim>a,.hub-section .source-list a,.hub-section .ranking-row a{color:color-mix(in srgb,var(--red) 70%,#fff)}
 .hub-section .verified-trailer{border:1px solid var(--red-dark);background:var(--surface-world);box-shadow:0 0 32px color-mix(in srgb,var(--red) 12%,transparent),0 18px 42px #0005}
@@ -592,7 +616,7 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .verified-trailer__screen>button::before{content:"";width:0;height:0;border-block:11px solid transparent;border-left:17px solid #fff;margin-left:5px}
 .hub-section .verified-trailer__frame{z-index:4}
 .hub-section .verified-trailer__meta{border-top:1px solid var(--hair);background:linear-gradient(95deg,var(--surface-world),var(--surface-raised))}
-.hub-section .verified-trailer__meta h3{font-family:var(--font-horror,var(--font-display));font-size:29px;line-height:.98;color:#faf3ef;letter-spacing:.02em}
+.hub-section .verified-trailer__meta h3{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-size:29px;line-height:.98;color:#faf3ef;letter-spacing:.02em}
 .hub-section .verified-trailer__meta p{color:#ddd5da;font-size:11px;letter-spacing:.06em}
 .hub-section .verified-trailer__meta>a{color:var(--red);min-height:40px;display:flex;align-items:center}
 .hub-section .verified-trailer__frame iframe,.hub-section .video-frame iframe{display:block;width:100%;height:100%;border:0}
@@ -602,13 +626,13 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-charts__top{background:radial-gradient(ellipse at 100% 0,#941e363a,transparent 68%),linear-gradient(120deg,#1c0c11,#0b080a);border-color:#71303c}
 .hub-charts__top .hub-eyebrow{color:#e7a9b1}
 .hub-charts__top p,.hub-charts__foot{color:#d1bdc0}
-.hub-charts h2{font-family:var(--font-horror,var(--font-display));font-size:clamp(30px,2.4vw,39px);line-height:.91;letter-spacing:.04em}
+.hub-charts h2{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-size:clamp(30px,2.4vw,39px);line-height:.91;letter-spacing:.04em}
 .hub-chart-list{position:relative;z-index:1;overscroll-behavior:contain;scrollbar-color:#773440 #100b0d;scrollbar-width:thin}
-.hub-chart-list--scrolling{max-height:410px;overflow:auto;scrollbar-width:thin;scrollbar-color:#773440 #100b0d;overscroll-behavior:contain}
+.hub-chart-list--scrolling{max-height:320px;overflow:auto;scrollbar-width:thin;scrollbar-color:#773440 #100b0d;overscroll-behavior:contain}
 .hub-chart-row{grid-template-columns:35px minmax(0,1fr) auto auto;position:relative;isolation:isolate;gap:9px;padding:10px 15px;border-color:#3d282e;background:#110c0e;transition:background-color .28s,border-color .28s,transform .28s,box-shadow .28s}
 .hub-chart-row:nth-child(even){background:#170d11}
 .hub-chart-row .position{color:#ff747e;font-size:16px}
-.hub-chart-row a{font:700 16px/1.1 var(--font-horror,var(--font-display));letter-spacing:.02em;color:#fff1ee}
+.hub-chart-row a{font:700 16px/1.1 var(--font-room,var(--font-horror,var(--font-display)));letter-spacing:.02em;color:#fff1ee}
 .hub-chart-row .score{color:#ffc1c6;font:800 13px var(--font-display)}
 .hub-chart-row .chart-meta{grid-column:2/5;display:flex;align-items:center;flex-wrap:wrap;gap:5px 10px;color:#cbb7ba;font:600 10px/1.3 var(--font-body)}
 .hub-chart-row .chart-meta a{font:700 10px var(--font-display);color:#f0a6ae;text-decoration:underline;text-underline-offset:2px}
@@ -628,17 +652,17 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-unranked[open] summary::after{content:"−"}
 .hub-unranked__list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px;padding-top:7px}
 .hub-unranked__item{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid #332127}
-.hub-unranked__item a{color:#f5e8e5;font:700 14px/1.1 var(--font-horror,var(--font-display))}
+.hub-unranked__item a{color:#f5e8e5;font:700 14px/1.1 var(--font-room,var(--font-horror,var(--font-display)))}
 .hub-unranked__item small{color:#d0b9bd;font-size:9px;text-align:right}
 .hub-ranking__updated{margin:4px 14px 9px;color:#d0bdc1;font:600 10px/1.45 var(--font-body)}
 .hub-ranking-watchlist__intro{max-width:720px;color:#d4c4c6;font-size:13px;line-height:1.6}
 .hub-ranking-watchlist__item small{display:block;margin-top:4px;color:#d2bcc0;font:500 10px/1.4 var(--font-body)}
 .hub-ranking-watchlist__refs a{color:#f0abb4;text-decoration:underline}
-.hub-body.hub-home .hub-charts::before{animation:rank-lumen 5s ease-in-out infinite}
+.hub-body.hub-home .hub-charts:has(.hub-chart-row)::before{animation:rank-lumen 5s ease-in-out infinite}
 @keyframes rank-lumen{0%,100%{opacity:.48}50%{opacity:1}}
 .hub-section .verified-trailer__type{position:absolute;z-index:1;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;padding:clamp(22px,4vw,54px);pointer-events:none;background:linear-gradient(90deg,color-mix(in srgb,var(--world) 88%,transparent),color-mix(in srgb,var(--world) 28%,transparent) 70%,transparent)}
 .hub-section .verified-trailer__type>span,.hub-section .verified-trailer__type>small{font:800 10px/1.4 var(--font-display);letter-spacing:.2em;color:color-mix(in srgb,var(--red) 66%,white);text-shadow:0 2px 8px #000}
-.hub-section .verified-trailer__type>strong{max-width:12ch;font:700 clamp(38px,6.7vw,86px)/.82 var(--font-horror,var(--font-display));letter-spacing:.025em;text-transform:uppercase;text-wrap:balance;color:#f8f1ed;text-shadow:0 5px 22px #000,0 0 34px color-mix(in srgb,var(--red) 22%,transparent)}
+.hub-section .verified-trailer__type>strong{max-width:12ch;font:700 clamp(38px,6.7vw,86px)/.82 var(--font-room,var(--font-horror,var(--font-display)));letter-spacing:.025em;text-transform:uppercase;text-wrap:balance;color:#f8f1ed;text-shadow:0 5px 22px #000,0 0 34px color-mix(in srgb,var(--red) 22%,transparent)}
 .hub-section .verified-trailer__type>small{color:#e8dedf}
 .hub-section .verified-trailer__screen.is-playing .verified-trailer__type{display:none}
 .hub-section .verified-trailer__screen>button:focus-visible{outline-color:#fff;outline-offset:6px}
@@ -648,7 +672,7 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .ranking-row{border-color:var(--hair);background:linear-gradient(100deg,color-mix(in srgb,var(--world-glow) 9%,var(--surface-world)),var(--surface-world));transition:background-color .28s,border-color .28s,box-shadow .28s}
 .hub-section .ranking-row__place strong,.hub-section .ranking-row__score strong{color:var(--red)}
 .hub-section .ranking-row__place span,.hub-section .ranking-row__film p,.hub-section .ranking-row__score span{color:#ded4d3}
-.hub-section .ranking-row__film h2{font:700 27px/1 var(--font-horror,var(--font-display));letter-spacing:.02em}
+.hub-section .ranking-row__film h2{font:700 27px/1 var(--font-room,var(--font-horror,var(--font-display)));letter-spacing:.02em}
 .hub-section .ranking-row__film p a{color:color-mix(in srgb,var(--red) 70%,white)}
 .hub-section .ranking-archive li span{color:#d0c8c6}
 .hub-section .film-status{color:#f0e7e3}
@@ -665,7 +689,7 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .horror-archive__hero h1 em,.hub-section .horror-archive__top h2 em{color:var(--red);font-style:normal}
 .hub-section .horror-archive__panel{border-color:var(--edge);background:linear-gradient(155deg,var(--surface-world),var(--world));box-shadow:inset 0 0 72px color-mix(in srgb,var(--world-glow) 12%,transparent)}
 .hub-section .horror-archive__top{border-color:var(--hair);background:radial-gradient(ellipse at 90% 8%,color-mix(in srgb,var(--world-glow) 20%,transparent),transparent 58%)}
-.hub-section .horror-archive__top h2{color:#f5f1ec;font-family:var(--font-horror,var(--font-display))}
+.hub-section .horror-archive__top h2{color:#f5f1ec;font-family:var(--font-room,var(--font-horror,var(--font-display)))}
 .hub-section .horror-archive__top p,.hub-section .horror-archive__source,.hub-section .horror-archive__notes p{color:#ded7d5}
 .hub-section .horror-archive__jump{color:color-mix(in srgb,var(--red) 72%,white)}
 .hub-section .horror-archive__jump select{border-color:var(--edge);background:var(--surface-raised);color:#fff}
@@ -683,27 +707,45 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
 .hub-section .horror-year__film-link:focus-visible{outline-color:var(--red)}
 .hub-section .horror-archive__offline{color:#f2d5c0}
 .hub-section .horror-archive__notes{border-color:var(--edge);background:linear-gradient(110deg,color-mix(in srgb,var(--world-glow) 18%,var(--surface-world)),var(--surface-world))}
-.hub-section .horror-archive__notes h2{font-family:var(--font-horror,var(--font-display))}
+.hub-section .horror-archive__notes h2{font-family:var(--font-room,var(--font-horror,var(--font-display)))}
 .hub-section .horror-archive__notes p a{color:color-mix(in srgb,var(--red) 75%,white)}
 @media(hover:hover) and (pointer:fine){
  .hub-section .hub-catalog .hub-tile:hover{transform:translateY(-2px);border-color:var(--red);box-shadow:0 22px 44px #0007,0 0 25px color-mix(in srgb,var(--red) 12%,transparent)}
  .hub-section .movie-card:hover .movie-card__art{transform:translateY(-2px);border-color:var(--red);box-shadow:0 18px 38px #0008,0 0 20px color-mix(in srgb,var(--red) 18%,transparent)}
  .hub-section .verified-trailer__screen>button:hover{filter:brightness(1.16);transform:scale(1.045)}
+ body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:hover{box-shadow:0 0 34px #9b64d936,inset 0 0 48px #7d40a528}
+ body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:hover{box-shadow:0 0 30px #4e9dff33,inset 0 0 45px #3964bc20}
+ body[data-theme="movies"] .movie-card__placeholder{transition:filter .36s ease,transform .36s ease}
+ body[data-theme="movies"] .movie-card:hover .movie-card__placeholder{filter:brightness(1.12);transform:scale(1.015)}
 }
+.hub-section .hub-catalog .hub-tile--long-title h3{max-width:24ch;font-size:clamp(27px,2.5vw,39px);line-height:1;text-wrap:pretty}
+@media(max-width:900px){body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none}body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:nth-child(2){grid-column:1/-1;min-height:350px;transform:none}}
 .hub-section .hub-art-note,.hub-section .hub-rights-note{color:#d0c8c4}
 .hub-section .hub-archive-banner{border-color:var(--edge);background:linear-gradient(110deg,color-mix(in srgb,var(--world-glow) 23%,var(--surface-world)),var(--surface-world))}
-.hub-section .hub-archive-banner strong,.hub-section .hub-archive-banner a{font-family:var(--font-horror,var(--font-display))}
+.hub-section .hub-archive-banner strong,.hub-section .hub-archive-banner a{font-family:var(--font-room,var(--font-horror,var(--font-display)))}
 .hub-footer .footer__bottom{border-color:var(--hair);color:#cfc5c6}
 @media(max-width:640px){
  .hub-section .hub-page-intro{padding:25px 19px 22px;margin-bottom:16px}
- .hub-page-intro h1{font-size:clamp(45px,13vw,63px);line-height:.91}
+ .hub-page-intro h1{font-size:clamp(39px,10vw,49px);line-height:.94;overflow-wrap:normal;word-break:normal;text-wrap:balance}
  .hub-section .hub-page-intro>p{font-size:14px;line-height:1.65}
  .hub-section .hub-catalog{gap:12px}
  .hub-section .hub-catalog .hub-tile{min-height:245px}
  .hub-section .hub-catalog .hub-tile__content{padding:17px 15px}
  .hub-section .hub-catalog .hub-tile h3{font-size:clamp(26px,8vw,37px);line-height:.95}
- .hub-section .hub-catalog .hub-tile p{font-size:13px;line-height:1.55}
- .hub-section .hub-catalog .hub-tile__link{font-size:11px;letter-spacing:.06em}
+ .hub-section .hub-catalog .hub-tile p{font-size:14px;line-height:1.5}
+ .hub-section .hub-catalog .hub-tile__link{font-size:12px;letter-spacing:.04em}
+ .hub-section .movie-card__text{font-size:14px;line-height:1.5}
+ .hub-section .movie-card__eyebrow{font-size:10px}
+ .hub-section .movie-card__official a{font-size:11px;letter-spacing:.08em}
+ .hub-section .verified-trailer__meta{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
+ .hub-section .verified-trailer__meta>div{min-width:0}
+ .hub-section .verified-trailer__meta>a{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+ body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded),body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded),body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:minmax(0,1fr);grid-template-rows:none}
+ body[data-theme="tv"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile,body[data-theme="podcasts"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile,body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile{grid-row:auto;min-height:260px}
+ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none}
+ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile,body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:nth-child(2){min-height:270px;transform:none}
+ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile:nth-child(2){grid-column:auto}
+ body[data-theme="games"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,12px 100%,0 calc(100% - 12px))}
  .hub-section .section-head h2{font-size:clamp(38px,12vw,55px);letter-spacing:0;overflow-wrap:anywhere}
  .hub-section .index-section h2{font-size:clamp(32px,10vw,52px);letter-spacing:0;overflow-wrap:anywhere;line-height:.95}
  .hub-section .discovery-section .section-head__stamp{display:grid;justify-items:start;gap:7px;max-width:100%;transform:none;white-space:normal}
@@ -718,14 +760,19 @@ body[data-theme="games"] .hub-catalog .hub-games{box-shadow:inset 0 0 0 1px #85d
  .hub-unranked__list{grid-template-columns:1fr}
 }
 @media(max-width:430px){
+ .hub-section .hub-page-intro{padding-inline:16px}
+ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:minmax(0,1fr)}
+ .hub-section .movie-card__placeholder{padding:25px 12px 17px}
+ .hub-section .movie-card__poster-fill .movie-card__placeholder>strong{font-size:clamp(24px,7vw,30px);line-height:.94;overflow-wrap:anywhere;text-wrap:balance}
  .hub-section .hub-catalog .hub-tile{min-height:220px}
- .hub-section .hub-catalog .hub-tile p{font-size:12px}
- .hub-section .hub-catalog .hub-tile h3{font-size:clamp(24px,7.4vw,31px)}
- .hub-section .hub-catalog .hub-tile__content{padding:15px 13px}
- .hub-section .hub-catalog .hub-kicker{font-size:10px;letter-spacing:.04em}
+ .hub-section .hub-catalog .hub-tile p{font-size:14px}
+ .hub-section .hub-catalog .hub-tile h3{font-size:clamp(25px,7.2vw,30px);line-height:.98;letter-spacing:0}
+ .hub-section .hub-catalog .hub-tile__content{padding:16px 14px}
+ .hub-section .hub-catalog .hub-kicker{font-size:11px;letter-spacing:.035em}
 }
 @media(max-width:360px){
  .hub-section .hub-catalog{grid-template-columns:1fr}
+ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded){grid-template-columns:minmax(0,1fr)}
  .hub-section .hub-catalog .hub-tile{min-height:210px}
  .hub-tabs a{font-size:11px;padding-inline:3px;letter-spacing:.02em}
  .hub-section .hub-honest-panel h2{max-width:100%;font-size:clamp(27px,9vw,32px);line-height:.96;text-wrap:balance;overflow-wrap:anywhere}

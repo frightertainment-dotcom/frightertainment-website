@@ -42,6 +42,20 @@ test('verified 2026 film records remain separate from the critic ranking', () =>
   }
 });
 
+test('staging 2026 release-year identities are not promoted without a separate film-year source', async () => {
+  const migration = await readFile(new URL('worker/migrations/0003_explicit_film_year_and_review_provenance.sql', root), 'utf8');
+  const operations = await readFile(new URL('STAGING_AUTOMATION.md', root), 'utf8');
+  assert.match(operations, /including 10 with `release_year=2026`/);
+  assert.match(operations, /Seven identities agree exactly/);
+  assert.match(operations, /their 2026 dates are territory-specific release dates/);
+  const sourcedFilmYearIds = [
+    '28-years-later-bone-temple', 'backrooms', 'send-help', 'scream-7',
+    'insidious-out-of-the-further', 'ready-or-not-2', 'victorian-psycho'
+  ];
+  for (const id of sourcedFilmYearIds) assert.match(migration, new RegExp(`film_id\\s*=\\s*['"]${id}['"]`));
+  for (const id of ['clayface', 'crawlers', 'werwulf']) assert.doesNotMatch(migration, new RegExp(`film_id\\s*=\\s*['"]${id}['"]`));
+});
+
 test('public homepage, chart, and film clients contain no publisher-preview scoring path', async () => {
   for (const file of ['index.html', 'movies.html', 'app.js', 'hub.js', 'home-discovery.js', 'discovery.js', 'top20.js', 'scripts/build-pages.mjs', 'scripts/build-preview.mjs']) {
     const source = await readFile(new URL(file, root), 'utf8');

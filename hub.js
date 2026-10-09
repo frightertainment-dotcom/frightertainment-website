@@ -79,6 +79,7 @@
     const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
     let previousTime = 0;
+    let animationPosition = list.scrollTop;
     let manualPause = motionPreference.matches;
     let transientPause = false;
     let reachedEnd = false;
@@ -89,7 +90,13 @@
     const stop = () => { if (frame) cancelAnimationFrame(frame); frame = 0; previousTime = 0; };
     const step = time => {
       if (manualPause || transientPause || reachedEnd || motionPreference.matches) { stop(); return; }
-      if (previousTime) list.scrollTop += (time - previousTime) * 0.006;
+      if (previousTime) {
+        // Keep fractional progress outside scrollTop: Chromium can quantize its readback,
+        // which otherwise discards each sub-pixel increment and stalls this slow scroll.
+        const elapsed = Math.min(Math.max(0, time - previousTime), 100);
+        animationPosition = Math.min(animationPosition + elapsed * 0.006, Math.max(0, list.scrollHeight - list.clientHeight));
+        list.scrollTop = animationPosition;
+      }
       previousTime = time;
       const atEnd = list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
       if (atEnd) { reachedEnd = true; stop(); updateControl(); return; }
@@ -97,7 +104,8 @@
     };
     const play = () => {
       if (motionPreference.matches) return;
-      if (reachedEnd) { list.scrollTop = 0; reachedEnd = false; }
+      if (reachedEnd) { list.scrollTop = 0; animationPosition = 0; reachedEnd = false; }
+      else animationPosition = list.scrollTop;
       manualPause = false;
       updateControl();
       stop();

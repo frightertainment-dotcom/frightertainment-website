@@ -44,7 +44,9 @@ jobs:
           ! test -e dist/.github
           ! test -e dist/API_LICENSING.md
       - run: npm test
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Verify Playwright headless browser installation
+        run: node --input-type=module -e "import { access } from 'node:fs/promises'; import { chromium } from '@playwright/test'; await access(chromium.executablePath())"
       - run: npm run test:browser
       - run: npm run validate:worker
       - run: npm run worker:migrations:local
