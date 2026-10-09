@@ -340,7 +340,7 @@ test('2026 is default and earlier films are under their actual original years', 
   await expect(page.locator('#results-count')).toContainText('24 films');
 });
 
-test('public film pages expose no private publisher snapshots and keep the Fright Index pending',async({page})=>{
+test('public film pages expose no private publisher snapshots and keep the Fright Rating pending',async({page})=>{
   await page.goto('/movies.html');
   const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
   await expect(card).toBeVisible();
@@ -350,7 +350,7 @@ test('public film pages expose no private publisher snapshots and keep the Frigh
   expect(await catalogue.text()).not.toContain('criticReferenceSnapshots');
   await card.getByRole('link',{name:'28 Years Later: The Bone Temple'}).first().click();
   await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
-  await expect(page.locator('#film-detail')).toContainText('FRIGHT INDEX STATUS');
+  await expect(page.locator('#film-detail')).toContainText('FRIGHT RATING STATUS');
   await expect(page.locator('#film-detail')).toContainText('Pending: no permission-cleared');
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
