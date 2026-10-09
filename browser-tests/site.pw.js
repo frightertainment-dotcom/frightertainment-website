@@ -176,9 +176,9 @@ test('navigation works between all main sections and official movie source', asy
   await expect(official).toHaveAttribute('href', /^https:\/\//);
   await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
   await expect(page).toHaveURL(/podcasts\.html$/);
-  await expect(page.locator('main .hub-tile')).toHaveCount(9);
+  await expect(page.locator('main .hub-tile')).toHaveCount(12);
   await page.locator('.hub-tabs a[href="/indie-movies.html"]').click();
-  await expect(page.locator('main .hub-catalog .hub-tile')).toHaveCount(9);
+  await expect(page.locator('main .hub-catalog .hub-tile')).toHaveCount(12);
   await expect(page.locator('main')).not.toContainText('DETAILS TO BE ANNOUNCED');
 });
 test('compact dashboard remains navigable at 320px and 768px', async ({ browser }) => {
@@ -302,10 +302,10 @@ test('homepage artwork is first-party and movie posters are not copied without p
 });
 
 test('expanded TV, podcast, game and indie listings have source-linked cards', async ({page})=>{
-  for(const route of ['/tv-shows.html','/podcasts.html','/games.html','/indie-movies.html']){
+  for(const [route,count] of [['/tv-shows.html',8],['/podcasts.html',9],['/games.html',9],['/indie-movies.html',9]]){
     await page.goto(route);
-    await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(6);
-    await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(6);
+    await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(count);
+    await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(count);
   }
   await page.goto('/podcasts.html');
   await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
@@ -361,14 +361,11 @@ test('public film pages expose no private publisher snapshots and keep the Frigh
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
 
-test('four franchise instalments link to historically correct film pages',async({page})=>{
+test('Movies page does not promote one franchise at the expense of the horror archive',async({page})=>{
   await page.goto('/movies.html');
-  const links=page.locator('.hub-series__items a');
-  await expect(links).toHaveCount(4);
-  await expect(links.nth(0)).toContainText('2002');
-  await expect(links.nth(1)).toContainText('2007');
-  await expect(links.nth(2)).toContainText('2025');
-  await expect(links.nth(3)).toContainText('2026');
+  await expect(page.locator('.hub-series')).toHaveCount(0);
+  await expect(page.locator('.hub-vault-portal')).toHaveCount(1);
+  await expect(page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]')).toBeVisible();
 });
 
 test('2026 chart shows only eligible rankings and factual unranked films',async({page})=>{
