@@ -51,7 +51,7 @@ for (const movie of movies) {
   } catch { errors.push(`Missing generated detail page: ${movie.id}`); }
 }
 
-for (const file of ['index.html', 'editorial-standards.html']) {
+for (const file of ['index.html']) {
   const html = await readFile(new URL(file, root), 'utf8');
   if (/Assets\//.test(html)) errors.push(`${file} contains an uppercase Assets/ path`);
   for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
@@ -60,12 +60,12 @@ for (const file of ['index.html', 'editorial-standards.html']) {
     try { await access(new URL(ref, root)); } catch { errors.push(`${file} refers to missing ${ref}`); }
   }
 }
-for (const f of ['index.html','editorial-standards.html','movies.html','tv-shows.html','podcasts.html','indie-movies.html','games.html']) {
+for (const f of ['index.html','movies.html','tv-shows.html','podcasts.html','indie-movies.html','games.html']) {
   const html = await readFile(new URL(f,root),'utf8');
   if (!html.includes('src="/app.js"') && !html.includes('src="app.js"')) errors.push(f+' is missing shared JavaScript');
 }
 const top20Archive = await readFile(new URL('top-20/index.html', root), 'utf8');
-for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `href="/top-20/${currentYear}/"`, 'href="/editorial-standards.html"']) if (!top20Archive.includes(required)) errors.push(`Top 20 archive is missing ${required}`);
+for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `href="/top-20/${currentYear}/"`]) if (!top20Archive.includes(required)) errors.push(`Top 20 archive is missing ${required}`);
 const rankingPages = (await import('node:fs/promises')).readdir;
 const rankingDirectories = (await rankingPages(new URL('top-20/', root), { withFileTypes: true })).filter(entry => entry.isDirectory());
 for (const directory of rankingDirectories) {
@@ -91,7 +91,7 @@ const apiLicensing = await readFile(new URL('API_LICENSING.md', root), 'utf8');
 for (const provider of ['TMDB', 'Watchmode', 'MovieGlu', 'Rotten Tomatoes', 'Cloudflare']) if (!apiLicensing.includes(provider)) errors.push(`API licensing notes missing ${provider}`);
 const sitemap = await readFile(new URL('sitemap.xml', root), 'utf8');
 for (const movie of movies) if (!sitemap.includes(`/films/${movie.id}/`)) errors.push(`Film missing from sitemap: ${movie.id}`);
-if (!sitemap.includes('/editorial-standards.html')) errors.push('Editorial standards page missing from sitemap');
+if (sitemap.includes('/editorial-standards.html')) errors.push('Removed public Editorial Standards page must not appear in sitemap');
 if (!sitemap.includes(`/top-20/${currentYear}/`)) errors.push(`${currentYear} annual Top 20 page missing from sitemap`);
 if (!sitemap.includes('/top-20/')) errors.push('Annual ranking archive missing from sitemap');
 
@@ -123,7 +123,7 @@ for (const required of ['id="movie-year"', 'value="older"', 'value="2025"', 'val
 if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='filmYear' && claim.value==='2007')))
   errors.push('28 Weeks Later must remain in the 2007 archive, never 2026');
 if(!movies.some(movie=>movie.id==='28-years-later-bone-temple' && Array.isArray(movie.reviews)))
-  errors.push('Bone Temple film record must retain its independent Fright Index review list');
+  errors.push('Bone Temple film record must retain its independent Fright Rating review list');
 const homeHub = await readFile(new URL('index.html',root),'utf8');
 if (homeHub.includes('hero-wordmark') || homeHub.includes('FRIGHTERTAINMENT ORIGINALS') || !homeHub.includes('id="hub-ranking"')) errors.push('Homepage must be compact without duplicate wordmark or unannounced productions');
 const buildSource = await readFile(new URL('scripts/build-preview.mjs',root),'utf8');
@@ -285,3 +285,9 @@ if(!dropHome.includes('data-release-brief')||!dropMovies.includes('data-release-
 
 if (errors.length) { console.error(errors.map(error => `ERROR ${error}`).join('\n')); process.exitCode = 1; }
 else console.log(`Content checks passed: ${movies.length} sourced film records, claim citations, responsive page navigation, generated pages, sitemap and local asset paths.`);
+
+// A removed public page must not be reintroduced in navigation, generated files, or the sitemap.
+for (const file of ['index.html','movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','film.html','archive-film.html','all-horror-movies.html','top-20/index.html']) {
+  const markup = await readFile(new URL(file, root), 'utf8');
+  if (/href=["']\\/?editorial-standards\\.html["']/i.test(markup)) errors.push(file + ' links to removed Editorial Standards page');
+}

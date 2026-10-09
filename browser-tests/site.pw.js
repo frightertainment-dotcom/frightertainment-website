@@ -11,7 +11,6 @@ const pages = [
   ['/indie-movies.html','INDIE'],
   ['/podcasts.html','HORROR'],
   ['/games.html','HORROR'],
-  ['/editorial-standards.html', 'EDITORIAL'],
   ['/top-20/', 'TOP 20'],
   ['/top-20/2026/', 'TOP 20 HORROR FILMS'],
   ['/films/28-days-later/', '28 Days Later'],
@@ -802,7 +801,7 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
 });
 
 test('direct page loads declare the shared Frightertainment typefaces', async ({ page }) => {
-  for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/editorial-standards.html', '/all-horror-movies.html']) {
+  for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     await page.goto(path);
     const fontHref = await page.locator('link[rel="stylesheet"][href*="fonts.googleapis.com/css2"]').getAttribute('href');
     expect(fontHref).toContain('Barlow+Condensed');
@@ -932,5 +931,15 @@ test('mobile copy, display headings and active navigation meet AA contrast in al
     expect(result.heading, `${theme} heading contrast`).toBeGreaterThanOrEqual(4.5);
     expect(result.accent, `${theme} accent contrast`).toBeGreaterThanOrEqual(4.5);
     expect(result.activeNav, `${theme} active navigation contrast`).toBeGreaterThanOrEqual(4.5);
+  }
+});
+
+
+test('removed Editorial Standards page is not served and public navigation has no stale links', async ({ page }) => {
+  const response = await page.goto('/editorial-standards.html');
+  expect(response?.status()).toBe(404);
+  for (const pathname of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/other-mommy/', '/top-20/2026/']) {
+    await page.goto(pathname);
+    await expect(page.locator('a[href$="editorial-standards.html"]')).toHaveCount(0);
   }
 });
