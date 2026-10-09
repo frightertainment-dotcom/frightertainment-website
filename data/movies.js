@@ -32,6 +32,24 @@ window.FR_MOVIES = [
         "source": "https://www.youtube.com/watch?v=bEpTgowZ1dI",
         "territory": "Official studio upload; video territory not specified",
         "checked": "2026-10-08"
+      },
+      {
+        "field": "releaseDate",
+        "label": "UK theatrical release",
+        "value": "2026-10-09",
+        "sourceName": "Cineworld UK",
+        "source": "https://www.cineworld.co.uk/films/1000023068-other-mommy/",
+        "territory": "United Kingdom (cinema listing; screening times depend on location)",
+        "checked": "2026-10-09"
+      },
+      {
+        "field": "runningTime",
+        "label": "UK running time",
+        "value": "93 minutes",
+        "sourceName": "Cineworld UK",
+        "source": "https://www.cineworld.co.uk/films/1000023068-other-mommy/",
+        "territory": "United Kingdom (cinema listing)",
+        "checked": "2026-10-09"
       }
     ],
     "poster": "",
