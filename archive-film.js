@@ -70,7 +70,7 @@
     // release-platform availability. Shows older film pages are not dead ends.
     const other=(Array.isArray(archiveData.films)?archiveData.films:[])
       .filter(x=>x.year===film.year && x.qid!==film.qid &&
-        typeof x.title==='string' && /^Q[1-9]\\d*$/.test(x.qid||''))
+        typeof x.title==='string' && /^Q[1-9]\d*$/.test(x.qid||''))
       .sort((a,b)=>a.title.localeCompare(b.title,'en',{numeric:true,sensitivity:'base'}))
       .slice(0,6);
     const related=make('section','archive-detail__related');
@@ -118,7 +118,7 @@
           const panel=make('div','archive-detail__metadata-item');
           panel.append(make('h3','',title));
           for(const p of values.filter(x=>x && typeof x.name==='string' &&
-               /^Q[1-9]\\d*$/.test(x.qid||''))){
+               /^Q[1-9]\d*$/.test(x.qid||''))){
             const a=link(p.name,'https://www.wikidata.org/wiki/'+p.qid,
               'archive-detail__metadata-person');
             panel.append(a);
