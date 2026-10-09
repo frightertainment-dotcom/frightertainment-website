@@ -193,7 +193,7 @@ if(!previewBuild.includes("'all-horror-movies.html'")||!previewBuild.includes("'
   errors.push('Archive missing from private Pages deployment bundle');
 const homeForArchive=await readFile(new URL('index.html',root),'utf8');
 const moviesForArchive=await readFile(new URL('movies.html',root),'utf8');
-if(!moviesForArchive.includes('class="hub-vault-portal"')) errors.push('Movies landing page must prominently link into the full Horror Vault');
+if(!moviesForArchive.includes('class="shell hub-vault-portal"')) errors.push('Movies landing page must prominently link into the full Horror Vault');
 if(!homeForArchive.includes('href="/all-horror-movies.html"')||
    !moviesForArchive.includes('href="/all-horror-movies.html"'))
   errors.push('All Horror Movies must be accessible as a Movies subtab and homepage link');
