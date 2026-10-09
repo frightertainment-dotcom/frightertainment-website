@@ -7,6 +7,31 @@ const movies = context.window.FR_MOVIES;
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const base = 'https://www.frightertainment.com';
 const currentYear = new Date().getUTCFullYear();
+const filmHeroMarkup=movie=>{
+  const claim=key=>movie.claims.find(x=>x.field===key)?.value;
+  const year=claim('releaseYear')||claim('filmYear')||
+    movie.claims.find(x=>x.field==='releaseDate')?.value?.slice(0,4)||'YEAR TBC';
+  const genre=claim('genre')||'Horror cinema';
+  const director=claim('director');
+  const cast=claim('cast');
+  const synopsis=claim('synopsis')||
+    'Explore verified film information and original source links below. More details are added as editorial research progresses.';
+  return '<section class="fr-movie-hero" aria-label="Film overview">'+
+    '<div class="fr-movie-hero__art" role="img" aria-label="Original Frightertainment editorial title artwork, not an official poster">'+
+    '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
+    '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
+    '<strong>'+escapeHTML(movie.title)+'</strong>'+
+    '<small>ORIGINAL EDITORIAL ARTWORK · NO OFFICIAL POSTER</small></div>'+
+    '<div class="fr-movie-hero__info"><span class="hub-eyebrow">WELCOME TO THE HORROR FILE</span>'+
+    '<h1>'+escapeHTML(movie.title)+'</h1>'+
+    '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+
+    '<p class="fr-movie-hero__synopsis">'+escapeHTML(synopsis)+'</p>'+
+    '<div class="fr-movie-hero__facts">'+
+    (director?'<div><span>DIRECTED BY</span><strong>'+escapeHTML(director)+'</strong></div>':'')+
+    (cast?'<div><span>FEATURED CAST</span><strong>'+escapeHTML(cast)+'</strong></div>':'')+
+    '</div><a class="fr-movie-hero__browse" href="/all-horror-movies.html?year='+encodeURIComponent(year)+'">EXPLORE MORE HORROR FROM '+escapeHTML(year)+' ↗</a>'+
+    '</div></section>';
+};
 const claimMarkup = claim => `<li class="film-claim"><div><strong>${escapeHTML(claim.label)}</strong><p>${escapeHTML(claim.value)}</p><small>TERRITORY: ${escapeHTML(claim.territory)} · CHECKED ${escapeHTML(claim.checked)}</small></div><a href="${escapeHTML(claim.source)}" target="_blank" rel="noopener noreferrer">${escapeHTML(claim.sourceName)} ></a></li>`;
 
 
@@ -45,7 +70,7 @@ for (const movie of movies) {
 <link rel="canonical" href="${base}${slug}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><title>${escapeHTML(movie.title)} — Frightertainment</title>
 </head><body data-film-id="${escapeHTML(movie.id)}"><div class="red-thread" aria-hidden="true"></div>
 <header class="header"><div class="shell header__inner"><a class="brand" href="/" aria-label="Frightertainment homepage"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a><nav class="nav" aria-label="Main navigation"><a href="/movies.html#discovery">DISCOVERY</a><a href="/top-20/${currentYear}/">TOP 20</a><a href="/movies.html#upcoming">FILMS</a><a href="/#horror-tv">TV & AUDIO</a><a href="/editorial-standards.html">STANDARDS</a></nav><a class="header__action" href="/">HOME <span aria-hidden="true">></span></a><button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button></div><nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden><a href="/movies.html#discovery">HORROR DISCOVERY</a><a href="/top-20/${currentYear}/">TOP 20 OF ${currentYear}</a><a href="/movies.html#upcoming">FILM LISTINGS</a><a href="/#horror-tv">TV & AUDIO</a><a href="/editorial-standards.html">EDITORIAL STANDARDS</a></nav></header>
-<main class="shell film-page"><div class="film-page__inner" id="film-detail"><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> PRIMARY-SOURCE FILM FILE</div><h1>${escapeHTML(movie.title)}</h1><p class="film-status">${escapeHTML(description)}</p><section class="film-section"><h2>SOURCED FILM DETAILS</h2>${synopsis ? `<p class="film-page__synopsis">${escapeHTML(synopsis.value)}</p>` : ''}<ul class="source-list">${claims}</ul></section><section class="film-section"><h2>FRIGHT INDEX</h2><p class="film-score">—</p><p>Method: eligible critic scores are converted to /100, equally weighted, averaged and rounded to the nearest whole number. Each included source must be linked, dated and cleared for score reuse. This comparison is not an independent critic verdict.</p><ul class="source-list"><li class="film-claim"><div><strong>No eligible critic scores</strong><p>No verified, permission-cleared critic ratings are available.</p></div></li></ul></section><section class="film-section"><h2>TRAILER</h2>${movie.trailer ? `<p>Official ${escapeHTML(movie.trailer.kind)} upload from ${escapeHTML(movie.trailer.channel)}. ${escapeHTML(movie.trailer.territory)} · checked ${escapeHTML(movie.trailer.checked)}.</p><p><a href="${escapeHTML(movie.trailer.source)}" target="_blank" rel="noopener noreferrer">Open the official ${escapeHTML(movie.trailer.kind)} source ></a></p>` : '<p>No exact official video upload is attached to this film record.</p>'}</section><p><a href="/movies.html#upcoming">← Back to film listings</a></p><noscript><p>All published film facts, official video source links and their territories are listed above. Interactive score and embedded video features require JavaScript.</p></noscript></div></main>
+<main class="shell film-page"><div class="film-page__inner" id="film-detail">${filmHeroMarkup(movie)}<p class="film-status">${escapeHTML(description)}</p><section class="film-section"><h2>SOURCED FILM DETAILS</h2>${synopsis ? `<p class="film-page__synopsis">${escapeHTML(synopsis.value)}</p>` : ''}<ul class="source-list">${claims}</ul></section><section class="film-section"><h2>FRIGHT INDEX</h2><p class="film-score">—</p><p>Method: eligible critic scores are converted to /100, equally weighted, averaged and rounded to the nearest whole number. Each included source must be linked, dated and cleared for score reuse. This comparison is not an independent critic verdict.</p><ul class="source-list"><li class="film-claim"><div><strong>No eligible critic scores</strong><p>No verified, permission-cleared critic ratings are available.</p></div></li></ul></section><section class="film-section"><h2>TRAILER</h2>${movie.trailer ? `<p>Official ${escapeHTML(movie.trailer.kind)} upload from ${escapeHTML(movie.trailer.channel)}. ${escapeHTML(movie.trailer.territory)} · checked ${escapeHTML(movie.trailer.checked)}.</p><p><a href="${escapeHTML(movie.trailer.source)}" target="_blank" rel="noopener noreferrer">Open the official ${escapeHTML(movie.trailer.kind)} source ></a></p>` : '<p>No exact official video upload is attached to this film record.</p>'}</section><p><a href="/movies.html#upcoming">← Back to film listings</a></p><noscript><p>All published film facts, official video source links and their territories are listed above. Interactive score and embedded video features require JavaScript.</p></noscript></div></main>
 <footer class="footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · INDEPENDENT HORROR EDITORIAL</span><a href="/editorial-standards.html">EDITORIAL STANDARDS ></a></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script></body></html>`;
   await writeFile(new URL('index.html', directory), decorateHubLayout(html));
 }
