@@ -61,7 +61,7 @@
       'Explore the verified film information and original source links below. Additional story details will appear after editorial checks.';
     const rt=scoreSnapshots(movie).find(x=>x.source==='Rotten Tomatoes'&&
       x.kind==='positive-review-percentage'&&Number.isInteger(x.value)&&x.value>=0&&x.value<=100);
-    const privatePreview=/frightertainment-private-preview\\.pages\\.dev$/.test(location.hostname) ||
+    const privatePreview=/frightertainment-private-preview\.pages\.dev$/.test(location.hostname) ||
       ['localhost','127.0.0.1'].includes(location.hostname);
     return '<section class="fr-movie-hero" aria-label="Film overview">'+
       '<div class="fr-movie-hero__art" role="img" aria-label="Original Frightertainment title artwork, not an official movie poster">'+
