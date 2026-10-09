@@ -65,6 +65,80 @@
     card.append(bottom);
     target.replaceChildren(card);target.setAttribute('aria-busy','false');
   };
+  const addExtras = (archiveData,film)=>{
+    // Source-driven discoveries, never a claimed review, recommendation or
+    // release-platform availability. Shows older film pages are not dead ends.
+    const other=(Array.isArray(archiveData.films)?archiveData.films:[])
+      .filter(x=>x.year===film.year && x.qid!==film.qid &&
+        typeof x.title==='string' && /^Q[1-9]\\d*$/.test(x.qid||''))
+      .sort((a,b)=>a.title.localeCompare(b.title,'en',{numeric:true,sensitivity:'base'}))
+      .slice(0,6);
+    const related=make('section','archive-detail__related');
+    const sub=make('h2','','MORE HORROR FROM '+film.year);
+    related.append(sub);
+    if(other.length){
+      const list=make('div','archive-detail__related-list');
+      for(const item of other){
+        const filmLink=link(item.title,'/archive-film.html?id='+encodeURIComponent(item.qid),
+          'archive-detail__related-link',false);
+        list.append(filmLink);
+      }
+      related.append(list);
+    }else{
+      related.append(make('p','','This year has no other indexed titles yet. The archive will grow with verified imports.'));
+    }
+    const seeAll=link('BROWSE ALL '+film.year+' HORROR ↗','/all-horror-movies.html?year='+film.year,
+      'archive-detail__return',false);
+    related.append(seeAll);
+    target.append(related);
+
+    if(!film.qid)return;
+    fetch('/data/archive/profiles.json',{headers:{accept:'application/json'}})
+      .then(async r=>r.ok?await r.json():null)
+      .then(data=>{
+        const profile=data?.records?.[film.qid];
+        if(!profile || profile.qid!==film.qid)return;
+        const section=make('section','archive-detail__metadata');
+        section.append(make('span','hub-eyebrow','CC0 SOURCE-LINKED FILM DATA'),
+          make('h2','','BEHIND THE FEAR.'));
+        if(profile.description){
+          const line=make('p','archive-detail__description',
+            'Wikidata description: '+profile.description);
+          section.append(line);
+        }
+        const fields=[
+          ['DIRECTED BY',profile.directors],
+          ['SELECTED CAST',profile.cast],
+          ['GENRE TAGS',profile.genres],
+          ['PRODUCTION COUNTRY',profile.countries]
+        ];
+        const grid=make('div','archive-detail__metadata-grid');
+        for(const [title,values] of fields){
+          if(!Array.isArray(values)||!values.length)continue;
+          const panel=make('div','archive-detail__metadata-item');
+          panel.append(make('h3','',title));
+          for(const p of values.filter(x=>x && typeof x.name==='string' &&
+               /^Q[1-9]\\d*$/.test(x.qid||''))){
+            const a=link(p.name,'https://www.wikidata.org/wiki/'+p.qid,
+              'archive-detail__metadata-person');
+            panel.append(a);
+          }
+          grid.append(panel);
+        }
+        if(Number.isInteger(profile.runtimeMinutes)&&profile.runtimeMinutes>=1&&profile.runtimeMinutes<=500){
+          const panel=make('div','archive-detail__metadata-item');
+          panel.append(make('h3','','CATALOGUED RUNTIME'),
+            make('strong','',profile.runtimeMinutes+' minutes'));grid.append(panel);
+        }
+        if(grid.children.length)section.append(grid);
+        const check=make('p','archive-detail__metadata-credit',
+          'Wikidata CC0 · source checked '+profile.checkedAt+
+          ' · credits and descriptors may be incomplete');
+        section.append(check,link('OPEN ORIGINAL WIKIDATA FILM RECORD ↗',
+          'https://www.wikidata.org/wiki/'+film.qid));
+        related.before(section);
+      }).catch(()=>{/* Film link and essential record remain usable without enrichment. */});
+  };
   const error=(message)=>{
     const panel=make('div','archive-detail__content');
     panel.append(make('span','hub-eyebrow','FRIGHTERTAINMENT · FILM VAULT'),heading('FILM RECORD UNAVAILABLE'),
@@ -95,7 +169,8 @@
         if(!row || typeof row.title!=='string' || !Number.isInteger(row.year)){
           error('This record is not in the current archive. It might have been corrected. Try searching by year again.');return;
         }
-        render({title:row.title,year:row.year,imdbId:reliableImdb(safeImdb(row.imdbId)),qid:row.qid});
+        const film={title:row.title,year:row.year,imdbId:reliableImdb(safeImdb(row.imdbId)),qid:row.qid};
+        render(film);addExtras(data,film);
         return;
       }
       const row=(Array.isArray(data.manual)?data.manual:[]).find(x=>x.id===id);
@@ -104,7 +179,8 @@
       }
       let source;
       try{const url=new URL(row.url);if(url.protocol==='https:')source=url.href;}catch{}
-      render({title:row.title,year:row.year,imdbId:safeImdb(row.imdbId),sourceUrl:source});
+      const film={title:row.title,year:row.year,imdbId:safeImdb(row.imdbId),sourceUrl:source};
+      render(film);addExtras(data,film);
     })
     .catch(()=>error('The film reference catalogue could not be loaded. Please return to All Horror Movies and try again.'));
 })();
