@@ -3,18 +3,19 @@
   const status = document.querySelector('#ranking-status');
   const updated = document.querySelector('#ranking-updated');
   const list = document.querySelector('#ranking-list');
+  const unranked = document.querySelector('#unranked-films');
   if (!status || !updated || !list || !Number.isInteger(year)) return;
 
   const eligibleFilmYear = film => {
     const claims = Array.isArray(film.claims) ? film.claims : [];
-    const claim = claims.find(item => item.field === 'filmYear') || claims.find(item => item.field === 'releaseYear');
+    const claim = claims.find(item => item.field === 'filmYear');
     const value = claim?.value;
     return /^\d{4}$/.test(String(value || '')) ? Number(value) : null;
   };
   const safeHttps = value => {
     try {
       const url = new URL(value);
-      return url.protocol === 'https:' ? url.href : '';
+      return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
     } catch { return ''; }
   };
   const filmHref = id => {
@@ -30,18 +31,21 @@
       : '';
   };
 
-  function showUnrankedVerifiedFilms() {
+  function showUnrankedVerifiedFilms(rankedIds = new Set()) {
     const films = (window.FR_MOVIES || [])
-      .filter(film => film.editorialStatus === 'approved' && eligibleFilmYear(film) === year)
+      .filter(film => film.editorialStatus === 'approved' && eligibleFilmYear(film) === year && !rankedIds.has(film.id))
       .sort((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }))
       .slice(0, 20);
-    if (!films.length) return;
+    if (!films.length || !unranked) return 0;
 
     const section = document.createElement('section');
     section.className = 'hub-ranking-watchlist';
     const heading = document.createElement('h2');
     heading.textContent = `Verified ${year} films awaiting eligible critic reviews`;
-    section.append(heading);
+    const explanation = document.createElement('p');
+    explanation.className = 'hub-ranking-watchlist__intro';
+    explanation.textContent = 'These source-verified film-year records are not ranked because they do not yet have three distinct, permission-cleared professional critic scores.';
+    section.append(heading, explanation);
 
     for (const film of films) {
       const item = document.createElement('p');
@@ -69,7 +73,7 @@
       }
       section.append(item);
     }
-    list.replaceChildren(section);
+    unranked.replaceChildren(section);
     return films.length;
   }
 
@@ -86,9 +90,11 @@
     const chart = document.createElement('div');
     chart.className = 'ranking-list__items';
     const seenPositions = new Set();
+    const seenFilms = new Set();
     const valid = items.filter(item => {
-      if (!validRankingItem(item) || seenPositions.has(item.position)) return false;
+      if (!validRankingItem(item) || seenPositions.has(item.position) || seenFilms.has(item.filmId)) return false;
       seenPositions.add(item.position);
+      seenFilms.add(item.filmId);
       return true;
     }).sort((a, b) => a.position - b.position).slice(0, 20);
 
@@ -136,7 +142,7 @@
       chart.append(row);
     }
     list.replaceChildren(chart);
-    return valid.length;
+    return new Set(valid.map(film => film.filmId));
   }
 
   fetch(`/api/rankings?year=${encodeURIComponent(year)}`, { headers: { accept: 'application/json' } })
@@ -146,15 +152,16 @@
     })
     .then(result => {
       const candidates = Array.isArray(result?.items) ? result.items : [];
-      const count = renderRanking(candidates);
+      const rankedIds = renderRanking(candidates);
+      const count = rankedIds.size;
       const lastPublished = formatDate(result?.updatedAt);
       updated.textContent = lastPublished ? `Last published ranking snapshot: ${lastPublished}` : 'Last successful ranking: none';
+      const unrankedCount = showUnrankedVerifiedFilms(rankedIds);
 
       if (!count) {
-        const filmCount = showUnrankedVerifiedFilms() || 0;
         status.textContent = result?.stale === true
           ? 'Ranking snapshot is stale. No current verified ranking is available.'
-          : `Critic ranking pending. Verified critic scores are not yet available.${filmCount ? ` ${filmCount} source-verified film records are listed below without ranking positions.` : ''}`;
+          : `Critic ranking pending. Verified critic scores are not yet available.${unrankedCount ? ` ${unrankedCount} source-verified film records are listed below without ranking positions.` : ''}`;
         return;
       }
 
@@ -162,7 +169,7 @@
       const minimumCritics = Number.isInteger(result?.minimumCritics) ? result.minimumCritics : 3;
       status.textContent = result?.stale === true
         ? `Ranking data is stale. Showing the last valid published chart of ${count} film${count === 1 ? '' : 's'}.`
-        : `${rankedFilms} eligible film${rankedFilms === 1 ? '' : 's'} ranked. At least ${minimumCritics} distinct, verified critics are required per film.`;
+        : `${rankedFilms} eligible film${rankedFilms === 1 ? '' : 's'} ranked. At least ${minimumCritics} distinct, verified critics are required per film.${unrankedCount ? ` ${unrankedCount} other verified film records remain unranked below.` : ''}`;
     })
     .catch(() => {
       status.textContent = 'Ranking unavailable. Verified ranking data could not be loaded; no score or position has been added.';

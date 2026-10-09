@@ -17,6 +17,10 @@ Contract correction, checked against the official endpoint specifications on 8 O
 
 Primary sources can verify film facts without granting a right to republish their posters, stills, logos or trailer files. Keep using text treatments unless explicit image/video embedding rights are documented. Official embedded YouTube uploads remain manually curated and are not generated from provider artwork.
 
+## Licensed critic-review feed status
+
+A server-side, allowlisted normalized-feed adapter has been prepared in `worker/review-ingestion.js`; it is disabled by default and has no provider credentials. It accepts only numeric critic review records whose score reuse is licensed, stages new reviews for editorial approval, and holds corrections/withdrawals in a separate review queue. It does not scrape protected websites. See `LICENSED_REVIEW_FEED.md` for the response contract, secret names, staging process and owner setup steps. The 2026 public ranking remains pending until eligible records are lawfully acquired and approved.
+
 ## Publication and ranking safeguards
 
 - Feed data is published only after schema checks pass. Dataset snapshots include source, territory, checked date and expiry. The pointer changes only after a complete valid snapshot is written. Failed updates are logged and leave the last valid snapshot in place; expired data is labelled stale.

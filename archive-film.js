@@ -49,12 +49,12 @@
     card.append(explanation);
     const buttons=make('div','archive-detail__actions');
     if(film.imdbId){
-      buttons.append(link('OPEN IMDb TITLE ↗','https://www.imdb.com/title/'+film.imdbId+'/', 'archive-detail__link archive-detail__link--main'));
+      buttons.append(link('OPEN IMDb TITLE →','https://www.imdb.com/title/'+film.imdbId+'/', 'archive-detail__link archive-detail__link--main'));
     }
-    buttons.append(link('FIND MOVIE ON IMDb ↗',imdbSearch(film.title,film.year),
+    buttons.append(link('FIND MOVIE ON IMDb →',imdbSearch(film.title,film.year),
       film.imdbId?'archive-detail__link':'archive-detail__link archive-detail__link--main'));
-    if(film.qid) buttons.append(link('WIKIDATA SOURCE ↗',sourceUrl(film.qid)));
-    if(film.sourceUrl)buttons.append(link('FILM SOURCE ↗',film.sourceUrl));
+    if(film.qid) buttons.append(link('WIKIDATA SOURCE →',sourceUrl(film.qid)));
+    if(film.sourceUrl)buttons.append(link('FILM SOURCE →',film.sourceUrl));
     card.append(buttons);
     const note=make('p','archive-detail__disclaimer',
       'IMDb link not working? Try the title search or source link.');
@@ -87,7 +87,7 @@
     }else{
       related.append(make('p','','This year has no other indexed titles yet. The archive will grow with verified imports.'));
     }
-    const seeAll=link('BROWSE ALL '+film.year+' HORROR ↗','/all-horror-movies.html?year='+film.year,
+    const seeAll=link('BROWSE ALL '+film.year+' HORROR →','/all-horror-movies.html?year='+film.year,
       'archive-detail__return',false);
     related.append(seeAll);
     target.append(related);
@@ -134,7 +134,7 @@
         const check=make('p','archive-detail__metadata-credit',
           'Wikidata CC0 · source checked '+profile.checkedAt+
           ' · credits and descriptors may be incomplete');
-        section.append(check,link('OPEN ORIGINAL WIKIDATA FILM RECORD ↗',
+        section.append(check,link('OPEN ORIGINAL WIKIDATA FILM RECORD →',
           'https://www.wikidata.org/wiki/'+film.qid));
         related.before(section);
       }).catch(()=>{/* Film link and essential record remain usable without enrichment. */});

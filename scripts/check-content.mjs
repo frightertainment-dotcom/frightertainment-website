@@ -32,6 +32,7 @@ for (const movie of movies) {
     if (!validDay(claim.checked)) errors.push(`Claim needs a valid check date: ${movie.id}/${claim.field}`);
     if (claim.field === 'releaseDate' && (!validDay(claim.value) || /^(?:territory|release territory) (?:not stated|unconfirmed|unspecified)/i.test(claim.territory))) errors.push(`Release date needs an ISO date and a stated territory: ${movie.id}`);
     if (claim.field === 'releaseYear' && !/^20\d{2}$/.test(claim.value)) errors.push(`Release year must be a four-digit year: ${movie.id}`);
+    if (claim.field === 'filmYear' && (!/^\d{4}$/.test(claim.value) || Number(claim.value) < 1888 || Number(claim.value) > currentYear + 2)) errors.push(`Film year must be a four-digit source-verified year: ${movie.id}`);
   }
   if (movie.poster && (!goodURL(movie.poster) || !movie.posterCredit || !movie.posterPermission || movie.posterLicenceStatus !== 'approved' || !goodURL(movie.posterSourcePage) || !goodURL(movie.posterPermissionEvidence) || !movie.posterUsageScope)) errors.push(`Poster artwork requires approved documented permission, evidence, source page and usage scope: ${movie.id}`);
   if (movie.trailer) {
@@ -119,7 +120,7 @@ const movieYearsMarkup = await readFile(new URL('movies.html',root),'utf8');
 for (const required of ['id="movie-year"', 'value="older"', 'value="2025"', 'value="2026"']) {
   if (!movieYearsMarkup.includes(required)) errors.push('Movie year filter missing '+required);
 }
-if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='releaseYear' && claim.value==='2007')))
+if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='filmYear' && claim.value==='2007')))
   errors.push('28 Weeks Later must remain in the 2007 archive, never 2026');
 if(!movies.some(movie=>movie.id==='28-years-later-bone-temple' && Array.isArray(movie.reviews)))
   errors.push('Bone Temple film record must retain its independent Fright Index review list');

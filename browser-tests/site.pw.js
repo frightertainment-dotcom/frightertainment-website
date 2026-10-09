@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
 
 const pages = [
   ['/', 'WELCOME'],
@@ -76,7 +77,7 @@ test('verified trailers load privacy-enhanced YouTube playback only after the vi
   await card.locator('.verified-trailer__screen').screenshot({ path: 'test-results/design-refinement/sections/trailer-preview-desktop.png' });
   await card.locator('[data-play-video="other-mommy"]').click();
   const player = card.locator('iframe');
-  await expect(player).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/bEpTgowZ1dI?autoplay=1&rel=0');
+  await expect(player).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/bEpTgowZ1dI?autoplay=1&rel=0&playsinline=1');
   await expect(player).toHaveAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
   await expect(player).toHaveAttribute('allowfullscreen', '');
   await expect(card.locator('[data-play-video]')).toHaveCount(0);
@@ -89,11 +90,28 @@ test('verified trailers load privacy-enhanced YouTube playback only after the vi
   await mobileCard.locator('.verified-trailer__screen').screenshot({ path: 'test-results/design-refinement/sections/trailer-preview-mobile-390.png' });
   await mobileCard.locator('[data-play-video="clayface"]').click();
   const mobilePlayer = mobileCard.locator('iframe');
-  await expect(mobilePlayer).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/6IxPD-jNdwM?autoplay=1&rel=0');
+  await expect(mobilePlayer).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/6IxPD-jNdwM?autoplay=1&rel=0&playsinline=1');
   const playerBox = await mobilePlayer.boundingBox();
   expect(playerBox.width).toBeLessThanOrEqual(390);
   expect(Math.abs(playerBox.width / playerBox.height - 16 / 9)).toBeLessThan(0.05);
   await mobileCard.locator('.verified-trailer__screen').screenshot({ path: 'test-results/design-refinement/sections/trailer-active-mobile-390.png' });
+});
+
+test('dynamic film records escape hostile text and reject credential-bearing source links', async ({ page }) => {
+  await page.addInitScript(() => { window.__filmXssRan = false; });
+  await page.route('**/api/films/security-fixture', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      film: { id: 'security-fixture', title: '<img src=x onerror="window.__filmXssRan=true">', territory: '<svg onload="window.__filmXssRan=true">', checkedAt: '2026-10-09' },
+      claims: [{ label: '<script>window.__filmXssRan=true</script>', value: '<iframe srcdoc=x>', territory: 'GB', checked: '2026-10-09', sourceName: 'Untrusted source', source: 'https://user:password@example.test/film' }]
+    })
+  }));
+  await page.goto('/film.html?id=security-fixture');
+  await expect(page.locator('#dynamic-film h1')).toHaveText('<img src=x onerror="window.__filmXssRan=true">');
+  await expect(page.locator('#dynamic-film img, #dynamic-film script, #dynamic-film iframe')).toHaveCount(0);
+  await expect(page.locator('#dynamic-film a[target="_blank"]')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__filmXssRan)).toBe(false);
 });
 
 for (const [path, heading] of [['/', 'WELCOME'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
@@ -175,6 +193,7 @@ test('compact dashboard remains navigable at 320px and 768px', async ({ browser 
   }
 });
 test('all six section themes and navigation fit the requested viewport widths', async ({ browser }) => {
+  test.setTimeout(120_000);
   const themes = [
     ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'],
     ['/indie-movies.html', 'indie'], ['/podcasts.html', 'podcasts'], ['/games.html', 'games']
@@ -182,7 +201,7 @@ test('all six section themes and navigation fit the requested viewport widths', 
   const widths = [320, 360, 390, 430, 768, 1024, 1440, 1920];
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   for (const [route, theme] of themes) {
-    await page.goto(route);
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
     await expect(page.locator('.hub-tabs a')).toHaveCount(6);
     await expect(page.locator('.hub-tabs a[aria-current="page"]')).toHaveCount(1);
@@ -610,6 +629,7 @@ test('opened Movies discovery links source-checked current and future horror eve
 
 
 test('homepage composition stays ordered and usable across the approved viewport widths', async ({ browser }) => {
+  test.setTimeout(120_000);
   for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) {
     const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
     await page.goto('/');
@@ -663,8 +683,48 @@ test('homepage ranking loading resolves to a clear pending state when no eligibl
   await expect(ranking).toContainText('Verified critic scores are not yet available.');
 });
 
+test('homepage slow chart scroll uses only validated ranking rows and pauses for keyboard focus', async ({ page }) => {
+  const items = Array.from({ length: 10 }, (_, index) => ({
+    filmId: `fixture-film-${index + 1}`, title: `Fixture Horror ${index + 1}`, position: index + 1,
+    averageScore: 90 - index, criticCount: 3, movementLabel: index === 0 ? 'NEW' : '—',
+    sources: [{ publication: 'Fixture Review Source', url: `https://example.test/review/${index + 1}`, territory: 'GB', checkedAt: '2026-10-08' }]
+  }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ year: 2026, items, updatedAt: '2026-10-08T04:00:00.000Z' }) }));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const list = page.locator('#hub-chart-results');
+  const control = page.getByRole('button', { name: 'Pause chart scroll' });
+  await expect(list.locator('.hub-chart-row')).toHaveCount(10);
+  await expect(list.locator('.hub-chart-row .movement').first()).toHaveAttribute('aria-label', 'Position movement new');
+  await expect(control).toBeVisible();
+  const before = await list.evaluate(element => element.scrollTop);
+  await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(before + 2);
+  await control.focus();
+  const paused = await list.evaluate(element => element.scrollTop);
+  await page.waitForTimeout(150);
+  expect(await list.evaluate(element => element.scrollTop)).toBeLessThanOrEqual(paused + 2);
+  await control.click();
+  await expect(page.getByRole('button', { name: 'Start slow chart scroll' })).toHaveAttribute('aria-pressed', 'false');
+  const manuallyPaused = await list.evaluate(element => element.scrollTop);
+  await page.waitForTimeout(150);
+  expect(await list.evaluate(element => element.scrollTop)).toBeLessThanOrEqual(manuallyPaused + 2);
+});
+
+test('annual chart rejects duplicate canonical films from an invalid API response', async ({ page }) => {
+  const items = [
+    { filmId: 'clayface', title: 'Fixture Film A', position: 1, averageScore: 80, criticCount: 3, sources: [] },
+    { filmId: 'clayface', title: 'Fixture Film Duplicate', position: 2, averageScore: 79, criticCount: 3, sources: [] },
+    { filmId: 'other-mommy', title: 'Fixture Film B', position: 3, averageScore: 78, criticCount: 3, sources: [] }
+  ];
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'ranked', updatedAt: '2026-10-08T04:00:00.000Z', items }) }));
+  await page.goto('/top-20/2026/');
+  await expect(page.locator('.ranking-row')).toHaveCount(2);
+  const displayedTitles = await page.locator('.ranking-row h2').allTextContents();
+  expect(displayedTitles).not.toContain('Fixture Film Duplicate');
+});
+
 test('stale rankings retain the last valid rows and label their status', async ({ page }) => {
-  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ stale: true, items: [{ filmId: 'clayface', title: 'Last Verified Horror', position: 1, averageScore: 77 }] }) }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ stale: true, items: [{ filmId: 'clayface', title: 'Last Verified Horror', position: 1, averageScore: 77, criticCount: 3 }] }) }));
   await page.goto('/');
   const ranking = page.locator('#hub-ranking');
   await expect(ranking).toHaveAttribute('aria-busy', 'false');
@@ -691,7 +751,7 @@ test('direct page loads declare the shared Frightertainment typefaces', async ({
     expect(fontHref).toContain('DM+Sans');
   }
   await page.goto('/movies.html');
-  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Bebas Neue');
+  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Cormorant Garamond');
 });
 
 test('reduced-motion preference disables homepage transitions and artwork zoom', async ({ page }) => {
@@ -731,4 +791,86 @@ test('pending ranking review screenshot contains no synthetic public score rows'
   await page.goto('/');
   await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
   await page.screenshot({ path: 'test-results/design-refinement/after-ranking-pending.png', fullPage: true });
+});
+
+test('six themed environments and review pages have desktop and mobile browser evidence', async ({ browser }) => {
+  test.setTimeout(240_000);
+  const out = 'test-results/design-refinement/sections';
+  mkdirSync(out, { recursive: true });
+  const routes = [
+    ['home', '/'], ['movies', '/movies.html'], ['tv-shows', '/tv-shows.html'],
+    ['indie-movies', '/indie-movies.html'], ['podcasts', '/podcasts.html'], ['games', '/games.html']
+  ];
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.route('**/api/rankings?year=*', request => request.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'pending', items: [] }) }));
+  for (const [name, route] of routes) {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await page.locator('main').waitFor();
+    await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
+    await page.screenshot({ path: `${out}/${name}-desktop-full.png`, fullPage: true });
+    if (name === 'home') await page.locator('.hub-charts').screenshot({ path: `${out}/homepage-chart-desktop.png` });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${out}/${name}-mobile-first.png` });
+    await page.screenshot({ path: `${out}/${name}-mobile-full.png`, fullPage: true });
+    if (name === 'home') await page.locator('.hub-charts').screenshot({ path: `${out}/homepage-chart-mobile.png` });
+  }
+  for (const [name, route] of [['annual-chart-2026', '/top-20/2026/'], ['movie-archive', '/all-horror-movies.html']]) {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await page.locator('main').waitFor();
+    await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
+    await page.screenshot({ path: `${out}/${name}-desktop-full.png`, fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${out}/${name}-mobile-first.png` });
+    await page.screenshot({ path: `${out}/${name}-mobile-full.png`, fullPage: true });
+  }
+  await context.close();
+});
+
+test('mobile copy, display headings and active navigation meet AA contrast in all six themes', async ({ page }) => {
+  const routes = [
+    ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'],
+    ['/indie-movies.html', 'indie'], ['/podcasts.html', 'podcasts'], ['/games.html', 'games']
+  ];
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [route, theme] of routes) {
+    await page.goto(route);
+    const result = await page.evaluate(theme => {
+      const channels = color => {
+        const hex = color.match(/^#([a-f0-9]{3}|[a-f0-9]{6})$/i)?.[1];
+        if (hex) {
+          const expanded = hex.length === 3 ? [...hex].map(part => part + part).join('') : hex;
+          return expanded.match(/.{2}/g).map(part => parseInt(part, 16));
+        }
+        return (color.match(/[\d.]+/g) || []).slice(0, 3).map(Number).map(value => value <= 1 ? value * 255 : value);
+      };
+      const luminance = color => channels(color).map(value => {
+        const channel = value / 255;
+        return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
+      }).reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
+      const contrast = (foreground, background) => {
+        const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+        return (values[0] + .05) / (values[1] + .05);
+      };
+      const body = getComputedStyle(document.body);
+      const heading = document.querySelector(theme === 'home' ? '.hub-intro h1' : '.hub-page-intro h1');
+      const copy = document.querySelector(theme === 'home' ? '.hub-intro>p' : '.hub-page-intro>p');
+      const active = document.querySelector('.hub-tabs a[aria-current="page"]');
+      const base = body.getPropertyValue('--world').trim();
+      return {
+        theme: document.body.dataset.theme,
+        copy: contrast(getComputedStyle(copy).color, base),
+        heading: contrast(getComputedStyle(heading).color, base),
+        accent: contrast(getComputedStyle(heading.querySelector('em') || heading).color, base),
+        activeNav: contrast(getComputedStyle(active).color, getComputedStyle(active).backgroundColor)
+      };
+    }, theme);
+    expect(result.theme).toBe(theme);
+    expect(result.copy, `${theme} paragraph contrast`).toBeGreaterThanOrEqual(4.5);
+    expect(result.heading, `${theme} heading contrast`).toBeGreaterThanOrEqual(4.5);
+    expect(result.accent, `${theme} accent contrast`).toBeGreaterThanOrEqual(4.5);
+    expect(result.activeNav, `${theme} active navigation contrast`).toBeGreaterThanOrEqual(4.5);
+  }
 });

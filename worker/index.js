@@ -1,10 +1,11 @@
 import {
-  averageReviews, buildAnnualRanking, isISOAlpha2, isISODate, normalizeReview, validateDataset
+  averageReviews, buildAnnualRanking, isHTTPS, isISOAlpha2, isISODate, MINIMUM_CRITICS, normalizeReview, validateDataset
 } from '../src/core.js';
 import {
   discoverHorrorCandidates, fetchNearbyShowtimes, refreshComingSoon,
   refreshStreaming, refreshStreamingReleases, refreshTheatricalReleases, refreshTrending
 } from './providers.js';
+import { importLicensedReviews } from './review-ingestion.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -91,18 +92,40 @@ async function recordCandidates(env, candidates, country) {
 }
 
 async function refreshRankingHistory(env, year) {
-  const [{ results: films }, { results: reviews }, { results: prior }] = await Promise.all([
-    env.DB.prepare(`SELECT film_id AS id, title, release_year AS releaseYear FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND release_year = ?`).bind(year).all(),
-    env.DB.prepare(`SELECT film_id AS filmId, release_year AS releaseYear, critic_id AS criticId, critic_name AS criticName, publication, publication_url AS publicationUrl, review_url AS reviewUrl,
+  const [{ results: films }, { results: reviews }] = await Promise.all([
+    env.DB.prepare(`SELECT film_id AS id, title, film_year AS filmYear FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND film_year = ?`).bind(year).all(),
+    env.DB.prepare(`SELECT film_id AS filmId, film_year AS filmYear, critic_id AS criticId, critic_name AS criticName, publication, publication_url AS publicationUrl, review_url AS reviewUrl,
       score, score_out_of AS scoreOutOf, territory, published_at AS publishedAt, checked_at AS checkedAt, (permission_cleared = 1) AS permissionCleared, (professional_verified = 1) AS professionalVerified,
-      'numeric-professional-review' AS ratingKind FROM critic_reviews WHERE status = 'approved' AND permission_cleared = 1 AND professional_verified = 1 AND release_year = ?`).bind(year).all(),
-    env.DB.prepare(`SELECT film_id AS filmId, position FROM rank_history WHERE release_year = ? AND ranked_at = (SELECT MAX(ranked_at) FROM rank_history WHERE release_year = ?)`).bind(year, year).all()
+      'numeric-professional-review' AS ratingKind FROM critic_reviews WHERE status = 'approved' AND permission_cleared = 1 AND professional_verified = 1 AND film_year = ?`).bind(year).all()
   ]);
+  let snapshotStorage = true;
+  let previousSnapshot = null;
+  try { previousSnapshot = await env.DB.prepare(`SELECT ranked_at AS rankedAt FROM annual_ranking_snapshots WHERE film_year = ? AND ranked_at < ? ORDER BY ranked_at DESC LIMIT 1`).bind(year, today()).first(); }
+  catch { snapshotStorage = false; log('ranking_snapshot_migration_required', { year }); }
+  const priorDate = previousSnapshot?.rankedAt || (await env.DB.prepare(`SELECT MAX(ranked_at) AS rankedAt FROM rank_history WHERE release_year = ? AND ranked_at < ?`).bind(year, today()).first())?.rankedAt;
+  const { results: prior = [] } = priorDate
+    ? await env.DB.prepare(`SELECT film_id AS filmId, position FROM rank_history WHERE release_year = ? AND ranked_at = ?`).bind(year, priorDate).all()
+    : { results: [] };
   const ranking = buildAnnualRanking(films, reviews, year, prior);
   const date = today();
+  const publishedAt = nowIso();
+  const pending = films.filter(film => averageReviews(reviews.filter(review => review.filmId === film.id)).status === 'pending').length;
+  const payload = {
+    year, status: ranking.length ? 'ranked' : 'pending', minimumCritics: MINIMUM_CRITICS,
+    methodology: 'Equal-weight average of distinct, permission-cleared, verified professional numeric critic ratings normalized to /100; rounded to the nearest whole point. Audience scores and aggregator percentages are excluded.',
+    updatedAt: publishedAt, rankedFilms: ranking.length, pendingFilmCount: pending,
+    items: ranking.map(row => ({
+      filmId: row.filmId, title: row.title, position: row.position, averageScore: row.average, criticCount: row.criticCount,
+      movement: row.movement, movementLabel: row.movementLabel,
+      sources: row.reviews.map(review => ({ critic: review.criticName, publication: review.publication, url: review.reviewUrl, territory: review.territory, checkedAt: review.checkedAt }))
+    }))
+  };
   const rows = ranking.map(row => env.DB.prepare(`INSERT INTO rank_history(release_year, film_id, position, average_score, critic_count, ranked_at)
     VALUES(?, ?, ?, ?, ?, ?) ON CONFLICT(release_year, film_id, ranked_at) DO UPDATE SET position = excluded.position, average_score = excluded.average_score, critic_count = excluded.critic_count`)
     .bind(year, row.filmId, row.position, row.average, row.criticCount, date));
+  if (snapshotStorage) rows.unshift(env.DB.prepare(`INSERT INTO annual_ranking_snapshots(film_year, ranked_at, published_at, result_count, payload_json)
+    VALUES(?, ?, ?, ?, ?) ON CONFLICT(film_year, ranked_at) DO UPDATE SET published_at = excluded.published_at, result_count = excluded.result_count, payload_json = excluded.payload_json`)
+    .bind(year, date, publishedAt, ranking.length, JSON.stringify(payload)));
   if (rows.length) await env.DB.batch(rows);
   return ranking.length;
 }
@@ -111,11 +134,36 @@ async function handleRanking(env, request) {
   const yearValue = new URL(request.url).searchParams.get('year') || String(new Date().getUTCFullYear());
   const year = Number(yearValue);
   if (!Number.isInteger(year) || year < 1888 || year > new Date().getUTCFullYear() + 2) return json({ error: 'Invalid ranking year' }, 400);
+  let snapshots = [];
+  try {
+    ({ results: snapshots = [] } = await env.DB.prepare(`SELECT ranked_at AS rankedAt, published_at AS publishedAt, payload_json AS payload
+      FROM annual_ranking_snapshots WHERE film_year = ? ORDER BY ranked_at DESC LIMIT 30`).bind(year).all());
+  } catch { log('ranking_snapshot_migration_required', { year }); }
+  for (let index = 0; index < snapshots.length; index++) {
+    const snapshot = snapshots[index];
+    let payload;
+    try { payload = JSON.parse(snapshot.payload); } catch { continue; }
+    if (payload?.year !== year || !Array.isArray(payload.items) || !Number.isInteger(payload.rankedFilms) || payload.rankedFilms !== payload.items.length) continue;
+    const seenFilms = new Set();
+    const seenPositions = new Set();
+    const valid = payload.items.every(item => {
+      const ok = /^[a-z0-9-]{1,80}$/.test(item?.filmId || '') && typeof item.title === 'string' && item.title.trim() && item.title.length <= 240 &&
+        Number.isInteger(item.position) && item.position >= 1 && item.position <= 20 && !seenPositions.has(item.position) &&
+        Number.isInteger(item.averageScore) && item.averageScore >= 0 && item.averageScore <= 100 &&
+        Number.isInteger(item.criticCount) && item.criticCount >= MINIMUM_CRITICS && !seenFilms.has(item.filmId) && Array.isArray(item.sources);
+      if (ok) { seenFilms.add(item.filmId); seenPositions.add(item.position); }
+      return ok;
+    });
+    if (!valid) continue;
+    const freshness = Date.parse(snapshot.publishedAt);
+    return json({ ...payload, updatedAt: snapshot.publishedAt, stale: index > 0 || !Number.isFinite(freshness) || freshness < Date.now() - 36 * 60 * 60 * 1000 }, 200,
+      { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
+  }
   const [{ results: films }, { results: reviews }, { results: prior }, { results: history }] = await Promise.all([
-    env.DB.prepare(`SELECT film_id AS id, title, release_year AS releaseYear FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND release_year = ? ORDER BY title`).bind(year).all(),
-    env.DB.prepare(`SELECT film_id AS filmId, release_year AS releaseYear, critic_id AS criticId, critic_name AS criticName, publication, publication_url AS publicationUrl, review_url AS reviewUrl,
+    env.DB.prepare(`SELECT film_id AS id, title, film_year AS filmYear FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND film_year = ? ORDER BY title`).bind(year).all(),
+    env.DB.prepare(`SELECT film_id AS filmId, film_year AS filmYear, critic_id AS criticId, critic_name AS criticName, publication, publication_url AS publicationUrl, review_url AS reviewUrl,
       score, score_out_of AS scoreOutOf, territory, published_at AS publishedAt, checked_at AS checkedAt, (permission_cleared = 1) AS permissionCleared, (professional_verified = 1) AS professionalVerified,
-      'numeric-professional-review' AS ratingKind FROM critic_reviews WHERE status = 'approved' AND permission_cleared = 1 AND professional_verified = 1 AND release_year = ? ORDER BY published_at`).bind(year).all(),
+      'numeric-professional-review' AS ratingKind FROM critic_reviews WHERE status = 'approved' AND permission_cleared = 1 AND professional_verified = 1 AND film_year = ? ORDER BY published_at`).bind(year).all(),
     env.DB.prepare(`SELECT film_id AS filmId, position FROM rank_history WHERE release_year = ? AND ranked_at < ? ORDER BY ranked_at DESC`).bind(year, today()).all(),
     env.DB.prepare(`SELECT MAX(ranked_at) AS rankedAt FROM rank_history WHERE release_year = ?`).bind(year).first()
   ]);
@@ -174,13 +222,17 @@ async function cinemaRateLimited(env, request) {
 
 async function handleFilmDetail(env, filmId) {
   if (!/^[a-z0-9-]{1,100}$/.test(filmId)) return json({ error: 'Invalid film id' }, 400);
-  const film = await env.DB.prepare(`SELECT film_id AS id, title, release_year AS releaseYear, territory,
+  const film = await env.DB.prepare(`SELECT film_id AS id, title, release_year AS releaseYear, film_year AS filmYear, film_year_source_name AS filmYearSourceName,
+    film_year_source_url AS filmYearSourceUrl, film_year_checked_at AS filmYearCheckedAt, territory,
     primary_source_name AS primarySourceName, primary_source_url AS primarySourceUrl, checked_at AS checkedAt,
     horror_source_url AS horrorSourceUrl, release_mode AS releaseMode, release_mode_source_url AS releaseModeSourceUrl
     FROM canonical_films WHERE film_id = ? AND editorial_status = 'approved' AND horror_verified = 1`).bind(filmId).first();
   if (!film) return json({ error: 'No approved horror film record was found' }, 404, { 'cache-control': 'no-store' });
+  const yearClaim = film.filmYear && film.filmYearSourceUrl
+    ? { label: 'Film year', value: String(film.filmYear), territory: 'Film year as stated by source', sourceName: film.filmYearSourceName, source: film.filmYearSourceUrl, checked: film.filmYearCheckedAt || film.checkedAt }
+    : { label: 'Territory release year (not a verified film-year claim)', value: String(film.releaseYear), territory: film.territory, sourceName: film.primarySourceName, source: film.primarySourceUrl, checked: film.checkedAt };
   return json({ film, claims: [
-    { label: 'Film year', value: String(film.releaseYear), territory: 'As recorded by Frightertainment', sourceName: film.primarySourceName, source: film.primarySourceUrl, checked: film.checkedAt },
+    yearClaim,
     { label: 'Horror classification', value: 'Verified by editorial review', territory: 'As recorded by Frightertainment', sourceName: film.primarySourceName, source: film.horrorSourceUrl, checked: film.checkedAt },
     ...(film.releaseMode !== 'unconfirmed' && film.releaseModeSourceUrl ? [{ label: 'Release path', value: film.releaseMode, territory: film.territory, sourceName: 'Primary source', source: film.releaseModeSourceUrl, checked: film.checkedAt }] : [])
   ], unconfirmed: ['Territorial release date', 'Cast and crew', 'Synopsis', 'Official trailer', 'Promotional artwork'], updatedAt: film.checkedAt }, 200, { 'cache-control': 'public, max-age=300' });
@@ -220,6 +272,44 @@ async function handleAdmin(env, request, path) {
   if (request.method === 'GET' && path === '/api/admin/review-queue') {
     const { results } = await env.DB.prepare(`SELECT item_id AS id, item_kind AS kind, source_name AS sourceName, source_url AS sourceUrl, territory, payload_json AS payload, reasons_json AS reasons, created_at AS createdAt FROM review_queue WHERE status = 'pending' ORDER BY created_at`).all();
     return json({ items: results.map(row => ({ ...row, payload: JSON.parse(row.payload), reasons: JSON.parse(row.reasons) })) }, 200, { 'cache-control': 'no-store' });
+  }
+  if (request.method === 'GET' && path === '/api/admin/provider-review-changes') {
+    const { results } = await env.DB.prepare(`SELECT revision_id AS revisionId, review_id AS reviewId, provider_id AS providerId, provider_review_id AS providerReviewId,
+      change_kind AS changeKind, previous_json AS previous, proposed_json AS proposed, source_url AS sourceUrl, checked_at AS checkedAt, created_at AS createdAt
+      FROM critic_review_revisions WHERE status = 'pending' ORDER BY created_at DESC LIMIT 100`).all();
+    return json({ items: results.map(row => ({ ...row, previous: JSON.parse(row.previous), proposed: JSON.parse(row.proposed) })) }, 200, { 'cache-control': 'no-store' });
+  }
+  if (request.method === 'POST' && path === '/api/admin/provider-review-changes/review') {
+    const body = await readBody(request);
+    if (!body.revisionId || !['approved', 'rejected'].includes(body.decision)) return json({ error: 'revisionId and an approved/rejected decision are required' }, 400);
+    const revision = await env.DB.prepare(`SELECT revision_id, review_id, change_kind, proposed_json, source_url, checked_at FROM critic_review_revisions WHERE revision_id = ? AND status = 'pending'`).bind(body.revisionId).first();
+    if (!revision) return json({ error: 'Pending provider review change not found' }, 404);
+    const reviewer = String(body.reviewer || 'site-admin').slice(0, 80);
+    const statements = [];
+    if (body.decision === 'approved') {
+      let proposal;
+      try { proposal = JSON.parse(revision.proposed_json); } catch { return json({ error: 'Stored provider change is invalid JSON' }, 409); }
+      if (revision.change_kind === 'withdrawn') {
+        statements.push(env.DB.prepare(`UPDATE critic_reviews SET status = 'rejected', checked_at = ? WHERE review_id = ?`).bind(revision.checked_at, revision.review_id));
+      } else {
+        const review = normalizeReview(proposal);
+        let permissionUrl;
+        try { permissionUrl = new URL(proposal.permissionEvidenceUrl).href; } catch { return json({ error: 'Proposed reuse permission evidence is invalid' }, 409); }
+        if (!review || !isHTTPS(permissionUrl)) return json({ error: 'Proposed correction failed source, permission or score validation' }, 409);
+        const film = await env.DB.prepare(`SELECT film_year FROM canonical_films WHERE film_id = ? AND editorial_status = 'approved' AND horror_verified = 1`).bind(review.filmId).first();
+        if (!film || film.film_year !== review.filmYear) return json({ error: 'Proposed correction does not match an approved film-year record' }, 409);
+        const duplicate = await env.DB.prepare(`SELECT review_id FROM critic_reviews WHERE review_id <> ? AND (canonical_review_key = ? OR (film_id = ? AND film_year = ? AND lower(critic_id) = lower(?))) LIMIT 1`)
+          .bind(revision.review_id, review.dedupeKey, review.filmId, review.filmYear, review.criticId).first();
+        if (duplicate) return json({ error: 'Correction duplicates another critic or canonical review record' }, 409);
+        statements.push(env.DB.prepare(`UPDATE critic_reviews SET critic_id=?, critic_name=?, publication=?, publication_url=?, review_url=?, canonical_review_key=?, score=?, score_out_of=?, territory=?, published_at=?, checked_at=?, permission_evidence_url=?, film_year=? WHERE review_id=?`)
+          .bind(review.criticId, review.criticName || review.criticId, review.publication, review.publicationUrl, review.reviewUrl, review.dedupeKey, review.score, review.scoreOutOf,
+            review.territory, review.publishedAt, review.checkedAt, permissionUrl, review.filmYear, revision.review_id));
+      }
+    }
+    statements.push(env.DB.prepare(`UPDATE critic_review_revisions SET status = ?, reviewed_at = ?, reviewer = ? WHERE revision_id = ? AND status = 'pending'`)
+      .bind(body.decision, nowIso(), reviewer, body.revisionId));
+    await env.DB.batch(statements);
+    return json({ revisionId: body.revisionId, status: body.decision }, 200, { 'cache-control': 'no-store' });
   }
   if (request.method === 'POST' && path === '/api/admin/review-queue/review') {
     const body = await readBody(request);
@@ -273,25 +363,38 @@ async function handleAdmin(env, request, path) {
     const body = await readBody(request);
     if (!body.filmId || !body.title || !Number.isInteger(body.releaseYear) || !body.primarySourceName || !/^https:\/\//.test(body.primarySourceUrl || '') || !isISOAlpha2(body.territory || '') || !isISODate(body.checkedAt || '')) return json({ error: 'Film identity, territory and primary source are required' }, 400);
     const source = new URL(body.primarySourceUrl);
-    if (source.protocol !== 'https:') return json({ error: 'Primary source must use HTTPS' }, 400);
+    if (!isHTTPS(source.href)) return json({ error: 'Primary source must use HTTPS without embedded credentials' }, 400);
     let horrorSourceUrl = null;
     if (body.horrorVerified === true) {
       try { horrorSourceUrl = new URL(body.horrorSourceUrl).href; } catch { return json({ error: 'A primary source supporting the horror classification is required' }, 400); }
-      if (!horrorSourceUrl.startsWith('https://')) return json({ error: 'Horror classification source must use HTTPS' }, 400);
+      if (!isHTTPS(horrorSourceUrl)) return json({ error: 'Horror classification source must use HTTPS without embedded credentials' }, 400);
     }
     const mode = ['streaming-first', 'direct-to-video', 'theatrical-then-streaming', 'unconfirmed'].includes(body.releaseMode) ? body.releaseMode : 'unconfirmed';
     let releaseModeSourceUrl = null;
     if (mode !== 'unconfirmed') {
       try { releaseModeSourceUrl = new URL(body.releaseModeSourceUrl).href; } catch { return json({ error: 'A source URL is required to label a release path' }, 400); }
-      if (!releaseModeSourceUrl.startsWith('https://')) return json({ error: 'Release path source must use HTTPS' }, 400);
+      if (!isHTTPS(releaseModeSourceUrl)) return json({ error: 'Release path source must use HTTPS without embedded credentials' }, 400);
+    }
+    let filmYear = null;
+    let filmYearSourceName = null;
+    let filmYearSourceUrl = null;
+    let filmYearCheckedAt = null;
+    if (body.filmYear != null) {
+      if (!Number.isInteger(body.filmYear) || body.filmYear < 1888 || body.filmYear > 2200 || !body.filmYearSourceName || !isISODate(body.filmYearCheckedAt || ''))
+        return json({ error: 'A film year requires a valid year, named source and source check date' }, 400);
+      try { filmYearSourceUrl = new URL(body.filmYearSourceUrl).href; } catch { return json({ error: 'Film-year source URL is required' }, 400); }
+      if (!isHTTPS(filmYearSourceUrl)) return json({ error: 'Film-year source must use HTTPS without embedded credentials' }, 400);
+      filmYear = body.filmYear;
+      filmYearSourceName = String(body.filmYearSourceName).slice(0, 160);
+      filmYearCheckedAt = body.filmYearCheckedAt;
     }
     const { results: sameYearTerritory } = await env.DB.prepare(`SELECT film_id, title FROM canonical_films WHERE film_id <> ? AND release_year = ? AND territory = ?`).bind(body.filmId, body.releaseYear, body.territory).all();
     const normalizedTitle = value => String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
     const duplicate = sameYearTerritory.find(row => normalizedTitle(row.title) === normalizedTitle(body.title));
     if (duplicate) return json({ error: `Duplicate title, year and territory; existing record ${duplicate.film_id}` }, 409);
-    await env.DB.prepare(`INSERT INTO canonical_films(film_id, title, release_year, territory, primary_source_name, primary_source_url, checked_at, horror_verified, horror_source_url, tmdb_id, watchmode_id, movieglu_id, release_mode, release_mode_source_url, editorial_status)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending') ON CONFLICT(film_id) DO UPDATE SET title = excluded.title, release_year = excluded.release_year, territory = excluded.territory, primary_source_name = excluded.primary_source_name, primary_source_url = excluded.primary_source_url, checked_at = excluded.checked_at, horror_verified = excluded.horror_verified, horror_source_url = excluded.horror_source_url, tmdb_id = excluded.tmdb_id, watchmode_id = excluded.watchmode_id, movieglu_id = excluded.movieglu_id, release_mode = excluded.release_mode, release_mode_source_url = excluded.release_mode_source_url, editorial_status = 'pending'`)
-      .bind(body.filmId, body.title, body.releaseYear, body.territory, body.primarySourceName, body.primarySourceUrl, body.checkedAt, body.horrorVerified === true ? 1 : 0, horrorSourceUrl, body.tmdbId || null, body.watchmodeId || null, body.moviegluId || null, mode, releaseModeSourceUrl).run();
+    await env.DB.prepare(`INSERT INTO canonical_films(film_id, title, release_year, territory, primary_source_name, primary_source_url, checked_at, horror_verified, horror_source_url, tmdb_id, watchmode_id, movieglu_id, release_mode, release_mode_source_url, editorial_status, film_year, film_year_source_name, film_year_source_url, film_year_checked_at)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?) ON CONFLICT(film_id) DO UPDATE SET title = excluded.title, release_year = excluded.release_year, territory = excluded.territory, primary_source_name = excluded.primary_source_name, primary_source_url = excluded.primary_source_url, checked_at = excluded.checked_at, horror_verified = excluded.horror_verified, horror_source_url = excluded.horror_source_url, tmdb_id = excluded.tmdb_id, watchmode_id = excluded.watchmode_id, movieglu_id = excluded.movieglu_id, release_mode = excluded.release_mode, release_mode_source_url = excluded.release_mode_source_url, editorial_status = 'pending', film_year = excluded.film_year, film_year_source_name = excluded.film_year_source_name, film_year_source_url = excluded.film_year_source_url, film_year_checked_at = excluded.film_year_checked_at`)
+      .bind(body.filmId, body.title, body.releaseYear, body.territory, body.primarySourceName, body.primarySourceUrl, body.checkedAt, body.horrorVerified === true ? 1 : 0, horrorSourceUrl, body.tmdbId || null, body.watchmodeId || null, body.moviegluId || null, mode, releaseModeSourceUrl, filmYear, filmYearSourceName, filmYearSourceUrl, filmYearCheckedAt).run();
     return json({ filmId: body.filmId, editorialStatus: 'pending' }, 202, { 'cache-control': 'no-store' });
   }
   if (request.method === 'POST' && path === '/api/admin/films/approve') {
@@ -305,13 +408,13 @@ async function handleAdmin(env, request, path) {
     const review = normalizeReview(body);
     let permissionUrl;
     try { permissionUrl = new URL(body.permissionEvidenceUrl).href; } catch { return json({ error: 'Permission evidence URL is required' }, 400); }
-    if (!permissionUrl.startsWith('https://')) return json({ error: 'Permission evidence must use HTTPS' }, 400);
+    if (!isHTTPS(permissionUrl)) return json({ error: 'Permission evidence must use HTTPS without embedded credentials' }, 400);
     if (!review) return json({ error: 'Review lacks a supported numeric score, source, territory, permissions or professional verification' }, 400);
-    const film = await env.DB.prepare(`SELECT release_year FROM canonical_films WHERE film_id = ? AND editorial_status = 'approved' AND horror_verified = 1`).bind(review.filmId).first();
-    if (!film || film.release_year !== review.releaseYear) return json({ error: 'Review film/year is not an approved film record' }, 400);
-    await env.DB.prepare(`INSERT INTO critic_reviews(review_id, film_id, release_year, critic_id, critic_name, publication, publication_url, review_url, canonical_review_key, score, score_out_of, territory, published_at, checked_at, permission_cleared, permission_evidence_url, professional_verified, status)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 1, 'pending')`)
-      .bind(id(), review.filmId, review.releaseYear, review.criticId, review.criticName || review.criticId, review.publication, review.publicationUrl, review.reviewUrl, review.dedupeKey, review.score, review.scoreOutOf, review.territory, review.publishedAt, review.checkedAt, permissionUrl).run();
+    const film = await env.DB.prepare(`SELECT film_year FROM canonical_films WHERE film_id = ? AND editorial_status = 'approved' AND horror_verified = 1`).bind(review.filmId).first();
+    if (!film || film.film_year !== review.filmYear) return json({ error: 'Review film/year is not an approved, source-verified film-year record' }, 400);
+    await env.DB.prepare(`INSERT INTO critic_reviews(review_id, film_id, release_year, critic_id, critic_name, publication, publication_url, review_url, canonical_review_key, score, score_out_of, territory, published_at, checked_at, permission_cleared, permission_evidence_url, professional_verified, status, film_year)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 1, 'pending', ?)`)
+      .bind(id(), review.filmId, review.filmYear, review.criticId, review.criticName || review.criticId, review.publication, review.publicationUrl, review.reviewUrl, review.dedupeKey, review.score, review.scoreOutOf, review.territory, review.publishedAt, review.checkedAt, permissionUrl, review.filmYear).run();
     return json({ status: 'pending' }, 202, { 'cache-control': 'no-store' });
   }
   if (request.method === 'POST' && path === '/api/admin/reviews/approve') {
@@ -352,6 +455,18 @@ async function runScheduled(controller, env) {
   const tasks = [];
   if (controller.cron === '0 4 * * *') {
     await env.DB.prepare(`DELETE FROM cinema_rate_limits WHERE window_started < ?`).bind(Date.now() - 5 * 60_000).run();
+    const reviewImportStarted = nowIso();
+    try {
+      const result = await importLicensedReviews(env, env.DB);
+      const status = result.status === 'disabled' ? 'skipped' : 'published';
+      await logRun(env.DB, 'licensed-review-ingestion', '', 'cron-daily', status, reviewImportStarted, null, result.imported + result.queued + result.revisions);
+      tasks.push({ task: 'licensed-review-ingestion', ...result, status });
+    } catch (error) {
+      const issue = safeError(error);
+      try { await logRun(env.DB, 'licensed-review-ingestion', '', 'cron-daily', 'failed', reviewImportStarted, issue); } catch {}
+      log('licensed_review_ingestion_failed_last_approved_scores_retained', { error: issue });
+      tasks.push({ task: 'licensed-review-ingestion', status: 'failed', error: issue });
+    }
     for (const country of countries) {
       tasks.push(await refreshTask(env, 'coming-soon', country, () => refreshComingSoon(env, env.DB, country), 36 * 60 * 60 * 1000, 'cron-daily'));
       tasks.push(await refreshTask(env, 'streaming-availability', country, () => refreshStreaming(env, env.DB, country), 36 * 60 * 60 * 1000, 'cron-daily'));
@@ -359,7 +474,7 @@ async function runScheduled(controller, env) {
       tasks.push(await refreshTask(env, 'theatrical-releases', country, () => refreshTheatricalReleases(env, env.DB, country), 36 * 60 * 60 * 1000, 'cron-daily'));
       tasks.push(await refreshTask(env, 'trending-horror', country, () => refreshTrending(env, country), 36 * 60 * 60 * 1000, 'cron-daily'));
     }
-    const { results: years } = await env.DB.prepare(`SELECT DISTINCT release_year AS year FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 UNION SELECT ? AS year`).bind(new Date().getUTCFullYear()).all();
+    const { results: years } = await env.DB.prepare(`SELECT DISTINCT film_year AS year FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1 AND film_year IS NOT NULL UNION SELECT ? AS year`).bind(new Date().getUTCFullYear()).all();
     for (const row of years) {
       const startedAt = nowIso();
       try {

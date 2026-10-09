@@ -11,7 +11,7 @@ export function isISODate(value) {
 }
 
 export function isHTTPS(value) {
-  try { return new URL(value).protocol === 'https:'; } catch { return false; }
+  try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password; } catch { return false; }
 }
 
 export function canonicalReviewKey(review) {
@@ -32,14 +32,15 @@ export function validateClaim(claim) {
 
 export function normalizeReview(review) {
   if (!review || review.ratingKind !== 'numeric-professional-review') return null;
-  if (!review.filmId || !Number.isInteger(review.releaseYear) || review.releaseYear < 1888) return null;
+  const filmYear = review.filmYear ?? review.releaseYear;
+  if (!review.filmId || !Number.isInteger(filmYear) || filmYear < 1888 || filmYear > 2200) return null;
   if (!review.criticId || !review.publication || !review.publicationUrl || !isHTTPS(review.publicationUrl)) return null;
-  if (!review.reviewUrl || !isHTTPS(review.reviewUrl) || !review.permissionCleared || ![true, 1].includes(review.professionalVerified)) return null;
-  if (!review.territory || !isISODate(review.checkedAt) || !isISODate(review.publishedAt)) return null;
+  if (!review.reviewUrl || !isHTTPS(review.reviewUrl) || ![true, 1].includes(review.permissionCleared) || ![true, 1].includes(review.professionalVerified)) return null;
+  if (!isISOAlpha2(review.territory) || !isISODate(review.checkedAt) || !isISODate(review.publishedAt)) return null;
   if (!Number.isFinite(review.score) || !Number.isFinite(review.scoreOutOf) || review.scoreOutOf <= 0 || review.score < 0 || review.score > review.scoreOutOf) return null;
   const key = canonicalReviewKey(review);
   if (!key) return null;
-  return { ...review, dedupeKey: key, normalizedScore: review.score / review.scoreOutOf * 100 };
+  return { ...review, filmYear, dedupeKey: key, normalizedScore: review.score / review.scoreOutOf * 100 };
 }
 
 export function selectEligibleReviews(reviews) {
@@ -53,7 +54,7 @@ export function selectEligibleReviews(reviews) {
   }
   const uniqueByCritic = new Map();
   for (const normalized of uniqueByUrl.values()) {
-    const key = `${normalized.filmId}:${normalized.releaseYear}:${normalized.criticId.toLowerCase()}`;
+    const key = `${normalized.filmId}:${normalized.filmYear}:${normalized.criticId.toLowerCase()}`;
     const prior = uniqueByCritic.get(key);
     // One verified contribution per professional critic, per film and release year.
     // If an outlet republishes a review, keep the earliest original publication.
@@ -76,8 +77,8 @@ export function buildAnnualRanking(films, reviews, year, previous = []) {
   if (!Number.isInteger(year) || year < 1888) throw new TypeError('year must be an integer film-release year');
   const hasPreviousRanking = previous.length > 0;
   const previousByFilm = new Map(previous.map(row => [row.filmId, row.position]));
-  const candidates = films.filter(film => film.releaseYear === year).map(film => {
-    const result = averageReviews(reviews.filter(review => review.filmId === film.id && review.releaseYear === year));
+  const candidates = films.filter(film => (film.filmYear ?? film.releaseYear) === year).map(film => {
+    const result = averageReviews(reviews.filter(review => review.filmId === film.id && (review.filmYear ?? review.releaseYear) === year));
     return result.status === 'ranked' ? { filmId: film.id, title: film.title, ...result } : null;
   }).filter(Boolean);
   candidates.sort((left, right) => right.average - left.average || left.title.localeCompare(right.title));

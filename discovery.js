@@ -2,7 +2,7 @@
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
   const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const safeURL = value => { try { const url = new URL(value, location.href); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; } };
+  const safeURL = value => { try { const url = new URL(value, location.href); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; } catch { return ''; } };
   const filmHref = id => window.FR_MOVIES?.some(movie => movie.id === id) ? `/films/${encodeURIComponent(id)}/` : `/film.html?id=${encodeURIComponent(id)}`;
   const countrySelect = $('#discovery-country');
   if (!countrySelect) return;
@@ -99,7 +99,7 @@
       panel.innerHTML=ranked.slice(0,6).map(item=>{
         const filmId=item.filmId||item.id;
         const href=filmHref(filmId);
-        const source=(item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' ↗</a>').join(' ');
+        const source=(item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' →</a>').join(' ');
         return '<article class="discovery-item"><div><strong><span class="ranking-position">#'+
           escapeHTML(item.position)+'</span> <a href="'+escapeHTML(href)+'">'+escapeHTML(item.title)+'</a></strong>'+
           '<span>'+escapeHTML(item.averageScore)+'/100 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel)+

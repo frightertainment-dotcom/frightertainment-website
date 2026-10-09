@@ -7,9 +7,24 @@
   if (heading) heading.textContent = 'FILMS · ' + year;
   const fullChart = document.querySelector('.hub-charts__all');
   if (fullChart) fullChart.href = '/top-20/' + year + '/';
-
   const isCompact = matchMedia('(max-width: 900px)').matches;
   const previewLimit = isCompact ? 5 : 10;
+  const safeSource = value => {
+    try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
+    catch { return ''; }
+  };
+  const filmHref = id => {
+    if (!/^[a-z0-9-]{1,80}$/.test(id || '')) return '/movies.html';
+    return window.FR_MOVIES?.some(film => film.id === id)
+      ? '/films/' + encodeURIComponent(id) + '/'
+      : '/film.html?id=' + encodeURIComponent(id);
+  };
+  const formatDate = value => {
+    const date = new Date(value);
+    return Number.isFinite(date.valueOf())
+      ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(date) + ' UTC'
+      : '';
+  };
 
   function createState(title, description, modifier = 'pending') {
     const state = document.createElement('div');
@@ -23,12 +38,194 @@
     return state;
   }
 
-  function renderState(title, description, modifier = 'pending') {
-    root.replaceChildren(createState(title, description, modifier));
+  function renderUnranked(year, rankedIds = new Set()) {
+    const films = (window.FR_MOVIES || []).filter(film => {
+      const filmYear = (film.claims || []).find(claim => claim.field === 'filmYear');
+      return film.editorialStatus === 'approved' && Number(filmYear?.value) === year && !rankedIds.has(film.id);
+    }).sort((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
+    if (!films.length) return null;
+
+    const disclosure = document.createElement('details');
+    disclosure.className = 'hub-unranked';
+    const summary = document.createElement('summary');
+    summary.textContent = `${films.length} verified ${year} ${films.length === 1 ? 'film' : 'films'} awaiting eligible critic reviews`;
+    const list = document.createElement('div');
+    list.className = 'hub-unranked__list';
+    for (const film of films) {
+      const item = document.createElement('div');
+      item.className = 'hub-unranked__item';
+      const title = document.createElement('a');
+      title.href = filmHref(film.id);
+      title.textContent = film.title;
+      const claim = film.claims.find(value => value.field === 'filmYear');
+      const sourceUrl = safeSource(claim?.source);
+      const source = document.createElement('small');
+      if (sourceUrl) {
+        const link = document.createElement('a');
+        link.href = sourceUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = claim.sourceName || 'Film-year source';
+        source.append(link);
+      } else source.textContent = 'Source link unavailable';
+      item.append(title, source);
+      list.append(item);
+    }
+    disclosure.append(summary, list);
+    return disclosure;
   }
 
-  function finish() {
-    root.setAttribute('aria-busy', 'false');
+  function setupScroll(list, controls, button) {
+    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = 0;
+    let previousTime = 0;
+    let manualPause = motionPreference.matches;
+    let transientPause = false;
+    let reachedEnd = false;
+    const updateControl = () => {
+      button.setAttribute('aria-pressed', String(!manualPause && !reachedEnd));
+      button.textContent = reachedEnd ? 'Restart slow chart scroll' : manualPause ? 'Start slow chart scroll' : 'Pause chart scroll';
+    };
+    const stop = () => { if (frame) cancelAnimationFrame(frame); frame = 0; previousTime = 0; };
+    const step = time => {
+      if (manualPause || transientPause || reachedEnd || motionPreference.matches) { stop(); return; }
+      if (previousTime) list.scrollTop += (time - previousTime) * 0.006;
+      previousTime = time;
+      const atEnd = list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
+      if (atEnd) { reachedEnd = true; stop(); updateControl(); return; }
+      frame = requestAnimationFrame(step);
+    };
+    const play = () => {
+      if (motionPreference.matches) return;
+      if (reachedEnd) { list.scrollTop = 0; reachedEnd = false; }
+      manualPause = false;
+      updateControl();
+      stop();
+      frame = requestAnimationFrame(step);
+    };
+    const pause = () => { manualPause = true; stop(); updateControl(); };
+    button.addEventListener('click', () => manualPause || reachedEnd ? play() : pause());
+    list.addEventListener('pointerenter', () => { transientPause = true; stop(); });
+    list.addEventListener('pointerleave', () => { transientPause = false; if (!manualPause && !reachedEnd) play(); });
+    list.addEventListener('focusin', () => { transientPause = true; stop(); });
+    list.addEventListener('focusout', event => {
+      if (event.relatedTarget && list.contains(event.relatedTarget)) return;
+      transientPause = false;
+      if (!manualPause && !reachedEnd) play();
+    });
+    button.addEventListener('focusin', () => { transientPause = true; stop(); });
+    button.addEventListener('focusout', () => {
+      transientPause = false;
+      if (!manualPause && !reachedEnd) play();
+    });
+    list.addEventListener('wheel', pause, { passive: true });
+    list.addEventListener('touchstart', pause, { passive: true, once: true });
+    motionPreference.addEventListener?.('change', event => {
+      if (event.matches) { manualPause = true; stop(); }
+      updateControl();
+    });
+    updateControl();
+    if (motionPreference.matches) controls.setAttribute('data-reduced-motion', 'true');
+    else play();
+  }
+
+  function renderRows(items) {
+    const seenFilms = new Set();
+    const seenPositions = new Set();
+    const valid = items.filter(item => {
+      const ok = item && /^[a-z0-9-]{1,80}$/.test(item.filmId || '') &&
+        typeof item.title === 'string' && item.title.trim().length > 0 && item.title.length <= 240 &&
+        Number.isInteger(item.position) && item.position >= 1 && item.position <= 20 && !seenPositions.has(item.position) &&
+        Number.isInteger(item.averageScore) && item.averageScore >= 0 && item.averageScore <= 100 &&
+        Number.isInteger(item.criticCount) && item.criticCount >= 3 && !seenFilms.has(item.filmId);
+      if (ok) { seenFilms.add(item.filmId); seenPositions.add(item.position); }
+      return ok;
+    }).sort((a, b) => a.position - b.position).slice(0, previewLimit);
+    if (!valid.length) return { node: null, ids: new Set(), count: 0 };
+
+    const list = document.createElement('div');
+    list.className = 'hub-chart-list';
+    list.id = 'hub-chart-results';
+    list.setAttribute('role', 'list');
+    for (const item of valid) {
+      const row = document.createElement('div');
+      row.className = 'hub-chart-row';
+      row.setAttribute('role', 'listitem');
+      const movementText = /^(?:NEW|—|UP \d+|DOWN \d+)$/.test(item.movementLabel || '') ? item.movementLabel : '—';
+      if (movementText !== '—') row.classList.add('is-changed');
+      const movement = document.createElement('span');
+      movement.className = 'movement';
+      const kind = movementText === 'NEW' ? 'new' : movementText.startsWith('UP') ? 'up' : movementText.startsWith('DOWN') ? 'down' : 'same';
+      movement.dataset.kind = kind;
+      movement.textContent = movementText === '—' ? 'UNCHANGED' : movementText;
+      movement.setAttribute('aria-label', movementText === '—' ? 'Position unchanged' : `Position movement ${movementText.toLowerCase()}`);
+      const position = document.createElement('span');
+      position.className = 'position';
+      position.textContent = '#' + item.position;
+      const title = document.createElement('a');
+      title.textContent = item.title;
+      title.href = filmHref(item.filmId);
+      const score = document.createElement('span');
+      score.className = 'score';
+      score.textContent = item.averageScore + '/100';
+      const meta = document.createElement('div');
+      meta.className = 'chart-meta';
+      const count = document.createElement('span');
+      count.textContent = `${item.criticCount} distinct critics`;
+      meta.append(count);
+      const sources = (Array.isArray(item.sources) ? item.sources : []).slice(0, 4);
+      for (const source of sources) {
+        const href = safeSource(source?.url);
+        if (!href) continue;
+        const link = document.createElement('a');
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = source.publication || source.critic || 'Review source';
+        link.title = `${source.territory || 'Territory not stated'} · checked ${source.checkedAt || 'date not stated'}`;
+        meta.append(link);
+      }
+      row.append(position, title, score, movement, meta);
+      list.append(row);
+    }
+    const ids = new Set(valid.map(item => item.filmId));
+    if (valid.length >= 8 && !isCompact) {
+      const controls = document.createElement('div');
+      controls.className = 'hub-chart-motion';
+      const note = document.createElement('span');
+      note.textContent = 'SLOW SCROLL · PAUSES ON HOVER, FOCUS OR MANUAL SCROLL';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-controls', list.id);
+      controls.append(note, button);
+      setupScroll(list, controls, button);
+      list.classList.add('hub-chart-list--scrolling');
+      return { node: [list, controls], ids, count: valid.length };
+    }
+    return { node: list, ids, count: valid.length };
+  }
+
+  function finish() { root.setAttribute('aria-busy', 'false'); }
+  function setResult(data) {
+    const dataItems = Array.isArray(data?.items) ? data.items : [];
+    const rendered = renderRows(dataItems);
+    const content = [];
+    if (rendered.node) {
+      if (Array.isArray(rendered.node)) content.push(...rendered.node);
+      else content.push(rendered.node);
+      const updated = document.createElement('p');
+      updated.className = 'hub-ranking__updated';
+      updated.textContent = formatDate(data?.updatedAt) ? `Last published ranking snapshot: ${formatDate(data.updatedAt)}` : 'Last published ranking snapshot: not available';
+      content.push(updated);
+      if (data?.stale === true) content.push(createState('Ranking data may be out of date', 'Showing the last valid ranking while its sources are reviewed.', 'stale'));
+    } else if (data?.stale === true) {
+      content.push(createState('Ranking data may be out of date', 'No current verified ranking is available.', 'stale'));
+    } else {
+      content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available. A film needs at least three distinct, permission-cleared professional critics to qualify.'));
+    }
+    const unranked = renderUnranked(year, rendered.ids);
+    if (unranked) content.push(unranked);
+    root.replaceChildren(...content);
   }
 
   fetch('/api/rankings?year=' + year, { headers: { accept: 'application/json' } })
@@ -36,54 +233,11 @@
       if (!response.ok) throw new Error('Ranking API unavailable');
       return response.json();
     })
-    .then(data => {
-      const items = Array.isArray(data?.items) ? data.items : [];
-      if (!items.length) {
-        if (data?.stale === true) {
-          renderState('Ranking data may be out of date', 'No current verified ranking is available.', 'stale');
-        } else {
-          renderState('Critic ranking pending', 'Verified critic scores are not yet available.');
-        }
-        return;
-      }
-
-      const list = document.createElement('div');
-      list.className = 'hub-chart-list';
-      for (const item of items.slice(0, previewLimit)) {
-        if (!Number.isInteger(item.position) || typeof item.title !== 'string' ||
-            !Number.isFinite(item.averageScore) || item.averageScore < 0 || item.averageScore > 100 ||
-            typeof item.filmId !== 'string' || !item.filmId) continue;
-        const row = document.createElement('div');
-        row.className = 'hub-chart-row';
-        const position = document.createElement('span');
-        position.className = 'position';
-        position.textContent = '#' + item.position;
-        const link = document.createElement('a');
-        link.textContent = item.title;
-        link.href = window.FR_MOVIES?.some(film => film.id === item.filmId)
-          ? '/films/' + encodeURIComponent(item.filmId) + '/'
-          : '/film.html?id=' + encodeURIComponent(item.filmId);
-        const score = document.createElement('span');
-        score.className = 'score';
-        score.textContent = Math.round(item.averageScore) + '/100';
-        row.append(position, link, score);
-        list.append(row);
-      }
-      if (list.children.length) {
-        root.replaceChildren(list);
-        if (data?.stale === true) {
-          root.append(createState('Ranking data may be out of date', 'Showing the last valid ranking while its sources are reviewed.', 'stale'));
-        }
-      } else {
-        if (data?.stale === true) {
-          renderState('Ranking data may be out of date', 'No current verified ranking is available.', 'stale');
-        } else {
-          renderState('Critic ranking pending', 'Verified critic scores are not yet available.');
-        }
-      }
-    })
+    .then(setResult)
     .catch(() => {
-      renderState('Ranking unavailable', 'Verified critic scores could not be refreshed. Please try again later.', 'unavailable');
+      root.replaceChildren(createState('Ranking unavailable', 'Verified critic scores could not be refreshed. Please try again later.', 'unavailable'));
+      const unranked = renderUnranked(year);
+      if (unranked) root.append(unranked);
     })
     .finally(finish);
 })();

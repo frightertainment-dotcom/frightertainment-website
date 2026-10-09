@@ -7,7 +7,7 @@
   document.querySelector('[data-current-ranking-link]').href = `/top-20/${rankingYear}/`;
   const kinds = ['rankings', 'theatrical-releases', 'streaming-releases', 'coming-soon', 'trending-horror'];
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const safeUrl = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; } };
+  const safeUrl = value => { try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; } catch { return ''; } };
   const search = document.querySelector('#home-search');
   let payloads = {};
   let rankingItems = [];

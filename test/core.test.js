@@ -35,12 +35,16 @@ test('duplicate film IDs and same-title year territory records are detected', ()
   assert.equal(findDuplicateFilms([...testFilms, { ...testFilms[0] }]).length, 2);
 });
 
-test('annual ranking scopes by release year and reports daily movement', () => {
+test('annual ranking uses verified film year and reports movement from the previous valid snapshot', () => {
   const ranked = buildAnnualRanking(testFilms, testReviews, 2026, [{ filmId: 'fixture-film-a', position: 2 }]);
   assert.equal(ranked.length, 1);
   assert.equal(ranked[0].movementLabel, 'UP 1');
   assert.equal(buildAnnualRanking(testFilms, testReviews, 2026)[0].movementLabel, '—');
   assert.equal(buildAnnualRanking(testFilms, testReviews, 2025).length, 0);
+  const territoryYearOnly = [{ ...testFilms[0], filmYear: 2025, releaseYear: 2026 }];
+  assert.equal(buildAnnualRanking(territoryYearOnly, testReviews, 2026).length, 0);
+  const correctFilmYearReviews = testReviews.map(review => ({ ...review, filmYear: 2025 }));
+  assert.equal(buildAnnualRanking(territoryYearOnly, correctFilmYearReviews, 2025).length, 1);
 });
 
 test('release date claims must include an ISO date and territory', () => {

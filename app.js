@@ -4,7 +4,7 @@
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
   const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const safeURL = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; } };
+  const safeURL = value => { try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; } catch { return ''; } };
   const licensedPoster = movie => movie.posterLicenceStatus === 'approved' &&
     Boolean(safeURL(movie.poster) && safeURL(movie.posterSourcePage) &&
     safeURL(movie.posterPermissionEvidence) && movie.posterCredit &&
@@ -33,12 +33,12 @@
     return scores.length >= 3 ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
   };
   const recordHasDate = movie => releaseClaims(movie).length > 0;
-  const recordYear = movie => Number(firstClaim(movie, 'releaseYear')?.value || firstClaim(movie, 'filmYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
+  const recordYear = movie => Number(firstClaim(movie, 'filmYear')?.value || firstClaim(movie, 'releaseYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
   const cardRelease = movie => {
     const claims = releaseClaims(movie);
     if (claims.length === 1) return `${prettyDate(claims[0].value)} · ${claims[0].territory}`;
     if (claims.length > 1) return `${claims.length} territory-specific dates · see sources`;
-    const year = firstClaim(movie, 'releaseYear') || firstClaim(movie, 'filmYear');
+    const year = firstClaim(movie, 'filmYear') || firstClaim(movie, 'releaseYear');
     return year ? `${escapeHTML(year.value)} · film year; local availability unconfirmed` : 'Release date and territory unconfirmed';
   };
   const movieHeroMarkup = movie => {
@@ -61,7 +61,7 @@
       '<div class="fr-movie-hero__facts">'+
       (director?'<div><span>DIRECTED BY</span><strong>'+escapeHTML(director)+'</strong></div>':'')+
       (cast?'<div><span>FEATURED CAST</span><strong>'+escapeHTML(cast)+'</strong></div>':'')+
-      '</div><a class="fr-movie-hero__browse" href="/all-horror-movies.html?year='+encodeURIComponent(year)+'">EXPLORE MORE HORROR FROM '+escapeHTML(year)+' ↗</a>'+
+      '</div><a class="fr-movie-hero__browse" href="/all-horror-movies.html?year='+encodeURIComponent(year)+'">EXPLORE MORE HORROR FROM '+escapeHTML(year)+' →</a>'+
       '</div></section>';
   };
   const cardMarkup = movie => {
@@ -73,7 +73,7 @@
     const synopsis = firstClaim(movie, 'synopsis')?.value || 'Verified film identity; further plot information has not been added.';
     const id = encodeURIComponent(movie.id);
     return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder"><span class="poster-mini">FRIGHTERTAINMENT FILM FILE</span><strong>${escapeHTML(movie.title)}</strong><small>FRIGHTERTAINMENT ART</small></div></div>`}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
-      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '<span class="movie-card__score movie-card__score--pending">FRIGHT<br>PENDING</span>' : `<span class="movie-card__score" aria-label="Fright Index ${score} out of 100">${score}<small>/100</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE ↗</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
+      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '<span class="movie-card__score movie-card__score--pending">FRIGHT<br>PENDING</span>' : `<span class="movie-card__score" aria-label="Fright Index ${score} out of 100">${score}<small>/100</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE →</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
   };
   const grid = $('#movie-grid');
   if (grid) {
@@ -108,7 +108,7 @@
         return filterOK && yearOK && searchText.includes(state.query.trim().toLocaleLowerCase());
       });
       filtered.sort((a, b) => state.sort === 'date'
-        ? (releaseClaims(a)[0]?.value || firstClaim(a, 'releaseYear')?.value || '9999').localeCompare(releaseClaims(b)[0]?.value || firstClaim(b, 'releaseYear')?.value || '9999') || a.title.localeCompare(b.title)
+        ? (releaseClaims(a)[0]?.value || firstClaim(a, 'filmYear')?.value || firstClaim(a, 'releaseYear')?.value || '9999').localeCompare(releaseClaims(b)[0]?.value || firstClaim(b, 'filmYear')?.value || firstClaim(b, 'releaseYear')?.value || '9999') || a.title.localeCompare(b.title)
         : a.title.localeCompare(b.title));
       grid.innerHTML = filtered.slice(0,state.visible).map(cardMarkup).join('');
       const more = $('#movie-more');
@@ -139,7 +139,7 @@
   const trailerGrid = $('#trailer-grid');
   if (trailerGrid) {
     const verifiedTrailers = movies.filter(movie => movie.trailer && /^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') && safeURL(movie.trailer.source));
-    trailerGrid.innerHTML = verifiedTrailers.length ? verifiedTrailers.map(movie => `<article class="verified-trailer"><div class="verified-trailer__screen"><button class="button button--red" type="button" data-play-video="${escapeHTML(movie.id)}">PLAY OFFICIAL ${escapeHTML(movie.trailer.kind)}</button><div class="verified-trailer__frame" id="home-trailer-${escapeHTML(movie.id)}" hidden></div></div><div class="verified-trailer__meta"><div><h3>${escapeHTML(movie.title)}</h3><p>OFFICIAL UPLOAD · ${escapeHTML(movie.trailer.channel)} · ${escapeHTML(movie.trailer.territory)}</p></div><a href="${escapeHTML(safeURL(movie.trailer.source))}" target="_blank" rel="noopener noreferrer">SOURCE ></a></div></article>`).join('') : '<div class="video-frame video-frame__empty-block"><div class="video-frame__empty">NO VERIFIED TRAILERS<span>Check back when an exact official studio or distributor upload has been confirmed.</span></div></div>';
+    trailerGrid.innerHTML = verifiedTrailers.length ? verifiedTrailers.map(movie => `<article class="verified-trailer" data-film-id="${escapeHTML(movie.id)}"><div class="verified-trailer__screen"><div class="verified-trailer__type" aria-hidden="true"><span>FRIGHTERTAINMENT · VIDEO FILE</span><strong>${escapeHTML(movie.title)}</strong><small>OFFICIAL ${escapeHTML(movie.trailer.kind.toUpperCase())}</small></div><button class="button button--red" type="button" aria-label="Play official ${escapeHTML(movie.trailer.kind)}: ${escapeHTML(movie.title)}" data-play-video="${escapeHTML(movie.id)}">PLAY OFFICIAL ${escapeHTML(movie.trailer.kind)}</button><div class="verified-trailer__frame" id="home-trailer-${escapeHTML(movie.id)}" hidden></div></div><div class="verified-trailer__meta"><div><h3>${escapeHTML(movie.title)}</h3><p>OFFICIAL UPLOAD · ${escapeHTML(movie.trailer.channel)} · ${escapeHTML(movie.trailer.territory)}</p></div><a href="${escapeHTML(safeURL(movie.trailer.source))}" target="_blank" rel="noopener noreferrer">OFFICIAL VIDEO SOURCE →</a></div></article>`).join('') : '<div class="video-frame video-frame__empty-block"><div class="video-frame__empty">NO VERIFIED TRAILERS<span>Check back when an exact official studio or distributor upload has been confirmed.</span></div></div>';
     trailerGrid.addEventListener('click', event => {
       const button = event.target.closest('[data-play-video]');
       if (!button) return;
@@ -148,11 +148,12 @@
       if (!movie || !trailer) return;
       const frame = $(`#home-trailer-${CSS.escape(movie.id)}`, trailerGrid);
       if (!frame || frame.querySelector('iframe')) return;
+      button.closest('.verified-trailer__screen')?.classList.add('is-playing');
       const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube-nocookie.com/embed/${trailer.videoId}?autoplay=1&rel=0`;
+      iframe.src = `https://www.youtube-nocookie.com/embed/${trailer.videoId}?autoplay=1&rel=0&playsinline=1`;
       iframe.title = `Official ${movie.title} ${trailer.kind}`;
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-      iframe.referrerPolicy = 'strict-origin-when-cross-origin'; iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin'; iframe.allowFullscreen = true; iframe.loading = 'lazy';
       frame.replaceChildren(iframe); frame.hidden = false; button.remove();
     });
   }
@@ -168,12 +169,13 @@
     if (movie && page) {
       const claims = claimList(movie);
       const dates = releaseClaims(movie);
-      const releaseYear = firstClaim(movie, 'releaseYear');
+      const territoryReleaseYear = firstClaim(movie, 'releaseYear');
+      const filmYear = firstClaim(movie, 'filmYear');
       const reviews = validReviews(movie);
       const score = frightIndex(movie);
       const trailer = movie.trailer && /^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') && safeURL(movie.trailer.source) ? movie.trailer : null;
       const sources = reviews.length ? reviews.map(review => `<li class="film-claim"><div><strong>${escapeHTML(review.source)}</strong><p>${escapeHTML(review.display || `${review.score}/${review.outOf}`)} · ${escapeHTML(review.type || 'Critic score')}</p><small>CHECKED ${escapeHTML(review.checked)} · ${escapeHTML(review.territory || 'Territory not stated')}</small></div><a href="${escapeHTML(safeURL(review.url))}" target="_blank" rel="noopener noreferrer">Review source ></a></li>`).join('') : '<li class="film-claim"><div><strong>No eligible critic scores</strong><p>No Frightertainment critic score yet.</p></div></li>';
-      const marketNote = dates.length ? dates.map(claim => `${prettyDate(claim.value)} (${claim.territory})`).join('; ') : releaseYear ? `Release year ${escapeHTML(releaseYear.value)}; ${escapeHTML(releaseYear.territory)}.` : 'A territory-specific release date has not been confirmed.';
+      const marketNote = dates.length ? dates.map(claim => `${prettyDate(claim.value)} (${claim.territory})`).join('; ') : territoryReleaseYear ? `Territory release year ${escapeHTML(territoryReleaseYear.value)}; ${escapeHTML(territoryReleaseYear.territory)}.` : filmYear ? `Film year ${escapeHTML(filmYear.value)}; source: ${escapeHTML(filmYear.sourceName)}.` : 'A territory-specific release date has not been confirmed.';
       const synopsis = firstClaim(movie, 'synopsis');
       page.innerHTML = `${movieHeroMarkup(movie)}<p class="film-status">${escapeHTML(marketNote)} Facts below are linked individually to their source, territory scope and check date. A missing release date means the cited source did not confirm one for a stated market.</p>
         <section class="film-section"><h2>SOURCED FILM DETAILS</h2>${synopsis ? `<p class="film-page__synopsis">${escapeHTML(synopsis.value)}</p>` : ''}<ul class="source-list">${claims.map(claimMarkup).join('')}</ul></section>
@@ -186,8 +188,8 @@
       if (play) play.addEventListener('click', () => {
         const frame = $('#film-trailer', page);
         const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube-nocookie.com/embed/${trailer.videoId}?autoplay=1&rel=0`;
-        iframe.title = `Official ${movie.title} trailer`; iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'; iframe.referrerPolicy = 'strict-origin-when-cross-origin'; iframe.allowFullscreen = true;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${trailer.videoId}?autoplay=1&rel=0&playsinline=1`;
+        iframe.title = `Official ${movie.title} trailer`; iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'; iframe.referrerPolicy = 'strict-origin-when-cross-origin'; iframe.allowFullscreen = true; iframe.loading = 'lazy';
         frame.replaceChildren(iframe); frame.hidden = false; play.remove();
       });
     }

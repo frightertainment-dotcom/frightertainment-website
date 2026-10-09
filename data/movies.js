@@ -444,7 +444,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "Sony Pictures",
@@ -483,7 +483,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2026",
         "sourceName": "Sony Pictures",
@@ -558,7 +558,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "Universal Pictures",
@@ -597,7 +597,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "Universal Pictures",
@@ -636,7 +636,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "NEON",
@@ -675,7 +675,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2024",
         "sourceName": "NEON",
@@ -714,7 +714,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "NEON",
@@ -753,7 +753,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "Sony Pictures",
@@ -792,7 +792,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2024",
         "sourceName": "A24",
@@ -831,7 +831,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2024",
         "sourceName": "Focus Features",
@@ -870,7 +870,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2025",
         "sourceName": "A24",
@@ -909,7 +909,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2026",
         "sourceName": "20th Century Studios",
@@ -948,7 +948,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2026",
         "sourceName": "A24",
@@ -987,7 +987,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2026",
         "sourceName": "Paramount Pictures",
@@ -1026,7 +1026,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2026",
         "sourceName": "Sony Pictures",
@@ -1065,7 +1065,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Film year (not a local streaming date)",
         "value": "2026",
         "sourceName": "Searchlight Pictures",
@@ -1104,7 +1104,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Original release year",
         "value": "2007",
         "sourceName": "20th Century Studios",
@@ -1161,7 +1161,7 @@ window.FR_MOVIES = [
         "checked": "2026-10-08"
       },
       {
-        "field": "releaseYear",
+        "field": "filmYear",
         "label": "Original UK production / cinema year",
         "value": "2002",
         "sourceName": "BBFC",

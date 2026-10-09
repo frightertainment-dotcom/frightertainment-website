@@ -22,6 +22,10 @@ test('verified 2026 film records remain separate from the critic ranking', () =>
     return Number(claim?.value) === 2026 && film.editorialStatus === 'approved';
   });
   assert.equal(eligible.length, 7);
+  assert.deepEqual(Array.from(eligible, film => film.id).sort(), [
+    '28-years-later-bone-temple', 'backrooms', 'insidious-out-of-the-further', 'ready-or-not-2',
+    'scream-7', 'send-help', 'victorian-psycho'
+  ]);
   for (const film of eligible) {
     assert((film.claims || []).some(claim => claim.field === 'title' && claim.source));
     assert((film.claims || []).some(claim => ['filmYear', 'releaseYear'].includes(claim.field) && claim.value === '2026' && claim.source));
@@ -31,6 +35,11 @@ test('verified 2026 film records remain separate from the critic ranking', () =>
       !film.claims.some(yearClaim => ['filmYear', 'releaseYear'].includes(yearClaim.field))));
   assert(territoryOnly2026.length >= 4);
   assert(territoryOnly2026.every(film => !eligible.includes(film)));
+  for (const filmId of ['crawlers', 'clayface', 'werwulf', 'other-mommy']) {
+    const film = films.find(item => item.id === filmId);
+    assert(film?.claims.some(claim => claim.field === 'releaseDate' && claim.value.startsWith('2026-')));
+    assert(!film.claims.some(claim => claim.field === 'filmYear' && claim.value === '2026'));
+  }
 });
 
 test('public homepage, chart, and film clients contain no publisher-preview scoring path', async () => {

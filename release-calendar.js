@@ -22,7 +22,7 @@
     const scope=document.createElement('small');scope.textContent=claim.territory;
     details.append(link,scope);
     const status=document.createElement('span');status.className='hub-release-state';status.textContent=claim.value<checked?'DATE PASSED':claim.value===checked?'DATED TODAY':'FUTURE DATE';
-    const source=document.createElement('a');source.href=claim.source;source.target='_blank';source.rel='noopener noreferrer';source.className='hub-release-source';source.textContent='SOURCE ↗';source.setAttribute('aria-label','View official source for '+film.title+' release date');
+    const source=document.createElement('a');source.href=claim.source;source.target='_blank';source.rel='noopener noreferrer';source.className='hub-release-source';source.textContent='SOURCE →';source.setAttribute('aria-label','View official source for '+film.title+' release date');
     article.append(date,details,status,source);root.append(article);
   }
 })();
