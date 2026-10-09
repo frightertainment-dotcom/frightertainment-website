@@ -244,13 +244,13 @@ const curatedFilmRenderer=await readFile(new URL('scripts/build-pages.mjs',root)
 if(profileCache.schemaVersion!==1||!profileCache.records||typeof profileCache.records!=='object')
   errors.push('Cumulative CC0 profile store is unavailable');
 for(const [qid,entry] of Object.entries(profileCache.records||{})){
-  if(!/^Q[1-9]\\d*$/.test(qid)||entry.qid!==qid||
+  if(!/^Q[1-9]\d*$/.test(qid)||entry.qid!==qid||
      entry.sourceUrl!=='https://www.wikidata.org/wiki/'+qid ||
      !validDay(entry.checkedAt))
     errors.push('Invalid sourced profile '+qid);
   for(const kind of ['directors','cast','genres','countries']){
     if(!entry[kind])continue;
-    if(!Array.isArray(entry[kind])||entry[kind].some(x=>!x.name||!/^Q[1-9]\\d*$/.test(x.qid||'')))
+    if(!Array.isArray(entry[kind])||entry[kind].some(x=>!x.name||!/^Q[1-9]\d*$/.test(x.qid||'')))
       errors.push('Invalid CC0 property '+qid+'/'+kind);
   }
 }
