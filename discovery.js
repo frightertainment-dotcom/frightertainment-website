@@ -37,22 +37,22 @@
       if (updated) updated.textContent = dataSet?.updatedAt ? `Last updated: ${new Date(dataSet.updatedAt).toLocaleString('en-GB')} · ${dataSet.status === 'stale' ? 'stale data' : `source checked ${dataSet.checkedAt || 'date unavailable'}`}` : 'Last updated: no verified data';
       if (!dataSet || dataSet.status === 'unavailable') {
         const messages = {
-          'coming-soon': 'No current release listings are available from a configured territory feed.',
-          'streaming-availability': 'Subscription, rental and purchase services are unconfirmed for this territory.',
-          'streaming-releases': 'Availability is unconfirmed: licensed territory data is not connected.',
-          'theatrical-releases': 'No verified recent theatrical release dates are available for this territory.',
-          'trending-horror': 'Popularity listings are unavailable until the commercial source is licensed.'
+          'coming-soon': 'No upcoming releases in this feed.',
+          'streaming-availability': 'No additional viewing services listed.',
+          'streaming-releases': 'No additional streaming listings yet.',
+          'theatrical-releases': 'No recent cinema listings here yet.',
+          'trending-horror': 'No current popularity chart.'
         };
         setState(kind, messages[kind]);
       } else if (dataSet.status === 'stale') setState(kind, `Showing last verified ${dataSet.checkedAt || 'unknown'} data; refresh failed and this information may have expired.`);
       else setState(kind, items.length ? kind === 'trending-horror' ? `${items.length} titles in the global weekly list (title language follows the selected region).` : `${items.length} verified ${items.length === 1 ? 'listing' : 'listings'} for ${names[countrySelect.value]}.` : 'No verified listings are available for this country and search.');
     }
     const sources = [...new Set(kinds.flatMap(kind => (data[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
-    $('#discovery-attribution').textContent = sources.length ? `Automated data sources: ${sources.join(', ')}. Every listing links to its source and states its territory and check date.` : 'No automated source data is currently published. Licensed source attribution will be shown alongside listings.';
+    $('#discovery-attribution').textContent = sources.length ? `Sources: ${sources.join(', ')}. Every listing links to its source and states its territory and check date.` : 'Find more films and viewing options.';
   }
   async function load() {
     const country = countrySelect.value;
-    for (const kind of kinds) setState(kind, 'Checking the territory-specific source…');
+    for (const kind of kinds) setState(kind, 'Finding available listings…');
     try {
       const [feedResponse, rankingResponse] = await Promise.all([
         fetch(`/api/discovery?country=${encodeURIComponent(country)}`, { headers: { accept: 'application/json' } }),
