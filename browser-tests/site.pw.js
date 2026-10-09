@@ -515,3 +515,28 @@ test('Movies has a compact secondary tools drawer, deep-linked cinema tools expa
   await page.setViewportSize({width:390,height:844});
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('optional homepage discovery still shows real UK editorial release notices with provider APIs offline',async({page})=>{
+  await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
+  await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
+  await page.goto('/');
+  await page.locator('.home-discovery-wrap summary').click();
+  await expect(page.locator('[data-home-list="streaming-releases"] article')).toHaveCount(4);
+  await expect(page.locator('[data-home-list="streaming-releases"]')).toContainText('Shudder');
+  await expect(page.locator('[data-home-list="theatrical-releases"]')).toContainText('Other Mommy');
+  await expect(page.locator('[data-home-list="coming-soon"]')).toContainText('Jitters');
+  await expect(page.locator('[data-home-list="trending-horror"]')).toContainText('Shudder');
+  await expect(page.locator('[data-home-state="trending-horror"]')).toContainText('UK release announcements');
+  await expect(page.locator('#home-attribution')).toContainText('Shudder UK release calendar');
+});
+test('opened Movies discovery links source-checked current and future horror even if licensed feeds are disabled',async({page})=>{
+  await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
+  await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
+  await page.goto('/movies.html#discovery');
+  await expect(page.locator('.movie-advanced')).toHaveAttribute('open','');
+  await expect(page.locator('[data-list="streaming-releases"]')).toContainText('Shudder');
+  await expect(page.locator('[data-list="theatrical-releases"]')).toContainText('Other Mommy');
+  await expect(page.locator('[data-list="coming-soon"]')).toContainText('Jitters');
+  await expect(page.locator('[data-list="trending-horror"]')).toContainText('Shudder');
+  await expect(page.locator('[data-state="rankings"]')).toContainText('Private preview');
+});
