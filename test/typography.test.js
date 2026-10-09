@@ -30,6 +30,7 @@ test('all directly served HTML pages declare the shared display and body fonts',
 test('section and film display typography uses the licensed horror display face with a safe fallback', async () => {
   const css = await readFile(join(process.cwd(), 'hub.css'), 'utf8');
   assert.match(css, /--font-horror:'Cormorant Garamond',Georgia,serif/);
+  assert.match(css, /--font-room:'Grenze Gotisch',Georgia,serif/, 'Movies and indie horror rooms use the licensed Gothic display');
   assert.match(css, /\.hub-intro h1,\.hub-page-intro h1[^\n]*font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
   assert.match(css, /\.hub-section \.fr-movie-hero__info h1\{font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
   assert.match(css, /\.hub-chart-row a\{font:700 16px\/1\.1 var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
