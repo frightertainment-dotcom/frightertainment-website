@@ -7,7 +7,7 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const publicFiles = [
-  'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html', 'editorial-standards.html',
+  'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
   'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-archive.js', 'archive-film.js',
   'styles.css', 'hub.css', 'sitemap.xml'
 ];
@@ -50,4 +50,5 @@ await writeFile(new URL('_headers', destination), sharedHeaders.replace('/*',
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]
 }));
+await cp(new URL('_redirects', root), new URL('_redirects', destination));
 console.log('Private-preview static bundle prepared in dist/ (no provider credentials, Worker code, or test data).');
