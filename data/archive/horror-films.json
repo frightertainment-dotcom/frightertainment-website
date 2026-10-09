@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-08T19:54:51.749Z",
+  "updatedAt": "2026-10-09T13:54:33.725Z",
   "source": "Wikidata CC0 structured data",
   "sourceUrl": "https://www.wikidata.org/wiki/Wikidata:Licensing",
   "coverage": "Known Wikidata horror-film genre records with published date and English label; not every global cinema, VOD or direct-to-video film",
@@ -68217,7 +68217,7 @@
     "windows": 11,
     "rowsFetched": 15894,
     "matched": 9772,
-    "added": 9772,
+    "added": 0,
     "corrected": 0,
     "total": 9772
   }
