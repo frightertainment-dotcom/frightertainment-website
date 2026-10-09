@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../worker/index.js';
+import { calculateDailyRanking } from '../worker/staging-rankings.js';
 import { onRequest } from '../functions/api/[[path]].js';
 
 test('health endpoint returns JSON without a data binding', async () => {
@@ -31,10 +32,11 @@ test('ranking API serves an atomic last-good snapshot and labels a fallback snap
   const chart = { year: 2026, status: 'ranked', minimumCritics: 3, rankedFilms: 1, pendingFilmCount: 0,
     items: [{ filmId: 'clayface', title: 'Verified Film', position: 1, averageScore: 82, criticCount: 3, sources: [] }] };
   const DB = { prepare(sql) { return { bind() { return this; }, async all() {
+    if (sql.includes('LIMIT 0')) return { results: [] };
     if (!sql.includes('annual_ranking_snapshots')) throw new Error(`Unexpected query: ${sql}`);
     return { results: [
-      { rankedAt: '2026-10-09', publishedAt: '2026-10-09T04:00:00.000Z', payload: '{invalid' },
-      { rankedAt: '2026-10-08', publishedAt: '2026-10-08T04:00:00.000Z', payload: JSON.stringify(chart) }
+      { rankedAt: '2026-10-09', publishedAt: '2026-10-09T04:00:00.000Z', resultCount: 1, payload: '{invalid' },
+      { rankedAt: '2026-10-08', publishedAt: '2026-10-08T04:00:00.000Z', resultCount: 1, payload: JSON.stringify(chart) }
     ] };
   } }; } };
   const response = await worker.fetch(new Request('https://site.test/api/rankings?year=2026'), { DB });
@@ -45,43 +47,100 @@ test('ranking API serves an atomic last-good snapshot and labels a fallback snap
   assert.equal(payload.items[0].title, 'Verified Film');
 });
 
-test('daily ranking scheduler writes an empty or populated snapshot atomically with position history', async () => {
+test('ranking API stays honestly pending before film_year and annual snapshots exist', async () => {
+  const DB = { prepare(sql) { return { bind() { return this; }, async all() {
+    if (sql.includes('film_year')) throw new Error('no such column: film_year');
+    return { results: [] };
+  } }; } };
+  const response = await worker.fetch(new Request('https://site.test/api/rankings?year=2026'), { DB });
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.status, 'pending');
+  assert.equal(payload.rankingSchemaStatus, 'migration-required');
+  assert.equal(payload.rankedFilms, 0);
+  assert.deepEqual(payload.items, []);
+  assert.equal(payload.updatedAt, null);
+});
+
+test('staging daily ranking reads film_year and atomically publishes a shared annual snapshot', async () => {
   const batches = [];
   const film = { id: 'fixture-film-a', title: 'Fixture Ranked Horror', filmYear: 2026 };
-  const reviews = [
-    ['critic-a', 4], ['critic-b', 5], ['critic-c', 3]
-  ].map(([criticId, score], index) => ({
-    filmId: film.id, filmYear: 2026, criticId, criticName: `Critic ${index + 1}`, publication: 'Fixture Review',
-    publicationUrl: 'https://review.example.test/about', reviewUrl: `https://review.example.test/${index + 1}`,
-    score, scoreOutOf: 5, territory: 'GB', publishedAt: `2026-10-0${index + 1}`, checkedAt: '2026-10-09',
+  const reviews = [['critic-a', 4], ['critic-b', 5], ['critic-c', 3]].map(([criticId, score], index) => ({
+    filmId: film.id, filmYear: 2026, criticId, criticName: 'Critic ' + (index + 1), publication: 'Fixture Review',
+    publicationUrl: 'https://review.example.test/about', reviewUrl: 'https://review.example.test/' + (index + 1),
+    score, scoreOutOf: 5, territory: 'GB', publishedAt: '2026-10-0' + (index + 1), checkedAt: '2026-10-09',
     permissionCleared: true, professionalVerified: true, ratingKind: 'numeric-professional-review'
   }));
   const DB = { prepare(sql) {
     return { sql, values: [], bind(...values) { this.values = values; return this; }, async all() {
+      if (sql.includes('LIMIT 0')) return { results: [] };
       if (sql.includes('SELECT DISTINCT film_year')) return { results: [{ year: 2026 }] };
       if (sql.includes('FROM canonical_films') && sql.includes('film_year = ?')) return { results: [film] };
-      if (sql.includes('FROM critic_reviews') && sql.includes('status = \'approved\'')) return { results: reviews };
-      if (sql.includes('FROM rank_history') && sql.includes('ranked_at = ?')) return { results: [{ filmId: film.id, position: 2 }] };
-      if (sql.includes('annual_ranking_snapshots')) return { results: [] };
+      if (sql.includes('FROM critic_reviews') && sql.includes("status = 'approved'")) return { results: reviews };
+      if (sql.includes('annual_ranking_snapshots')) return { results: [{ rankedAt: '2026-10-08', payload: JSON.stringify({ year: 2026, rankedFilms: 1, items: [{ filmId: film.id, position: 2 }] }) }] };
       return { results: [] };
     }, async first() {
-      if (sql.includes('annual_ranking_snapshots')) return { rankedAt: '2026-10-08' };
-      if (sql.includes('MAX(ranked_at)')) return { rankedAt: '2026-10-08' };
       return null;
     }, async run() { return { meta: { changes: 1 } }; } };
   }, async batch(statements) { batches.push(statements); } };
-  const tasks = await worker.scheduled({ cron: '0 4 * * *' }, { DB, DEFAULT_COUNTRY: 'GB', DISCOVERY_COUNTRIES: 'GB' });
+  const result = await calculateDailyRanking(DB, new Date('2026-10-09T04:00:00.000Z'));
   const rankingBatch = batches.find(batch => batch.some(statement => statement.sql.includes('annual_ranking_snapshots')));
   assert.ok(rankingBatch);
-  assert.equal(rankingBatch.some(statement => statement.sql.includes('rank_history')), true);
+  assert.equal(rankingBatch.some(statement => statement.sql.includes('rank_history')), false);
+  assert.equal(rankingBatch.some(statement => statement.sql.includes('update_runs')), true);
   const snapshot = rankingBatch.find(statement => statement.sql.includes('annual_ranking_snapshots'));
   const payload = JSON.parse(snapshot.values[4]);
   assert.equal(payload.rankedFilms, 1);
   assert.equal(payload.items[0].movementLabel, 'UP 1');
   assert.equal(payload.items[0].averageScore, 80);
-  assert.equal(tasks.some(task => task.task === 'licensed-review-ingestion' && task.status === 'skipped'), true);
+  assert.equal(result.rankedRows, 1);
+  assert.equal(result.snapshots[0].year, 2026);
 });
 
+test('staging ranking records an honest empty snapshot and migration-required state', async () => {
+  const batches = [];
+  const DB = { prepare(sql) { return { sql, values: [], bind(...values) { this.values = values; return this; }, async all() {
+    if (sql.includes('LIMIT 0')) return { results: [] };
+    if (sql.includes('SELECT DISTINCT film_year')) return { results: [{ year: 2026 }] };
+    if (sql.includes('FROM canonical_films') && sql.includes('film_year = ?')) return { results: [{ id: 'verified-film', title: 'Verified Film', filmYear: 2026 }] };
+    if (sql.includes('FROM critic_reviews')) return { results: [] };
+    return { results: [] };
+  }, async first() { return null; }, async run() { return { meta: { changes: 1 } }; } }; }, async batch(statements) { batches.push(statements); } };
+  const result = await calculateDailyRanking(DB, new Date('2026-10-09T04:00:00.000Z'));
+  const snapshot = batches[0].find(statement => statement.sql.includes('annual_ranking_snapshots'));
+  const payload = JSON.parse(snapshot.values[4]);
+  assert.equal(result.rankedRows, 0);
+  assert.equal(payload.status, 'pending');
+  assert.equal(payload.items.length, 0);
+  assert.deepEqual(payload.pendingFilms, [{ filmId: 'verified-film', title: 'Verified Film', criticCount: 0 }]);
+  let skippedRun;
+  const oldSchema = { prepare(sql) { return { bind(...values) { this.values = values; return this; }, async all() {
+    if (sql.includes('film_year')) throw new Error('no such column: film_year');
+    return { results: [] };
+  }, async run() { skippedRun = this.values; return { meta: { changes: 1 } }; } }; } };
+  const skipped = await calculateDailyRanking(oldSchema, new Date('2026-10-09T04:00:00.000Z'));
+  assert.equal(skipped.status, 'skipped');
+  assert.equal(skipped.reason, 'migration-required');
+  assert.equal(skippedRun[3], 'skipped');
+});
+
+test('failed daily ranking batch retains the last valid snapshot and logs failure', async () => {
+  const prior = { year: 2026, rankedFilms: 1, items: [{ filmId: 'verified-film', position: 1 }] };
+  let failedLog = null;
+  const DB = { prepare(sql) { return { values: [], bind(...values) { this.values = values; return this; }, async all() {
+    if (sql.includes('LIMIT 0')) return { results: [] };
+    if (sql.includes('SELECT DISTINCT film_year')) return { results: [{ year: 2026 }] };
+    if (sql.includes('FROM canonical_films') && sql.includes('film_year = ?')) return { results: [] };
+    if (sql.includes('FROM critic_reviews')) return { results: [] };
+    if (sql.includes('annual_ranking_snapshots')) return { results: [{ rankedAt: '2026-10-08', payload: JSON.stringify(prior) }] };
+    return { results: [] };
+  }, async first() { return null; }, async run() { failedLog = this.values; return { meta: { changes: 1 } }; } }; },
+  async batch() { throw new Error('forced isolated batch failure'); } };
+  const result = await calculateDailyRanking(DB, new Date('2026-10-09T04:00:00.000Z'));
+  assert.equal(result.snapshots[0].status, 'failed');
+  assert.match(failedLog[8], /forced isolated batch failure/);
+  assert.equal(prior.items[0].position, 1);
+});
 test('film detail endpoint rejects malformed and path-shaped identifiers safely', async () => {
   for (const id of ['%2Fadmin', '%E0%A4%A', '..']) {
     const response = await worker.fetch(new Request(`https://site.test/api/films/${id}`), { DB: {} });

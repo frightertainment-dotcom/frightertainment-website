@@ -1,45 +1,55 @@
-// Staging-only, zero-provider daily ranking snapshot.
-// Runs after verified critic reviews are editorially approved in the staging D1.
-// Does NOT acquire reviews, scrape critics, or call licensed providers.
-const RANKING_SQL = `
-INSERT INTO rank_history(release_year,film_id,position,average_score,critic_count,ranked_at)
-SELECT release_year,film_id,position,average_score,critic_count,ranked_at
-FROM (
-  SELECT f.release_year, f.film_id,
-  ROW_NUMBER() OVER(PARTITION BY f.release_year ORDER BY ROUND(AVG(r.score*100.0/r.score_out_of),0) DESC,
-    COUNT(DISTINCT r.critic_id) DESC,f.title COLLATE NOCASE,f.film_id) AS position,
-  ROUND(AVG(r.score*100.0/r.score_out_of),0) AS average_score,
-  COUNT(DISTINCT r.critic_id) AS critic_count,
-  DATE('now') AS ranked_at
-  FROM canonical_films f
-  JOIN critic_reviews r ON r.film_id=f.film_id AND r.release_year=f.release_year
-  WHERE f.editorial_status='approved' AND f.horror_verified=1
-    AND r.status='approved' AND r.permission_cleared=1 AND r.professional_verified=1
-    AND r.score>=0 AND r.score_out_of>0 AND r.score<=r.score_out_of
-  GROUP BY f.release_year,f.film_id
-  HAVING COUNT(DISTINCT r.critic_id)>=3
-)
-WHERE position<=20
-ON CONFLICT(release_year,film_id,ranked_at)
-DO UPDATE SET position=excluded.position,average_score=excluded.average_score,critic_count=excluded.critic_count
-`;
-export async function calculateDailyRanking(db, now=new Date()){
-  if(!db)throw Error('Staging D1 binding missing');
-  const result=await db.prepare(RANKING_SQL).run();
-  const updatedAt=now.toISOString();
-  return {updatedAt, rankedRows:result.meta?.changes??0,method:'approved-numeric-critic-scores-only'};
+// Staging-only daily snapshot job. It reads already approved, permission-cleared
+// critic reviews; it never scrapes or calls a ratings provider.
+import { hasRankingSchema, listRankingYears, publishAnnualRankingSnapshot } from './ranking-snapshots.js';
+
+const method = 'approved-numeric-critic-scores-only';
+const log = (event, details = {}) => console.log(JSON.stringify({ event, ...details }));
+const errorDetails = error => ({
+  code: error?.name === 'TypeError' ? 'invalid_data' : 'storage_or_schema_error',
+  message: String(error?.message || 'unknown').slice(0, 240)
+});
+
+async function logRun(db, { task, trigger = 'cron-staging', status, startedAt, finishedAt, count = 0, error = null }) {
+  await db.prepare(`INSERT INTO update_runs(run_id, task, country_code, trigger_name, status, started_at, finished_at, record_count, error_code, error_message)
+    VALUES(?, ?, '', ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(crypto.randomUUID(), task, trigger, status, startedAt, finishedAt, count, error?.code || null, error?.message || null).run();
 }
+
+export async function calculateDailyRanking(db, now = new Date()) {
+  if (!db) throw new Error('Staging D1 binding missing');
+  const startedAt = now.toISOString();
+  if (!(await hasRankingSchema(db))) {
+    const issue = { code: 'migration_required', message: 'film_year and annual_ranking_snapshots are not available' };
+    await logRun(db, { task: 'annual-rankings', status: 'skipped', startedAt, finishedAt: now.toISOString(), error: issue });
+    log('daily_staging_rankings_skipped', { reason: 'migration-required' });
+    return { updatedAt: now.toISOString(), rankedRows: 0, status: 'skipped', reason: 'migration-required', method };
+  }
+
+  const years = await listRankingYears(db, now.getUTCFullYear());
+  const snapshots = [];
+  for (const year of years) {
+    try {
+      const payload = await publishAnnualRankingSnapshot(db, year, now, 'cron-staging');
+      snapshots.push({ year, rankedRows: payload?.rankedFilms || 0, status: 'published' });
+    } catch (error) {
+      const issue = errorDetails(error);
+      try { await logRun(db, { task: `ranking-${year}`, status: 'failed', startedAt, finishedAt: new Date().toISOString(), error: issue }); }
+      catch (logError) { log('staging_ranking_failure_log_failed', { year, error: errorDetails(logError) }); }
+      snapshots.push({ year, rankedRows: 0, status: 'failed', error: issue });
+      log('staging_ranking_snapshot_failed_last_good_retained', { year, error: issue });
+    }
+  }
+  return { updatedAt: now.toISOString(), rankedRows: snapshots.reduce((total, row) => total + row.rankedRows, 0), status: 'published', snapshots, method };
+}
+
 export default {
-  async scheduled(_controller,env,_ctx){
-    const startedAt=new Date().toISOString();
-    try{
-      const {rankedRows}=await calculateDailyRanking(env.DB);
-      await env.DB.prepare(`INSERT INTO update_runs(run_id,task,country_code,trigger_name,status,started_at,finished_at,record_count)
-        VALUES(?, 'daily-critic-ranking', '', 'cron-staging', 'published', ?, ?, ?)`)
-        .bind(crypto.randomUUID(),startedAt,new Date().toISOString(),rankedRows).run();
-      console.log(JSON.stringify({event:'daily_staging_rankings_updated',rankedRows}));
-    }catch(error){
-      console.error(JSON.stringify({event:'daily_staging_rankings_failed',reason:String(error?.message||'unknown').slice(0,180)}));
+  async scheduled(_controller, env, _ctx) {
+    try {
+      const result = await calculateDailyRanking(env.DB);
+      log('daily_staging_rankings_updated', { rankedRows: result.rankedRows, status: result.status, years: result.snapshots?.map(row => row.year) || [] });
+      return result;
+    } catch (error) {
+      log('daily_staging_rankings_failed', { reason: errorDetails(error).message });
       throw error;
     }
   }
