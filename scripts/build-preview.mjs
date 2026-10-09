@@ -21,6 +21,7 @@ await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
+await cp(new URL('data/archive/profiles.json', root), new URL('data/archive/profiles.json', destination));
 
 // Prevent any staging page from being indexed, including generated film and ranking pages.
 async function markHtmlNoIndex(directory) {
