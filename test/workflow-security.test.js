@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-test('write-enabled archive workflows pass branch names through quoted environment variables', async () => {
+test('write-enabled archive workflows target protected staging and never push directly to main', async () => {
   for (const file of ['.github/workflows/horror-archive-sync.yml', '.github/workflows/film-profile-sync.yml']) {
     const workflow = await readFile(file, 'utf8');
-    assert.match(workflow, /TARGET_BRANCH:\s*\$\{\{\s*github\.ref_name\s*\}\}/, `${file} must expose the selected branch as an environment value`);
+    assert.match(workflow, /TARGET_BRANCH:\\s*codex\\/frightertainment-v1/, `${file} must commit into the protected staging branch`);
+    assert.match(workflow, /ref:\\s*codex\\/frightertainment-v1/, `${file} must check out staging before syncing`);
+    assert.doesNotMatch(workflow, /TARGET_BRANCH:\\s*main\\b/, `${file} must not automatically update the public branch`);
     assert.doesNotMatch(workflow, /git\s+(?:fetch|rebase|push)[^\n]*\$\{\{/, `${file} must not interpolate the branch expression inside git shell commands`);
     assert.match(workflow, /git fetch origin "refs\/heads\/\$\{TARGET_BRANCH\}"/);
     assert.match(workflow, /git push origin "HEAD:refs\/heads\/\$\{TARGET_BRANCH\}"/);
