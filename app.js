@@ -98,8 +98,6 @@
       const options=[
         {value:String(currentYear),label:currentYear+' RELEASES'},
         {value:String(currentYear-1),label:(currentYear-1)+' RELEASES'},
-        {value:'older',label:'PRE-'+(currentYear-1)+' EDITORIAL PICKS'},
-        {value:'future',label:(currentYear+1)+' ONWARDS'},
         {value:'all',label:'ALL EDITORIAL PICKS'}
       ];
       yearMenu.replaceChildren(...options.map(item=>{
@@ -115,9 +113,7 @@
         const filterOK = state.filter === 'all' || (state.filter === 'date-tbc' && !dateKnown) ||
           (state.filter === 'reviewed' && hasScore);
         const year = listingYear(movie);
-        const yearOK = state.year === 'all' || (state.year === 'older' ? year !== null && year < currentYear-1 :
-          state.year === 'future' ? year !== null && year > new Date().getUTCFullYear() :
-          year === Number(state.year));
+        const yearOK = state.year === 'all' || year === Number(state.year);
         const searchText = [movie.title, ...claimList(movie).map(claim => claim.value)].join(' ').toLocaleLowerCase();
         return filterOK && yearOK && searchText.includes(state.query.trim().toLocaleLowerCase());
       });
@@ -133,7 +129,7 @@
       $('#results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'selected film' : 'selected films'}`;
       $('#total-count').textContent = String(movies.length).padStart(2, '0');
       const scope=$('#movie-year-title');
-      if (scope) scope.textContent=state.year==='all'?'ALL EDITORIAL PICKS':state.year==='older'?'PRE-'+(currentYear-1)+' EDITORIAL PICKS':state.year==='future'?'FUTURE EDITORIAL PICKS':state.year+' FEATURED FILMS';
+      if (scope) scope.textContent=state.year==='all'?'ALL EDITORIAL PICKS':state.year+' FEATURED FILMS';
     };
     document.addEventListener('click', event => {
       const chip = event.target.closest('[data-filter]');

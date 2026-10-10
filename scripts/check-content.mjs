@@ -117,7 +117,7 @@ for (const path of ['top-20/2026/index.html','films/28-years-later-bone-temple/i
   if (!markup.includes('data-theme="movies"')) errors.push(`${path} must use the Movies environment`);
 }
 const movieYearsMarkup = await readFile(new URL('movies.html',root),'utf8');
-for (const required of ['id="movie-year"', 'value="older"', 'value="2025"', 'value="2026"']) {
+for (const required of ['id="movie-year"', 'value="all"', 'value="2025"', 'value="2026"']) {
   if (!movieYearsMarkup.includes(required)) errors.push('Movie year filter missing '+required);
 }
 if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='filmYear' && claim.value==='2007')))

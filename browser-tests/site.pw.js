@@ -326,21 +326,20 @@ test('upcoming release calendar excludes historical and already released films',
   await expect(calendar).not.toContainText('2007');
 });
 
-test('2026 is default and earlier films are under their actual original years', async ({page})=>{
+test('featured recent years are separate from the complete pre-2025 year-by-year archive',async({page})=>{
   await page.goto('/movies.html');
   await expect(page.locator('#movie-year')).toHaveValue('2026');
   await expect(page.locator('#results-count')).toContainText('11 selected films');
-  await expect(page.locator('#movie-grid')).toContainText('28 Years Later: The Bone Temple');
   await expect(page.locator('#movie-grid')).not.toContainText('28 Weeks Later');
-  await expect(page.locator('#movie-grid')).not.toContainText('28 Years Later</');
-  await page.selectOption('#movie-year', '2025');
+  await expect(page.locator('#movie-year option[value="older"],#movie-year option[value="future"]')).toHaveCount(0);
+  await page.selectOption('#movie-year','2025');
   await expect(page.locator('#results-count')).toContainText('7 selected films');
-  await expect(page.locator('#movie-grid')).toContainText('28 Years Later');
-  await page.selectOption('#movie-year', 'older');
-  await expect(page.locator('#results-count')).toContainText('5 selected films');
-  await expect(page.locator('#movie-grid')).toContainText('28 Weeks Later');
-  await page.selectOption('#movie-year', 'all');
+  await page.selectOption('#movie-year','all');
   await expect(page.locator('#results-count')).toContainText('24 selected films');
+  await page.goto('/all-horror-movies.html?year=2007');
+  await expect(page.locator('#archive-summary')).toContainText('horror films across');
+  await expect(page.locator('.horror-year')).not.toHaveCount(0);
+  await expect(page.getByText('28 Weeks Later',{exact:true}).first()).toBeVisible();
 });
 
 test('public film pages expose no private publisher snapshots or Fright Rating section',async({page})=>{
@@ -1060,4 +1059,57 @@ test('removed Editorial Standards page is not served and public navigation has n
     await page.goto(pathname);
     await expect(page.locator('a[href$="editorial-standards.html"]')).toHaveCount(0);
   }
+});
+
+test('all seven main tabs fit narrow and wide viewports, with centred second-row links',async({browser})=>{
+  test.setTimeout(150000);
+  for(const width of [320,375,390,768,1440]){
+    const page=await browser.newPage({viewport:{width,height:820},reducedMotion:'reduce'});
+    await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[],page:1,totalPages:1,status:'ready'}}));
+    for(const path of ['/','/movies.html','/tv-shows.html','/cinema.html','/indie-movies.html','/podcasts.html','/games.html']){
+      await page.goto(path);
+      await expect(page.locator('.hub-tabs a')).toHaveCount(7);
+      await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+      if(width<=640){
+        const values=await page.locator('.hub-tabs').evaluate(nav=>{
+          const box=nav.getBoundingClientRect();
+          const links=[...nav.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
+          return {diff:Math.abs((links[4].left+links[6].right)/2 - (box.left+box.right)/2),row2:links[4].top,firstRow:links[0].top,lastRow:links[6].top};
+        });
+        expect(values.row2).toBeGreaterThan(values.firstRow);
+        expect(values.row2).toBe(values.lastRow);
+        expect(values.diff).toBeLessThanOrEqual(4);
+      }
+    }
+    if(width===375){await page.goto('/movies.html');await page.screenshot({path:'test-results/visual/frightertainment-movies-375px.png',fullPage:true});}
+    await page.close();
+  }
+});
+test('cinema country control persists selection and only shows UK editorial results for UK',async({page})=>{
+  const seen=[];
+  await page.route('**/api/catalogue?**',route=>{
+    seen.push(new URL(route.request().url()).searchParams.get('country'));
+    return route.fulfill({json:{items:[],page:1,totalPages:1,status:'ready'}});
+  });
+  await page.goto('/cinema.html');
+  await page.locator('#cinema-country').selectOption('US');
+  await expect.poll(()=>seen.at(-1)).toBe('US');
+  await expect(page.locator('[data-cinema-country-label]').first()).toHaveText('UNITED STATES');
+  await expect(page.locator('#recent-cinema')).toBeHidden();
+  await page.reload();
+  await expect(page.locator('#cinema-country')).toHaveValue('US');
+  await page.locator('#cinema-country').selectOption('GB');
+  await expect.poll(()=>seen.at(-1)).toBe('GB');
+  await expect(page.locator('#recent-cinema')).toBeVisible();
+});
+test('TV chart is year-specific and Games chart has a sourced, consistent rating method',async({page})=>{
+  await page.goto('/tv-shows.html');
+  await expect(page.locator('#chart-heading')).toContainText('TOP HORROR SHOWS OF 2026');
+  await page.locator('#chart select').selectOption('2025');
+  await expect(page.locator('#chart-heading')).toContainText('TOP HORROR SHOWS OF 2025');
+  await page.goto('/games.html');
+  await expect(page.locator('#halloween-title')).toContainText('HALLOWEEN');
+  await expect(page.locator('.fr-game-chart__rows li')).toHaveCount(5);
+  await expect(page.locator('.fr-game-chart a[href*="steamdb.info/stats/gameratings/2026/"]')).toBeVisible();
+  await expect(page.locator('.fr-game-spotlight iframe')).toHaveAttribute('src',/store.steampowered.com\/widget\/3219630/);
 });
