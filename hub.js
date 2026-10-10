@@ -241,7 +241,7 @@
       const kind = movementText === 'NEW' ? 'new' : movementText.startsWith('UP') ? 'up' : movementText.startsWith('DOWN') ? 'down' : 'same';
       movement.dataset.kind = kind;
       movement.textContent = ratingKind === 'tmdb-community' ? 'TMDB' : movementText === '—' ? 'UNCHANGED' : movementText;
-      movement.setAttribute('aria-label', movementText === '—' ? 'Position unchanged' : `Position movement ${movementText.toLowerCase()}`);
+      movement.setAttribute('aria-label', ratingKind === 'tmdb-community' ? 'TMDB community chart' : movementText === '—' ? 'Position unchanged' : `Position movement ${movementText.toLowerCase()}`);
       const position = document.createElement('span');
       position.className = 'position';
       position.textContent = '#' + item.position;
@@ -302,7 +302,7 @@
     ratingKind = data?.ratingKind === 'tmdb-community' ? 'tmdb-community' : 'professional-critics';
     if (ratingKind === 'tmdb-community') {
       document.querySelector('.hub-charts .hub-eyebrow').textContent = 'TMDB COMMUNITY RATING /10';
-      document.querySelector('.hub-charts__top p').textContent = 'Horror films released this year, ranked by TMDB viewer votes (50 minimum).';
+      document.querySelector('.hub-charts__top p').textContent = 'Horror films released this year, ranked by average TMDB viewer rating (50 votes minimum).';
       chartFoot.textContent = year + ' · TMDB COMMUNITY CHART';
     }
     const dataItems = Array.isArray(data?.items) ? data.items : [];

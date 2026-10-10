@@ -65,6 +65,8 @@ export async function refreshMovieArtwork(env, db) {
   const { results: films = [] } = await db.prepare(`SELECT film_id AS id, title, release_year AS year, tmdb_id AS tmdbId
     FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1
     ORDER BY film_id LIMIT 100`).all();
+  // Verified editorial title variant: TMDB omits the sequel number in this entry.
+  const verifiedIds = { 'ready-or-not-2': 1266127 };
   const results = new Array(films.length);
   let next = 0;
   async function worker() {
@@ -72,11 +74,12 @@ export async function refreshMovieArtwork(env, db) {
       const index = next++;
       const film = films[index];
       try {
-        const response = film.tmdbId
-          ? await tmdb(env, `/movie/${film.tmdbId}`, { language: 'en-GB' })
+        const pinnedId = film.tmdbId || verifiedIds[film.id];
+        const response = pinnedId
+          ? await tmdb(env, `/movie/${pinnedId}`, { language: 'en-GB' })
           : await tmdb(env, '/search/movie', { query: film.title, include_adult: false, language: 'en-GB' });
-        const candidates = film.tmdbId ? [response] : (response.results || []);
-        const matches = candidates.filter(item => normalize(item.title) === normalize(film.title) ||
+        const candidates = pinnedId ? [response] : (response.results || []);
+        const matches = candidates.filter(item => pinnedId || normalize(item.title) === normalize(film.title) ||
           normalize(item.original_title) === normalize(film.title));
         const match = matches.filter(item => {
           const releaseYear = Number(String(item.release_date || '').slice(0, 4));

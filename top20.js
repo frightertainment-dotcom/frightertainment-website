@@ -84,7 +84,7 @@
       Number.isInteger(item.position) && item.position >= 1 && item.position <= 20 &&
       Number.isInteger(item.averageScore) && item.averageScore >= 0 && item.averageScore <= 100 &&
       (ratingKind === 'tmdb-community' ? Number.isInteger(item.voteCount) && item.voteCount >= 50 : Number.isInteger(item.criticCount) && item.criticCount >= 3) &&
-      Array.isArray(item.sources);
+      (ratingKind === 'tmdb-community' || Array.isArray(item.sources));
   }
 
   function renderRanking(items) {
@@ -119,7 +119,7 @@
       heading.append(title);
       const sourceList = document.createElement('p');
       sourceList.append(document.createTextNode(ratingKind === 'tmdb-community' ? `${film.voteCount} TMDB community votes · ${film.firstReleaseDate || year}` : `${film.criticCount} distinct professional critics`));
-      for (const source of film.sources.slice(0, 12)) {
+      for (const source of (film.sources || []).slice(0, 12)) {
         const href = safeHttps(source?.url);
         if (!href) continue;
         sourceList.append(document.createTextNode(' · '));
