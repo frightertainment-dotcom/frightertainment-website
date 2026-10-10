@@ -1307,3 +1307,9 @@ body[data-theme="podcasts"] main>.hub-catalog>.hub-tile .hub-tile__content{width
 .hub-body h1,.hub-section .hub-page-intro h1{font-size:clamp(25px,3.5vw,44px);line-height:1.08}
 .hub-body h2{font-size:clamp(22px,2.8vw,34px);line-height:1.1}
 @media(max-width:640px){.hub-body h1,.hub-section .hub-page-intro h1{font-size:clamp(21px,5.8vw,26px)!important;line-height:1.08}.hub-body h2{font-size:clamp(20px,5.4vw,25px);line-height:1.1}}
+
+/* Keep the long home phrase clear of its supporting copy at every viewport. */
+.hub-intro{grid-template-columns:minmax(0,1fr);align-items:start;gap:4px}
+.hub-intro h1{font-size:clamp(14px,2.3vw,30px)!important;line-height:1.18;max-width:100%;white-space:nowrap;text-wrap:nowrap;transform:scaleX(.94);transform-origin:left center}
+.hub-intro>p{max-width:72ch;line-height:1.45}
+@media(max-width:640px){.hub-intro h1{font-size:clamp(13px,3.8vw,16px)!important;line-height:1.2}.hub-intro>p{font-size:14px;line-height:1.42}}
