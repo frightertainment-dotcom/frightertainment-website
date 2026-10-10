@@ -16,8 +16,11 @@
   const card = (item, rank) => {
     const image = poster(item);
     const date = prettyDate(item.releaseDate || item.firstReleaseDate);
-    const label = item.releaseCountry==='GB'?'UK release':mediaType(item)==='tv'?'First aired':'First release';
-    return `<article class="movie-card fr-media-card" data-media-type="${mediaType(item)}" data-tmdb-id="${id(item)}"><a class="movie-card__art fr-media-card__poster" href="${href(item)}" aria-label="Explore ${escape(item.title)}">${image ? `<img class="tmdb-card-poster" src="${image}" alt="${escape(item.title)} poster" loading="lazy" decoding="async" width="500" height="750">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder"><strong>${escape(item.title)}</strong><small>Poster unavailable</small></div></div>`}${rank ? `<span class="fr-chart-rank">${rank}</span>` : ''}</a><div class="movie-card__body fr-media-card__body"><div class="movie-card__headline"><h3><a href="${href(item)}">${escape(item.title)}</a></h3>${score(item)}</div><p class="fr-media-card__meta" data-media-field="date">${date ? `${escape(label)} · ${escape(date)}${item.releaseCountry ? ' · ' + escape(item.releaseCountry) : ''}` : 'Premiere date not announced'}</p><p class="movie-card__text">${escape(item.overview || 'Explore the title details and available trailer.')}</p><div class="fr-media-card__actions">${trailer(item)}<a href="${href(item)}">DETAILS →</a></div></div></article>`;
+    const theatrical = !!item.theatricalDate;
+    const places = { GB:'UK', US:'US', CA:'Canada', AU:'Australia', IE:'Ireland' };
+    const label = theatrical ? (places[item.releaseCountry] || item.releaseCountry || 'Regional') + ' cinema release'
+      : mediaType(item)==='tv' ? 'First aired' : item.releaseCountry==='GB' ? 'UK release' : 'First release';
+    return `<article class="movie-card fr-media-card" data-media-type="${mediaType(item)}" data-tmdb-id="${id(item)}"><a class="movie-card__art fr-media-card__poster" href="${href(item)}" aria-label="Explore ${escape(item.title)}">${image ? `<img class="tmdb-card-poster" src="${image}" alt="${escape(item.title)} poster" loading="lazy" decoding="async" width="500" height="750">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder"><strong>${escape(item.title)}</strong><small>Poster unavailable</small></div></div>`}${rank ? `<span class="fr-chart-rank">${rank}</span>` : ''}</a><div class="movie-card__body fr-media-card__body"><div class="movie-card__headline"><h3><a href="${href(item)}">${escape(item.title)}</a></h3>${score(item)}</div><p class="fr-media-card__meta" data-media-field="date">${date ? `${escape(label)} · ${escape(date)}${item.releaseCountry && !theatrical ? ' · ' + escape(item.releaseCountry) : ''}` : 'Premiere date not announced'}</p><p class="movie-card__text">${escape(item.overview || 'Explore the title details and available trailer.')}</p><div class="fr-media-card__actions">${trailer(item)}<a href="${href(item)}">DETAILS →</a></div></div></article>`;
   };
   window.FR_CATALOGUE = {escape,mediaType,id,href,poster,prettyDate,score,trailer,card};
 
@@ -37,10 +40,7 @@
     const updateCinemaLabels=()=>{
       if(!cinemaPicker)return;
       document.querySelectorAll('[data-cinema-country-label]').forEach(element=>element.textContent=cinemaCountryNames[cinemaCountry]);
-      const ukEditorial=document.getElementById('recent-cinema');
-      if(ukEditorial)ukEditorial.hidden=cinemaCountry!=='GB';
-      const note=root.querySelector('[data-cinema-editorial-note]');
-      if(note)note.hidden=cinemaCountry==='GB';
+
     };
     updateCinemaLabels();
     const requestedYear = Number(url.searchParams.get('year'));
@@ -65,7 +65,7 @@
         if(headingYear)headingYear.textContent=String(year);
         yearSelect.addEventListener('change', () => { year = Number(yearSelect.value); const headingYear=section.querySelector('[data-catalogue-chart-year]');if(headingYear)headingYear.textContent=String(year); page = 1; history = []; load(); });
       }
-      if(mode==='cinema' && cinemaPicker) cinemaPicker.addEventListener('change',()=>{
+      if((mode==='cinema'||mode==='cinema-recent') && cinemaPicker) cinemaPicker.addEventListener('change',()=>{
         if(!Object.hasOwn(cinemaCountryNames,cinemaPicker.value))return;
         cinemaCountry=cinemaPicker.value;
         try{localStorage.setItem('frightertainment-cinema-country',cinemaCountry);}catch{}
@@ -87,7 +87,7 @@
         status.textContent = 'Loading titles…';
         pagination.replaceChildren();
         const params = new URLSearchParams({type, mode, page:String(page)});
-        if(mode==='cinema')params.set('country',cinemaCountry);
+        if(mode==='cinema'||mode==='cinema-recent')params.set('country',cinemaCountry);
         if (yearSelect) params.set('year', String(year));
         if (query) params.set('query', query);
         try {
@@ -120,9 +120,9 @@
           list.innerHTML = items.map((item, index) => card(item, mode === 'chart' ? index + 1 : null)).join('');
           if (mode === 'chart') {
             status.textContent = items.length ? `${year} · ${items.length} ${type === 'tv' ? 'shows' : 'films'} · TMDB viewer ratings · 50+ votes` : `No ${year} titles meet the 50-vote chart minimum yet. Explore another year or the archive.`;
-          } else status.textContent = (mode==='cinema' ? cinemaCountryNames[cinemaCountry]+' · ' : '') + (items.length ? `${items.length} ${type === 'tv' ? 'shows' : items.length === 1 ? 'film' : 'films'}${mode === 'archive' ? ' · ' + year : ''}${data.stale ? ' · Last available update' : ''}` : (mode === 'cinema' ? 'No upcoming theatrical dates verified for '+cinemaCountryNames[cinemaCountry]+'. Coverage may be incomplete.' : mode === 'upcoming' ? 'No upcoming premiere dates are listed yet. Check back for new announcements.' : 'No matching titles. Try another year or title.'));
+          } else status.textContent = (mode==='cinema'||mode==='cinema-recent' ? cinemaCountryNames[cinemaCountry]+' · ' : '') + (items.length ? `${items.length} ${type === 'tv' ? 'shows' : items.length === 1 ? 'film' : 'films'}${mode === 'archive' ? ' · ' + year : ''}${data.stale ? ' · Last available update' : ''}` : (mode === 'cinema' ? 'No upcoming cinema dates listed for this country yet.' : mode === 'cinema-recent' ? 'No recent cinema releases matched for this country. Try another date or check back soon.' : mode === 'upcoming' ? 'No upcoming premiere dates are listed yet. Check back for new announcements.' : 'No matching titles. Try another year or title.'));
           const totalPages = Math.max(1, Math.min(500, Number(data.totalPages) || 1));
-          if (mode !== 'chart' && totalPages > 1 && (mode !== 'cinema' || data.nextPage || history.length)) {
+          if (mode !== 'chart' && totalPages > 1 && (!['cinema','cinema-recent'].includes(mode) || data.nextPage || history.length)) {
             const previous = document.createElement('button');
             previous.className = 'button button--outline'; previous.type = 'button'; previous.textContent = '← PREVIOUS'; previous.disabled = history.length === 0;
             previous.addEventListener('click', () => {page = history.pop() || 1; load(); section.scrollIntoView({block:'start'});});

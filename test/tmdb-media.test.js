@@ -138,3 +138,30 @@ test('cinema discovery verifies the selected Canadian theatrical release instead
     assert.equal(result.items[0].releaseCountry,'CA');
   }finally{globalThis.fetch=previous;}
 });
+test('recent cinema uses the chosen territory and only returns its theatrical releases from the past 90 days',async()=>{
+  const oldFetch=globalThis.fetch,urls=[],now=Date.now();
+  const recent=new Date(now-12*86400000).toISOString().slice(0,10);
+  const outdated=new Date(now-140*86400000).toISOString().slice(0,10);
+  globalThis.fetch=async url=>{
+    const u=new URL(url);urls.push(u);
+    if(u.pathname.includes('/discover/'))return reply({total_pages:1,total_results:3,results:[
+      {id:11,title:'Australian Cinema',genre_ids:[27],poster_path:'/a.jpg',release_date:recent},
+      {id:12,title:'US Cinema Only',genre_ids:[27],poster_path:'/b.jpg',release_date:recent},
+      {id:13,title:'Old Australian Cinema',genre_ids:[27],poster_path:'/c.jpg',release_date:recent}
+    ]});
+    const id=Number(u.pathname.split('/').at(-1));
+    return reply({id,title:id===11?'Australian Cinema':id===12?'US Cinema Only':'Old Australian Cinema',
+      release_date:recent,poster_path:'/a.jpg',
+      release_dates:{results:[{iso_3166_1:id===12?'US':'AU',
+        release_dates:[{type:3,release_date:(id===13?outdated:recent)+'T00:00:00Z'}]}]}});
+  };
+  try{
+    const d=await fetchCatalogue(env,{type:'movie',mode:'cinema-recent',page:1,year:new Date().getUTCFullYear(),country:'AU'});
+    assert.equal(urls[0].searchParams.get('region'),'AU');
+    assert.equal(urls[0].searchParams.get('sort_by'),'release_date.desc');
+    assert.equal(urls[0].searchParams.get('release_date.lte'),new Date().toISOString().slice(0,10));
+    assert.deepEqual(d.items.map(x=>x.title),['Australian Cinema']);
+    assert.equal(d.items[0].theatricalDate,recent);
+    assert.equal(d.items[0].releaseCountry,'AU');
+  }finally{globalThis.fetch=oldFetch;}
+});

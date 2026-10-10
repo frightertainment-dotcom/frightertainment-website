@@ -1086,21 +1086,26 @@ test('all seven main tabs fit narrow and wide viewports, with centred second-row
     await page.close();
   }
 });
-test('cinema country control persists selection and only shows UK editorial results for UK',async({page})=>{
+test('cinema country switch updates upcoming and recent release lists, preserving active anchor', async({page})=>{
   const seen=[];
   await page.route('**/api/catalogue?**',route=>{
-    seen.push(new URL(route.request().url()).searchParams.get('country'));
+    const query=new URL(route.request().url()).searchParams;
+    seen.push({country:query.get('country'),mode:query.get('mode')});
     return route.fulfill({json:{items:[],page:1,totalPages:1,status:'ready'}});
   });
   await page.goto('/cinema.html');
-  await page.locator('#cinema-country').selectOption('US');
-  await expect.poll(()=>seen.at(-1)).toBe('US');
-  await expect(page.locator('[data-cinema-country-label]').first()).toHaveText('UNITED STATES');
-  await expect(page.locator('#recent-cinema')).toBeHidden();
+  await page.locator('#cinema-country').selectOption('AU');
+  await expect.poll(()=>seen.filter(x=>x.country==='AU').map(x=>x.mode).sort()).toEqual(['cinema','cinema-recent']);
+  await page.getByRole('link',{name:'RECENT RELEASES'}).click();
+  await expect(page).toHaveURL(/#recent-cinema$/);
+  await expect(page.locator('#recent-cinema')).toBeVisible();
+  await expect(page.locator('#recent-cinema')).toContainText('AUSTRALIA');
+  await expect(page.locator('.fr-cinema-context')).toContainText('AUSTRALIA');
+  await expect(page.locator('[data-cinema-editorial-note]')).toHaveCount(0);
   await page.reload();
-  await expect(page.locator('#cinema-country')).toHaveValue('US');
+  await expect(page.locator('#cinema-country')).toHaveValue('AU');
   await page.locator('#cinema-country').selectOption('GB');
-  await expect.poll(()=>seen.at(-1)).toBe('GB');
+  await expect.poll(()=>seen.filter(x=>x.country==='GB').length).toBeGreaterThanOrEqual(2);
   await expect(page.locator('#recent-cinema')).toBeVisible();
 });
 test('TV chart is year-specific and Games chart has a sourced, consistent rating method',async({page})=>{

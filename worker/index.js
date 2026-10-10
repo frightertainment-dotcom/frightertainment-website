@@ -167,7 +167,7 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   const params = new URL(request.url).searchParams;
   const type = params.get('type') || 'movie';
   if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
-  const cinemaMode=catalogue && params.get('mode')==='cinema';
+  const cinemaMode=catalogue && ['cinema','cinema-recent'].includes(params.get('mode'));
   const requestedCinemaCountry=params.get('country') || env.DEFAULT_COUNTRY || 'GB';
   if(cinemaMode && !cinemaPreviewCountries.has(requestedCinemaCountry)) throw new HttpError(400,'Unsupported cinema country');
   const country=cinemaMode ? requestedCinemaCountry : countryOf(request,env);
@@ -179,8 +179,8 @@ async function handleTMDBMedia(env, request, catalogue = false) {
     options.mode = params.get('mode') || 'archive';
     options.page = Number(params.get('page') || 1);
     options.query = (params.get('query') || '').trim();
-    if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
-    if (options.mode === 'cinema') options.catalogueVersion = 3;
+    if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema', 'cinema-recent'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
+    if (cinemaMode) options.catalogueVersion = 4;
   } else {
     options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
     if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');
