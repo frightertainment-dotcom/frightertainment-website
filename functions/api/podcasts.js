@@ -4,7 +4,16 @@
 const known={'The NoSleep Podcast':'444083093','The Magnus Archives':'1095138637','Knifepoint Horror':'406250030','Old Gods of Appalachia':'1485435369','The Silt Verses':'1547222295','Lore':'978052928','Unwell':'1449441502','I Am in Eskew':'1339770338','The White Vault':'1267043823','Malevolent':'1525652021','Spooked':'1279361017','Radio Rental':'1483289230'};
 const names=['The NoSleep Podcast','The Magnus Archives','Knifepoint Horror','Old Gods of Appalachia','The Silt Verses','Lore','Unwell','I Am in Eskew','The White Vault','Malevolent','Spooked','Radio Rental'];
 const normalize=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const headers={'content-type':'application/json; charset=utf-8','cache-control':'public, max-age=3600','x-content-type-options':'nosniff'};
+const headers={
+ 'content-type':'application/json; charset=utf-8',
+ 'cache-control':'public, max-age=3600',
+ 'x-content-type-options':'nosniff',
+ 'x-frame-options':'DENY',
+ 'referrer-policy':'no-referrer',
+ 'strict-transport-security':'max-age=31536000',
+ 'content-security-policy':"default-src 'none'; frame-ancestors 'none'",
+ 'cross-origin-resource-policy':'same-origin'
+};
 export async function onRequestGet({request}){
  const cache=caches.default,url=new URL(request.url),key=new Request(url.origin+url.pathname+'?version=2');
  const saved=await cache.match(key);if(saved)return saved;

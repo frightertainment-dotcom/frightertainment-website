@@ -28,3 +28,9 @@ test('shared static security headers set isolation and disallow cross-domain emb
   assert.doesNotMatch(headers,/script-src[^\n]*'unsafe-inline'/);
   assert.doesNotMatch(headers,/script-src[^\n]*'unsafe-eval'/);
 });
+test('podcast JSON API is not frameable and does not grant third-party CORS access',async()=>{
+ const source=await readFile(new URL('../functions/api/podcasts.js',import.meta.url),'utf8');
+ for(const control of ["'x-frame-options':'DENY'","'referrer-policy':'no-referrer'","'content-security-policy':\"default-src 'none'; frame-ancestors 'none'\"","'cross-origin-resource-policy':'same-origin'"])
+  assert.ok(source.includes(control),'Podcast response is missing '+control);
+ assert.doesNotMatch(source,/access-control-allow-origin/i);
+});
