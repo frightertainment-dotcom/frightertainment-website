@@ -1325,3 +1325,33 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
 /* Keep the homepage phrase legible at phone scale and on one intentional line. */
 .hub-intro h1{font-size:clamp(22px,3.1vw,40px)!important;line-height:1.15;white-space:nowrap;text-wrap:nowrap;transform:none;max-width:100%}
 @media(max-width:640px){.hub-intro h1{font-size:clamp(17px,5.2vw,21px)!important;line-height:1.2;letter-spacing:-.02em}}
+
+/* Private preview responsive repair, 10 Oct 2026 — preserve Times New Roman and section logos. */
+.hub-header__inside,.hub-tabs,.hub-intro,.hub-intro>*,.hub-dashboard,.hub-showcase__bottom,.hub-page-intro,.movie-grid,.fr-catalogue-grid,.hub-vault-portal__copy{min-width:0;max-width:100%}
+.hub-tabs{grid-template-columns:repeat(7,minmax(0,1fr));width:100%}
+.hub-tabs a{font-size:clamp(12px,1vw,16px);white-space:normal!important;overflow-wrap:break-word;line-height:1.17;text-wrap:balance;padding:8px 3px;min-width:0}
+.hub-intro h1{font-size:clamp(27px,3.5vw,46px)!important;line-height:1.13;white-space:normal!important;text-wrap:balance;overflow-wrap:break-word;transform:none!important;max-width:100%}
+.hub-intro p,.hub-page-intro p,.hub-tile__content,.hub-tile h3,.hub-feature h3,.hub-catalog .hub-tile h3,.movie-card h3,.hub-chart-row a{min-width:0;max-width:100%;overflow-wrap:break-word;white-space:normal}
+.hub-vault-portal__links a,.hub-year-picker small a,.empty-state a{overflow-wrap:anywhere}
+.hub-year-picker small a,.empty-state a{color:#b4eac0;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:900px){
+  .hub-header__inside{grid-template-columns:1fr;justify-items:center}
+  .hub-tabs{grid-column:1/-1;grid-row:auto}
+  .hub-intro h1{font-size:clamp(26px,5vw,39px)!important}
+}
+@media(max-width:640px){
+  .hub-header__inside{width:calc(100% - 24px)}
+  .hub-tabs{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:0}
+  .hub-tabs a:nth-child(-n+4){grid-column:span 3;grid-row:1}
+  .hub-tabs a:nth-child(n+5){grid-column:span 4;grid-row:2}
+  .hub-tabs a{font-size:clamp(11px,3.05vw,14px)!important;min-height:43px;padding:8px 2px;line-height:1.12}
+  .hub-intro h1{font-size:clamp(26px,6.8vw,34px)!important;line-height:1.14;white-space:normal!important}
+  .hub-section .hub-subtabs,.hub-section .hub-section-jumps{flex-wrap:wrap;gap:6px;max-width:100%}
+  .hub-section .hub-subtabs a,.hub-section .hub-section-jumps a{flex:1 1 40%;min-width:0;white-space:normal;padding:9px 5px;font-size:12px}
+  .horror-year[open]>.horror-year__header{padding-right:11px!important}
+  .horror-year__search-label{position:static;width:100%!important;max-width:100%!important;padding:12px 12px 0;font-size:12px!important;letter-spacing:.02em!important}
+  .horror-year__header{flex-wrap:wrap}
+  .horror-year__film-link,.horror-vault-search__result{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .horror-vault-search__result{flex-wrap:wrap}
+  .horror-vault-search__result span{flex:0 1 auto}
+}

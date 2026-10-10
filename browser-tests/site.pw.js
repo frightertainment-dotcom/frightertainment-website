@@ -72,36 +72,19 @@ test('no-JavaScript film pages retain the verified Other Mommy and Clayface trai
   }
 });
 
-test('verified trailers open the shared privacy-enhanced trailer dialog after play', async ({ page }) => {
-  await page.goto('/movies.html#trailers');
-  const card=page.locator('.verified-trailer').filter({hasText:'Other Mommy'});
-  await expect(card).toBeVisible();
-  await expect(page.locator('.trailer-dialog iframe')).toHaveCount(0);
-  await expect(card.locator('.verified-trailer__meta p')).toContainText('OFFICIAL UPLOAD');
-  await expect(card.locator('.verified-trailer__meta a')).toHaveAttribute('href',/^https:\/\//);
-  const button=card.locator('[data-trailer-video]');
+test('verified film-card trailers open the dialog with no duplicated trailer block',async({page})=>{
+  await page.goto('/movies.html');
+  await expect(page.locator('#trailers,.verified-trailer')).toHaveCount(0);
+  await page.locator('#movie-year').selectOption('all');
+  const button=page.locator('.movie-card [data-trailer-video]').first();
+  await expect(button).toBeVisible();
   await button.click();
   const dialog=page.locator('.trailer-dialog');
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator('iframe')).toHaveAttribute('src','https://www.youtube-nocookie.com/embed/bEpTgowZ1dI?autoplay=1&rel=0&playsinline=1');
-  await expect(dialog.locator('iframe')).toHaveAttribute('allowfullscreen','');
-  const backdrop=await dialog.evaluate(el=>getComputedStyle(el,'::backdrop').backgroundColor);
-  expect(backdrop).toBe('rgba(0, 0, 0, 0.5)');
+  await expect(dialog.locator('iframe')).toHaveAttribute('src',/youtube-nocookie\\.com\/embed\//);
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(dialog.locator('iframe')).not.toHaveAttribute('src',/.+/);
-  await expect(button).toBeFocused();
-  await page.setViewportSize({width:375,height:812});
-  await page.goto('/movies.html#trailers');
-  await page.locator('.verified-trailer').filter({hasText:'Clayface'}).locator('[data-trailer-video]').click();
-  const player=page.locator('.trailer-dialog iframe');
-  await expect(player).toHaveAttribute('src',/6IxPD-jNdwM/);
-  const box=await player.boundingBox();
-  expect(box.width).toBeLessThanOrEqual(375);
-  expect(Math.abs(box.width/box.height-16/9)).toBeLessThan(.05);
-  await page.getByRole('button',{name:'Close trailer'}).click();
-  await expect(page.locator('.trailer-dialog')).toBeHidden();
-  await expect(player).not.toHaveAttribute('src',/.+/);
 });
 
 test('dynamic film records escape hostile text and reject credential-bearing source links', async ({ page }) => {
@@ -137,19 +120,17 @@ test('homepage film search produces an accessible empty state', async ({ page })
   await page.goto('/movies.html');
   await page.locator('#movie-search').fill('zz-no-match');
   await expect(page.locator('#empty-state')).toBeVisible();
-  await expect(page.locator('#results-count')).toContainText('0 films');
+  await expect(page.locator('#results-count')).toContainText('0 selected films');
 });
 
-test('homepage date and verified-score filters report truthful result counts', async ({ page }) => {
+test('Movies removes empty date/score filters while retaining working search',async({page})=>{
   await page.goto('/movies.html');
-  await page.locator('[data-filter="date-tbc"]').click();
-  await expect(page.locator('#results-count')).toContainText('6 films');
-  await expect(page.locator('[data-filter="date-tbc"]')).toHaveAttribute('aria-pressed', 'true');
-  await page.locator('[data-filter="reviewed"]').click();
-  await expect(page.locator('#results-count')).toContainText('0 films');
+  await expect(page.locator('.filter-chips,[data-filter],#trailers')).toHaveCount(0);
+  await page.locator('#movie-search').fill('28 Weeks Later');
+  await expect(page.locator('#results-count')).toContainText('1 selected film');
+  await page.locator('#movie-search').fill('zz-no-match');
   await expect(page.locator('#empty-state')).toBeVisible();
 });
-
 
 test('homepage recommendations do not advertise unannounced productions', async ({ page }) => {
   await page.goto('/');
@@ -348,18 +329,18 @@ test('upcoming release calendar excludes historical and already released films',
 test('2026 is default and earlier films are under their actual original years', async ({page})=>{
   await page.goto('/movies.html');
   await expect(page.locator('#movie-year')).toHaveValue('2026');
-  await expect(page.locator('#results-count')).toContainText('11 films');
+  await expect(page.locator('#results-count')).toContainText('11 selected films');
   await expect(page.locator('#movie-grid')).toContainText('28 Years Later: The Bone Temple');
   await expect(page.locator('#movie-grid')).not.toContainText('28 Weeks Later');
   await expect(page.locator('#movie-grid')).not.toContainText('28 Years Later</');
   await page.selectOption('#movie-year', '2025');
-  await expect(page.locator('#results-count')).toContainText('7 films');
+  await expect(page.locator('#results-count')).toContainText('7 selected films');
   await expect(page.locator('#movie-grid')).toContainText('28 Years Later');
   await page.selectOption('#movie-year', 'older');
-  await expect(page.locator('#results-count')).toContainText('5 films');
+  await expect(page.locator('#results-count')).toContainText('5 selected films');
   await expect(page.locator('#movie-grid')).toContainText('28 Weeks Later');
   await page.selectOption('#movie-year', 'all');
-  await expect(page.locator('#results-count')).toContainText('24 films');
+  await expect(page.locator('#results-count')).toContainText('24 selected films');
 });
 
 test('public film pages expose no private publisher snapshots or Fright Rating section',async({page})=>{

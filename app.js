@@ -98,9 +98,9 @@
       const options=[
         {value:String(currentYear),label:currentYear+' RELEASES'},
         {value:String(currentYear-1),label:(currentYear-1)+' RELEASES'},
-        {value:'older',label:'BEFORE '+(currentYear-1)+' · ARCHIVE'},
+        {value:'older',label:'PRE-'+(currentYear-1)+' EDITORIAL PICKS'},
         {value:'future',label:(currentYear+1)+' ONWARDS'},
-        {value:'all',label:'ALL RELEASE YEARS'}
+        {value:'all',label:'ALL EDITORIAL PICKS'}
       ];
       yearMenu.replaceChildren(...options.map(item=>{
         const opt=document.createElement('option');opt.value=item.value;opt.textContent=item.label;
@@ -130,10 +130,10 @@
       const shown = $('#movie-shown');
       if(shown) shown.textContent = `Showing ${Math.min(state.visible,filtered.length)} of ${filtered.length}`;
       $('#empty-state').hidden = filtered.length > 0;
-      $('#results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'film' : 'films'}`;
+      $('#results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'selected film' : 'selected films'}`;
       $('#total-count').textContent = String(movies.length).padStart(2, '0');
       const scope=$('#movie-year-title');
-      if (scope) scope.textContent=state.year==='all'?'ALL FILM YEARS':state.year==='older'?'BEFORE '+(currentYear-1):state.year==='future'?'FUTURE FILMS':state.year+' HORROR FILMS';
+      if (scope) scope.textContent=state.year==='all'?'ALL EDITORIAL PICKS':state.year==='older'?'PRE-'+(currentYear-1)+' EDITORIAL PICKS':state.year==='future'?'FUTURE EDITORIAL PICKS':state.year+' FEATURED FILMS';
     };
     document.addEventListener('click', event => {
       const chip = event.target.closest('[data-filter]');
