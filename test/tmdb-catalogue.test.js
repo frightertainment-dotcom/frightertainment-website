@@ -34,8 +34,9 @@ test('community chart excludes unreleased, low-vote, non-horror and invalid-post
 
 test('poster match requires the approved film title and a nearby release year', async () => {
   const previous = globalThis.fetch;
-  globalThis.fetch = async (_url, options) => {
+  globalThis.fetch = async (url, options) => {
     assert.equal(options.headers.Authorization, 'Bearer private-test-fixture');
+    if (String(url).includes('/movie/1400837')) return reply({ id: 1400837, title: 'Other Mommy', release_date: '2026-10-09', poster_path: '/other-mommy.jpg' });
     return reply({ results: [
       { id: 8, title: 'Matching Horror', release_date: '1980-01-01', poster_path: '/wrong.jpg' },
       { id: 9, title: 'Other Horror', release_date: '2026-01-01', poster_path: '/other.jpg' },
@@ -48,7 +49,8 @@ test('poster match requires the approved film title and a nearby release year', 
   try {
     const artwork = await refreshMovieArtwork(env, db);
     assert.deepEqual(artwork.items.map(item => [item.id, item.tmdbId, item.posterPath]), [
-      ['matching-horror', 10, '/correct.jpg']
+      ['matching-horror', 10, '/correct.jpg'],
+      ['other-mommy', 1400837, '/other-mommy.jpg']
     ]);
   } finally { globalThis.fetch = previous; }
 });

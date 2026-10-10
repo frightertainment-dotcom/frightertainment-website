@@ -158,6 +158,34 @@
       }).catch(() => { /* Keep original film artwork if TMDB is unavailable. */ });
   }
 
+  const filmHero = document.querySelector('.fr-movie-hero__art');
+  const filmPageId = document.body.dataset.filmId;
+  if (filmHero && /^[a-z0-9-]{1,80}$/.test(filmPageId || '')) {
+    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        const item = data?.items?.find(value => value.id === filmPageId);
+        if (!/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item?.posterPath || '')) return;
+        const image = document.createElement('img');
+        image.className = 'fr-movie-hero__poster';
+        image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
+        image.alt = '';
+        image.addEventListener('error', () => image.remove(), { once: true });
+        filmHero.prepend(image);
+        filmHero.setAttribute('aria-label', 'TMDB poster artwork and Frightertainment film information for ' + item.title);
+        const label = filmHero.querySelector('small');
+        if (label) label.textContent = 'POSTER VIA TMDB';
+        const notice = document.createElement('p');
+        notice.className = 'tmdb-notice';
+        notice.textContent = 'Poster via TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. ';
+        const credits = document.createElement('a');
+        credits.href = '/credits.html';
+        credits.textContent = 'TMDB credits and attribution';
+        notice.append(credits);
+        filmHero.closest('.fr-movie-hero')?.after(notice);
+      }).catch(() => {});
+  }
+
   const trailerGrid = $('#trailer-grid');
   if (trailerGrid) {
     const verifiedTrailers = movies.filter(movie => movie.trailer && /^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') && safeURL(movie.trailer.source));

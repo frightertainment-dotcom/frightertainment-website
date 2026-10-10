@@ -62,9 +62,16 @@ export async function refreshCommunityChart(env, year) {
 }
 
 export async function refreshMovieArtwork(env, db) {
-  const { results: films = [] } = await db.prepare(`SELECT film_id AS id, title, release_year AS year, tmdb_id AS tmdbId
+  const { results: approvedFilms = [] } = await db.prepare(`SELECT film_id AS id, title, release_year AS year, tmdb_id AS tmdbId
     FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1
     ORDER BY film_id LIMIT 100`).all();
+  // Source-checked film files that have not yet been copied into the canonical D1 table.
+  const extraFilms = [
+    { id: 'other-mommy', title: 'Other Mommy', year: 2026, tmdbId: 1400837 },
+    { id: '28-days-later', title: '28 Days Later', year: 2002 },
+    { id: '28-weeks-later', title: '28 Weeks Later', year: 2007 }
+  ];
+  const films = [...approvedFilms, ...extraFilms.filter(film => !approvedFilms.some(row => row.id === film.id))];
   // Verified editorial title variant: TMDB omits the sequel number in this entry.
   const verifiedIds = { 'ready-or-not-2': 1266127 };
   const results = new Array(films.length);

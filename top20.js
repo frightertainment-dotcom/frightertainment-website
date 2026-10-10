@@ -186,7 +186,7 @@
       const minimumCritics = Number.isInteger(result?.minimumCritics) ? result.minimumCritics : 3;
       status.textContent = result?.stale === true
         ? `Ranking data is stale. Showing the last valid published chart of ${count} film${count === 1 ? '' : 's'}.`
-        : ratingKind === 'tmdb-community' ? `${rankedFilms} horror film${rankedFilms === 1 ? '' : 's'} ranked by TMDB community votes, with at least 50 votes each. These are viewer scores, not critic or Fright Ratings.` : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
+        : ratingKind === 'tmdb-community' ? `${rankedFilms} horror film${rankedFilms === 1 ? '' : 's'} ranked by average TMDB community rating, with at least 50 votes each. These are viewer scores, not critic or Fright Ratings.` : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
     })
     .catch(() => {
       status.textContent = 'Ranking unavailable. No score or position has been added.';
