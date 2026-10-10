@@ -387,6 +387,7 @@ test('TMDB community chart and film page artwork stay distinct from Fright Ratin
   await expect(page.locator('#ranking-status')).toContainText('TMDB community rating');
   await page.goto('/films/other-mommy/');
   await expect(page.locator('.fr-movie-hero__poster')).toHaveCount(1);
+  await expect(page.locator('.fr-movie-hero__art')).toHaveClass(/has-tmdb-poster/);
   await expect(page.locator('#film-detail')).toContainText('TMDB COMMUNITY RATING');
   await expect(page.locator('#film-detail')).toContainText('300 TMDB viewer votes');
   await expect(page.locator('.film-score--pending')).toHaveText('Not rated yet.');

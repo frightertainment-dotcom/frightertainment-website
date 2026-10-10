@@ -5,7 +5,7 @@
   const communityScore = movie => {
     const item = artByFilm.get(movie.id);
     return Number.isFinite(item?.voteAverage) && item.voteAverage > 0 &&
-      Number.isInteger(item?.voteCount) && item.voteCount >= 50 ? item : null;
+      Number.isInteger(item?.voteCount) && item.voteCount > 0 ? item : null;
   };
   const tmdbArtwork = movie => {
     const path = artByFilm.get(movie.id)?.posterPath;
@@ -237,10 +237,17 @@
         const image = document.createElement('img');
         image.className = 'fr-movie-hero__poster';
         image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
-        image.alt = '';
-        image.addEventListener('error', () => image.remove(), { once: true });
+        image.alt = 'TMDB poster for ' + item.title;
+        image.addEventListener('error', () => {
+          image.remove();
+          filmHero.classList.remove('has-tmdb-poster');
+          const sourceLabel = filmHero.querySelector('small');
+          if (sourceLabel) sourceLabel.textContent = 'FRIGHTERTAINMENT ARTWORK';
+        }, { once: true });
         filmHero.prepend(image);
-        filmHero.setAttribute('aria-label', 'TMDB poster artwork and Frightertainment film information for ' + item.title);
+        filmHero.classList.add('has-tmdb-poster');
+        filmHero.removeAttribute('role');
+        filmHero.removeAttribute('aria-label');
         const label = filmHero.querySelector('small');
         if (label) label.textContent = 'POSTER VIA TMDB';
         const notice = document.createElement('p');
@@ -252,7 +259,7 @@
         notice.append(credits);
         filmHero.closest('.fr-movie-hero')?.after(notice);
         if (Number.isFinite(item.voteAverage) && item.voteAverage > 0 &&
-            Number.isInteger(item.voteCount) && item.voteCount >= 50) {
+            Number.isInteger(item.voteCount) && item.voteCount > 0) {
           const section = document.createElement('section');
           section.className = 'film-section';
           const heading = document.createElement('h2');

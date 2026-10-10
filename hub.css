@@ -1023,3 +1023,10 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
 
 .fr-movie-hero__art .fr-movie-hero__poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38;z-index:0}
 .fr-movie-hero__art:has(.fr-movie-hero__poster)>:not(img){z-index:1}
+
+.fr-movie-hero__art.has-tmdb-poster{background:#120d11}
+.fr-movie-hero__art.has-tmdb-poster .fr-movie-hero__poster{object-fit:contain;opacity:1}
+.fr-movie-hero__art.has-tmdb-poster>.fr-movie-hero__year,
+.fr-movie-hero__art.has-tmdb-poster>strong{display:none}
+.fr-movie-hero__art.has-tmdb-poster>small{position:absolute;bottom:16px;left:18px;padding:4px 7px;background:#0a090acb;color:#f4e7e6}
+.fr-movie-hero__art.has-tmdb-poster>.fr-movie-hero__studio{top:16px;left:18px;padding:4px 7px;background:#0a090acb}
