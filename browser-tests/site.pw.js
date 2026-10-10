@@ -207,7 +207,8 @@ test('all seven section themes and navigation fit the requested viewport widths'
 test('TV, indie, podcast and games landings use distinct desktop compositions', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   for (const route of ['/podcasts.html']) {
-    await page.goto(route);
+    // Podcast embeds can stall the load event; verify the rendered layout after DOM readiness.
+    await page.goto(route,{waitUntil:'domcontentloaded'});
     const cards = page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile');
     await expect(cards.first()).toBeVisible();
     const boxes = await cards.evaluateAll(nodes => nodes.map(node => {
