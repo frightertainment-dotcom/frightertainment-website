@@ -91,11 +91,11 @@ export async function fetchCatalogue(env, options) {
   const chart = mode === 'top'; const end = `${year}-12-31` < today() ? `${year}-12-31` : today();
   const keywordIds = type === 'tv' ? await horrorKeywords(env) : [];
   const parameters = { language: 'en-GB', include_adult: false, include_video: false, page,
-    sort_by: chart ? 'vote_average.desc' : mode === 'upcoming' || mode === 'cinema' ? type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc' : 'popularity.desc',
+    sort_by: chart ? 'vote_average.desc' : mode === 'cinema' ? 'release_date.asc' : mode === 'upcoming' ? type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc' : 'popularity.desc',
     ...(type === 'tv' ? { with_keywords: keywordIds.join('|'), include_null_first_air_dates: false } : { with_genres: 27 }) };
   const field = type === 'tv' ? 'first_air_date' : 'primary_release_date';
   if (['archive', 'top'].includes(mode)) { parameters[`${field}.gte`] = `${year}-01-01`; parameters[`${field}.lte`] = chart ? end : `${year}-12-31`; }
-  if (mode === 'upcoming' || mode === 'cinema') { parameters[`${field}.gte`] = new Date(Date.now() + 86400000).toISOString().slice(0, 10); parameters[`${field}.lte`] = `${new Date().getUTCFullYear() + 2}-12-31`; }
+  if (mode === 'upcoming' || mode === 'cinema') { const releaseField = mode === 'cinema' ? 'release_date' : field; parameters[`${releaseField}.gte`] = new Date(Date.now() + 86400000).toISOString().slice(0, 10); parameters[`${releaseField}.lte`] = `${new Date().getUTCFullYear() + 2}-12-31`; }
   if (mode === 'cinema') { parameters.region = 'GB'; parameters.with_release_type = '3|2'; }
   if (mode === 'trending') parameters[`${field}.lte`] = today();
   if (chart) parameters['vote_count.gte'] = 50;

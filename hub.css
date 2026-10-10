@@ -1232,3 +1232,27 @@ body[data-theme="games"] .hub-tile__content .fr-trailer-button{margin:4px 10px 9
 @media(max-width:640px){body[data-theme="games"] .hub-catalog .hub-tile{min-height:320px}.game-store-widget{height:170px}}
 /* Every visible interface label and paragraph uses the same brand-adjacent face. */
 body.hub-body :where(*):not(svg):not(path){font-family:var(--font-body)!important}
+.podcast-player{display:block;width:min(100%,520px);height:175px;border:0;background:var(--world);margin:10px 0}
+body[data-theme="podcasts"] main>.hub-catalog>.hub-tile:first-child{min-height:520px}
+body[data-theme="podcasts"] main>.hub-catalog>.hub-tile{min-height:340px}
+body[data-theme="podcasts"] main>.hub-catalog>.hub-tile .hub-tile__content{width:100%;max-width:100%}
+@media(max-width:640px){body[data-theme="podcasts"] main>.hub-catalog>.hub-tile{min-height:300px}.podcast-player{height:160px}}
+/* Gothic letterforms have a small x-height: size ordinary reading text for legibility. */
+.hub-body p:not(.tmdb-notice):not(.hub-rights-note):not(.release-brief__note),.hub-body .movie-card__text,.hub-body .fr-media-card__meta{font-size:clamp(17px,1.35vw,20px)!important;line-height:1.48}
+.hub-body .hub-kicker,.hub-body .hub-eyebrow,.hub-body .eyebrow{font-size:clamp(12px,1.05vw,15px);letter-spacing:.08em}
+.hub-tabs a{font-size:clamp(16px,1.35vw,19px)}
+.hub-body .release-brief__title,.hub-body .release-brief__heading{font-size:clamp(21px,1.9vw,27px)}
+.hub-body .release-brief__subtitle{font-size:clamp(15px,1.2vw,18px)}
+.hub-body .hub-chart-row a{font-size:clamp(17px,1.4vw,20px)}
+.hub-body .hub-chart-row .chart-meta{font-size:13px}
+.hub-body .hub-chart-row .score{font-size:clamp(18px,1.4vw,21px)}
+.hub-body .hub-tile__link,.hub-body .fr-trailer-button{font-size:clamp(16px,1.2vw,18px)}
+.hub-body .hub-rights-note,.hub-body .tmdb-notice{font-size:clamp(15px,1.1vw,17px)}
+@media(max-width:640px){
+ .hub-body p:not(.tmdb-notice):not(.hub-rights-note):not(.release-brief__note){font-size:16px!important;line-height:1.43}
+ .hub-tabs a{font-size:clamp(13px,3.7vw,17px)}
+ body[data-theme="movies"] .hub-page-intro h1{font-size:clamp(22px,6.6vw,30px)!important;white-space:nowrap;text-wrap:nowrap}
+ .hub-body .hub-tile__link,.hub-body .fr-trailer-button{font-size:14px}
+ .hub-body .release-brief__title{font-size:18px}
+ .hub-body .hub-chart-row .score{font-size:18px}
+}

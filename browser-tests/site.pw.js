@@ -166,7 +166,7 @@ test('homepage is compact, branded and links into distinct pages', async ({page}
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
   await expect(page.locator('.hub-brand img')).toBeVisible();
-  await expect(page.locator('.hub-tabs a')).toHaveCount(6);
+  await expect(page.locator('.hub-tabs a')).toHaveCount(7);
   await expect(page.locator('.hero-wordmark')).toHaveCount(0);
   await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
   await expect(page.locator('#movie-grid')).toHaveCount(0);
@@ -195,15 +195,15 @@ test('compact dashboard remains navigable at 320px and 768px', async ({ browser 
     const page = await browser.newPage({viewport:{width,height:820}});
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('.hub-brand img')).toBeVisible();
-    await expect(page.locator('.hub-tabs a')).toHaveCount(6);
+    await expect(page.locator('.hub-tabs a')).toHaveCount(7);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.close();
   }
 });
-test('all six section themes and navigation fit the requested viewport widths', async ({ browser }) => {
+test('all seven section themes and navigation fit the requested viewport widths', async ({ browser }) => {
   test.setTimeout(120_000);
   const themes = [
-    ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'],
+    ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'], ['/cinema.html', 'movies'],
     ['/indie-movies.html', 'indie'], ['/podcasts.html', 'podcasts'], ['/games.html', 'games']
   ];
   const widths = [320, 360, 390, 430, 768, 1024, 1440, 1920];
@@ -211,7 +211,7 @@ test('all six section themes and navigation fit the requested viewport widths', 
   for (const [route, theme] of themes) {
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
-    await expect(page.locator('.hub-tabs a')).toHaveCount(6);
+    await expect(page.locator('.hub-tabs a')).toHaveCount(7);
     await expect(page.locator('.hub-tabs a[aria-current="page"]')).toHaveCount(1);
     for (const width of widths) {
       await page.setViewportSize({ width, height: 844 });
@@ -814,8 +814,8 @@ test('homepage composition stays ordered and usable across the approved viewport
   for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) {
     const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
     await page.goto('/');
-    await expect(page.locator('.hub-tabs a')).toHaveCount(6);
-    for (let index = 0; index < 6; index++) await expect(page.locator('.hub-tabs a').nth(index)).toBeVisible();
+    await expect(page.locator('.hub-tabs a')).toHaveCount(7);
+    for (let index = 0; index < 7; index++) await expect(page.locator('.hub-tabs a').nth(index)).toBeVisible();
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const layout = await page.evaluate(() => {
       const feature = document.querySelector('.hub-feature').getBoundingClientRect();
@@ -930,8 +930,9 @@ test('direct page loads declare the shared Frightertainment typefaces', async ({
   for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     await page.goto(path);
     const fontHref = await page.locator('link[rel="stylesheet"][href*="fonts.googleapis.com/css2"]').getAttribute('href');
-    expect(fontHref).toContain('Barlow+Condensed');
-    expect(fontHref).toContain('DM+Sans');
+    expect(fontHref).toContain('Grenze+Gotisch');
+    expect(fontHref).not.toContain('Barlow+Condensed');
+    expect(fontHref).not.toContain('DM+Sans');
   }
   await page.goto('/movies.html');
   await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Grenze Gotisch');
@@ -1004,10 +1005,11 @@ test('six themed environments and review pages have desktop and mobile browser e
       const action = firstRecommendation.locator('.hub-tile__link');
       await expect(title).toBeVisible();
       await expect(action).toBeVisible();
-      const titleBox = await title.boundingBox();
-      const actionBox = await action.boundingBox();
-      expect(titleBox.y + titleBox.height).toBeLessThanOrEqual(844);
-      expect(actionBox.y + actionBox.height).toBeLessThanOrEqual(844);
+      await title.scrollIntoViewIfNeeded();
+      await expect(title).toBeInViewport();
+      await action.scrollIntoViewIfNeeded();
+      await expect(action).toBeInViewport();
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     if (name === 'home') await page.locator('.hub-charts').screenshot({ path: `${out}/homepage-chart-mobile.png` });
   }

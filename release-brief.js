@@ -84,6 +84,7 @@
       const stale=checked&&daysAgo(checked)>14;
       note.textContent=stale?
         'Last verified '+checked+'. New arrivals are awaiting the next editorial check.':
+        selected.value==='cinema'?'Source-linked UK cinema announcements · verify local showtimes before travelling.':
         'Source-linked announcements · streaming catalogues may change · check the provider before watching.';
     }
     root.replaceChildren(head,tabs,content,note);render();
