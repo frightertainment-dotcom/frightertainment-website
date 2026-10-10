@@ -66,6 +66,29 @@ test('historical chart keeps the year boundary and excludes major producers from
   } finally { globalThis.fetch = previous; }
 });
 
+test('cinema screens the next batch and only shows future UK theatrical dates', async () => {
+  const previous = globalThis.fetch; const urls = [];
+  const future = `${new Date().getUTCFullYear() + 1}-10-05`;
+  globalThis.fetch = async url => {
+    const u = new URL(url); urls.push(u);
+    if (u.pathname.includes('/discover/')) {
+      const second = u.searchParams.get('page') === '2';
+      return reply({ total_pages: 2, total_results: 2, results: [{ id: second ? 2 : 1, title: second ? 'UK Cinema' : 'US Only', genre_ids: [27], poster_path: '/film.jpg', release_date: future }] });
+    }
+    const id = Number(u.pathname.split('/').at(-1));
+    return reply({ id, title: id === 2 ? 'UK Cinema' : 'US Only', release_date: future, poster_path: '/film.jpg', release_dates: { results: [{ iso_3166_1: id === 2 ? 'GB' : 'US', release_dates: [{ type: 3, release_date: future + 'T00:00:00Z' }] }] } });
+  };
+  try {
+    const result = await fetchCatalogue(env, { type: 'movie', mode: 'cinema', year: new Date().getUTCFullYear(), page: 1, country: 'GB' });
+    assert.equal(urls[0].searchParams.get('region'), 'GB');
+    assert.equal(urls[0].searchParams.get('with_release_type'), '3|2');
+    assert.equal(urls[0].searchParams.get('release_date.gte') !== null, true);
+    assert.deepEqual(result.items.map(item => item.title), ['UK Cinema']);
+    assert.equal(result.items[0].releaseCountry, 'GB');
+    assert.equal(result.nextPage, null);
+  } finally { globalThis.fetch = previous; }
+});
+
 test('TV discovery resolves exact horror keywords rather than treating all fantasy shows as horror', async () => {
   const previous = globalThis.fetch; const urls = [];
   globalThis.fetch = async url => {

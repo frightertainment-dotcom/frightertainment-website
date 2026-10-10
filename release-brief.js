@@ -66,7 +66,7 @@
       const rows=summarise(items,selected.value).slice(0,4);
       content.replaceChildren();
       for(const item of rows){
-        const row=make('article','release-brief__item');row.dataset.mediaType='movie';row.dataset.mediaTitle=item.title;if(Number.isInteger(item.year))row.dataset.mediaYear=String(item.year);
+        const row=make('article','release-brief__item');row.dataset.mediaType='movie';row.dataset.mediaTitle=item.title;if(Number.isInteger(item.year))row.dataset.mediaYear=String(item.year);if(Number.isInteger(item.tmdbId)&&item.tmdbId>0)row.dataset.tmdbId=String(item.tmdbId);
         const frame=make('div','release-brief__art');const poster=make('img','release-brief__poster');poster.dataset.mediaField='poster';poster.hidden=true;poster.alt='Poster for '+item.title;frame.append(poster,make('span','release-brief__poster-fallback',item.title));row.append(frame);
         const main=make('div','release-brief__item-main');
         const href=item.filmId&&/^[a-z0-9-]+$/.test(item.filmId)?

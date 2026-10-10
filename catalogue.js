@@ -94,9 +94,9 @@
           list.innerHTML = items.map((item, index) => card(item, mode === 'chart' ? index + 1 : null)).join('');
           if (mode === 'chart') {
             status.textContent = items.length ? `${year} · ${items.length} ${type === 'tv' ? 'shows' : 'films'} · TMDB viewer ratings · 50+ votes` : `No ${year} titles meet the 50-vote chart minimum yet. Explore another year or the archive.`;
-          } else status.textContent = items.length ? `${items.length} ${type === 'tv' ? 'shows' : 'films'}${mode === 'archive' ? ' · ' + year : ''}${data.stale ? ' · Last available update' : ''}` : (mode === 'upcoming' ? 'No upcoming premiere dates are listed yet. Check back for new announcements.' : 'No matching titles. Try another year or title.');
+          } else status.textContent = items.length ? `${items.length} ${type === 'tv' ? 'shows' : items.length === 1 ? 'film' : 'films'}${mode === 'archive' ? ' · ' + year : ''}${data.stale ? ' · Last available update' : ''}` : (mode === 'cinema' ? 'No upcoming UK theatrical dates are verified yet. Check back for new announcements.' : mode === 'upcoming' ? 'No upcoming premiere dates are listed yet. Check back for new announcements.' : 'No matching titles. Try another year or title.');
           const totalPages = Math.max(1, Math.min(500, Number(data.totalPages) || 1));
-          if (mode !== 'chart' && totalPages > 1) {
+          if (mode !== 'chart' && (data.nextPage || history.length)) {
             const previous = document.createElement('button');
             previous.className = 'button button--outline'; previous.type = 'button'; previous.textContent = '← PREVIOUS'; previous.disabled = history.length === 0;
             previous.addEventListener('click', () => {page = history.pop() || 1; load(); section.scrollIntoView({block:'start'});});

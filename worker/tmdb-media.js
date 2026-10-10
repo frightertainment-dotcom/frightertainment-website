@@ -105,8 +105,9 @@ export async function fetchCatalogue(env, options) {
   const path = search ? `/search/${type}` : `/discover/${type}`;
   const first = await tmdbRequest(env, path, parameters);
   const totalPages = Math.min(500, Number(first.total_pages) || 1);
-  // Indie charts screen a bounded two-page candidate pool. Continuation pages let people explore further without an unbounded request.
-  const extra = kind === 'indie' && !search && page < totalPages ? await tmdbRequest(env, path, { ...parameters, page: page + 1 }) : null;
+  // Both independent status and UK theatrical dates need detail verification.
+  // Screen a bounded two-page pool so a page of false candidates is not shown as empty.
+  const extra = (kind === 'indie' || mode === 'cinema') && !search && page < totalPages ? await tmdbRequest(env, path, { ...parameters, page: page + 1 }) : null;
   let candidates = [...(first.results || []), ...(extra?.results || [])].filter(raw => raw.adult !== true && safePoster(raw.poster_path) && Number.isInteger(raw.id));
   if (type === 'movie') candidates = candidates.filter(raw => raw.genre_ids?.includes(27));
   if (search && ['archive', 'top'].includes(mode)) candidates = candidates.filter(raw => Number(String(type === 'tv' ? raw.first_air_date : raw.release_date).slice(0, 4)) === year);
@@ -136,5 +137,5 @@ export async function fetchCatalogue(env, options) {
     year, type: kind, mode: options.mode, ratingKind: 'tmdb-community', minimumVotes: chart ? 50 : null,
     classification: kind === 'indie' ? 'independent-production-candidates' : type === 'tv' ? 'tmdb-horror-keyword' : 'tmdb-horror-genre',
     methodology: `${mode === 'cinema' ? 'Upcoming UK limited or general theatrical dates verified against TMDB release-date details. Territories and dates may change.' : kind === 'indie' ? INDIE_POLICY : type === 'tv' ? TV_POLICY : 'Horror genre entries from TMDB.'}${chart ? ' Ranked by TMDB community score with at least 50 votes, among released titles in the selected first-release year. Fewer entries are shown if the screened pool has fewer qualifying titles.' : ''}`,
-    screeningLimit: kind === 'indie' ? 40 : null };
+    screeningLimit: kind === 'indie' || mode === 'cinema' ? 40 : null };
 }
