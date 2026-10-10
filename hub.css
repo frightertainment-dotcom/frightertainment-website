@@ -1355,3 +1355,32 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
   .horror-vault-search__result{flex-wrap:wrap}
   .horror-vault-search__result span{flex:0 1 auto}
 }
+
+/* Official game spotlight, scoped SteamDB rating snapshot and supported regional cinema select. */
+.fr-cinema-region{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px;color:var(--red);font:700 14px/1.3 var(--font-body);letter-spacing:.05em}
+.fr-cinema-region select{min-height:44px;max-width:100%;background:var(--surface-world);border:1px solid var(--edge);color:#f6edf0;padding:8px 12px}
+.fr-cinema-context{color:#ddd0cc;font:400 14px/1.5 var(--font-body);margin:10px 0}
+.fr-cinema-context strong{color:#f1e9e7}
+#recent-cinema[hidden],[data-cinema-editorial-note][hidden]{display:none!important}
+.fr-game-spotlight{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center;gap:24px;margin:20px 0 30px;padding:clamp(19px,3vw,38px);border:1px solid var(--edge);background:linear-gradient(115deg,#101524,#080d1a 70%,#181321);min-width:0}
+.fr-game-spotlight__copy,.fr-game-spotlight__media{min-width:0}
+.fr-game-spotlight h2,.fr-game-chart h2,.fr-game-extra h2{font:700 clamp(29px,3.8vw,48px)/1.04 var(--font-display);margin:8px 0 15px;overflow-wrap:anywhere}
+.fr-game-spotlight h2 em,.fr-game-chart h2 em,.fr-game-extra h2 em{font-style:normal;color:var(--red)}
+.fr-game-spotlight p,.fr-game-chart p,.fr-game-extra p{line-height:1.6;color:#d9dce6}
+.fr-game-spotlight__platforms{font-weight:700;letter-spacing:.06em}
+.fr-game-spotlight__links{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}
+.fr-game-spotlight a,.fr-game-chart a,.fr-game-extra a{color:#c3d9ff;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.fr-game-spotlight__fine{font-size:12px!important;color:#aab4c6!important}
+.fr-game-spotlight__media .game-store-widget{width:100%;max-width:100%;height:200px}
+.fr-game-chart,.fr-game-extra{margin:35px 0;padding:clamp(16px,2.7vw,30px);border-top:1px solid var(--edge);background:color-mix(in srgb,var(--surface-world) 76%,transparent);min-width:0}
+.fr-game-chart__head{display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.fr-game-chart__rows{counter-reset:game;list-style:none;padding:0;margin:17px 0}
+.fr-game-chart__rows li{counter-increment:game;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;padding:13px 4px;border-bottom:1px solid var(--hair);align-items:center;font-size:clamp(14px,1.3vw,18px)}
+.fr-game-chart__rows li::before{content:counter(game,decimal-leading-zero);font-weight:700;color:var(--red)}
+.fr-game-chart__rows strong{min-width:0;overflow-wrap:anywhere}
+.fr-game-chart__rows li span{font-variant-numeric:tabular-nums;color:#c6e0ff;font-weight:700}
+.fr-game-chart__method{font-size:12px}
+.fr-game-extra__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.fr-game-extra__grid article{padding:20px;min-width:0;background:#0c121e;border:1px solid var(--edge)}
+.fr-game-extra__grid h3{font:700 25px/1.08 var(--font-display);margin:0 0 9px;overflow-wrap:anywhere}
+@media(max-width:700px){.fr-game-spotlight{grid-template-columns:1fr;gap:12px}.fr-game-extra__grid{grid-template-columns:1fr}.fr-game-spotlight__media .game-store-widget{height:175px}.fr-game-chart__rows li{font-size:14px}}
