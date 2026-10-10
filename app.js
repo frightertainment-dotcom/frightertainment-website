@@ -167,55 +167,6 @@
       }).catch(() => { /* Keep original film artwork if TMDB is unavailable. */ });
   }
 
-  const filmHero = document.querySelector('.fr-movie-hero__art');
-  const filmPageId = document.body.dataset.filmId;
-  if (filmHero && /^[a-z0-9-]{1,80}$/.test(filmPageId || '')) {
-    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => {
-        const item = data?.items?.find(value => value.id === filmPageId);
-        if (!/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item?.posterPath || '')) return;
-        const image = document.createElement('img');
-        image.className = 'fr-movie-hero__poster';
-        image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
-        image.alt = '';
-        image.addEventListener('error', () => image.remove(), { once: true });
-        filmHero.prepend(image);
-        filmHero.setAttribute('aria-label', 'TMDB poster artwork and Frightertainment film information for ' + item.title);
-        const label = filmHero.querySelector('small');
-        if (label) label.textContent = 'POSTER VIA TMDB';
-        const notice = document.createElement('p');
-        notice.className = 'tmdb-notice';
-        notice.textContent = 'Poster via TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. ';
-        const credits = document.createElement('a');
-        credits.href = '/credits.html';
-        credits.textContent = 'TMDB credits and attribution';
-        notice.append(credits);
-        filmHero.closest('.fr-movie-hero')?.after(notice);
-        if (Number.isFinite(item.voteAverage) && item.voteAverage > 0 &&
-            Number.isInteger(item.voteCount) && item.voteCount >= 50) {
-          const section = document.createElement('section');
-          section.className = 'film-section';
-          const heading = document.createElement('h2');
-          heading.textContent = 'TMDB COMMUNITY RATING';
-          const rating = document.createElement('p');
-          rating.className = 'film-score';
-          rating.textContent = item.voteAverage.toFixed(1) + '/10';
-          const note = document.createElement('p');
-          note.textContent = item.voteCount + ' TMDB viewer votes. This is not a professional critic or Fright Rating.';
-          const source = document.createElement('a');
-          source.href = safeURL(item.sourceUrl);
-          source.textContent = 'View rating source on TMDB →';
-          source.target = '_blank';
-          source.rel = 'noopener noreferrer';
-          section.append(heading, rating, note, source);
-          const frightSection = [...document.querySelectorAll('.film-section')]
-            .find(value => value.querySelector('h2')?.textContent === 'FRIGHT RATING');
-          frightSection?.before(section);
-        }
-      }).catch(() => {});
-  }
-
   const trailerGrid = $('#trailer-grid');
   if (trailerGrid) {
     const verifiedTrailers = movies.filter(movie => movie.trailer && /^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') && safeURL(movie.trailer.source));
@@ -273,6 +224,55 @@
         frame.replaceChildren(iframe); frame.hidden = false; play.remove();
       });
     }
+  }
+
+  const filmHero = document.querySelector('.fr-movie-hero__art');
+  const filmPageId = document.body.dataset.filmId;
+  if (filmHero && /^[a-z0-9-]{1,80}$/.test(filmPageId || '')) {
+    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        const item = data?.items?.find(value => value.id === filmPageId);
+        if (!/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item?.posterPath || '')) return;
+        const image = document.createElement('img');
+        image.className = 'fr-movie-hero__poster';
+        image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
+        image.alt = '';
+        image.addEventListener('error', () => image.remove(), { once: true });
+        filmHero.prepend(image);
+        filmHero.setAttribute('aria-label', 'TMDB poster artwork and Frightertainment film information for ' + item.title);
+        const label = filmHero.querySelector('small');
+        if (label) label.textContent = 'POSTER VIA TMDB';
+        const notice = document.createElement('p');
+        notice.className = 'tmdb-notice';
+        notice.textContent = 'Poster via TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. ';
+        const credits = document.createElement('a');
+        credits.href = '/credits.html';
+        credits.textContent = 'TMDB credits and attribution';
+        notice.append(credits);
+        filmHero.closest('.fr-movie-hero')?.after(notice);
+        if (Number.isFinite(item.voteAverage) && item.voteAverage > 0 &&
+            Number.isInteger(item.voteCount) && item.voteCount >= 50) {
+          const section = document.createElement('section');
+          section.className = 'film-section';
+          const heading = document.createElement('h2');
+          heading.textContent = 'TMDB COMMUNITY RATING';
+          const rating = document.createElement('p');
+          rating.className = 'film-score';
+          rating.textContent = item.voteAverage.toFixed(1) + '/10';
+          const note = document.createElement('p');
+          note.textContent = item.voteCount + ' TMDB viewer votes. This is not a professional critic or Fright Rating.';
+          const source = document.createElement('a');
+          source.href = safeURL(item.sourceUrl);
+          source.textContent = 'View rating source on TMDB →';
+          source.target = '_blank';
+          source.rel = 'noopener noreferrer';
+          section.append(heading, rating, note, source);
+          const frightSection = [...document.querySelectorAll('.film-section')]
+            .find(value => value.querySelector('h2')?.textContent === 'FRIGHT RATING');
+          frightSection?.before(section);
+        }
+      }).catch(() => {});
   }
 
   const menu = $('.menu-toggle');
