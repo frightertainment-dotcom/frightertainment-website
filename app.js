@@ -1,6 +1,12 @@
 (() => {
   'use strict';
   const movies = Array.isArray(window.FR_MOVIES) ? window.FR_MOVIES : [];
+  const artByFilm = new Map();
+  const tmdbArtwork = movie => {
+    const path = artByFilm.get(movie.id)?.posterPath;
+    return /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(path || '') ?
+      'https://image.tmdb.org/t/p/w500' + path : '';
+  };
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
   const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -77,7 +83,7 @@
     const synopsis = firstClaim(movie, 'synopsis')?.value || 'Verified film identity; further plot information has not been added.';
     const id = encodeURIComponent(movie.id);
     const coverStyle = [...movie.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 6;
-    return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder" data-cover-style="${coverStyle}"><span class="poster-mini">FRIGHTERTAINMENT FILM FILE</span><strong>${escapeHTML(movie.title)}</strong><small>FRIGHTERTAINMENT ART</small></div></div>`}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
+    return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder" data-cover-style="${coverStyle}"><span class="poster-mini">FRIGHTERTAINMENT FILM FILE</span><strong>${escapeHTML(movie.title)}</strong><small>FRIGHTERTAINMENT ART</small></div></div>${tmdbArtwork(movie) ? `<img class="tmdb-card-poster" src="${escapeHTML(tmdbArtwork(movie))}" alt="TMDB poster for ${escapeHTML(movie.title)}" loading="lazy" decoding="async">` : ''} `}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
       <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '' : `<span class="movie-card__score" aria-label="Fright Rating ${(score / 10).toFixed(1)} out of 10">${(score / 10).toFixed(1)}<small>/10</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE →</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
   };
   const grid = $('#movie-grid');
@@ -139,6 +145,17 @@
     $('#movie-year')?.addEventListener('change', event => { state.year = event.target.value; state.visible = 8; render(); });
     $('#movie-more')?.addEventListener('click', () => { state.visible += 8; render(); });
     render();
+    grid.addEventListener('error', event => {
+      if (event.target?.matches('img.tmdb-card-poster')) event.target.classList.add('is-broken');
+    }, true);
+    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        for (const item of data?.items || []) {
+          if (/^[a-z0-9-]{1,80}$/.test(item.id || '')) artByFilm.set(item.id, item);
+        }
+        render();
+      }).catch(() => { /* Keep original film artwork if TMDB is unavailable. */ });
   }
 
   const trailerGrid = $('#trailer-grid');

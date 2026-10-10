@@ -10,6 +10,7 @@ import {
   refreshStreaming, refreshStreamingReleases, refreshTheatricalReleases, refreshTrending
 } from './providers.js';
 import { importLicensedReviews } from './review-ingestion.js';
+import { refreshCommunityChart, refreshMovieArtwork } from './tmdb-catalogue.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -99,6 +100,20 @@ async function handleRanking(env, request) {
   const yearValue = new URL(request.url).searchParams.get('year') || String(new Date().getUTCFullYear());
   const year = Number(yearValue);
   if (!Number.isInteger(year) || year < 1888 || year > new Date().getUTCFullYear() + 2) return json({ error: 'Invalid ranking year' }, 400);
+  if (env.TMDB_PREVIEW_ON_DEMAND === 'true') {
+    const kind = `tmdb-community-${year}`;
+    let dataset = await loadDataset(env.DB, kind, '');
+    if (dataset.status !== 'current') {
+      await refreshTask(env, kind, '', () => refreshCommunityChart(env, year),
+        24 * 60 * 60 * 1000, 'preview-on-demand');
+      dataset = await loadDataset(env.DB, kind, '');
+    }
+    return json({ year, ratingKind: 'tmdb-community', minimumVotes: 50,
+      methodology: 'TMDB community vote average out of 10, ranked among horror films with at least 50 votes and a primary release date in this year up to today. Not a professional critic score or Frightertainment Fright Rating.',
+      items: dataset.items || [], rankedFilms: dataset.items?.length || 0,
+      updatedAt: dataset.updatedAt, stale: dataset.status === 'stale',
+      status: dataset.status }, 200, { 'cache-control': 'public, max-age=60' });
+  }
   if (!(await hasRankingSchema(env.DB))) {
     return json({ year, status: 'pending', minimumCritics: MINIMUM_CRITICS, methodology: RANKING_METHOD,
       rankedFilms: 0, pendingFilmCount: 0, pendingFilms: [], items: [], updatedAt: null,
@@ -130,6 +145,19 @@ async function handleRanking(env, request) {
   const payload = await createAnnualRankingPayload(env.DB, year);
   return json({ ...payload, updatedAt: null, snapshotStatus: 'awaiting-first-scheduled-snapshot', stale: false }, 200,
     { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
+}
+
+async function handleMovieArtwork(env) {
+  if (env.TMDB_PREVIEW_ON_DEMAND !== 'true') return json({ error: 'Not available' }, 404);
+  let dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
+  if (dataset.status !== 'current') {
+    await refreshTask(env, 'tmdb-movie-artwork', '',
+      () => refreshMovieArtwork(env, env.DB), 7 * 24 * 60 * 60 * 1000, 'preview-on-demand');
+    dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
+  }
+  return json({ source: 'TMDB', updatedAt: dataset.updatedAt,
+    status: dataset.status, items: dataset.items || [] }, 200,
+    { 'cache-control': 'public, max-age=300' });
 }
 
 async function handleDiscovery(env, request) {
@@ -393,6 +421,7 @@ async function fetchHandler(request, env) {
   try {
     if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
     if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
+    if (path === '/api/movie-artwork' && request.method === 'GET') return await handleMovieArtwork(env);
     if (path.startsWith('/api/films/') && request.method === 'GET') {
       let filmId;
       try { filmId = decodeURIComponent(path.slice('/api/films/'.length)); }

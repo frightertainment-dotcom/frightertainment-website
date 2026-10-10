@@ -9,6 +9,8 @@
   const names = { GB: 'United Kingdom', US: 'United States', CA: 'Canada', AU: 'Australia', NZ: 'New Zealand', IE: 'Ireland' };
   const localDate = () => { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; };
   let data = {};
+  let artworkByTitle = new Map();
+  const titleKey = value => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   let query = '';
   const kinds = ['coming-soon', 'streaming-availability', 'streaming-releases', 'theatrical-releases', 'trending-horror'];
   const setState = (kind, message) => { const node = $(`[data-state="${kind}"]`); if (node) node.textContent = message; };
@@ -25,7 +27,8 @@
     const filmId = item.filmId && /^[a-z0-9-]+$/.test(item.filmId) ? item.filmId : '';
     const titleMarkup = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">${content}</a>` : `<div>${content}</div>`;
     const detailLink = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">FILM FILE</a>` : '';
-    const posterPath = kind === 'trending-horror' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
+    const candidatePoster = kind === 'trending-horror' ? item.posterPath : artworkByTitle.get(titleKey(item.title))?.posterPath;
+    const posterPath = /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(candidatePoster || '') ? candidatePoster : '';
     const poster = posterPath ? `<img class="tmdb-poster" src="https://image.tmdb.org/t/p/w342${escapeHTML(posterPath)}" alt="Poster for ${escapeHTML(item.title)}" loading="lazy" decoding="async">` : '';
     return `<article class="discovery-item${poster ? ' discovery-item--poster' : ''}">${poster}<div class="discovery-item__copy">${titleMarkup}<span class="discovery-item__source">${sourceLink(item)} ${detailLink}</span></div></article>`;
   };
@@ -85,33 +88,43 @@
     const country=countrySelect.value;
     const year=new Date().getUTCFullYear();
     for(const kind of kinds)setState(kind,'Checking new horror titles…');
-    const [feed,ranking,editorial]=await Promise.all([
+    const [feed,ranking,editorial,artwork]=await Promise.all([
       fetch('/api/discovery?country='+encodeURIComponent(country),{headers:{accept:'application/json'}})
         .then(r=>r.ok?r.json():null).catch(()=>null),
       fetch('/api/rankings?year='+year,{headers:{accept:'application/json'}})
         .then(r=>r.ok?r.json():null).catch(()=>null),
       fetch('/data/editorial-releases.json',{headers:{accept:'application/json'}})
+        .then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch('/api/movie-artwork',{headers:{accept:'application/json'}})
         .then(r=>r.ok?r.json():null).catch(()=>null)
     ]);
     data=feed?.datasets||{};
+    artworkByTitle = new Map((artwork?.items || []).map(item => [titleKey(item.title), item]));
     overlayEditorial(editorial);
     const panel=$('[data-list="rankings"]');
     const ranked=Array.isArray(ranking?.items)?ranking.items:[];
     if(panel){
       panel.innerHTML=ranked.slice(0,6).map(item=>{
+        const community = ranking?.ratingKind === 'tmdb-community';
         const filmId=item.filmId||item.id;
-        const href=filmHref(filmId);
-        const source=(item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' →</a>').join(' ');
-        return '<article class="discovery-item"><div><strong><span class="ranking-position">#'+
+        const href=community ? safeURL(item.sourceUrl) : filmHref(filmId);
+        const source=community ? '<a href="'+escapeHTML(safeURL(item.sourceUrl))+'" target="_blank" rel="noopener noreferrer">TMDB →</a>' :
+          (item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' →</a>').join(' ');
+        const posterPath = community && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
+        const poster = posterPath ? '<img class="tmdb-poster" src="https://image.tmdb.org/t/p/w185'+escapeHTML(posterPath)+'" alt="Poster for '+escapeHTML(item.title)+'" loading="lazy">' : '';
+        const label=community ? 'TMDB community rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.voteCount)+' votes' :
+          'Fright Rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel);
+        return '<article class="discovery-item'+(poster?' discovery-item--poster':'')+'">'+poster+'<div><strong><span class="ranking-position">#'+
           escapeHTML(item.position)+'</span> <a href="'+escapeHTML(href)+'">'+escapeHTML(item.title)+'</a></strong>'+
-          '<span>Fright Rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel)+
-          '</span></div><span class="discovery-item__source">'+source+'</span></article>';
+          '<span>'+label+'</span></div><span class="discovery-item__source">'+source+'</span></article>';
       }).join('');
     }
-    setState('rankings',ranked.length?'Critic chart based on source-verified professional reviews.':
-      'Critic ranking pending: permission-cleared professional review data is not yet available.');
+    setState('rankings',ranking?.ratingKind === 'tmdb-community'
+      ? ranked.length ? 'TMDB viewer scores · minimum 50 votes · not critic ratings.' : 'No films have met the TMDB 50-vote minimum.'
+      : ranked.length?'Critic chart based on source-verified professional reviews.':
+        'Critic ranking pending: permission-cleared professional review data is not yet available.');
     const rankingUpdated=$('[data-updated="rankings"]');
-    if(rankingUpdated)rankingUpdated.textContent=ranking?.updatedAt?'Last ranking snapshot: '+ranking.updatedAt:'Last successful ranking: none';
+    if(rankingUpdated)rankingUpdated.textContent=ranking?.updatedAt?(ranking.ratingKind === 'tmdb-community' ? 'TMDB checked: ' : 'Last ranking snapshot: ')+ranking.updatedAt:'Last successful ranking: none';
     render();
   }
   countrySelect.addEventListener('change', () => {

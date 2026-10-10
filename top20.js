@@ -5,6 +5,7 @@
   const list = document.querySelector('#ranking-list');
   const unranked = document.querySelector('#unranked-films');
   if (!status || !updated || !list || !Number.isInteger(year)) return;
+  let ratingKind = 'professional-critics';
 
   const eligibleFilmYear = film => {
     const claims = Array.isArray(film.claims) ? film.claims : [];
@@ -82,7 +83,7 @@
       typeof item.title === 'string' && item.title.trim().length > 0 && item.title.length <= 240 &&
       Number.isInteger(item.position) && item.position >= 1 && item.position <= 20 &&
       Number.isInteger(item.averageScore) && item.averageScore >= 0 && item.averageScore <= 100 &&
-      Number.isInteger(item.criticCount) && item.criticCount >= 3 &&
+      (ratingKind === 'tmdb-community' ? Number.isInteger(item.voteCount) && item.voteCount >= 50 : Number.isInteger(item.criticCount) && item.criticCount >= 3) &&
       Array.isArray(item.sources);
   }
 
@@ -113,11 +114,11 @@
       details.className = 'ranking-row__film';
       const heading = document.createElement('h2');
       const title = document.createElement('a');
-      title.href = filmHref(film.filmId);
+      title.href = ratingKind === 'tmdb-community' ? safeHttps(film.sourceUrl) || '/movies.html' : filmHref(film.filmId);
       title.textContent = film.title;
       heading.append(title);
       const sourceList = document.createElement('p');
-      sourceList.append(document.createTextNode(`${film.criticCount} distinct professional critics`));
+      sourceList.append(document.createTextNode(ratingKind === 'tmdb-community' ? `${film.voteCount} TMDB community votes · ${film.firstReleaseDate || year}` : `${film.criticCount} distinct professional critics`));
       for (const source of film.sources.slice(0, 12)) {
         const href = safeHttps(source?.url);
         if (!href) continue;
@@ -138,7 +139,15 @@
       const scale = document.createElement('span');
       scale.textContent = '/10';
       score.append(value, scale);
-      row.append(place, details, score);
+      if (ratingKind === 'tmdb-community' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(film.posterPath || '')) {
+        const poster = document.createElement('img');
+        poster.className = 'ranking-row__poster';
+        poster.alt = 'Poster for ' + film.title;
+        poster.src = 'https://image.tmdb.org/t/p/w185' + film.posterPath;
+        poster.loading = 'lazy';
+        poster.addEventListener('error', () => poster.remove(), { once: true });
+        row.append(place, poster, details, score);
+      } else row.append(place, details, score);
       chart.append(row);
     }
     list.replaceChildren(chart);
@@ -151,17 +160,25 @@
       return response.json();
     })
     .then(result => {
+      ratingKind = result?.ratingKind === 'tmdb-community' ? 'tmdb-community' : 'professional-critics';
+      if (ratingKind === 'tmdb-community') {
+        document.querySelector('.eyebrow--small').textContent = 'TMDB COMMUNITY VOTES · SOURCE-LINKED';
+        const attribution = document.querySelector('#ranking-attribution');
+        if (attribution) attribution.hidden = false;
+        document.querySelector('#ranking-method').textContent = result.methodology;
+        document.querySelector('#ranking-method').closest('details').querySelector('summary').textContent = 'How the TMDB community chart works';
+      }
       const candidates = Array.isArray(result?.items) ? result.items : [];
       const rankedIds = renderRanking(candidates);
       const count = rankedIds.size;
       const lastPublished = formatDate(result?.updatedAt);
-      updated.textContent = lastPublished ? `Last published ranking snapshot: ${lastPublished}` : 'Last successful ranking: none';
-      const unrankedCount = showUnrankedVerifiedFilms(rankedIds);
+      updated.textContent = lastPublished ? (ratingKind === 'tmdb-community' ? `TMDB data checked: ${lastPublished}` : `Last published ranking snapshot: ${lastPublished}`) : 'Last successful ranking: none';
+      const unrankedCount = ratingKind === 'tmdb-community' ? 0 : showUnrankedVerifiedFilms(rankedIds);
 
       if (!count) {
         status.textContent = result?.stale === true
           ? 'Ranking snapshot is stale. No current verified ranking is available.'
-          : `Critic ranking pending. Verified critic scores are not yet available.${unrankedCount ? ` ${unrankedCount} verified films remain unranked.` : ''}`;
+          : ratingKind === 'tmdb-community' ? 'No films have reached the 50-vote minimum for this year yet.' : `Critic ranking pending. Verified critic scores are not yet available.${unrankedCount ? ` ${unrankedCount} verified films remain unranked.` : ''}`;
         return;
       }
 
@@ -169,7 +186,7 @@
       const minimumCritics = Number.isInteger(result?.minimumCritics) ? result.minimumCritics : 3;
       status.textContent = result?.stale === true
         ? `Ranking data is stale. Showing the last valid published chart of ${count} film${count === 1 ? '' : 's'}.`
-        : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
+        : ratingKind === 'tmdb-community' ? `${rankedFilms} horror film${rankedFilms === 1 ? '' : 's'} ranked by TMDB community votes, with at least 50 votes each. These are viewer scores, not critic or Fright Ratings.` : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
     })
     .catch(() => {
       status.textContent = 'Ranking unavailable. No score or position has been added.';

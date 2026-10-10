@@ -30,14 +30,30 @@
         description.textContent=typeof synopsis==='string'&&synopsis.length>15?
           synopsis:'Enter the latest film file and explore its official release announcement.';
         link.href='/films/'+encodeURIComponent(chosen.film.id)+'/';
+        feature.dataset.filmId = chosen.film.id;
         link.setAttribute('aria-label','Explore '+chosen.film.title+' film details');
       }
     }
+  }
+  if (feature?.dataset.filmId) {
+    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        const item = data?.items?.find(value => value.id === feature.dataset.filmId);
+        if (!/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item?.posterPath || '')) return;
+        const image = document.createElement('img');
+        image.className = 'hub-feature__poster';
+        image.alt = 'TMDB poster for ' + item.title;
+        image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
+        image.addEventListener('error', () => image.remove(), { once: true });
+        feature.prepend(image);
+      }).catch(() => {});
   }
   const root = document.querySelector('#hub-ranking');
   if (!root) return;
 
   const year = new Date().getUTCFullYear();
+  let ratingKind = 'professional-critics';
   const heading = document.querySelector('.hub-charts h2 em');
   if (heading) heading.textContent = 'FILMS · ' + year;
   const chartFoot = document.querySelector('.hub-charts__foot');
@@ -204,7 +220,7 @@
         typeof item.title === 'string' && item.title.trim().length > 0 && item.title.length <= 240 &&
         Number.isInteger(item.position) && item.position >= 1 && item.position <= 20 && !seenPositions.has(item.position) &&
         Number.isInteger(item.averageScore) && item.averageScore >= 0 && item.averageScore <= 100 &&
-        Number.isInteger(item.criticCount) && item.criticCount >= 3 && !seenFilms.has(item.filmId);
+        (ratingKind === 'tmdb-community' ? Number.isInteger(item.voteCount) && item.voteCount >= 50 : Number.isInteger(item.criticCount) && item.criticCount >= 3) && !seenFilms.has(item.filmId);
       if (ok) { seenFilms.add(item.filmId); seenPositions.add(item.position); }
       return ok;
     }).sort((a, b) => a.position - b.position).slice(0, previewLimit);
@@ -224,21 +240,21 @@
       movement.className = 'movement';
       const kind = movementText === 'NEW' ? 'new' : movementText.startsWith('UP') ? 'up' : movementText.startsWith('DOWN') ? 'down' : 'same';
       movement.dataset.kind = kind;
-      movement.textContent = movementText === '—' ? 'UNCHANGED' : movementText;
+      movement.textContent = ratingKind === 'tmdb-community' ? 'TMDB' : movementText === '—' ? 'UNCHANGED' : movementText;
       movement.setAttribute('aria-label', movementText === '—' ? 'Position unchanged' : `Position movement ${movementText.toLowerCase()}`);
       const position = document.createElement('span');
       position.className = 'position';
       position.textContent = '#' + item.position;
       const title = document.createElement('a');
       title.textContent = item.title;
-      title.href = filmHref(item.filmId);
+      title.href = ratingKind === 'tmdb-community' ? safeSource(item.sourceUrl) || '/movies.html' : filmHref(item.filmId);
       const score = document.createElement('span');
       score.className = 'score';
       score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
       const meta = document.createElement('div');
       meta.className = 'chart-meta';
       const count = document.createElement('span');
-      count.textContent = `${item.criticCount} distinct critics`;
+      count.textContent = ratingKind === 'tmdb-community' ? `${item.voteCount} TMDB community votes` : `${item.criticCount} distinct critics`;
       meta.append(count);
       const sources = (Array.isArray(item.sources) ? item.sources : []).slice(0, 4);
       for (const source of sources) {
@@ -252,7 +268,16 @@
         link.title = `${source.territory || 'Territory not stated'} · checked ${source.checkedAt || 'date not stated'}`;
         meta.append(link);
       }
-      row.append(position, title, score, movement, meta);
+      if (ratingKind === 'tmdb-community' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '')) {
+        const poster = document.createElement('img');
+        poster.className = 'hub-chart-poster';
+        poster.alt = 'Poster for ' + item.title;
+        poster.src = 'https://image.tmdb.org/t/p/w185' + item.posterPath;
+        poster.loading = 'lazy';
+        poster.addEventListener('error', () => poster.remove(), { once: true });
+        row.classList.add('hub-chart-row--poster');
+        row.append(position, poster, title, score, movement, meta);
+      } else row.append(position, title, score, movement, meta);
       list.append(row);
     }
     const ids = new Set(valid.map(item => item.filmId));
@@ -274,6 +299,12 @@
 
   function finish() { root.setAttribute('aria-busy', 'false'); }
   function setResult(data) {
+    ratingKind = data?.ratingKind === 'tmdb-community' ? 'tmdb-community' : 'professional-critics';
+    if (ratingKind === 'tmdb-community') {
+      document.querySelector('.hub-charts .hub-eyebrow').textContent = 'TMDB COMMUNITY RATING /10';
+      document.querySelector('.hub-charts__top p').textContent = 'Horror films released this year, ranked by TMDB viewer votes (50 minimum).';
+      chartFoot.textContent = year + ' · TMDB COMMUNITY CHART';
+    }
     const dataItems = Array.isArray(data?.items) ? data.items : [];
     const rendered = renderRows(dataItems);
     const content = [];
@@ -282,7 +313,7 @@
       else content.push(rendered.node);
       const updated = document.createElement('p');
       updated.className = 'hub-ranking__updated';
-      updated.textContent = formatDate(data?.updatedAt) ? `Last published ranking snapshot: ${formatDate(data.updatedAt)}` : 'Last published ranking snapshot: not available';
+      updated.textContent = formatDate(data?.updatedAt) ? `TMDB data checked: ${formatDate(data.updatedAt)}` : 'TMDB data check unavailable';
       content.push(updated);
       if (data?.stale === true) content.push(createState('Ranking data may be out of date', 'Showing the last valid ranking while its sources are reviewed.', 'stale'));
     } else if (data?.stale === true) {
@@ -290,7 +321,7 @@
     } else {
       content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available.'));
     }
-    const unranked = renderUnranked(year, rendered.ids);
+    const unranked = ratingKind === 'tmdb-community' ? null : renderUnranked(year, rendered.ids);
     if (unranked) content.push(unranked);
     root.replaceChildren(...content);
   }
