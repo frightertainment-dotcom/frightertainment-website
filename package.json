@@ -9,6 +9,7 @@
   "scripts": {
     "build:pages": "node scripts/build-pages.mjs && node scripts/build-editorial.mjs",
     "check": "node scripts/check-content.mjs && node scripts/check-links.mjs",
+    "audit:vault": "node scripts/audit-vault.mjs",
     "test": "node --test",
     "test:browser": "playwright test",
     "sync:manual-films": "node scripts/sync-manual-films.mjs",

@@ -22,6 +22,8 @@ jobs:
         run: npm audit --audit-level=high
       - run: npm run build:pages
       - run: npm run check
+      - name: Audit every historical Horror Vault record and record media provenance gaps
+        run: npm run audit:vault
       - run: npm run build:preview
       - name: Verify isolated, non-indexable preview bundle
         run: |

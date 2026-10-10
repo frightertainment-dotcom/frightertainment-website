@@ -81,7 +81,7 @@
       '</div><a class="fr-movie-hero__browse" href="'+(recordYear(movie)?'/all-horror-movies.html?year='+encodeURIComponent(year):'/all-horror-movies.html')+'">'+(recordYear(movie)?'EXPLORE MORE HORROR FROM '+escapeHTML(year):'EXPLORE THE HORROR VAULT')+' →</a>'+
       '</div></section>';
   };
-  const pinnedIds = {'ready-or-not-2':1266127,'other-mommy':1400837};
+  const pinnedIds = {'ready-or-not-2':1266127,'other-mommy':1400837,'crawlers':1376400};
   const mediaAttrs = movie => `data-media-type="movie" data-media-title="${escapeHTML(movie.title)}" data-media-year="${listingYear(movie)||''}" ${artByFilm.get(movie.id)?.tmdbId || pinnedIds[movie.id] ? `data-tmdb-id="${artByFilm.get(movie.id)?.tmdbId || pinnedIds[movie.id]}"` : ''}`;
   const cardMarkup = movie => {
     const community=communityScore(movie), id=encodeURIComponent(movie.id), poster=tmdbArtwork(movie);

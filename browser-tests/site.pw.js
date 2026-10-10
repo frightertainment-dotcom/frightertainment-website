@@ -328,6 +328,31 @@ test('upcoming release calendar excludes historical and already released films',
   await expect(calendar).not.toContainText('2007');
 });
 
+test('Crawlers poster in Coming Soon resolves using its verified TMDB identity',async({page})=>{
+  const mediaRequests=[];
+  await page.route('**/api/movie-artwork',route=>route.fulfill({json:{items:[],status:'ready'}}));
+  await page.route('**/api/media?**',route=>{
+    const query=new URL(route.request().url()).searchParams;
+    mediaRequests.push(Object.fromEntries(query));
+    const item=query.get('id')==='1376400'?{tmdbId:1376400,mediaType:'movie',title:'Crawlers',
+      posterPath:'/lNXeEpg4yLSRwXwOeR5lbPgwbqL.jpg',voteAverage:null,voteCount:0,
+      releaseDate:'2026-10-29',releaseCountry:'AU',overview:'A deadly spider invasion.'}:null;
+    return route.fulfill({json:{item,status:'ready'}});
+  });
+  await page.route('https://image.tmdb.org/**',route=>route.fulfill({
+    status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+l5a8AAAAASUVORK5CYII=','base64')
+  }));
+  await page.goto('/movies.html');
+  const item=page.locator('#hub-release-list .hub-release-row').filter({hasText:'Crawlers'});
+  await expect(item).toBeVisible();
+  await expect(item).toHaveAttribute('data-tmdb-id','1376400');
+  await expect(item).toHaveAttribute('data-media-year','2026');
+  await item.scrollIntoViewIfNeeded();
+  await expect.poll(()=>item.getAttribute('data-media-status')).toBe('ready');
+  await expect(item.locator('img[data-media-field="poster"]')).toBeVisible();
+  await expect.poll(()=>item.locator('img').evaluate(x=>x.naturalWidth)).toBeGreaterThan(0);
+  expect(mediaRequests.some(q=>q.id==='1376400')).toBe(true);
+});
 test('featured recent years are separate from the complete pre-2025 year-by-year archive',async({page})=>{
   await page.goto('/movies.html');
   await expect(page.locator('#movie-year')).toHaveValue('2026');

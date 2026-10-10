@@ -6,6 +6,9 @@
     const films=Array.isArray(window.FR_MOVIES)?window.FR_MOVIES:[];
     let artwork=[];try{const r=await fetch('/api/movie-artwork');if(r.ok)artwork=(await r.json()).items||[];}catch{}
     const art=new Map(artwork.map(x=>[x.id,x]));
+    // Editorial-to-TMDB matches are pinned only after an exact source check.
+    // These IDs remain reliable even before the weekly artwork snapshot updates.
+    const pinnedTmdbIds=Object.freeze({'crawlers':1376400});
     const candidates=films.map(film=>{
       const media=art.get(film.id);
       const sourceDates=(film.claims||[]).filter(c=>c.field==='releaseDate'&&/^\d{4}-\d{2}-\d{2}$/.test(c.value||''));
@@ -16,8 +19,12 @@
     const summary=document.getElementById('hub-release-summary');if(summary)summary.textContent=candidates.length+' upcoming films · dates shown by territory';
     for(const {film,media,date,sourceDates} of candidates){
       const row=document.createElement('article');row.className='hub-release-row';row.dataset.mediaType='movie';row.dataset.mediaTitle=film.title;
-      if(media?.tmdbId)row.dataset.tmdbId=String(media.tmdbId);
-      const poster=document.createElement('img');poster.dataset.mediaField='poster';poster.hidden=true;
+      // Without an ID/year, similarly named films can suppress or mismatch posters.
+      const sourcedYear=(film.claims||[]).find(c=>c.field==='filmYear')?.value;
+      row.dataset.mediaYear=/^\d{4}$/.test(String(sourcedYear||''))?String(sourcedYear):date.slice(0,4);
+      const verifiedId=media?.tmdbId || pinnedTmdbIds[film.id];
+      if(Number.isInteger(verifiedId)&&verifiedId>0)row.dataset.tmdbId=String(verifiedId);
+      const poster=document.createElement('img');poster.dataset.mediaField='poster';poster.alt='';poster.hidden=true;poster.loading='lazy';poster.decoding='async';
       const dates=document.createElement('div');dates.className='hub-release-row__dates';
       const when=document.createElement('time');when.dateTime=date;when.textContent=new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z'));
       const territory=document.createElement('small');territory.textContent=media?.releaseCountry==='GB'?'UK · TMDB':media?'First release · TMDB':sourceDates.find(c=>c.value===date)?.territory || 'See source';dates.append(when,territory);

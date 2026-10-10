@@ -9,7 +9,7 @@ const normalize = value => String(value || '').normalize('NFKD').replace(/[\u030
 
 async function tmdb(env, path, parameters) {
   if (env.TMDB_NONCOMMERCIAL_USE_APPROVED !== 'true' || env.TMDB_ATTRIBUTION_READY !== 'true' ||
-      !env.TMDB_READ_ACCESS_TOKEN) throw new Error('TMDB preview access is not configured');
+      !env.TMDB_READ_ACCESS_TOKEN) throw new Error('Approved TMDB server access is not configured');
   const url = new URL(BASE + path);
   for (const [key, value] of Object.entries(parameters)) url.searchParams.set(key, String(value));
   const response = await fetch(url, {
@@ -69,6 +69,7 @@ export async function refreshMovieArtwork(env, db) {
   // Source-checked film files that have not yet been copied into the canonical D1 table.
   const extraFilms = [
     { id: 'other-mommy', title: 'Other Mommy', year: 2026, tmdbId: 1400837 },
+    { id: 'crawlers', title: 'Crawlers', year: 2026, tmdbId: 1376400 },
     { id: '28-days-later', title: '28 Days Later', year: 2002 },
     { id: '28-weeks-later', title: '28 Weeks Later', year: 2007 }
   ];

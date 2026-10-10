@@ -29,5 +29,10 @@
 5. Confirm Cloudflare Access remains protective until owner approval; verify WAF, DNS/TLS, security headers and monitoring without lowering existing gates. Make a staged production deployment and smoke test protected production before lifting Access.
 6. Record exact approved commit, CI completion, working deployment URL and owner acceptance before launch; never treat a successful build alone as proof of the whole live service's availability.
 
+## Full Horror Vault integrity audit (10 October 2026)
+The automated command `npm run audit:vault` inspects every source snapshot entry, title, year, QID, IMDb ID, internal detail route, canonical Wikidata source link, first-party source claim and permitted trailer metadata. It produces a per-film manifest and a summary in `test-results/vault-audit.json` and `test-results/vault-audit.md`, attached to every quality-workflow run. External HTTP reachability and verified TMDB/YouTube media availability remain separately identified as **unverified** unless actually tested. The historical data intentionally has no global poster or trailer fields: the live website retrieves rights-attributed TMDB media on demand for exact matches, preserving honest fallbacks when no media exists.
+
+**Crawlers:** The licensed production TMDB cache has movie ID 1376400 with poster path `/lNXeEpg4yLSRwXwOeR5lbPgwbqL.jpg`; its source-checked VVS Films regional cinema listing remains `https://vvsfilms.com/anz/movie/crawlers/`. The site now pins that verified film ID for the selected editorial card and its upcoming-release row and includes it in the production artwork batch to prevent a missing/ambiguous poster lookup.
+
 ## Residual risk, not represented as completed
 A full manual verification of every external destination and every official trailer across the thousands of horror-film archive records has not yet been completed. Cloudflare security features and input validation reduce risk but cannot guarantee that a publicly accessible site is free from all vulnerabilities. A production security audit and smoke test still require correctly provisioned production services.

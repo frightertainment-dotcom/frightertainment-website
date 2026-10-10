@@ -75,3 +75,28 @@ test('artwork batch reserves requests for every poster lookup and caps enrichmen
     assert.ok(result.items.every(item => item.posterPath));
   } finally { globalThis.fetch = previous; }
 });
+
+test('Crawlers uses its exact verified 2026 TMDB ID when enriching upcoming editorial artwork', async () => {
+  const previous=globalThis.fetch;
+  const lookupIds=[];
+  globalThis.fetch=async url=>{
+    const parsed=new URL(url);
+    const id=Number(parsed.pathname.split('/').at(-1));
+    if(parsed.pathname.includes('/search/movie'))return reply({results:[]});
+    lookupIds.push(id);
+    if(id===1376400)return reply({id,title:'Crawlers',release_date:'2026-10-29',
+      poster_path:'/lNXeEpg4yLSRwXwOeR5lbPgwbqL.jpg',vote_average:0,vote_count:0});
+    if(id===1400837)return reply({id,title:'Other Mommy',release_date:'2026-10-09',
+      poster_path:'/other-mommy.jpg',vote_average:7.2,vote_count:30});
+    return reply({id,title:'Other',release_date:'2007-01-01',poster_path:null});
+  };
+  try{
+    const db={prepare:()=>({all:async()=>({results:[]})})};
+    const artwork=await refreshMovieArtwork(env,db);
+    const crawlers=artwork.items.find(x=>x.id==='crawlers');
+    assert.equal(crawlers?.tmdbId,1376400);
+    assert.equal(crawlers?.posterPath,'/lNXeEpg4yLSRwXwOeR5lbPgwbqL.jpg');
+    assert.equal(crawlers?.sourceUrl,'https://www.themoviedb.org/movie/1376400');
+    assert.ok(lookupIds.includes(1376400));
+  }finally{globalThis.fetch=previous;}
+});
