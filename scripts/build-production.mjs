@@ -69,8 +69,8 @@ if (!headers.startsWith('/*') || !headers.includes('Content-Security-Policy:') |
 }
 await writeFile(new URL('_headers', destination), headers);
 
-// Pages Functions are available only at /api/* (the production project initially
-// has no D1 binding, so unlicensed/provider-dependent APIs must fail safely).
+// Pages Functions are available only at /api/* and use environment-specific
+// approved D1 and API secret bindings. No provider credentials enter dist/.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version: 1, include: ['/api/*'], exclude: []
 }));

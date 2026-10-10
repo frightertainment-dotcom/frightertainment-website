@@ -1398,3 +1398,35 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
   .hub-section .hub-page-intro .hub-section-jumps a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:45px;max-width:100%;padding:9px 7px;font-size:clamp(12px,3vw,14px);white-space:normal;line-height:1.15}
   .hub-section .hub-page-intro .hub-section-jumps a:last-child{grid-column:1/-1}
 }
+
+/* Verified mobile film-card legibility: no broken titles in cramped two-column cards. */
+@media(max-width:640px){
+  .hub-section #movie-grid.movie-grid{grid-template-columns:minmax(0,1fr);gap:15px}
+  .hub-section #movie-grid .movie-card{
+    display:grid;grid-template-columns:clamp(105px,31vw,145px) minmax(0,1fr);
+    align-items:start;gap:13px;padding:12px;min-width:0;
+    border:1px solid color-mix(in srgb,var(--edge) 72%,#000);
+    background:linear-gradient(125deg,color-mix(in srgb,var(--surface-raised) 86%,#000),var(--world));
+    box-shadow:0 12px 24px #0004;
+  }
+  .hub-section #movie-grid .movie-card__art{width:100%;aspect-ratio:2/3;margin:0}
+  .hub-section #movie-grid .movie-card__body{min-width:0;padding:0}
+  .hub-section #movie-grid .movie-card__headline{display:block;min-width:0}
+  .hub-section #movie-grid .movie-card__headline h3{
+    margin:0 0 8px;font-size:clamp(18px,4.5vw,22px);line-height:1.14;
+    overflow-wrap:normal!important;word-break:normal;hyphens:auto;
+  }
+  .hub-section #movie-grid .movie-card__placeholder>strong{
+    font-size:clamp(15px,3.8vw,21px);overflow-wrap:normal!important;
+    word-break:normal;hyphens:auto;line-height:1.05;
+  }
+  .hub-section #movie-grid .movie-card__score{display:inline-block;max-width:100%;font-size:12px}
+  .hub-section #movie-grid .movie-card__text{
+    font-size:13px!important;line-height:1.35;margin:9px 0;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;
+  }
+  .hub-section #movie-grid .movie-card__release{font-size:12px;line-height:1.4}
+  .hub-section #movie-grid .movie-card__actions{font-size:12px;gap:8px}
+  .hub-section #movie-grid .movie-card__actions a{max-width:100%;overflow-wrap:break-word}
+  .hub-section #movie-grid .movie-card__date{font-size:12px}
+}

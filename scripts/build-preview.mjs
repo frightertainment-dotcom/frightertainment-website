@@ -44,8 +44,10 @@ await writeFile(new URL('robots.txt', destination),
   'User-agent: *\nDisallow: /\n');
 const sharedHeaders = await readFile(new URL('_headers', root), 'utf8');
 if (!sharedHeaders.startsWith('/*')) throw new Error('Shared security headers are missing the Pages _headers rule');
-await writeFile(new URL('_headers', destination), sharedHeaders.replace('/*',
-  '/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Cache-Control: no-store'));
+const previewHeaders = sharedHeaders.replace('  Cache-Control: no-cache, must-revalidate', '  Cache-Control: no-store');
+if (!previewHeaders.includes('Cache-Control: no-store')) throw new Error('Protected preview must use no-store');
+await writeFile(new URL('_headers', destination),
+  previewHeaders.replace('/*', '/*\n  X-Robots-Tag: noindex, nofollow, noarchive'));
 // Keep static pages free of Functions invocation charges.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]

@@ -1062,6 +1062,25 @@ test('removed Editorial Standards page is not served and public navigation has n
   }
 });
 
+test('editorial movie cards remain readable with one card per row on phones',async({page})=>{
+  await page.setViewportSize({width:375,height:812});
+  await page.route('**/api/movie-artwork',route=>route.fulfill({json:{items:[]}}));
+  await page.goto('/movies.html');
+  const grid=page.locator('#movie-grid');
+  await expect(grid.locator('.movie-card')).toHaveCount(8);
+  const metrics=await grid.evaluate(root=>{
+    const cards=[...root.querySelectorAll('.movie-card')];
+    const first=cards[0].getBoundingClientRect(),second=cards[1].getBoundingClientRect();
+    const firstTitle=cards[0].querySelector('h3').getBoundingClientRect();
+    return {columns:getComputedStyle(root).gridTemplateColumns.split(' ').length,
+      stacked:second.top>first.bottom,readableTitle:firstTitle.width>100,
+      viewportOverflow:document.documentElement.scrollWidth>innerWidth};
+  });
+  expect(metrics.columns).toBe(1);
+  expect(metrics.stacked).toBe(true);
+  expect(metrics.readableTitle).toBe(true);
+  expect(metrics.viewportOverflow).toBe(false);
+});
 test('all seven main tabs fit narrow and wide viewports, with centred second-row links',async({browser})=>{
   test.setTimeout(150000);
   for(const width of [320,375,390,768,1440]){
@@ -1075,11 +1094,16 @@ test('all seven main tabs fit narrow and wide viewports, with centred second-row
         const values=await page.locator('.hub-tabs').evaluate(nav=>{
           const box=nav.getBoundingClientRect();
           const links=[...nav.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
-          return {diff:Math.abs((links[4].left+links[6].right)/2 - (box.left+box.right)/2),row2:links[4].top,firstRow:links[0].top,lastRow:links[6].top};
+          return {diff:Math.abs((links[4].left+links[6].right)/2 - (box.left+box.right)/2),
+            row2:links[4].top,firstRow:links[0].top,lastRow:links[6].top,
+            fourFirstRow:links.slice(0,4).every(r=>Math.abs(r.top-links[0].top)<1),
+            threeSecondRow:links.slice(4).every(r=>Math.abs(r.top-links[4].top)<1)};
         });
         expect(values.row2).toBeGreaterThan(values.firstRow);
         expect(values.row2).toBe(values.lastRow);
         expect(values.diff).toBeLessThanOrEqual(4);
+        expect(values.fourFirstRow).toBe(true);
+        expect(values.threeSecondRow).toBe(true);
       }
     }
     if(width===375){await page.goto('/movies.html');await page.screenshot({path:'test-results/visual/frightertainment-movies-375px.png',fullPage:true});}
