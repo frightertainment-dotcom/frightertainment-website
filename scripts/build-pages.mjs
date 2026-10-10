@@ -51,9 +51,6 @@ function decorateHubLayout(html) {
     html = html.replace(/<body([^>]*)>/, '<body$1><a class="skip-link" href="#main-content">Skip to main content</a>');
     html = html.replace('<main class="shell film-page"', '<main id="main-content" class="shell film-page"');
   }
-  if (!html.includes('fonts.googleapis.com/css2?family=Barlow+Condensed')) {
-    html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&display=swap"></head>');
-  }
   return html
     .replace(/<nav class="nav"[^>]*>[\s\S]*?<\/nav>/,
       '<nav class="hub-tabs" aria-label="Main site sections">' + sectionTabs + '</nav>')

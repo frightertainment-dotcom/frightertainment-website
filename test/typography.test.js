@@ -24,24 +24,27 @@ test('all directly served HTML pages load the shared typography stylesheet', asy
   }
 });
 
-test('site-wide typography uses the logo-adjacent font at a natural, lighter weight', async () => {
+test('site-wide typography uses readable Times New Roman and the supplied page wordmarks', async () => {
   const css = await readFile(join(process.cwd(), 'hub.css'), 'utf8');
   const baseCss = await readFile(join(process.cwd(), 'styles.css'), 'utf8');
-  assert.match(baseCss, /@import url\("https:\/\/fonts\.googleapis\.com\/css2\?family=UnifrakturMaguntia&display=swap"\)/);
-  assert.match(baseCss, /--font-display:'UnifrakturMaguntia',Georgia,serif;--font-body:'UnifrakturMaguntia',Georgia,serif/);
-  assert.match(baseCss, /font-synthesis:none/);
-  assert.match(css, /--font-horror:'UnifrakturMaguntia',Georgia,serif/);
-  assert.match(css, /--font-room:'UnifrakturMaguntia',Georgia,serif/, 'All horror rooms use the shared logo-adjacent font');
-  assert.match(css, /\.hub-intro h1,\.hub-page-intro h1[^\n]*font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
-  assert.match(css, /\.hub-section \.fr-movie-hero__info h1\{font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
-  assert.match(css, /\.hub-chart-row a\{font:700 16px\/1\.1 var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
+  assert.match(baseCss, /--font-display:'Times New Roman',Georgia,serif;--font-body:'Times New Roman',Georgia,serif/);
+  assert.doesNotMatch(baseCss, /UnifrakturMaguntia/);
+  assert.match(css, /--font-horror:'Times New Roman',Georgia,serif/);
+  assert.match(css, /--font-room:'Times New Roman',Georgia,serif/);
+  assert.match(css, /font-family:"Times New Roman",Times,serif!important/);
+  assert.doesNotMatch(css, /UnifrakturMaguntia/);
+  for (const [page, image] of [['movies.html','page-title-movies.png'],['all-horror-movies.html','page-title-movies.png'],['tv-shows.html','page-title-tv-shows.png'],['cinema.html','page-title-cinema.png'],['indie-movies.html','page-title-indie-movies.png'],['podcasts.html','page-title-podcasts.png'],['games.html','page-title-games.png']]) {
+    const html = await readFile(join(process.cwd(), page), 'utf8');
+    assert.match(html, /class="hub-page-title hub-page-title--wordmark" aria-label=/);
+    assert.match(html, new RegExp('/assets/' + image.replaceAll('.', '\\.')));
+    assert.match(html, /class="sr-only"/);
+  }
 });
 
-test('shared logo-adjacent typeface and fallback behavior are documented', async () => {
+test('Times New Roman and accessible section wordmarks are documented', async () => {
   const docs = await readFile(join(process.cwd(), 'TYPOGRAPHY.md'), 'utf8');
-  assert.match(docs, /UnifrakturMaguntia/);
-  assert.match(docs, /Georgia/);
-  assert.match(docs, /PNG artwork file/);
+  assert.match(docs, /Times New Roman/);
+  assert.match(docs, /accessible text heading/);
 });
 
 test('generated film detail templates present a synopsis once and retain the sourced claim list', async () => {

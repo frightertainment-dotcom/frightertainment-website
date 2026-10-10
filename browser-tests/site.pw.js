@@ -926,16 +926,14 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
   await expect(ranking).toContainText('could not be refreshed');
 });
 
-test('direct page loads declare the shared Frightertainment typefaces', async ({ page }) => {
+test('direct page loads use readable Times New Roman typography', async ({ page }) => {
   for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     await page.goto(path);
-    const fontHref = await page.locator('link[rel="stylesheet"][href*="fonts.googleapis.com/css2"]').getAttribute('href');
-    expect(fontHref).toContain('Grenze+Gotisch');
-    expect(fontHref).not.toContain('Barlow+Condensed');
-    expect(fontHref).not.toContain('DM+Sans');
+    await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Times New Roman');
   }
   await page.goto('/movies.html');
-  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Grenze Gotisch');
+  await expect(page.locator('.hub-page-intro h1')).toHaveAttribute('aria-label', 'HORROR MOVIES');
+  await expect(page.locator('.hub-page-intro .hub-page-wordmark')).toHaveAttribute('src', '/assets/page-title-movies.png');
 });
 
 test('reduced-motion preference disables homepage transitions and artwork zoom', async ({ page }) => {
