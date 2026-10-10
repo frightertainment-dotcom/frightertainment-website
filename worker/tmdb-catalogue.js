@@ -95,7 +95,10 @@ export async function refreshMovieArtwork(env, db) {
             Math.abs(Number(b.release_date.slice(0, 4)) - film.year) || b.popularity - a.popularity)[0];
         if (match && posterPath(match.poster_path)) results[index] = {
           id: film.id, title: film.title, posterPath: posterPath(match.poster_path),
-          tmdbId: match.id, sourceName: 'TMDB',
+          tmdbId: match.id,
+          voteAverage: Number.isFinite(match.vote_average) && match.vote_average >= 0 && match.vote_average <= 10 ? match.vote_average : null,
+          voteCount: Number.isInteger(match.vote_count) && match.vote_count >= 0 ? match.vote_count : null,
+          sourceName: 'TMDB',
           sourceUrl: `https://www.themoviedb.org/movie/${match.id}`,
           territory: 'Global', checkedAt: day()
         };

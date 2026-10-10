@@ -2,6 +2,11 @@
   'use strict';
   const movies = Array.isArray(window.FR_MOVIES) ? window.FR_MOVIES : [];
   const artByFilm = new Map();
+  const communityScore = movie => {
+    const item = artByFilm.get(movie.id);
+    return Number.isFinite(item?.voteAverage) && item.voteAverage > 0 &&
+      Number.isInteger(item?.voteCount) && item.voteCount >= 50 ? item : null;
+  };
   const tmdbArtwork = movie => {
     const path = artByFilm.get(movie.id)?.posterPath;
     return /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(path || '') ?
@@ -76,6 +81,7 @@
   };
   const cardMarkup = movie => {
     const score = frightIndex(movie);
+    const community = communityScore(movie);
     const dates = releaseClaims(movie);
     const displayYear = recordYear(movie) || 'YEAR UNCONFIRMED';
     const label = dates.length ? 'SOURCE-CHECKED RELEASE' : 'DATE NOT CONFIRMED';
@@ -84,7 +90,8 @@
     const id = encodeURIComponent(movie.id);
     const coverStyle = [...movie.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 6;
     return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder" data-cover-style="${coverStyle}"><span class="poster-mini">FRIGHTERTAINMENT FILM FILE</span><strong>${escapeHTML(movie.title)}</strong><small>FRIGHTERTAINMENT ART</small></div></div>${tmdbArtwork(movie) ? `<img class="tmdb-card-poster" src="${escapeHTML(tmdbArtwork(movie))}" alt="TMDB poster for ${escapeHTML(movie.title)}" loading="lazy" decoding="async">` : ''} `}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
-      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score === null ? '' : `<span class="movie-card__score" aria-label="Fright Rating ${(score / 10).toFixed(1)} out of 10">${(score / 10).toFixed(1)}<small>/10</small></span>`}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE →</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
+      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score !== null ? `<span class="movie-card__score" aria-label="Fright Rating ${(score / 10).toFixed(1)} out of 10">${(score / 10).toFixed(1)}<small>/10</small></span>` :
+        community ? `<span class="movie-card__score" aria-label="TMDB community rating ${community.voteAverage.toFixed(1)} out of 10 from ${community.voteCount} votes"><small>TMDB </small>${community.voteAverage.toFixed(1)}<small>/10</small></span>` : ''}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE →</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
   };
   const grid = $('#movie-grid');
   if (grid) {
@@ -108,7 +115,7 @@
     const render = () => {
       const filtered = movies.filter(movie => {
         const dateKnown = recordHasDate(movie);
-        const hasScore = frightIndex(movie) !== null;
+        const hasScore = frightIndex(movie) !== null || communityScore(movie) !== null;
         const filterOK = state.filter === 'all' || (state.filter === 'date-tbc' && !dateKnown) ||
           (state.filter === 'reviewed' && hasScore);
         const year = listingYear(movie);
@@ -154,6 +161,8 @@
         for (const item of data?.items || []) {
           if (/^[a-z0-9-]{1,80}$/.test(item.id || '')) artByFilm.set(item.id, item);
         }
+        const scoreFilter = document.querySelector('[data-filter="reviewed"]');
+        if (scoreFilter) scoreFilter.textContent = 'WITH CHECKED SCORES';
         render();
       }).catch(() => { /* Keep original film artwork if TMDB is unavailable. */ });
   }
@@ -183,6 +192,27 @@
         credits.textContent = 'TMDB credits and attribution';
         notice.append(credits);
         filmHero.closest('.fr-movie-hero')?.after(notice);
+        if (Number.isFinite(item.voteAverage) && item.voteAverage > 0 &&
+            Number.isInteger(item.voteCount) && item.voteCount >= 50) {
+          const section = document.createElement('section');
+          section.className = 'film-section';
+          const heading = document.createElement('h2');
+          heading.textContent = 'TMDB COMMUNITY RATING';
+          const rating = document.createElement('p');
+          rating.className = 'film-score';
+          rating.textContent = item.voteAverage.toFixed(1) + '/10';
+          const note = document.createElement('p');
+          note.textContent = item.voteCount + ' TMDB viewer votes. This is not a professional critic or Fright Rating.';
+          const source = document.createElement('a');
+          source.href = safeURL(item.sourceUrl);
+          source.textContent = 'View rating source on TMDB →';
+          source.target = '_blank';
+          source.rel = 'noopener noreferrer';
+          section.append(heading, rating, note, source);
+          const frightSection = [...document.querySelectorAll('.film-section')]
+            .find(value => value.querySelector('h2')?.textContent === 'FRIGHT RATING');
+          frightSection?.before(section);
+        }
       }).catch(() => {});
   }
 

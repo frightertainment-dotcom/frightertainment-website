@@ -36,11 +36,11 @@ test('poster match requires the approved film title and a nearby release year', 
   const previous = globalThis.fetch;
   globalThis.fetch = async (url, options) => {
     assert.equal(options.headers.Authorization, 'Bearer private-test-fixture');
-    if (String(url).includes('/movie/1400837')) return reply({ id: 1400837, title: 'Other Mommy', release_date: '2026-10-09', poster_path: '/other-mommy.jpg' });
+    if (String(url).includes('/movie/1400837')) return reply({ id: 1400837, title: 'Other Mommy', release_date: '2026-10-09', poster_path: '/other-mommy.jpg', vote_average: 7.2, vote_count: 300 });
     return reply({ results: [
       { id: 8, title: 'Matching Horror', release_date: '1980-01-01', poster_path: '/wrong.jpg' },
       { id: 9, title: 'Other Horror', release_date: '2026-01-01', poster_path: '/other.jpg' },
-      { id: 10, title: 'Matching Horror', release_date: '2026-01-01', poster_path: '/correct.jpg' }
+      { id: 10, title: 'Matching Horror', release_date: '2026-01-01', poster_path: '/correct.jpg', vote_average: 8.1, vote_count: 75 }
     ] });
   };
   const db = { prepare: () => ({ all: async () => ({ results: [
@@ -48,9 +48,9 @@ test('poster match requires the approved film title and a nearby release year', 
   ] }) }) };
   try {
     const artwork = await refreshMovieArtwork(env, db);
-    assert.deepEqual(artwork.items.map(item => [item.id, item.tmdbId, item.posterPath]), [
-      ['matching-horror', 10, '/correct.jpg'],
-      ['other-mommy', 1400837, '/other-mommy.jpg']
+    assert.deepEqual(artwork.items.map(item => [item.id, item.tmdbId, item.posterPath, item.voteCount]), [
+      ['matching-horror', 10, '/correct.jpg', 75],
+      ['other-mommy', 1400837, '/other-mommy.jpg', 300]
     ]);
   } finally { globalThis.fetch = previous; }
 });
