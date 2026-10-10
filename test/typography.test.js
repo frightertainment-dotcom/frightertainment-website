@@ -15,14 +15,12 @@ async function htmlFiles(directory) {
   return files;
 }
 
-test('all directly served HTML pages request the selected display and body fonts directly', async () => {
+test('all directly served HTML pages request the same gothic family with lighter weights', async () => {
   const files = await htmlFiles(process.cwd());
   assert.ok(files.length > 0);
   for (const file of files) {
     const html = await readFile(file, 'utf8');
-    assert.match(html, /fonts\.googleapis\.com\/css2\?family=Barlow\+Condensed/, `${file} must load Barlow Condensed directly`);
-    assert.match(html, /family=Grenze\+Gotisch:wght@600;700/, `${file} must load the selected horror display face directly`);
-    assert.match(html, /family=DM\+Sans/, `${file} must load DM Sans directly`);
+    assert.match(html, /family=Grenze\+Gotisch:wght@400;500;600;700/, `${file} must load the shared typeface`);
   }
 });
 

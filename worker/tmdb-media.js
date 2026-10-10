@@ -91,11 +91,12 @@ export async function fetchCatalogue(env, options) {
   const chart = mode === 'top'; const end = `${year}-12-31` < today() ? `${year}-12-31` : today();
   const keywordIds = type === 'tv' ? await horrorKeywords(env) : [];
   const parameters = { language: 'en-GB', include_adult: false, include_video: false, page,
-    sort_by: chart ? 'vote_average.desc' : mode === 'upcoming' ? type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc' : 'popularity.desc',
+    sort_by: chart ? 'vote_average.desc' : mode === 'upcoming' || mode === 'cinema' ? type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc' : 'popularity.desc',
     ...(type === 'tv' ? { with_keywords: keywordIds.join('|'), include_null_first_air_dates: false } : { with_genres: 27 }) };
   const field = type === 'tv' ? 'first_air_date' : 'primary_release_date';
   if (['archive', 'top'].includes(mode)) { parameters[`${field}.gte`] = `${year}-01-01`; parameters[`${field}.lte`] = chart ? end : `${year}-12-31`; }
-  if (mode === 'upcoming') { parameters[`${field}.gte`] = new Date(Date.now() + 86400000).toISOString().slice(0, 10); parameters[`${field}.lte`] = `${new Date().getUTCFullYear() + 2}-12-31`; }
+  if (mode === 'upcoming' || mode === 'cinema') { parameters[`${field}.gte`] = new Date(Date.now() + 86400000).toISOString().slice(0, 10); parameters[`${field}.lte`] = `${new Date().getUTCFullYear() + 2}-12-31`; }
+  if (mode === 'cinema') { parameters.region = 'GB'; parameters.with_release_type = '3|2'; }
   if (mode === 'trending') parameters[`${field}.lte`] = today();
   if (chart) parameters['vote_count.gte'] = 50;
   if (mode === 'trending') parameters['vote_count.gte'] = 5;
@@ -110,9 +111,14 @@ export async function fetchCatalogue(env, options) {
   if (type === 'movie') candidates = candidates.filter(raw => raw.genre_ids?.includes(27));
   if (search && ['archive', 'top'].includes(mode)) candidates = candidates.filter(raw => Number(String(type === 'tv' ? raw.first_air_date : raw.release_date).slice(0, 4)) === year);
   let items;
-  if (kind === 'indie' || (type === 'tv' && search)) {
+  if (kind === 'indie' || (type === 'tv' && search) || mode === 'cinema') {
     items = await mapBounded(candidates.slice(0, 40), async candidate => {
       const raw = await tmdbRequest(env, `/${type}/${candidate.id}`, { language: 'en-US', append_to_response: type === 'tv' ? 'videos,keywords' : 'videos,release_dates' });
+      if (mode === 'cinema') {
+        const uk = raw.release_dates?.results?.find(entry => entry.iso_3166_1 === 'GB');
+        const theatrical = uk?.release_dates?.filter(entry => [2, 3].includes(entry.type) && date(entry.release_date?.slice(0, 10)) && entry.release_date.slice(0, 10) > today()).sort((a, b) => a.release_date.localeCompare(b.release_date))[0];
+        return theatrical ? { ...sanitizeMedia(raw, type, 'GB'), releaseDate: theatrical.release_date.slice(0, 10), releaseCountry: 'GB', theatricalDate: theatrical.release_date.slice(0, 10) } : null;
+      }
       if (kind === 'indie') {
         const assessment = independentAssessment(raw);
         return assessment.independent ? { ...sanitizeMedia(raw, type, options.country), ...assessment } : null;
@@ -129,6 +135,6 @@ export async function fetchCatalogue(env, options) {
     filteredResults: items.length, countIsCandidateTotal: kind === 'indie' || search, firstYear: type === 'tv' ? 1940 : 1888,
     year, type: kind, mode: options.mode, ratingKind: 'tmdb-community', minimumVotes: chart ? 50 : null,
     classification: kind === 'indie' ? 'independent-production-candidates' : type === 'tv' ? 'tmdb-horror-keyword' : 'tmdb-horror-genre',
-    methodology: `${kind === 'indie' ? INDIE_POLICY : type === 'tv' ? TV_POLICY : 'Horror genre entries from TMDB.'}${chart ? ' Ranked by TMDB community score with at least 50 votes, among released titles in the selected first-release year. Fewer entries are shown if the screened pool has fewer qualifying titles.' : ''}`,
+    methodology: `${mode === 'cinema' ? 'Upcoming UK limited or general theatrical dates verified against TMDB release-date details. Territories and dates may change.' : kind === 'indie' ? INDIE_POLICY : type === 'tv' ? TV_POLICY : 'Horror genre entries from TMDB.'}${chart ? ' Ranked by TMDB community score with at least 50 votes, among released titles in the selected first-release year. Fewer entries are shown if the screened pool has fewer qualifying titles.' : ''}`,
     screeningLimit: kind === 'indie' ? 40 : null };
 }

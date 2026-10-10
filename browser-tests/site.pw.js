@@ -18,6 +18,8 @@ const pages = [
   ['/tv-shows.html','HORROR'],
   ['/indie-movies.html','INDIE'],
   ['/podcasts.html','HORROR'],
+  ['/cinema.html','HORROR'],
+  ['/contact.html','CONTACT'],
   ['/games.html','HORROR'],
   ['/top-20/', 'TOP 20'],
   ['/top-20/2026/', 'TOP 20 HORROR FILMS'],
@@ -50,14 +52,10 @@ for (const [path, heading] of pages) {
     });
     const brokenImages = await page.locator('img').evaluateAll(images => images.filter(image => image.getAttribute('src')?.trim() && (!image.complete || image.naturalWidth === 0)).map(image => image.src));
     expect(brokenImages).toEqual([]);
-    const toggle = page.locator('.menu-toggle');
-    await expect(toggle).toBeVisible();
-    await toggle.click();
-    await expect(page.locator('#mobile-nav')).toBeVisible();
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#mobile-nav')).toBeHidden();
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    const sections = page.locator('.hub-tabs a');
+    await expect(sections).toHaveCount(7);
+    await expect(page.locator('.menu-toggle')).toHaveCount(0);
+    await expect(page.locator('.hub-tabs a[href="/cinema.html"]')).toBeVisible();
     await page.screenshot({ path: `test-results/visual/mobile-${path.replace(/[^a-z0-9]+/gi, '-') || 'home'}.png`, fullPage: true });
     await page.close();
   });

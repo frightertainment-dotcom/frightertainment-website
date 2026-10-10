@@ -175,7 +175,7 @@ async function handleTMDBMedia(env, request, catalogue = false) {
     options.mode = params.get('mode') || 'archive';
     options.page = Number(params.get('page') || 1);
     options.query = (params.get('query') || '').trim();
-    if (!['archive', 'chart', 'top', 'trending', 'upcoming'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
+    if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
   } else {
     options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
     if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');

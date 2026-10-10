@@ -1134,3 +1134,101 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
 .hub-section .archive-detail__link--main{background:var(--red-dark);color:#fff}
 .hub-section .archive-detail__fact span,.hub-section .archive-detail__intro,.hub-section .archive-detail__explain p{color:#b8c1b8}
 .hub-section .archive-detail__footer{border-top-color:var(--edge)}
+
+/* October visual pass: one consistent, lighter gothic face and quiet texture. */
+:root{--font-display:'Grenze Gotisch',Georgia,serif;--font-body:'Grenze Gotisch',Georgia,serif;--font-room:'Grenze Gotisch',Georgia,serif}
+body[data-theme="home"],body[data-theme="movies"],body[data-theme="tv"],body[data-theme="indie"],body[data-theme="podcasts"],body[data-theme="games"]{--font-room:var(--font-display)}
+.hub-body{font-family:var(--font-body);font-size:16px;font-weight:400;background:linear-gradient(100deg,color-mix(in srgb,var(--world) 90%,transparent),color-mix(in srgb,var(--world-glow) 11%,var(--world)) 56%,color-mix(in srgb,var(--world) 91%,transparent)),url('/assets/horror-wall-wide.webp') center top/cover fixed,var(--world)}
+.hub-body::before{display:none}
+.hub-body h1,.hub-body h2,.hub-body h3,.hub-body h4,.hub-body strong,.hub-body .hub-kicker,.hub-body .hub-eyebrow{font-weight:500}
+.hub-body p,.hub-body li,.hub-body small,.hub-body label,.hub-body input,.hub-body select,.hub-body button,.hub-body a{font-family:var(--font-body)}
+.hub-body p{font-weight:400;line-height:1.55;text-wrap:pretty}
+.hub-body h1,.hub-body h2,.hub-body h3,.hub-body strong{text-wrap:balance}
+.hub-header__inside{grid-template-columns:minmax(170px,245px) minmax(0,1fr);gap:14px}
+.hub-header .hub-menu-toggle,.hub-extra-nav{display:none!important}
+.hub-tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
+.hub-tabs a{font-size:clamp(13px,1.15vw,18px);font-weight:600;letter-spacing:.015em;padding-inline:3px}
+.hub-microbar{height:38px;background:linear-gradient(90deg,#080708,#1c0b10,#080708);border-block:1px solid color-mix(in srgb,var(--red) 25%,transparent);font-size:11px;letter-spacing:.17em;text-align:center}
+.hub-microbar .microbar__inner{justify-content:center;gap:22px}
+.hub-microbar .microbar__inner>span:last-child{opacity:.68}
+.hub-intro>p,.hub-page-intro>p{font-size:clamp(15px,1.35vw,19px);max-width:70ch;text-wrap:pretty}
+.hub-intro h1{font-size:clamp(35px,4vw,56px);line-height:1.04;max-width:23ch}
+.hub-section .hub-page-intro h1{font-size:clamp(38px,5vw,74px);max-width:none;line-height:1.02}
+.hub-section .hub-page-intro{background:linear-gradient(90deg,var(--world) 0%,color-mix(in srgb,var(--world) 85%,transparent) 53%,color-mix(in srgb,var(--world) 28%,transparent)),var(--room-art) 68% center/cover no-repeat}
+.hub-tile__content{max-width:88%}
+.hub-showcase__bottom .hub-tile__content{max-width:100%;padding:19px 20px;min-width:0}
+.hub-showcase__bottom .hub-tile h3{font-size:clamp(24px,2.1vw,32px);line-height:1.07;max-width:22ch}
+.hub-showcase__bottom .hub-tile{min-height:235px}
+.hub-showcase__bottom .hub-tile__wash{background:linear-gradient(90deg,#07080bee 0%,#07080bce 62%,#07080b7f 100%)}
+.hub-tile.has-tmdb-poster .hub-tile__content{max-width:72%}
+.hub-showcase__bottom .hub-tile.has-tmdb-poster .hub-tile__content{max-width:68%}
+.hub-charts .score,.hub-body .movie-card__score,.hub-body .film-score,.hub-body .archive-detail__rating,.hub-body .archive-media__rating,.hub-body .hub-feature__rating,.hub-body .fr-movie-hero__score,.hub-body .fr-media-detail__rating,.hub-body .fr-media-card__score,.hub-body .ranking-row__score,.hub-body .release-brief__item [data-media-field="rating"]{color:#b7ff8b!important;font-family:var(--font-display)!important;font-weight:500!important;letter-spacing:.025em;text-shadow:0 1px 2px #000,0 0 10px #142d13,0 0 18px #69b7579c}
+.hub-charts .score{font-size:1.24em}
+.hub-body .movie-card__score{font-size:1.05rem;border-color:#53975d}
+.hub-body .tmdb-notice,.hub-body .hub-rights-note,.hub-body .home-discovery__attribution,.hub-body .release-brief__note{max-width:72ch;margin-inline:auto;text-align:center;font-size:clamp(13px,1.2vw,15px);line-height:1.5}
+.hub-charts .tmdb-notice{text-align:center;margin:12px auto;padding-inline:18px}
+.hub-body .footer__bottom{justify-content:center;text-align:center;gap:20px;flex-wrap:wrap}
+.hub-body .footer__bottom a{text-decoration:underline;text-underline-offset:.3em}
+.release-brief__art{position:relative;flex:none;width:88px;aspect-ratio:2/3;overflow:hidden;border:1px solid var(--edge);background:linear-gradient(145deg,#16181a,var(--surface-world));display:grid;place-items:center}
+.release-brief__art::after{content:"";position:absolute;inset:5px;border:1px solid color-mix(in srgb,var(--red) 35%,transparent);pointer-events:none}
+.release-brief__poster{width:100%!important;height:100%!important;object-fit:cover;position:absolute;inset:0;z-index:2}
+.release-brief__poster-fallback{padding:8px;text-align:center;font-size:clamp(12px,1.3vw,17px);line-height:1.1;color:#f5eee6;text-shadow:0 2px 8px #000;text-wrap:balance}
+.release-brief__art.has-tmdb-poster .release-brief__poster-fallback{display:none}
+.release-brief__item{align-items:center}
+.contact-panel{max-width:800px;margin:2rem auto 5rem;padding:clamp(20px,4vw,44px);border:1px solid var(--edge);background:color-mix(in srgb,var(--surface-world) 92%,transparent)}
+.contact-panel label{display:grid;gap:6px;margin:0 0 1rem;font-size:1.15rem}
+.contact-panel input,.contact-panel textarea{width:100%;border:1px solid var(--edge);background:var(--world);color:#f8f3ec;padding:12px 14px;font:400 1.1rem var(--font-body);min-height:48px}
+.contact-panel textarea{min-height:175px;resize:vertical}
+.contact-panel a{color:var(--red);text-decoration:underline;text-underline-offset:.2em}
+.contact-panel button{font-size:1.15rem}
+.contact-panel__status{min-height:2em}
+@media(max-width:900px){.hub-header__inside{grid-template-columns:1fr;justify-items:center;padding-block:8px}.hub-brand{width:min(260px,65vw);height:auto}.hub-tabs{width:100%}.hub-tabs a{min-height:40px}.hub-intro{grid-template-columns:1fr}.hub-showcase__bottom .hub-tile__content{max-width:100%}}
+@media(max-width:640px){
+ .hub-body{background:linear-gradient(90deg,color-mix(in srgb,var(--world) 91%,transparent),color-mix(in srgb,var(--world) 84%,transparent),color-mix(in srgb,var(--world) 91%,transparent)),url('/assets/horror-wall-mobile.webp') center top/100% auto repeat-y,var(--world)}
+ .hub-microbar .microbar__inner>span:last-child{display:none}
+ .hub-microbar{height:32px;font-size:10px;letter-spacing:.08em}
+ .hub-header__inside{gap:3px}.hub-brand{width:min(235px,68vw);height:57px}
+ .hub-tabs{grid-template-columns:repeat(4,minmax(0,1fr));gap:1px}
+ .hub-tabs a{min-height:38px;font-size:clamp(12px,3.4vw,17px);letter-spacing:0;line-height:1;padding:5px 1px}
+ .hub-tabs a:nth-child(n+5){grid-row:2}
+ .hub-section .hub-page-intro h1{font-size:clamp(31px,8vw,41px);max-width:none;line-height:1.06}
+ .hub-intro h1{font-size:clamp(30px,7.5vw,39px);max-width:none;line-height:1.06}
+ .hub-intro>p,.hub-page-intro>p{font-size:clamp(14px,3.8vw,17px);max-width:none;line-height:1.42}
+ .hub-intro{gap:7px}
+ .hub-showcase__bottom{grid-template-columns:1fr;gap:10px}
+ .hub-showcase__bottom .hub-tile{min-height:170px}
+ .hub-showcase__bottom .hub-tile h3{font-size:clamp(23px,6vw,31px)}
+ .hub-showcase__bottom .hub-tile__content{padding:16px;max-width:82%}
+ .hub-showcase__bottom .hub-tile.has-tmdb-poster .hub-tile__content{max-width:66%}
+ .hub-showcase__bottom .hub-tile__content p{display:none}
+ .hub-section .hub-page-intro{padding:22px 16px;min-height:210px}
+ .hub-section .hub-subtabs,.hub-section .hub-section-jumps{display:flex;flex-wrap:nowrap;gap:5px;width:100%}
+ .hub-section .hub-subtabs a,.hub-section .hub-section-jumps a{min-width:0;flex:1;text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.1;font-size:clamp(10px,2.8vw,13px);letter-spacing:0;padding-inline:2px}
+ .hub-section .hub-catalog .hub-tile h3{font-size:clamp(24px,6.2vw,31px)}
+ .release-brief__art{width:62px}
+ .release-brief__item{display:grid!important;grid-template-columns:62px minmax(0,1fr) auto;gap:10px!important}
+ .release-brief__item-main{min-width:0}
+ .release-brief__source{font-size:11px}
+ .release-brief__poster-fallback{font-size:13px}
+ .hub-body .tmdb-notice,.hub-body .hub-rights-note{font-size:13px}
+}
+@media(max-width:380px){.hub-tabs a{font-size:12px}.hub-section .hub-page-intro h1{font-size:30px}.release-brief__item{grid-template-columns:56px minmax(0,1fr)}.release-brief__art{width:56px}.release-brief__source{grid-column:2;justify-self:start}}
+.podcast-chart{margin:2rem 0 3rem;padding:clamp(14px,3vw,28px);border:1px solid var(--edge);background:color-mix(in srgb,var(--surface-world) 87%,transparent)}
+.podcast-chart__list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px}
+.podcast-chart__row{display:flex;align-items:center;gap:12px;min-width:0;min-height:84px;padding:8px;border-bottom:1px solid var(--hair);background:color-mix(in srgb,var(--world) 65%,transparent)}
+.podcast-chart__row img{width:57px;height:57px;object-fit:cover;flex:none}
+.podcast-chart__number{font-size:1.2rem;color:var(--red)}
+.podcast-chart__row>div{min-width:0;display:grid;gap:2px}
+.podcast-chart__row strong{font-size:1.2rem;line-height:1.1}
+.podcast-chart__row a{font-size:.85rem;color:var(--red);text-decoration:underline}
+.podcast-cover{object-fit:contain;width:45%;right:2%;opacity:.85}
+.hub-tile.has-podcast-cover .hub-tile__content{max-width:64%}
+@media(max-width:640px){.podcast-chart__list{grid-template-columns:1fr}.hub-tile.has-podcast-cover .hub-tile__content{max-width:66%}}
+.game-store-widget{display:block;width:min(100%,480px);height:190px;border:0;margin:10px 0 12px;background:#10151a}
+body[data-theme="games"] .hub-catalog .hub-tile{min-height:400px}
+body[data-theme="games"] .hub-tile__content{width:100%;max-width:100%}
+body[data-theme="games"] .hub-catalog--expanded .hub-tile{min-height:395px}
+body[data-theme="games"] .hub-tile__content .fr-trailer-button{margin:4px 10px 9px 0}
+@media(max-width:640px){body[data-theme="games"] .hub-catalog .hub-tile{min-height:320px}.game-store-widget{height:170px}}
+/* Every visible interface label and paragraph uses the same brand-adjacent face. */
+body.hub-body :where(*):not(svg):not(path){font-family:var(--font-body)!important}

@@ -38,7 +38,7 @@ const claimMarkup = claim => `<li class="film-claim"><div><strong>${escapeHTML(c
 
 function decorateHubLayout(html) {
   const sectionTabs = [['/', 'HOME'], ['/movies.html','MOVIES'], ['/tv-shows.html','TV SHOWS'],
-    ['/indie-movies.html','INDIE MOVIES'], ['/podcasts.html','PODCASTS'], ['/games.html','GAMES']]
+    ['/cinema.html','CINEMA'], ['/indie-movies.html','INDIE MOVIES'], ['/podcasts.html','PODCASTS'], ['/games.html','GAMES']]
     .map(([href,label]) => '<a href="' + href + '"' + (label === 'MOVIES' ? ' class="active" aria-current="page"' : '') + '>' + label + '</a>').join('');
   html = html.replace(/<body([^>]*)>/, (_match, attributes) => {
     let next = attributes;
@@ -52,19 +52,19 @@ function decorateHubLayout(html) {
     html = html.replace('<main class="shell film-page"', '<main id="main-content" class="shell film-page"');
   }
   if (!html.includes('fonts.googleapis.com/css2?family=Barlow+Condensed')) {
-    html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Grenze+Gotisch:wght@600;700&display=swap"></head>');
+    html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&display=swap"></head>');
   }
   return html
     .replace(/<nav class="nav"[^>]*>[\s\S]*?<\/nav>/,
       '<nav class="hub-tabs" aria-label="Main site sections">' + sectionTabs + '</nav>')
-    .replace(/<nav class="mobile-nav"[^>]*>[\s\S]*?<\/nav>/,
-      '<nav class="mobile-nav hub-extra-nav" id="mobile-nav" aria-label="Additional navigation" hidden><a href="/top-20/' + currentYear + '/">TOP 20 HORROR</a></nav>')
+    .replace(/<nav class="mobile-nav"[^>]*>[\s\S]*?<\/nav>/, '')
     .replace('<header class="header">','<header class="header hub-header">')
     .replace('<div class="shell header__inner">','<div class="shell hub-header__inside">')
     .replace('<a class="brand"','<a class="brand hub-brand"')
-    .replace('<button class="menu-toggle"','<button class="menu-toggle hub-menu-toggle"')
+    .replace(/<button class="menu-toggle"[^>]*>[\s\S]*?<\/button>/, '')
     .replace(/<a class="header__action"[^>]*>[\s\S]*?<\/a>/,'')
     .replace('</head>', '<link rel="stylesheet" href="/hub.css"></head>')
+    .replace('</div></footer>', '<a href="/contact.html">CONTACT US</a></div></footer>')
     .replace('</body>', '<script src="/media-ui.js" defer></script></body>');
 }
 
