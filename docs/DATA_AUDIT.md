@@ -33,4 +33,4 @@ Saw (Q486239, IMDb tt0387564) moved from 2003 to 2004, confirmed by the [BFI fil
 
 ## Internal links
 
-`node scripts/check-links.mjs` passed: 41 HTML files, 749 internal references, sitemap routes validated. It counted 304 external links but does not test their remote availability; external HTTP access requires a separate check.
+`node scripts/check-links.mjs` passed: 41 HTML files, 788 internal references, sitemap routes validated. It counted 304 external links but does not test their remote availability; external HTTP access requires a separate check.

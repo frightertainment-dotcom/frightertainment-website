@@ -1093,7 +1093,7 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
  .fr-media-detail__hero,.archive-detail__media{grid-template-columns:minmax(0,1fr);gap:1.2rem}
  .fr-media-detail__poster,.archive-detail__art{max-width:250px;margin:0 auto;width:100%}
  .hub-section .movie-card__headline h3{font-size:1.28rem;flex-basis:100%;margin-bottom:0}
- .hub-section .movie-card__text{font-size:.86rem;line-height:1.6}.movie-card__body{padding:.7rem 0}
+ .hub-section .movie-card__text{font-size:.875rem;line-height:1.6}.movie-card__body{padding:.7rem 0}
  .movie-card__actions,.fr-media-card__actions{gap:.55rem;font-size:.8rem}
  .movie-card__date{display:none}.movie-card__eyebrow{font-size:.75rem}
  .hub-section h1{font-size:clamp(2rem,8vw,3.2rem);line-height:1.1}
@@ -1122,3 +1122,15 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
  .hub-section .hub-release-row[data-media-type]>div:not([class]){grid-column:2;grid-row:2}
  .hub-section .hub-release-row[data-media-type]>.hub-release-row__sources{grid-column:1/-1;grid-row:3}
 }
+
+/* Shared controls and archive details follow their section palette. */
+.fr-catalogue-tools input,.fr-catalogue-tools select,.fr-catalogue-year select{background:var(--surface-world);border-color:var(--edge)}
+.fr-trailer-button{background:color-mix(in srgb,var(--red) 12%,var(--surface-world));border-color:var(--edge);color:#f5f1ec}.fr-trailer-button:hover{background:color-mix(in srgb,var(--red) 24%,var(--surface-world))}
+.fr-chart-rank{color:var(--red);border-left-color:var(--red);background:var(--surface-world)}
+.hub-section .archive-detail{border-color:var(--edge);background:linear-gradient(104deg,color-mix(in srgb,var(--surface-raised) 95%,transparent),color-mix(in srgb,var(--world) 90%,transparent) 72%),url('/assets/hub-haunted.svg') center/cover}
+.hub-section .archive-detail__title,.hub-section .archive-detail__explain h2{font-family:var(--font-room,var(--font-display))}
+.hub-section .archive-detail__label,.hub-section .archive-detail__breadcrumbs a,.hub-section .archive-detail__return{color:var(--red)}
+.hub-section .archive-detail__fact,.hub-section .archive-detail__link{border-color:var(--edge);background:var(--surface-world)}
+.hub-section .archive-detail__link--main{background:var(--red-dark);color:#fff}
+.hub-section .archive-detail__fact span,.hub-section .archive-detail__intro,.hub-section .archive-detail__explain p{color:#b8c1b8}
+.hub-section .archive-detail__footer{border-top-color:var(--edge)}
