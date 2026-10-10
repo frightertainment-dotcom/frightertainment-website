@@ -1,5 +1,5 @@
 # Frightertainment typography
 
-The interface loads three type families directly on each HTML page: **Grenze Gotisch** for selected display headings, **Barlow Condensed** for navigation and compact labels, and **DM Sans** for body copy and data. Film titles remain in readable mixed case and wrap at spaces. The original Frightertainment logo is unchanged.
+The site uses **UnifrakturMaguntia** across headings, navigation, labels and body copy to bring the interface closer to the Frightertainment wordmark. The face is requested at its regular weight, and browser-synthesized bold is disabled so small text and headings stay lighter. Georgia is the local fallback.
 
-All three families are available through Google Fonts under the **SIL Open Font License 1.1**. Sources: [Grenze Gotisch](https://github.com/Omnibus-Type/Grenze-Gotisch), [Barlow Condensed](https://github.com/google/fonts/tree/main/ofl/barlowcondensed), and [DM Sans](https://github.com/google/fonts/tree/main/ofl/dmsans). The browser requests the stylesheet on every direct page load; Barlow Condensed and DM Sans use local sans-serif fallbacks, and Grenze Gotisch falls back to Georgia. `font-display: swap` behaviour is used by the Google Fonts stylesheet, so content stays readable if remote fonts are unavailable.
+The logo supplied to the site is a PNG artwork file, not a font file, so its letter shapes cannot be reproduced exactly by CSS text. UnifrakturMaguntia is the closest shared text face used here; the logo artwork remains unchanged. The font is served through Google Fonts with `display=swap`.

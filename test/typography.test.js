@@ -15,29 +15,33 @@ async function htmlFiles(directory) {
   return files;
 }
 
-test('all directly served HTML pages request the same gothic family with lighter weights', async () => {
+test('all directly served HTML pages load the shared typography stylesheet', async () => {
   const files = await htmlFiles(process.cwd());
   assert.ok(files.length > 0);
   for (const file of files) {
     const html = await readFile(file, 'utf8');
-    assert.match(html, /family=Grenze\+Gotisch:wght@400;500;600;700/, `${file} must load the shared typeface`);
+    assert.match(html, /stylesheet[^>]+styles\.css/, `${file} must load the shared typography stylesheet`);
   }
 });
 
-test('section and film display typography uses the licensed horror display face with a safe fallback', async () => {
+test('site-wide typography uses the logo-adjacent font at a natural, lighter weight', async () => {
   const css = await readFile(join(process.cwd(), 'hub.css'), 'utf8');
-  assert.match(css, /--font-horror:'Grenze Gotisch',Georgia,serif/);
-  assert.match(css, /--font-room:'Grenze Gotisch',Georgia,serif/, 'Selected horror rooms use the licensed Gothic display');
+  const baseCss = await readFile(join(process.cwd(), 'styles.css'), 'utf8');
+  assert.match(baseCss, /@import url\("https:\/\/fonts\.googleapis\.com\/css2\?family=UnifrakturMaguntia&display=swap"\)/);
+  assert.match(baseCss, /--font-display:'UnifrakturMaguntia',Georgia,serif;--font-body:'UnifrakturMaguntia',Georgia,serif/);
+  assert.match(baseCss, /font-synthesis:none/);
+  assert.match(css, /--font-horror:'UnifrakturMaguntia',Georgia,serif/);
+  assert.match(css, /--font-room:'UnifrakturMaguntia',Georgia,serif/, 'All horror rooms use the shared logo-adjacent font');
   assert.match(css, /\.hub-intro h1,\.hub-page-intro h1[^\n]*font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
   assert.match(css, /\.hub-section \.fr-movie-hero__info h1\{font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
   assert.match(css, /\.hub-chart-row a\{font:700 16px\/1\.1 var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
 });
 
-test('Grenze Gotisch license and fallback behavior are documented', async () => {
+test('shared logo-adjacent typeface and fallback behavior are documented', async () => {
   const docs = await readFile(join(process.cwd(), 'TYPOGRAPHY.md'), 'utf8');
-  assert.match(docs, /SIL Open Font License 1\.1/);
+  assert.match(docs, /UnifrakturMaguntia/);
   assert.match(docs, /Georgia/);
-  assert.match(docs, /Grenze Gotisch/);
+  assert.match(docs, /PNG artwork file/);
 });
 
 test('generated film detail templates present a synopsis once and retain the sourced claim list', async () => {
