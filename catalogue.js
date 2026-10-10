@@ -9,8 +9,9 @@
   const score = item => Number(item.voteCount) > 0 && Number(item.voteAverage) > 0 ? `<span class="movie-card__score" aria-label="TMDB viewer rating ${Number(item.voteAverage).toFixed(1)} out of 10 from ${Number(item.voteCount)} votes"><small>TMDB </small>${Number(item.voteAverage).toFixed(1)}<small>/10</small></span>` : '<span class="fr-media-unrated">Not yet rated</span>';
   const trailer = item => {
     const key = item.trailer?.key || item.trailerVideoId;
-    const attr = /^[A-Za-z0-9_-]{11}$/.test(key || '') ? `data-trailer-video="${escape(key)}"` : `data-media-trailer data-media-type="${mediaType(item)}" data-tmdb-id="${id(item)}"`;
-    return `<button type="button" class="fr-trailer-button" ${attr} data-trailer-title="${escape(item.title)}" aria-label="Play trailer for ${escape(item.title)}"><span aria-hidden="true">▶</span> PLAY TRAILER</button>`;
+    const verified = /^[A-Za-z0-9_-]{11}$/.test(key || '');
+    const attr = verified ? `data-trailer-video="${escape(key)}"` : `data-media-trailer data-media-type="${mediaType(item)}" data-tmdb-id="${id(item)}"`;
+    return `<button type="button" class="fr-trailer-button" ${attr} data-trailer-title="${escape(item.title)}" aria-label="Play trailer for ${escape(item.title)}"><span aria-hidden="true">▶</span> ${verified ? "PLAY OFFICIAL TRAILER" : "CHECK OFFICIAL TRAILER"}</button>`;
   };
   const card = (item, rank) => {
     const image = poster(item);
@@ -26,6 +27,22 @@
     const type = root.dataset.catalogueType;
     const thisYear = new Date().getFullYear();
     const url = new URL(location.href);
+    const cinemaCountryNames = Object.freeze({GB:'UNITED KINGDOM',US:'UNITED STATES',CA:'CANADA',AU:'AUSTRALIA',IE:'IRELAND'});
+    const cinemaPicker = root.querySelector('[data-cinema-country]');
+    let cinemaCountry = 'GB';
+    if(cinemaPicker){
+      try{const previous=localStorage.getItem('frightertainment-cinema-country');if(Object.hasOwn(cinemaCountryNames,previous))cinemaCountry=previous;}catch{}
+      cinemaPicker.value=cinemaCountry;
+    }
+    const updateCinemaLabels=()=>{
+      if(!cinemaPicker)return;
+      document.querySelectorAll('[data-cinema-country-label]').forEach(element=>element.textContent=cinemaCountryNames[cinemaCountry]);
+      const ukEditorial=document.getElementById('recent-cinema');
+      if(ukEditorial)ukEditorial.hidden=cinemaCountry!=='GB';
+      const note=root.querySelector('[data-cinema-editorial-note]');
+      if(note)note.hidden=cinemaCountry==='GB';
+    };
+    updateCinemaLabels();
     const requestedYear = Number(url.searchParams.get('year'));
     for (const section of root.querySelectorAll('[data-catalogue-mode]')) {
       const mode = section.dataset.catalogueMode;
@@ -44,8 +61,16 @@
         const firstYear = type === 'tv' ? 1940 : 1888;
         yearSelect.innerHTML = Array.from({length:thisYear - firstYear + 1}, (_, index) => `<option value="${thisYear - index}">${thisYear - index}</option>`).join('');
         yearSelect.value = String(year);
-        yearSelect.addEventListener('change', () => { year = Number(yearSelect.value); page = 1; history = []; load(); });
+        const headingYear=section.querySelector('[data-catalogue-chart-year]');
+        if(headingYear)headingYear.textContent=String(year);
+        yearSelect.addEventListener('change', () => { year = Number(yearSelect.value); const headingYear=section.querySelector('[data-catalogue-chart-year]');if(headingYear)headingYear.textContent=String(year); page = 1; history = []; load(); });
       }
+      if(mode==='cinema' && cinemaPicker) cinemaPicker.addEventListener('change',()=>{
+        if(!Object.hasOwn(cinemaCountryNames,cinemaPicker.value))return;
+        cinemaCountry=cinemaPicker.value;
+        try{localStorage.setItem('frightertainment-cinema-country',cinemaCountry);}catch{}
+        updateCinemaLabels();page=1;history=[];load();
+      });
       form?.addEventListener('submit', event => {
         event.preventDefault();
         query = form.querySelector('input').value.trim();
@@ -62,6 +87,7 @@
         status.textContent = 'Loading titles…';
         pagination.replaceChildren();
         const params = new URLSearchParams({type, mode, page:String(page)});
+        if(mode==='cinema')params.set('country',cinemaCountry);
         if (yearSelect) params.set('year', String(year));
         if (query) params.set('query', query);
         try {
@@ -94,7 +120,7 @@
           list.innerHTML = items.map((item, index) => card(item, mode === 'chart' ? index + 1 : null)).join('');
           if (mode === 'chart') {
             status.textContent = items.length ? `${year} · ${items.length} ${type === 'tv' ? 'shows' : 'films'} · TMDB viewer ratings · 50+ votes` : `No ${year} titles meet the 50-vote chart minimum yet. Explore another year or the archive.`;
-          } else status.textContent = items.length ? `${items.length} ${type === 'tv' ? 'shows' : items.length === 1 ? 'film' : 'films'}${mode === 'archive' ? ' · ' + year : ''}${data.stale ? ' · Last available update' : ''}` : (mode === 'cinema' ? 'No upcoming UK theatrical dates are verified yet. Check back for new announcements.' : mode === 'upcoming' ? 'No upcoming premiere dates are listed yet. Check back for new announcements.' : 'No matching titles. Try another year or title.');
+          } else status.textContent = (mode==='cinema' ? cinemaCountryNames[cinemaCountry]+' · ' : '') + (items.length ? `${items.length} ${type === 'tv' ? 'shows' : items.length === 1 ? 'film' : 'films'}${mode === 'archive' ? ' · ' + year : ''}${data.stale ? ' · Last available update' : ''}` : (mode === 'cinema' ? 'No upcoming theatrical dates verified for '+cinemaCountryNames[cinemaCountry]+'. Coverage may be incomplete.' : mode === 'upcoming' ? 'No upcoming premiere dates are listed yet. Check back for new announcements.' : 'No matching titles. Try another year or title.');
           const totalPages = Math.max(1, Math.min(500, Number(data.totalPages) || 1));
           if (mode !== 'chart' && totalPages > 1 && (mode !== 'cinema' || data.nextPage || history.length)) {
             const previous = document.createElement('button');

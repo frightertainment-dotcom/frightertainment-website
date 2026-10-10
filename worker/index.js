@@ -23,6 +23,7 @@ const JSON_HEADERS = {
   'permissions-policy': 'camera=(), microphone=(), geolocation=()'
 };
 const countryPattern = /^[A-Z]{2}$/;
+const cinemaPreviewCountries=new Set(['GB','US','CA','AU','IE']);
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const nowIso = () => new Date().toISOString();
 const today = () => nowIso().slice(0, 10);
@@ -166,7 +167,10 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   const params = new URL(request.url).searchParams;
   const type = params.get('type') || 'movie';
   if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
-  const country = countryOf(request, env);
+  const cinemaMode=catalogue && params.get('mode')==='cinema';
+  const requestedCinemaCountry=params.get('country') || env.DEFAULT_COUNTRY || 'GB';
+  if(cinemaMode && !cinemaPreviewCountries.has(requestedCinemaCountry)) throw new HttpError(400,'Unsupported cinema country');
+  const country=cinemaMode ? requestedCinemaCountry : countryOf(request,env);
   const currentYear = new Date().getUTCFullYear();
   const year = params.has('year') ? Number(params.get('year')) : catalogue ? currentYear : null;
   if (year !== null && (!Number.isInteger(year) || year < 1888 || year > currentYear + 2)) throw new HttpError(400, 'Invalid media year');
@@ -176,7 +180,7 @@ async function handleTMDBMedia(env, request, catalogue = false) {
     options.page = Number(params.get('page') || 1);
     options.query = (params.get('query') || '').trim();
     if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
-    if (options.mode === 'cinema') options.catalogueVersion = 2;
+    if (options.mode === 'cinema') options.catalogueVersion = 3;
   } else {
     options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
     if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');

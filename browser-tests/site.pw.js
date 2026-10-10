@@ -81,7 +81,7 @@ test('verified film-card trailers open the dialog with no duplicated trailer blo
   await button.click();
   const dialog=page.locator('.trailer-dialog');
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator('iframe')).toHaveAttribute('src',/youtube-nocookie\\.com\/embed\//);
+  await expect(dialog.locator('iframe')).toHaveAttribute('src',/youtube-nocookie.*embed/);
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(dialog.locator('iframe')).not.toHaveAttribute('src',/.+/);

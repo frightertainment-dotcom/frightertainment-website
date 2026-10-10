@@ -118,3 +118,23 @@ test('media endpoint keeps a last-good snapshot on a failed refresh and never re
     assert.equal((await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB })).status, 404);
   } finally { globalThis.fetch = previous; }
 });
+
+test('cinema discovery verifies the selected Canadian theatrical release instead of UK or US',async()=>{
+  const previous=globalThis.fetch;const requests=[];const upcoming=`${new Date().getUTCFullYear()+1}-08-21`;
+  globalThis.fetch=async url=>{
+    const parsed=new URL(url);requests.push(parsed);
+    if(parsed.pathname.includes('/discover/'))return reply({total_pages:1,total_results:2,results:[
+      {id:11,title:'Canada Screening',genre_ids:[27],poster_path:'/a.jpg',release_date:upcoming},
+      {id:12,title:'US Screening',genre_ids:[27],poster_path:'/b.jpg',release_date:upcoming}
+    ]});
+    const id=Number(parsed.pathname.split('/').at(-1));
+    return reply({id,title:id===11?'Canada Screening':'US Screening',release_date:upcoming,poster_path:'/a.jpg',
+      release_dates:{results:[{iso_3166_1:id===11?'CA':'US',release_dates:[{type:3,release_date:upcoming+'T00:00:00Z'}]}]}});
+  };
+  try{
+    const result=await fetchCatalogue(env,{type:'movie',mode:'cinema',page:1,country:'CA',year:new Date().getUTCFullYear()});
+    assert.equal(requests[0].searchParams.get('region'),'CA');
+    assert.deepEqual(result.items.map(item=>item.title),['Canada Screening']);
+    assert.equal(result.items[0].releaseCountry,'CA');
+  }finally{globalThis.fetch=previous;}
+});

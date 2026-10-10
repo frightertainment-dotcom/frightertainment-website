@@ -96,7 +96,7 @@ export async function fetchCatalogue(env, options) {
   const field = type === 'tv' ? 'first_air_date' : 'primary_release_date';
   if (['archive', 'top'].includes(mode)) { parameters[`${field}.gte`] = `${year}-01-01`; parameters[`${field}.lte`] = chart ? end : `${year}-12-31`; }
   if (mode === 'upcoming' || mode === 'cinema') { const releaseField = mode === 'cinema' ? 'release_date' : field; parameters[`${releaseField}.gte`] = new Date(Date.now() + 86400000).toISOString().slice(0, 10); parameters[`${releaseField}.lte`] = `${new Date().getUTCFullYear() + 2}-12-31`; }
-  if (mode === 'cinema') { parameters.region = 'GB'; parameters.with_release_type = '3|2'; }
+  if (mode === 'cinema') { parameters.region = options.country || 'GB'; parameters.with_release_type = '3|2'; }
   if (mode === 'trending') parameters[`${field}.lte`] = today();
   if (chart) parameters['vote_count.gte'] = 50;
   if (mode === 'trending') parameters['vote_count.gte'] = 5;
@@ -116,9 +116,10 @@ export async function fetchCatalogue(env, options) {
     items = await mapBounded(candidates.slice(0, 40), async candidate => {
       const raw = await tmdbRequest(env, `/${type}/${candidate.id}`, { language: 'en-US', append_to_response: type === 'tv' ? 'videos,keywords' : 'videos,release_dates' });
       if (mode === 'cinema') {
-        const uk = raw.release_dates?.results?.find(entry => entry.iso_3166_1 === 'GB');
-        const theatrical = uk?.release_dates?.filter(entry => [2, 3].includes(entry.type) && date(entry.release_date?.slice(0, 10)) && entry.release_date.slice(0, 10) > today()).sort((a, b) => a.release_date.localeCompare(b.release_date))[0];
-        return theatrical ? { ...sanitizeMedia(raw, type, 'GB'), releaseDate: theatrical.release_date.slice(0, 10), releaseCountry: 'GB', theatricalDate: theatrical.release_date.slice(0, 10) } : null;
+        const region=options.country || 'GB';
+        const dates=raw.release_dates?.results?.find(entry=>entry.iso_3166_1===region);
+        const theatrical=dates?.release_dates?.filter(entry=>[2,3].includes(entry.type)&&date(entry.release_date?.slice(0,10))&&entry.release_date.slice(0,10)>today()).sort((a,b)=>a.release_date.localeCompare(b.release_date))[0];
+        return theatrical?{...sanitizeMedia(raw,type,region),releaseDate:theatrical.release_date.slice(0,10),releaseCountry:region,theatricalDate:theatrical.release_date.slice(0,10)}:null;
       }
       if (kind === 'indie') {
         const assessment = independentAssessment(raw);
@@ -129,13 +130,13 @@ export async function fetchCatalogue(env, options) {
     });
   } else items = candidates.map(raw => sanitizeMedia(raw, type, options.country)).filter(Boolean);
   if (chart) items = items.filter(item => item.voteCount >= 50 && item.voteAverage !== null && item.firstReleaseDate <= end && Number(item.firstReleaseDate?.slice(0, 4)) === year)
-    .sort((a, b) => b.voteAverage - a.voteAverage || b.voteCount - a.voteCount).slice(0, type === 'tv' ? 10 : 20).map((item, i) => ({ ...item, position: i + 1, averageScore: Math.round(item.voteAverage * 10) }));
+    .sort((a, b) => b.voteAverage - a.voteAverage || b.voteCount - a.voteCount).slice(0, 20).map((item, i) => ({ ...item, position: i + 1, averageScore: Math.round(item.voteAverage * 10) }));
   const seen = new Set(); items = items.filter(item => !seen.has(item.id) && seen.add(item.id));
   const continuation = extra ? page + 2 : page + 1;
-  return { items, page, nextPage: continuation <= totalPages ? continuation : null, screeningComplete: continuation > totalPages || (chart && items.length >= (type === 'tv' ? 10 : 20)), totalPages, totalResults: Number(first.total_results) || 0,
+  return { items, page, nextPage: continuation <= totalPages ? continuation : null, screeningComplete: continuation > totalPages || (chart && items.length >= 20), totalPages, totalResults: Number(first.total_results) || 0,
     filteredResults: items.length, countIsCandidateTotal: kind === 'indie' || search, firstYear: type === 'tv' ? 1940 : 1888,
     year, type: kind, mode: options.mode, ratingKind: 'tmdb-community', minimumVotes: chart ? 50 : null,
     classification: kind === 'indie' ? 'independent-production-candidates' : type === 'tv' ? 'tmdb-horror-keyword' : 'tmdb-horror-genre',
-    methodology: `${mode === 'cinema' ? 'Upcoming UK limited or general theatrical dates verified against TMDB release-date details. Territories and dates may change.' : kind === 'indie' ? INDIE_POLICY : type === 'tv' ? TV_POLICY : 'Horror genre entries from TMDB.'}${chart ? ' Ranked by TMDB community score with at least 50 votes, among released titles in the selected first-release year. Fewer entries are shown if the screened pool has fewer qualifying titles.' : ''}`,
+    methodology: `${mode === 'cinema' ? `Upcoming ${options.country || 'GB'} limited or general theatrical dates verified against TMDB release-date details. Territories and dates may change.` : kind === 'indie' ? INDIE_POLICY : type === 'tv' ? TV_POLICY : 'Horror genre entries from TMDB.'}${chart ? ' Ranked by TMDB community score with at least 50 votes, among released titles in the selected first-release year. Fewer entries are shown if the screened pool has fewer qualifying titles.' : ''}`,
     screeningLimit: kind === 'indie' || mode === 'cinema' ? 40 : null };
 }
