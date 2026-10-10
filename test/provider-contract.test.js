@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { fetchNearbyShowtimes, refreshStreamingReleases, refreshTheatricalReleases } from '../worker/providers.js';
+import { fetchNearbyShowtimes, refreshStreamingReleases, refreshTheatricalReleases, refreshTrending } from '../worker/providers.js';
 
 const movieGluFixture = JSON.parse(await readFile(new URL('./fixtures/movieglu-film-showtimes.example.json', import.meta.url), 'utf8'));
 const approvedFilm = { film_id: 'approved-horror', title: 'Approved Horror', release_year: 2026, watchmode_id: 123 };
@@ -55,5 +55,27 @@ test('Watchmode streaming-release rows never publish unmapped provider titles', 
     assert.equal(data.items[0].filmId, 'approved-horror');
     assert.equal(data.items[0].title, 'Approved Horror');
     assert.equal(data.items.some(item => item.title === 'Arbitrary Horror'), false);
+  } finally { restore(); }
+});
+
+test('TMDB noncommercial route returns validated poster paths and rejects unsafe image paths', async () => {
+  const restore = stubFetch({ results: [
+    { id: 10, title: 'Poster Horror', release_date: '2026-10-01', popularity: 12, genre_ids: [27], poster_path: '/poster_10.jpg' },
+    { id: 11, title: 'No Poster', release_date: '2026-10-02', popularity: 8, genre_ids: [27], poster_path: 'https://evil.example/poster.jpg' }
+  ] });
+  try {
+    const result = await refreshTrending({
+      TMDB_NONCOMMERCIAL_USE_APPROVED: 'true',
+      TMDB_ATTRIBUTION_READY: 'true',
+      TMDB_READ_ACCESS_TOKEN: 'fixture'
+    }, 'GB');
+    assert.equal(result.items[0].posterPath, '/poster_10.jpg');
+    assert.equal(result.items[1].posterPath, null);
+    await assert.rejects(() => refreshTrending({
+      TMDB_NONCOMMERCIAL_USE_APPROVED: 'true',
+      TMDB_COMMERCIAL_LICENSE_APPROVED: 'true',
+      TMDB_ATTRIBUTION_READY: 'true',
+      TMDB_READ_ACCESS_TOKEN: 'fixture'
+    }, 'GB'), /Set exactly one/);
   } finally { restore(); }
 });
