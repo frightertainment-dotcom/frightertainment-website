@@ -39,11 +39,12 @@
       switch (node.dataset.mediaField) {
         case 'poster': {
           const url = safePoster(item); if (!url) break;
+          if(node.getAttribute('role')==='img')node.setAttribute('aria-label','Poster for '+item.title);
           let img = node.matches('img') ? node : node.querySelector('img');
           if (!img) {img=document.createElement('img');node.prepend(img);}
-          img.alt = 'Poster for '+item.title; img.loading='lazy'; img.decoding='async';
+          img.alt = 'Poster for '+item.title; img.loading=root.dataset.mediaEager==='true'?'eager':'lazy'; img.decoding='async'; img.hidden=false;
           img.addEventListener('load',()=> {img.hidden=false; node.classList.add('has-tmdb-poster'); img.parentElement.classList.add('has-tmdb-poster');root.querySelectorAll('[data-media-field="poster-status"]').forEach(n=>n.hidden=true);}, {once:true});
-          img.addEventListener('error',()=> {img.hidden=true; node.classList.remove('has-tmdb-poster');}, {once:true});
+          img.addEventListener('error',()=> {img.hidden=true; node.classList.remove('has-tmdb-poster');img.parentElement.classList.remove('has-tmdb-poster');root.querySelectorAll('[data-media-field="poster-status"]').forEach(n=>{n.hidden=false;n.textContent='Poster unavailable';});}, {once:true});
           img.src=url; if(img.complete && img.naturalWidth>0) {img.hidden=false;node.classList.add('has-tmdb-poster');img.parentElement.classList.add('has-tmdb-poster');}
           break;
         }

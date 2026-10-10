@@ -1033,8 +1033,8 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
 /* Shared media presentation across the vault, charts, indie cinema and TV. */
 .fr-catalogue-section{margin:2.5rem 0;scroll-margin-top:6rem}
 .fr-catalogue-head{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin-bottom:1rem}
-.fr-catalogue-head h2{font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.12;margin:0 0 .6rem}
-.fr-catalogue-head p,.fr-catalogue-status{font-family:var(--body-font,'DM Sans',sans-serif);font-size:.92rem;line-height:1.6;color:#b8b9b1;max-width:65ch}
+.fr-catalogue-head h2{font-family:var(--font-room,var(--font-horror,var(--font-display)));font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.12;margin:0 0 .6rem}
+.fr-catalogue-head p,.fr-catalogue-status{font-family:var(--font-body,'DM Sans',sans-serif);font-size:.92rem;line-height:1.6;color:#b8b9b1;max-width:65ch}
 .fr-catalogue-tools{display:flex;flex-wrap:wrap;gap:.8rem;align-items:end;margin:1rem 0}
 .fr-catalogue-tools label,.fr-catalogue-year{display:grid;gap:.4rem;font:700 .8rem 'Barlow Condensed',sans-serif;letter-spacing:.06em}
 .fr-catalogue-tools input,.fr-catalogue-tools select,.fr-catalogue-year select{background:#0c1911;border:1px solid #425c47;color:#edece5;padding:.65rem .8rem;border-radius:3px;font:inherit;max-width:100%;min-height:44px}
@@ -1044,9 +1044,9 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
 .fr-media-card__poster{aspect-ratio:2/3}
 .fr-media-card__poster img{width:100%;height:100%;object-fit:cover}
 .movie-card__headline{align-items:start;flex-wrap:wrap;gap:.5rem}
-.movie-card__headline h3{font-size:clamp(1.3rem,1.7vw,1.75rem);line-height:1.2;min-width:0;flex:1 1 140px}
+.hub-section .movie-card__headline h3{font-size:clamp(1.3rem,1.7vw,1.75rem);line-height:1.2;min-width:0;flex:1 1 140px}
 .movie-card__score,.fr-media-unrated{white-space:nowrap;font:700 .85rem 'Barlow Condensed',sans-serif;padding:.3rem .45rem;flex:none}
-.movie-card__text{font-size:.94rem;line-height:1.6;margin:.8rem 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hub-section .movie-card__text{font-size:.94rem;line-height:1.6;margin:.8rem 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .movie-card__release,.fr-media-card__meta{font:400 .8rem/1.55 'DM Sans',sans-serif;color:#afb9ad;margin:.6rem 0}
 .movie-card__actions,.fr-media-card__actions{display:flex;align-items:center;flex-wrap:wrap;gap:.65rem;margin:.8rem 0;font:700 .85rem 'Barlow Condensed',sans-serif}
 .movie-card__actions a,.fr-media-card__actions a{text-decoration:none;color:#bdc5ba}
@@ -1092,8 +1092,8 @@ body[data-theme="indie"] main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile
  .fr-catalogue-tools form{width:100%}.fr-catalogue-tools input{min-width:0;flex:1}
  .fr-media-detail__hero,.archive-detail__media{grid-template-columns:minmax(0,1fr);gap:1.2rem}
  .fr-media-detail__poster,.archive-detail__art{max-width:250px;margin:0 auto;width:100%}
- .movie-card__headline h3{font-size:1.28rem;flex-basis:100%;margin-bottom:0}
- .movie-card__text{font-size:.86rem;line-height:1.6}.movie-card__body{padding:.7rem 0}
+ .hub-section .movie-card__headline h3{font-size:1.28rem;flex-basis:100%;margin-bottom:0}
+ .hub-section .movie-card__text{font-size:.86rem;line-height:1.6}.movie-card__body{padding:.7rem 0}
  .movie-card__actions,.fr-media-card__actions{gap:.55rem;font-size:.8rem}
  .movie-card__date{display:none}.movie-card__eyebrow{font-size:.75rem}
  .hub-section h1{font-size:clamp(2rem,8vw,3.2rem);line-height:1.1}

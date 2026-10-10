@@ -37,6 +37,9 @@ test('archive film hydrates poster, viewer score, release date and trailer dialo
  await expect(page.locator('.archive-detail__rating')).toContainText('7.8/10');
  await expect(page.locator('.archive-detail__release')).toContainText('22 Jun 2007');
  await expect(page.locator('.archive-detail__release')).toContainText('UK release');
+ await page.screenshot({path:'test-results/catalogue-review/archive-detail-desktop.png',fullPage:true});
+ await page.setViewportSize({width:375,height:812});
+ await page.screenshot({path:'test-results/catalogue-review/archive-detail-mobile.png',fullPage:true});
  await page.locator('.archive-detail__media [data-trailer-video]').click();
  const dialog=page.locator('.trailer-dialog');
  await expect(dialog).toBeVisible();
@@ -49,7 +52,7 @@ test('archive film hydrates poster, viewer score, release date and trailer dialo
 test('375px catalogue layouts keep posters, readable long titles and all features',async({page})=>{
  await page.setViewportSize({width:375,height:812});
  const long={...film,title:'The Extraordinary Haunting of the Forgotten House in the Woods'};
- await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[long,film],page:1,totalPages:2,status:'ready'}}));
+ await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[long,{...film,tmdbId:124}],page:1,totalPages:2,status:'ready'}}));
  await page.route('**/api/media?**',route=>route.fulfill({json:{item:long,status:'ready'}}));
  for(const route of ['/indie-movies.html','/tv-shows.html']){
   await page.goto(route);
@@ -62,6 +65,9 @@ test('375px catalogue layouts keep posters, readable long titles and all feature
   expect(metrics.scroll).toBeLessThanOrEqual(metrics.client+1);
   await expect(page.locator('#archive form')).toBeVisible();
   await expect(page.locator('#archive .fr-catalogue-pagination')).toContainText('NEXT');
+  const name=route.includes('indie')?'indie':'tv';
+  await page.screenshot({path:`test-results/catalogue-review/${name}-mobile-first.png`});
+  await page.screenshot({path:`test-results/catalogue-review/${name}-mobile-full.png`,fullPage:true});
  }
 });
 

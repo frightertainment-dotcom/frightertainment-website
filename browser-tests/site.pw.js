@@ -44,9 +44,11 @@ for (const [path, heading] of pages) {
     await page.goto(path);
     await expect(page.locator('h1').first()).toContainText(heading, { ignoreCase: true });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-    await page.evaluate(async () => { for (const image of document.images) image.loading = 'eager'; });
-    await page.waitForTimeout(100);
-    const brokenImages = await page.locator('img').evaluateAll(images => images.filter(image => !image.complete || image.naturalWidth === 0).map(image => image.src));
+    await page.evaluate(async () => {
+      const images=[...document.images].filter(image=>image.getAttribute('src')?.trim());
+      await Promise.all(images.map(image=>{image.loading='eager';return image.decode().catch(()=>{});}));
+    });
+    const brokenImages = await page.locator('img').evaluateAll(images => images.filter(image => image.getAttribute('src')?.trim() && (!image.complete || image.naturalWidth === 0)).map(image => image.src));
     expect(brokenImages).toEqual([]);
     const toggle = page.locator('.menu-toggle');
     await expect(toggle).toBeVisible();
@@ -366,6 +368,7 @@ test('public film pages expose no private publisher snapshots or Fright Rating s
   await page.goto('/movies.html');
   const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
   await expect(card).toBeVisible();
+  await card.scrollIntoViewIfNeeded();
   await expect(card.locator('.movie-card__score')).toHaveText('Not rated');
   const catalogue=await page.request.get('/data/movies.js');
   expect(await catalogue.text()).not.toContain('criticReferenceSnapshots');
@@ -544,9 +547,22 @@ test('all horror movie navigation is a sub-tab under main Movies tab',async({pag
 test('imported horror vault retains thousands of indexed records and every year in mobile UI',async({page})=>{
   await page.goto('/all-horror-movies.html', { waitUntil: 'domcontentloaded' });
   const counter=page.locator('#archive-summary');
-  await expect(counter).toContainText('indexed film links', { timeout: 15000 });
+  await expect(counter).toContainText('horror films across', { timeout: 15000 });
   const count=await counter.evaluate(el=>Number((el.textContent.match(/[0-9,]+/)||['0'])[0].replaceAll(',','')));
-  expect(count).toBeGreaterThanOrEqual(9772);
+  const response=await page.request.get('/data/archive/horror-films.json');
+  const raw=await response.json();
+  expect(raw.films).toHaveLength(9772);
+  const expected=await page.evaluate(raw=>{
+    const currentYear=new Date().getUTCFullYear();
+    const key=(title,year)=>year+'|'+String(title).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('en-GB');
+    const local=(window.FR_MOVIES||[]).filter(movie=>movie.editorialStatus==='approved').map(movie=>({title:movie.title,year:Number(movie.claims?.find(claim=>claim.field==='filmYear')?.value)})).filter(movie=>movie.year>=1896&&movie.year<=currentYear);
+    const keys=new Set(local.map(movie=>key(movie.title,movie.year)));
+    const archived=raw.films.filter(movie=>!movie.excludedFromMovieArchive&&movie.year>=1896&&movie.year<=currentYear&&!keys.has(key(movie.title,movie.year)));
+    const manual=(raw.manual||[]).filter(movie=>movie.year>=1896&&movie.year<=currentYear&&!keys.has(key(movie.title,movie.year)));
+    const duplicatedOpeningFilm=manual.some(movie=>movie.id==='manual:le-manoir-du-diable-1896')&&archived.some(movie=>movie.qid==='Q153603')?1:0;
+    return archived.length+manual.length+local.length-duplicatedOpeningFilm;
+  },raw);
+  expect(count).toBe(expected);
   const year=page.locator('#horror-year-2007');
   await year.locator('summary').click();
   await expect.poll(()=>year.locator('.horror-year__film').count()).toBeGreaterThan(300);
@@ -1001,7 +1017,7 @@ test('six themed environments and review pages have desktop and mobile browser e
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await page.locator('main').waitFor();
-    if (name === 'movie-archive') await expect(page.locator('#archive-summary')).toContainText('indexed film links', { timeout: 15000 });
+    if (name === 'movie-archive') await expect(page.locator('#archive-summary')).toContainText('horror films across', { timeout: 15000 });
     await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
     await page.screenshot({ path: `${out}/${name}-desktop-full.png`, fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });

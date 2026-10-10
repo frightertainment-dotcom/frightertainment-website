@@ -47,6 +47,8 @@
   const recordYear = movie => Number((artByFilm.get(movie.id)?.firstReleaseDate || '').slice(0,4)) || Number(firstClaim(movie, 'filmYear')?.value || firstClaim(movie,'releaseYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
   const listingYear = movie => recordYear(movie) || Number(firstClaim(movie, 'releaseYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
   const cardRelease = movie => {
+    const media = artByFilm.get(movie.id);
+    if (media?.releaseDate) return `${prettyDate(media.releaseDate)} · ${media.releaseCountry === 'GB' ? 'UK release' : 'First release'} · TMDB`;
     const claims = releaseClaims(movie);
     if (claims.length === 1) return `${prettyDate(claims[0].value)} · ${claims[0].territory}`;
     if (claims.length > 1) return `${claims.length} territory-specific dates · see sources`;
@@ -83,7 +85,7 @@
   const mediaAttrs = movie => `data-media-type="movie" data-media-title="${escapeHTML(movie.title)}" data-media-year="${listingYear(movie)||''}" ${artByFilm.get(movie.id)?.tmdbId || pinnedIds[movie.id] ? `data-tmdb-id="${artByFilm.get(movie.id)?.tmdbId || pinnedIds[movie.id]}"` : ''}`;
   const cardMarkup = movie => {
     const community=communityScore(movie), id=encodeURIComponent(movie.id), poster=tmdbArtwork(movie);
-    const synopsis=firstClaim(movie,'synopsis')?.value || '';
+    const synopsis=artByFilm.get(movie.id)?.overview || firstClaim(movie,'synopsis')?.value || ''; 
     const official=safeURL(firstClaim(movie,'title')?.source||'');
     return `<article class="movie-card" ${mediaAttrs(movie)}><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details" data-media-field="poster"><div class="movie-card__placeholder"><strong>${escapeHTML(movie.title)}</strong><small>Poster unavailable</small></div>${poster?`<img class="tmdb-card-poster" src="${escapeHTML(poster)}" alt="Poster for ${escapeHTML(movie.title)}" loading="lazy">`:''}</a><div class="movie-card__body"><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3><span class="movie-card__score" data-media-field="rating">${community?'TMDB '+community.voteAverage.toFixed(1)+'/10':'Checking rating…'}</span></div><p class="movie-card__text" data-media-field="overview">${escapeHTML(synopsis)}</p><p class="movie-card__release" data-media-field="date">${escapeHTML(cardRelease(movie))}</p><div class="movie-card__actions"><a href="/films/${id}/">DETAILS →</a><button type="button" class="fr-trailer-button" data-media-field="trailer" ${movie.trailer?.videoId?`data-trailer-video="${escapeHTML(movie.trailer.videoId)}" data-trailer-title="${escapeHTML(movie.title)}"`:'hidden'}>▶ PLAY TRAILER</button>${official?`<a href="${escapeHTML(official)}" target="_blank" rel="noopener noreferrer">Official source ↗</a>`:''}</div></div></article>`;
   };
@@ -109,7 +111,7 @@
     const render = () => {
       const filtered = movies.filter(movie => {
         const dateKnown = recordHasDate(movie);
-        const hasScore = frightIndex(movie) !== null || communityScore(movie) !== null;
+        const hasScore = communityScore(movie) !== null;
         const filterOK = state.filter === 'all' || (state.filter === 'date-tbc' && !dateKnown) ||
           (state.filter === 'reviewed' && hasScore);
         const year = listingYear(movie);
@@ -156,7 +158,7 @@
           if (/^[a-z0-9-]{1,80}$/.test(item.id || '')) artByFilm.set(item.id, item);
         }
         const scoreFilter = document.querySelector('[data-filter="reviewed"]');
-        if (scoreFilter) scoreFilter.textContent = 'WITH CHECKED SCORES';
+        if (scoreFilter) scoreFilter.textContent = 'WITH TMDB RATINGS';
         render();
       }).catch(() => { /* Keep original film artwork if TMDB is unavailable. */ });
   }
