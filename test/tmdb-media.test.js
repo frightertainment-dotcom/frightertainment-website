@@ -110,12 +110,14 @@ test('media endpoint keeps a last-good snapshot on a failed refresh and never re
   const item = sanitizeMedia({ id: 1, title: 'Cached Film', release_date: '2025-01-01', poster_path: '/safe.jpg', vote_average: 7.5, vote_count: 100 }, 'movie');
   const DB = { prepare() { return { bind() { return this; }, first: async () => ({ payload_json: JSON.stringify({ items: [item] }), updated_at: '2025-01-01T00:00:00Z', expires_at: '2025-01-02T00:00:00Z' }), run: async () => ({}) }; } };
   try {
-    const response = await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB, TMDB_PREVIEW_ON_DEMAND: 'true', DEFAULT_COUNTRY: 'GB' });
+    const response = await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB, DEFAULT_COUNTRY: 'GB' });
     assert.equal(response.status, 200);
     const payload = await response.json();
     assert.equal(payload.item.title, 'Cached Film'); assert.equal(payload.stale, true);
     assert.equal(JSON.stringify(payload).includes('private-fixture'), false);
-    assert.equal((await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB })).status, 404);
+    assert.equal((await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB, TMDB_READ_ACCESS_TOKEN: '' })).status, 404);
+    assert.equal((await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB, TMDB_NONCOMMERCIAL_USE_APPROVED: 'false' })).status, 404);
+    assert.equal((await worker.fetch(new Request('https://site.test/api/media?type=movie&id=1'), { ...env, DB, TMDB_ATTRIBUTION_READY: 'false' })).status, 404);
   } finally { globalThis.fetch = previous; }
 });
 

@@ -22,6 +22,13 @@ const JSON_HEADERS = {
   'content-security-policy': "default-src 'none'; base-uri 'none'; frame-ancestors 'none'",
   'permissions-policy': 'camera=(), microphone=(), geolocation=()'
 };
+// Both private preview and production require an explicit approved, attributed,
+ // encrypted server-side TMDB credential. A preview-only opt-in must not
+ // accidentally leave the production catalogue switched off.
+const tmdbReady = env => env.TMDB_NONCOMMERCIAL_USE_APPROVED === 'true'
+  && env.TMDB_ATTRIBUTION_READY === 'true'
+  && typeof env.TMDB_READ_ACCESS_TOKEN === 'string'
+  && env.TMDB_READ_ACCESS_TOKEN.length > 0;
 const countryPattern = /^[A-Z]{2}$/;
 const cinemaPreviewCountries=new Set(['GB','US','CA','AU','IE']);
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
@@ -102,12 +109,12 @@ async function handleRanking(env, request) {
   const yearValue = new URL(request.url).searchParams.get('year') || String(new Date().getUTCFullYear());
   const year = Number(yearValue);
   if (!Number.isInteger(year) || year < 1888 || year > new Date().getUTCFullYear() + 2) return json({ error: 'Invalid ranking year' }, 400);
-  if (env.TMDB_PREVIEW_ON_DEMAND === 'true') {
+  if (tmdbReady(env)) {
     const kind = `tmdb-community-${year}`;
     let dataset = await loadDataset(env.DB, kind, '');
     if (dataset.status !== 'current') {
       await refreshTask(env, kind, '', () => refreshCommunityChart(env, year),
-        24 * 60 * 60 * 1000, 'preview-on-demand');
+        24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
       dataset = await loadDataset(env.DB, kind, '');
     }
     return json({ year, ratingKind: 'tmdb-community', minimumVotes: 50,
@@ -150,11 +157,11 @@ async function handleRanking(env, request) {
 }
 
 async function handleMovieArtwork(env) {
-  if (env.TMDB_PREVIEW_ON_DEMAND !== 'true') return json({ error: 'Not available' }, 404);
+  if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
   let dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
   if (dataset.status !== 'current') {
     await refreshTask(env, 'tmdb-movie-artwork', '',
-      () => refreshMovieArtwork(env, env.DB), 7 * 24 * 60 * 60 * 1000, 'preview-on-demand');
+      () => refreshMovieArtwork(env, env.DB), 7 * 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
     dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
   }
   return json({ source: 'TMDB', updatedAt: dataset.updatedAt,
@@ -163,7 +170,7 @@ async function handleMovieArtwork(env) {
 }
 
 async function handleTMDBMedia(env, request, catalogue = false) {
-  if (env.TMDB_PREVIEW_ON_DEMAND !== 'true') return json({ error: 'Not available' }, 404);
+  if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
   const params = new URL(request.url).searchParams;
   const type = params.get('type') || 'movie';
   if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
@@ -195,7 +202,7 @@ async function handleTMDBMedia(env, request, catalogue = false) {
     await refreshTask(env, kind, '', async () => {
       const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
       return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org', territory: 'Global', checkedAt: today() };
-    }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'preview-on-demand');
+    }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'tmdb-request-on-demand');
     dataset = await loadDataset(env.DB, kind, '');
   }
   const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
@@ -205,13 +212,13 @@ async function handleTMDBMedia(env, request, catalogue = false) {
 
 async function handleDiscovery(env, request) {
   const country = countryOf(request, env);
-  // Private Preview refreshes TMDB on its first request and after the snapshot expires.
-  // Pages Functions have no cron; production leaves this opt-in flag unset.
-  if (env.TMDB_PREVIEW_ON_DEMAND === 'true') {
+  // Pages Functions have no cron. When TMDB is configured in the current
+  // environment, refresh approved discovery data on demand using D1 snapshots.
+  if (tmdbReady(env)) {
     const trending = await loadDataset(env.DB, 'trending-horror', country);
     if (trending.status !== 'current') {
       await refreshTask(env, 'trending-horror', country, () => refreshTrending(env, country),
-        36 * 60 * 60 * 1000, 'preview-on-demand');
+        36 * 60 * 60 * 1000, 'tmdb-request-on-demand');
     }
   }
   const kinds = ['coming-soon', 'streaming-availability', 'streaming-releases', 'theatrical-releases', 'trending-horror'];

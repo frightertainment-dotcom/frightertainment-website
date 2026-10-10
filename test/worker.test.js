@@ -289,8 +289,7 @@ test('private Preview loads TMDB posters on demand and keeps the bearer token se
   try {
     const env = { DB, DEFAULT_COUNTRY: 'GB', DISCOVERY_COUNTRIES: 'GB',
       TMDB_READ_ACCESS_TOKEN: 'fixture-token',
-      TMDB_NONCOMMERCIAL_USE_APPROVED: 'true', TMDB_ATTRIBUTION_READY: 'true',
-      TMDB_PREVIEW_ON_DEMAND: 'true' };
+      TMDB_NONCOMMERCIAL_USE_APPROVED: 'true', TMDB_ATTRIBUTION_READY: 'true' };
     const request = () => new Request('https://site.test/api/discovery?country=GB');
     const first = await worker.fetch(request(), env);
     assert.equal(first.status, 200);
