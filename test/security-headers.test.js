@@ -19,3 +19,12 @@ test('static responses use a restrictive CSP compatible with approved local asse
   assert.match(previewBuild, /sharedHeaders\s*=\s*await readFile/);
   assert.match(previewBuild, /X-Robots-Tag: noindex/);
 });
+
+test('shared static security headers set isolation and disallow cross-domain embedding',async()=>{
+  const headers=await readFile(new URL('../_headers',import.meta.url),'utf8');
+  for(const expected of ['Cross-Origin-Opener-Policy: same-origin','Cross-Origin-Resource-Policy: same-site','X-Permitted-Cross-Domain-Policies: none']){
+    assert.ok(headers.includes(expected),expected);
+  }
+  assert.doesNotMatch(headers,/script-src[^\n]*'unsafe-inline'/);
+  assert.doesNotMatch(headers,/script-src[^\n]*'unsafe-eval'/);
+});
