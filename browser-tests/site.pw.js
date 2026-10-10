@@ -126,6 +126,7 @@ test('homepage film search produces an accessible empty state', async ({ page })
 test('Movies removes empty date/score filters while retaining working search',async({page})=>{
   await page.goto('/movies.html');
   await expect(page.locator('.filter-chips,[data-filter],#trailers')).toHaveCount(0);
+  await page.locator('#movie-year').selectOption('all');
   await page.locator('#movie-search').fill('28 Weeks Later');
   await expect(page.locator('#results-count')).toContainText('1 selected film');
   await page.locator('#movie-search').fill('zz-no-match');
