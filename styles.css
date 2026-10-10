@@ -41,3 +41,7 @@
 @media(max-width:640px){.curated-grid{grid-template-columns:1fr}.curated-card{min-height:220px;padding:21px}.recommendations-section{padding:58px 0 70px}.curated-subhead{margin-top:55px}}
 
 @media(max-width:640px){.movie-card__headline{min-width:0}.movie-card__headline h3{flex:1;min-width:0;overflow-wrap:anywhere}.movie-card__score{flex:none}.movie-card__score--pending{letter-spacing:.3px}}
+
+/* TMDB poster artwork in source-linked discovery lists */
+.discovery-item--poster{justify-content:flex-start;align-items:flex-start}.tmdb-poster{display:block;width:58px;height:86px;flex:0 0 58px;object-fit:cover;background:#171112;border:1px solid #493039}.discovery-item__copy{min-width:0;display:grid;gap:7px}.discovery-item__copy>div{display:grid;gap:4px}.home-discovery__item--poster{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;align-items:start}.home-discovery__poster{width:48px;height:72px;object-fit:cover;background:#171112;border:1px solid #493039}.home-discovery__item--poster>div{min-width:0}
+.credits-main{padding-top:52px;padding-bottom:72px}.tmdb-notice{margin:12px 0;color:#b8abad;font-size:11px;line-height:1.6}.tmdb-notice a{color:#f3b9c0;text-decoration:underline;text-underline-offset:2px}

@@ -25,7 +25,9 @@
     const filmId = item.filmId && /^[a-z0-9-]+$/.test(item.filmId) ? item.filmId : '';
     const titleMarkup = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">${content}</a>` : `<div>${content}</div>`;
     const detailLink = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">FILM FILE</a>` : '';
-    return `<article class="discovery-item">${titleMarkup}<span class="discovery-item__source">${sourceLink(item)} ${detailLink}</span></article>`;
+    const posterPath = kind === 'trending-horror' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
+    const poster = posterPath ? `<img class="tmdb-poster" src="https://image.tmdb.org/t/p/w342${escapeHTML(posterPath)}" alt="Poster for ${escapeHTML(item.title)}" loading="lazy" decoding="async">` : '';
+    return `<article class="discovery-item${poster ? ' discovery-item--poster' : ''}">${poster}<div class="discovery-item__copy">${titleMarkup}<span class="discovery-item__source">${sourceLink(item)} ${detailLink}</span></div></article>`;
   };
   function render() {
     for (const kind of kinds) {

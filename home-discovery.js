@@ -28,7 +28,9 @@
         const date = item.releaseDate ? ` · ${escape(item.releaseDate)} (${escape(item.releaseTerritory || item.territory || '')})` : '';
         const extra = kind === 'streaming-releases' ? (item.releaseMode === 'unconfirmed' ? 'Release path unconfirmed' : escape(item.releaseMode)) : kind === 'trending-horror' ? (payloads[kind]?.status==='editorial'?'Recently added to UK horror streaming':'Weekly popularity · not a score') : '';
         const href = safeUrl(item.sourceUrl);
-        return `<article><strong>${escape(item.title)}</strong><span>${escape(item.provider || item.status || extra)}${date}</span><small>${href ? `<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(item.sourceName || 'Source')} →</a>` : ''} · ${escape(item.territory)} · checked ${escape(item.checkedAt)}</small></article>`;
+        const posterPath = kind === 'trending-horror' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
+        const poster = posterPath ? `<img class="home-discovery__poster" src="https://image.tmdb.org/t/p/w342${escape(posterPath)}" alt="Poster for ${escape(item.title)}" loading="lazy" decoding="async">` : '';
+        return `<article class="${poster ? 'home-discovery__item--poster' : ''}">${poster}<div><strong>${escape(item.title)}</strong><span>${escape(item.provider || item.status || extra)}${date}</span><small>${href ? `<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(item.sourceName || 'Source')} →</a>` : ''} · ${escape(item.territory)} · checked ${escape(item.checkedAt)}</small></div></article>`;
       }).join('');
       if (updated) {
         const time = kind === 'rankings' ? payloads.rankingsUpdatedAt : payloads[kind]?.updatedAt;

@@ -5,7 +5,7 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
 const publicFiles = [
-  'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html',
+  'index.html', 'movies.html', 'credits.html', 'all-horror-movies.html', 'archive-film.html',
   'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html',
   'film.html',
   'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',

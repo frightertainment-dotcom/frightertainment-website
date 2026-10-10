@@ -134,6 +134,15 @@ async function handleRanking(env, request) {
 
 async function handleDiscovery(env, request) {
   const country = countryOf(request, env);
+  // Private Preview refreshes TMDB on its first request and after the snapshot expires.
+  // Pages Functions have no cron; production leaves this opt-in flag unset.
+  if (env.TMDB_PREVIEW_ON_DEMAND === 'true') {
+    const trending = await loadDataset(env.DB, 'trending-horror', country);
+    if (trending.status !== 'current') {
+      await refreshTask(env, 'trending-horror', country, () => refreshTrending(env, country),
+        36 * 60 * 60 * 1000, 'preview-on-demand');
+    }
+  }
   const kinds = ['coming-soon', 'streaming-availability', 'streaming-releases', 'theatrical-releases', 'trending-horror'];
   const datasets = await Promise.all(kinds.map(async kind => [kind, await loadDataset(env.DB, kind, country)]));
   return json({ country, updatedAt: datasets.map(([, data]) => data.updatedAt).filter(Boolean).sort().at(-1) || null,

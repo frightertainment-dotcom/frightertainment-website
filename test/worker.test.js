@@ -251,3 +251,57 @@ test('approved horror film detail API returns source claims and hides unapproved
   current = null;
   assert.equal((await worker.fetch(new Request('https://site.test/api/films/pending-fixture'), { DB })).status, 404);
 });
+
+test('private Preview loads TMDB posters on demand and keeps the bearer token server-side', async () => {
+  const oldFetch = globalThis.fetch;
+  let providerRequests = 0;
+  let snapshot = null;
+  const DB = {
+    prepare(sql) {
+      return {
+        sql, values: [],
+        bind(...values) { this.values = values; return this; },
+        async first() {
+          if (!sql.includes('FROM current_datasets') || this.values[0] !== 'trending-horror') return null;
+          return snapshot;
+        },
+        async run() { return { meta: { changes: 1 } }; }
+      };
+    },
+    async batch(statements) {
+      const insert = statements.find(statement => statement.sql.includes('INSERT INTO dataset_snapshots'));
+      assert.ok(insert);
+      snapshot = {
+        payload_json: insert.values[9], expires_at: insert.values[8],
+        updated_at: insert.values[7], source_name: insert.values[3]
+      };
+    }
+  };
+  globalThis.fetch = async (url, options) => {
+    providerRequests++;
+    assert.equal(new URL(url).hostname, 'api.themoviedb.org');
+    assert.equal(options.headers.Authorization, 'Bearer fixture-token');
+    return new Response(JSON.stringify({
+      results: [{ id: 52, title: 'Fixture Horror', genre_ids: [27],
+        poster_path: '/fixture.jpg', release_date: '2026-10-10', popularity: 12 }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  try {
+    const env = { DB, DEFAULT_COUNTRY: 'GB', DISCOVERY_COUNTRIES: 'GB',
+      TMDB_READ_ACCESS_TOKEN: 'fixture-token',
+      TMDB_NONCOMMERCIAL_USE_APPROVED: 'true', TMDB_ATTRIBUTION_READY: 'true',
+      TMDB_PREVIEW_ON_DEMAND: 'true' };
+    const request = () => new Request('https://site.test/api/discovery?country=GB');
+    const first = await worker.fetch(request(), env);
+    assert.equal(first.status, 200);
+    const firstText = await first.text();
+    assert.equal(firstText.includes('fixture-token'), false);
+    const payload = JSON.parse(firstText);
+    assert.equal(payload.datasets['trending-horror'].status, 'current');
+    assert.equal(payload.datasets['trending-horror'].items[0].posterPath, '/fixture.jpg');
+    await worker.fetch(request(), env);
+    assert.equal(providerRequests, 1);
+  } finally {
+    globalThis.fetch = oldFetch;
+  }
+});
