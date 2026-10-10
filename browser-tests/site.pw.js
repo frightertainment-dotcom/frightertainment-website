@@ -366,6 +366,32 @@ test('public film pages expose no private publisher snapshots and keep the Frigh
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
 
+test('TMDB community chart and film page artwork stay distinct from Fright Rating', async ({ page }) => {
+  const tinyPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Yk4zh8AAAAASUVORK5CYII=', 'base64');
+  await page.route('**/image.tmdb.org/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: tinyPng }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ ratingKind: 'tmdb-community', updatedAt: '2026-10-10T10:00:00.000Z', rankedFilms: 1,
+      items: [{ filmId: 'tmdb-1400837', title: 'Other Mommy', position: 1,
+        averageScore: 72, voteCount: 300, posterPath: '/poster.jpg',
+        sourceUrl: 'https://www.themoviedb.org/movie/1400837', firstReleaseDate: '2026-10-09' }] })
+  }));
+  await page.route('**/api/movie-artwork', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ items: [{ id: 'other-mommy', title: 'Other Mommy', posterPath: '/poster.jpg',
+      voteAverage: 7.2, voteCount: 300, sourceUrl: 'https://www.themoviedb.org/movie/1400837' }] })
+  }));
+  await page.goto('/top-20/2026/');
+  await expect(page.locator('.ranking-row')).toHaveCount(1);
+  await expect(page.locator('.ranking-row__poster')).toHaveCount(1);
+  await expect(page.locator('#ranking-status')).toContainText('TMDB community rating');
+  await page.goto('/films/other-mommy/');
+  await expect(page.locator('.fr-movie-hero__poster')).toHaveCount(1);
+  await expect(page.locator('#film-detail')).toContainText('TMDB COMMUNITY RATING');
+  await expect(page.locator('#film-detail')).toContainText('300 TMDB viewer votes');
+  await expect(page.locator('.film-score--pending')).toHaveText('Not rated yet.');
+});
+
 test('Movies page does not promote one franchise at the expense of the horror archive',async({page})=>{
   await page.goto('/movies.html');
   await expect(page.locator('.hub-series')).toHaveCount(0);
