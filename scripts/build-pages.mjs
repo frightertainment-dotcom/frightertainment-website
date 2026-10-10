@@ -103,7 +103,7 @@ for (const year of rankingYears) {
 }
 
 // Roll the global navigation and homepage chart into the next year automatically.
-for (const filename of ['index.html','movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','film.html']) {
+for (const filename of ['index.html','movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html','film.html']) {
   const file = new URL('../' + filename, import.meta.url);
   let source = await readFile(file, 'utf8');
   source = source.replace(/\/top-20\/20\d{2}\//g, '/top-20/' + currentYear + '/')
