@@ -1422,7 +1422,7 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
   }
   .hub-section #movie-grid .movie-card__score{display:inline-block;max-width:100%;font-size:12px}
   .hub-section #movie-grid .movie-card__text{
-    font-size:13px!important;line-height:1.35;margin:9px 0;
+    font-size:14px!important;line-height:1.4;margin:9px 0;
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;
   }
   .hub-section #movie-grid .movie-card__release{font-size:12px;line-height:1.4}
