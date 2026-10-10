@@ -102,7 +102,7 @@
         const source=(item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' →</a>').join(' ');
         return '<article class="discovery-item"><div><strong><span class="ranking-position">#'+
           escapeHTML(item.position)+'</span> <a href="'+escapeHTML(href)+'">'+escapeHTML(item.title)+'</a></strong>'+
-          '<span>'+escapeHTML(item.averageScore)+'/100 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel)+
+          '<span>Fright Rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel)+
           '</span></div><span class="discovery-item__source">'+source+'</span></article>';
       }).join('');
     }

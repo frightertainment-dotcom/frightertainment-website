@@ -15,7 +15,7 @@
 <nav class="hub-tabs" aria-label="Main site sections"><a href="/">HOME</a><a href="/movies.html" class="active" aria-current="page">MOVIES</a><a href="/tv-shows.html">TV SHOWS</a><a href="/indie-movies.html">INDIE MOVIES</a><a href="/podcasts.html">PODCASTS</a><a href="/games.html">GAMES</a></nav>
 <button class="menu-toggle hub-menu-toggle" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Open additional navigation"><span></span><span></span><span></span></button>
 </div><nav id="mobile-nav" class="mobile-nav hub-extra-nav" aria-label="Additional navigation" hidden>
-<a href="/top-20/2026/">TOP 20 HORROR</a><a href="/editorial-standards.html">EDITORIAL STANDARDS</a>
+<a href="/top-20/2026/">TOP 20 HORROR</a>
 </nav></header><main id="main" class="shell horror-archive">
   <section class="hub-page-intro horror-archive__hero">
     <span class="hub-eyebrow">FRIGHTERTAINMENT · FILM HISTORY</span>
@@ -30,14 +30,21 @@
         <select id="archive-jump" aria-label="Jump to release year"></select>
       </label>
     </div>
-    <div class="horror-archive__source">This is a growing reference catalogue, <strong>not a claim that every film in every country has been indexed yet</strong>. The archive includes films catalogued as horror, including works released through cinema, home media, streaming and VOD; distribution formats are only stated when verified. Titles and original release years may be corrected as more sources become available.</div>
+    <div class="horror-vault-search">
+      <label for="archive-global-search">SEARCH EVERY YEAR</label>
+      <div class="horror-vault-search__controls"><input type="search" id="archive-global-search" autocomplete="off" placeholder="Search thousands of horror films…">
+      <button type="button" id="archive-global-clear" hidden>CLEAR</button></div>
+      <p id="archive-global-status" class="horror-vault-search__status" role="status">Or select any year below for an A–Z list.</p>
+      <div id="archive-global-results" class="horror-vault-search__results" hidden></div>
+    </div>
+    <div class="horror-archive__source">Explore documented horror cinema. The collection grows as more films are indexed.</div>
     <div id="archive-years" class="horror-archive__years" aria-live="polite"></div>
   </section>
   <section class="horror-archive__notes">
-    <h2>FROM THE FIRST FRIGHT TO TODAY</h2>
+    <h2>HORROR NEVER ENDS.</h2>
     <p><em>Le Manoir du diable</em> (1896), directed by Georges Méliès, is often regarded as the first horror film. Our archive begins there, including shorts as well as features. <a href="https://www.bfi.org.uk/film/903dde01-68ea-536a-9be3-471d59cf83bb/le-manoir-du-diable" target="_blank" rel="noopener noreferrer">BFI film record →</a></p>
     <p>Basic catalogue information may come from <a href="https://www.wikidata.org/wiki/Wikidata:Licensing" target="_blank" rel="noopener noreferrer">Wikidata's CC0 structured data</a>; each film opens a Frightertainment information page with links to its source and IMDb search, plus a direct IMDb link where an identifier is available. Frightertainment does not reproduce film posters or third-party review scores in this archive.</p>
     <a href="mailto:frightertainment@gmail.com?subject=Frightertainment%20Horror%20Archive%20Correction" class="hub-tile__link">SUGGEST A MISSING FILM OR CORRECTION →</a>
   </section>
 </main>
-<footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span><a href="/editorial-standards.html">EDITORIAL STANDARDS →</a></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/horror-archive.js" defer></script></body></html>
+<footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/horror-archive.js" defer></script></body></html>

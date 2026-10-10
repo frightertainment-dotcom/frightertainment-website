@@ -42,11 +42,18 @@ export async function calculateDailyRanking(db, now = new Date()) {
   }
   const publishedYears = snapshots.filter(row => row.status === 'published').length;
   const failedYears = snapshots.filter(row => row.status === 'failed').length;
-  const status = publishedYears === 0 ? 'failed' : failedYears === 0 ? 'published' : 'partial';
+  const status = snapshots.length === 0
+    ? 'failed'
+    : failedYears === 0
+      ? 'published'
+      : publishedYears === 0
+        ? 'failed'
+        : 'partial';
   return {
     updatedAt: now.toISOString(),
     rankedRows: snapshots.reduce((total, row) => total + row.rankedRows, 0),
     publishedYears,
+    succeededYears: publishedYears,
     failedYears,
     status,
     snapshots,
@@ -65,6 +72,22 @@ export default {
         status: result.status,
         years: result.snapshots?.map(row => row.year) || []
       });
+      if (result.status === 'skipped') return result;
+      if (result.status !== 'published') {
+        log('daily_staging_rankings_incomplete', {
+          status: result.status,
+          succeededYears: result.succeededYears,
+          failedYears: result.failedYears,
+          failedFilmYears: result.snapshots?.filter(row => row.status === 'failed').map(row => row.year) || []
+        });
+        // Surface partial failure to Cloudflare Cron monitoring, even when another
+        // year was successfully published. Empty runs must not report success either.
+        const errorMessage = result.failedYears > 0
+          ? `Failed to publish ${result.failedYears} of ${result.snapshots?.length || 0} annual ranking snapshots (run status: ${result.status})`
+          : `Annual ranking run status was ${result.status}: no yearly snapshots were published`;
+        throw new Error(errorMessage);
+      }
+      log('daily_staging_rankings_updated', { rankedRows: result.rankedRows, status: result.status, years: result.snapshots.map(row => row.year) });
       return result;
     } catch (error) {
       log('daily_staging_rankings_failed', { reason: errorDetails(error).message });

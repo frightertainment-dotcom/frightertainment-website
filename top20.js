@@ -134,9 +134,9 @@
       const score = document.createElement('div');
       score.className = 'ranking-row__score';
       const value = document.createElement('strong');
-      value.textContent = String(film.averageScore);
+      value.textContent = (film.averageScore / 10).toFixed(1);
       const scale = document.createElement('span');
-      scale.textContent = '/100';
+      scale.textContent = '/10';
       score.append(value, scale);
       row.append(place, details, score);
       chart.append(row);

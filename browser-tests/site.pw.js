@@ -11,7 +11,6 @@ const pages = [
   ['/indie-movies.html','INDIE'],
   ['/podcasts.html','HORROR'],
   ['/games.html','HORROR'],
-  ['/editorial-standards.html', 'EDITORIAL'],
   ['/top-20/', 'TOP 20'],
   ['/top-20/2026/', 'TOP 20 HORROR FILMS'],
   ['/films/28-days-later/', '28 Days Later'],
@@ -177,9 +176,9 @@ test('navigation works between all main sections and official movie source', asy
   await expect(official).toHaveAttribute('href', /^https:\/\//);
   await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
   await expect(page).toHaveURL(/podcasts\.html$/);
-  await expect(page.locator('main .hub-tile')).toHaveCount(9);
+  await expect(page.locator('main .hub-tile')).toHaveCount(12);
   await page.locator('.hub-tabs a[href="/indie-movies.html"]').click();
-  await expect(page.locator('main .hub-catalog .hub-tile')).toHaveCount(9);
+  await expect(page.locator('main .hub-catalog .hub-tile')).toHaveCount(12);
   await expect(page.locator('main')).not.toContainText('DETAILS TO BE ANNOUNCED');
 });
 test('compact dashboard remains navigable at 320px and 768px', async ({ browser }) => {
@@ -303,10 +302,10 @@ test('homepage artwork is first-party and movie posters are not copied without p
 });
 
 test('expanded TV, podcast, game and indie listings have source-linked cards', async ({page})=>{
-  for(const route of ['/tv-shows.html','/podcasts.html','/games.html','/indie-movies.html']){
+  for(const [route,count] of [['/tv-shows.html',8],['/podcasts.html',9],['/games.html',9],['/indie-movies.html',9]]){
     await page.goto(route);
-    await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(6);
-    await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(6);
+    await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(count);
+    await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(count);
   }
   await page.goto('/podcasts.html');
   await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
@@ -315,12 +314,19 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
   await expect(page.locator('a[href="https://qr.netflix.com/gb/title/80209229"]')).toHaveCount(0);
 });
 
-test('release calendar uses source claims and does not invent live UK showtimes',async({page})=>{
+test('upcoming release calendar excludes historical and already released films',async({page})=>{
   await page.goto('/movies.html');
-  await expect(page.locator('#hub-release-list .hub-release-row')).toHaveCount(8);
-  const urls=await page.locator('#hub-release-list a.hub-release-source').evaluateAll(a=>a.map(x=>x.getAttribute('href')));
-  expect(urls.every(x=>x.startsWith('https://'))).toBe(true);
-  await expect(page.locator('#hub-release-list')).toContainText('No UK availability inferred');
+  const calendar=page.locator('#hub-release-list');
+  await expect(calendar.locator('.hub-release-row').first()).toBeVisible();
+  const rows=await calendar.locator('.hub-release-row').evaluateAll(nodes=>
+    nodes.map(row=>({title:row.querySelector('div>a')?.textContent||'',date:row.querySelector('time')?.getAttribute('datetime')||'',url:row.querySelector('.hub-release-source')?.getAttribute('href')||''})));
+  const today=new Date().toISOString().slice(0,10);
+  expect(rows.length).toBeGreaterThan(0);
+  expect(rows.every(row=>row.date>today&&row.url.startsWith('https://'))).toBe(true);
+  expect(rows.map(row=>row.title)).not.toContain('28 Weeks Later');
+  expect(rows.map(row=>row.title)).not.toContain('28 Years Later: The Bone Temple');
+  await expect(calendar).not.toContainText('DATE PASSED');
+  await expect(calendar).not.toContainText('2007');
 });
 
 test('2026 is default and earlier films are under their actual original years', async ({page})=>{
@@ -340,7 +346,7 @@ test('2026 is default and earlier films are under their actual original years', 
   await expect(page.locator('#results-count')).toContainText('24 films');
 });
 
-test('public film pages expose no private publisher snapshots and keep the Fright Index pending',async({page})=>{
+test('public film pages expose no private publisher snapshots and keep the Fright Rating pending',async({page})=>{
   await page.goto('/movies.html');
   const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
   await expect(card).toBeVisible();
@@ -350,19 +356,16 @@ test('public film pages expose no private publisher snapshots and keep the Frigh
   expect(await catalogue.text()).not.toContain('criticReferenceSnapshots');
   await card.getByRole('link',{name:'28 Years Later: The Bone Temple'}).first().click();
   await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
-  await expect(page.locator('#film-detail')).toContainText('FRIGHT INDEX STATUS');
-  await expect(page.locator('#film-detail')).toContainText('Pending: no permission-cleared');
+  await expect(page.locator('#film-detail')).toContainText('FRIGHT RATING');
+  await expect(page.locator('#film-detail')).toContainText('PENDING /10');
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
 
-test('four franchise instalments link to historically correct film pages',async({page})=>{
+test('Movies page does not promote one franchise at the expense of the horror archive',async({page})=>{
   await page.goto('/movies.html');
-  const links=page.locator('.hub-series__items a');
-  await expect(links).toHaveCount(4);
-  await expect(links.nth(0)).toContainText('2002');
-  await expect(links.nth(1)).toContainText('2007');
-  await expect(links.nth(2)).toContainText('2025');
-  await expect(links.nth(3)).toContainText('2026');
+  await expect(page.locator('.hub-series')).toHaveCount(0);
+  await expect(page.locator('.hub-vault-portal')).toHaveCount(1);
+  await expect(page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]')).toBeVisible();
 });
 
 test('2026 chart shows only eligible rankings and factual unranked films',async({page})=>{
@@ -384,6 +387,30 @@ test('homepage score panel shows a compact pending state without unlicensed comp
   await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
   await expect(page.locator('#hub-ranking')).not.toContainText('%');
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('Movies leads clearly to the complete 9,700-film vault rather than presenting 24 as the whole library',async({page})=>{
+  await page.goto('/movies.html');
+  await expect(page.getByRole('heading',{name:/EVERY YEAR/})).toBeVisible();
+  await expect(page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]')).toBeVisible();
+  await expect(page.locator('#review-index')).toHaveCount(0);
+  await expect(page.locator('.hub-series')).toHaveCount(0);
+  await page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]').click();
+  await expect(page).toHaveURL(/all-horror-movies\.html$/);
+  await expect(page.locator('#archive-summary')).toContainText('9,');
+});
+
+test('global horror vault search finds historical titles without opening every year',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  const search=page.locator('#archive-global-search');
+  await expect(search).toBeVisible();
+  await search.fill('28 Weeks Later');
+  const results=page.locator('#archive-global-results');
+  await expect(results).toContainText('28 Weeks Later');
+  await expect(results).toContainText('2007');
+  await expect(results.locator('a').first()).toHaveAttribute('href','/films/28-weeks-later/');
+  await page.locator('#archive-global-clear').click();
+  await expect(results).toBeHidden();
 });
 
 test('All Horror Movies offers years 1896 through current year as initially closed accordions',async({page})=>{
@@ -802,14 +829,14 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
 });
 
 test('direct page loads declare the shared Frightertainment typefaces', async ({ page }) => {
-  for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/editorial-standards.html', '/all-horror-movies.html']) {
+  for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     await page.goto(path);
     const fontHref = await page.locator('link[rel="stylesheet"][href*="fonts.googleapis.com/css2"]').getAttribute('href');
     expect(fontHref).toContain('Barlow+Condensed');
     expect(fontHref).toContain('DM+Sans');
   }
   await page.goto('/movies.html');
-  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Cormorant Garamond');
+  await expect.poll(() => page.locator('.hub-page-intro h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Grenze Gotisch');
 });
 
 test('reduced-motion preference disables homepage transitions and artwork zoom', async ({ page }) => {
@@ -932,5 +959,15 @@ test('mobile copy, display headings and active navigation meet AA contrast in al
     expect(result.heading, `${theme} heading contrast`).toBeGreaterThanOrEqual(4.5);
     expect(result.accent, `${theme} accent contrast`).toBeGreaterThanOrEqual(4.5);
     expect(result.activeNav, `${theme} active navigation contrast`).toBeGreaterThanOrEqual(4.5);
+  }
+});
+
+
+test('removed Editorial Standards page is not served and public navigation has no stale links', async ({ page }) => {
+  const response = await page.goto('/editorial-standards.html');
+  expect(response?.status()).toBe(404);
+  for (const pathname of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/other-mommy/', '/top-20/2026/']) {
+    await page.goto(pathname);
+    await expect(page.locator('a[href$="editorial-standards.html"]')).toHaveCount(0);
   }
 });

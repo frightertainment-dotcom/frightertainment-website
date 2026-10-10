@@ -16,7 +16,9 @@
     "worker:dev": "wrangler dev --persist-to .wrangler/discovery",
     "worker:migrations:local": "wrangler d1 migrations apply frightertainment-discovery --local --persist-to .wrangler/discovery",
     "serve": "python3 -m http.server 8080",
-    "build:preview": "npm run build:pages && node scripts/build-preview.mjs"
+    "build:preview": "npm run build:pages && node scripts/build-preview.mjs",
+    "build:production": "npm run build:pages && node scripts/build-production.mjs",
+    "check:published": "node scripts/check-published-links.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",

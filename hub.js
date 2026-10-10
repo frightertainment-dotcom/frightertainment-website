@@ -1,4 +1,39 @@
 (() => {
+  // A rotating, sourced feature: prefer a film actually released recently, then
+  // the closest verified upcoming release. No fabricated availability or score.
+  const feature=document.querySelector('.hub-feature');
+  const films=Array.isArray(window.FR_MOVIES)?window.FR_MOVIES:[];
+  if(feature&&films.length){
+    const today=new Date().toISOString().slice(0,10);
+    const recent=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+    const future=new Date(Date.now()+45*86400000).toISOString().slice(0,10);
+    const releases=films.flatMap(film=>(film.claims||[])
+      .filter(c=>c.field==='releaseDate'&&/^\d{4}-\d{2}-\d{2}$/.test(c.value||'')&&
+        /^https:\/\//.test(c.source||'')&&/theatrical|cinema/i.test(c.label||''))
+      .map(claim=>({film,claim})));
+    const sortRecent=(a,b)=>b.claim.value.localeCompare(a.claim.value)||
+      a.film.title.localeCompare(b.film.title);
+    const sortUpcoming=(a,b)=>a.claim.value.localeCompare(b.claim.value)||
+      a.film.title.localeCompare(b.film.title);
+    const latest=releases.filter(x=>x.claim.value<=today&&x.claim.value>=recent).sort(sortRecent)[0];
+    const upcoming=releases.filter(x=>x.claim.value>today&&x.claim.value<=future).sort(sortUpcoming)[0];
+    const chosen=latest||upcoming;
+    if(chosen&&/^[a-z0-9-]+$/.test(chosen.film.id)){
+      const kicker=feature.querySelector('.hub-kicker');
+      const title=feature.querySelector('h3');
+      const description=feature.querySelector('.hub-tile__content p');
+      const link=feature.querySelector('.hub-tile__link');
+      if(kicker&&title&&description&&link){
+        const synopsis=(chosen.film.claims||[]).find(x=>x.field==='synopsis')?.value;
+        kicker.textContent=latest?'RECENT HORROR RELEASE · OFFICIAL FILM FILE':'COMING HORROR · OFFICIAL FILM FILE';
+        title.textContent=chosen.film.title;
+        description.textContent=typeof synopsis==='string'&&synopsis.length>15?
+          synopsis:'Enter the latest film file and explore its official release announcement.';
+        link.href='/films/'+encodeURIComponent(chosen.film.id)+'/';
+        link.setAttribute('aria-label','Explore '+chosen.film.title+' film details');
+      }
+    }
+  }
   const root = document.querySelector('#hub-ranking');
   if (!root) return;
 
@@ -175,7 +210,7 @@
       title.href = filmHref(item.filmId);
       const score = document.createElement('span');
       score.className = 'score';
-      score.textContent = item.averageScore + '/100';
+      score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
       const meta = document.createElement('div');
       meta.className = 'chart-meta';
       const count = document.createElement('span');
