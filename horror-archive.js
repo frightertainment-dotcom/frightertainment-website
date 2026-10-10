@@ -14,8 +14,9 @@
   const titleKey=s=>String(s||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('en-GB');
   const filmYear=film=>{
     const claims=Array.isArray(film.claims)?film.claims:[];
-    const year=claims.find(c=>['releaseYear','filmYear'].includes(c.field))?.value ||
-      claims.find(c=>c.field==='releaseDate')?.value?.slice(0,4);
+    // Only the source-verified original film-year claim belongs in the year
+    // archive. Territory release years and dates are separate facts.
+    const year=claims.find(c=>c.field==='filmYear')?.value;
     return /^\d{4}$/.test(String(year))?Number(year):null;
   };
   const officialLocal=(window.FR_MOVIES||[]).filter(f=>f.editorialStatus==='approved')
@@ -189,19 +190,35 @@
       });
       archive.append(details);
     }
-    jump.addEventListener('change',()=>{
+    const selectYear=(value,{scroll=true,focus=false}={})=>{
+      if(!/^\d{4}$/.test(String(value))||Number(value)<startYear||Number(value)>currentYear)return;
+      jump.value=String(value);
       const section=document.getElementById('horror-year-'+jump.value);
       if(!section)return;
+      archive.querySelectorAll('.horror-year[open]').forEach(openYear=>{
+        if(openYear!==section)openYear.open=false;
+      });
       section.open=true;
-      section.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
-      section.querySelector('summary')?.focus({preventScroll:true});
+      if(scroll)section.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+      if(focus)section.querySelector('summary')?.focus({preventScroll:true});
+    };
+    jump.addEventListener('change',()=>{
+      const value=jump.value;
+      selectYear(value,{focus:true});
+      history.pushState({year:value},'',`${location.pathname}?year=${encodeURIComponent(value)}`);
     });
     const fragment=new URLSearchParams(location.search).get('year');
     if(fragment&&/^\d{4}$/.test(fragment)&&Number(fragment)>=startYear&&Number(fragment)<=currentYear){
-      jump.value=fragment;
-      const section=document.getElementById('horror-year-'+fragment);
-      if(section){section.open=true;section.scrollIntoView({block:'start'});}
+      selectYear(fragment,{scroll:true});
     }
+    window.addEventListener('popstate',()=>{
+      const value=new URLSearchParams(location.search).get('year');
+      if(value&&/^\d{4}$/.test(value))selectYear(value,{scroll:true});
+      else{
+        jump.value='';
+        archive.querySelectorAll('.horror-year[open]').forEach(openYear=>{openYear.open=false;});
+      }
+    });
   }
   fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
     .then(async response=>{

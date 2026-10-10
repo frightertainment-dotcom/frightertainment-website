@@ -44,7 +44,7 @@
     heading.textContent = `Verified ${year} films awaiting eligible critic reviews`;
     const explanation = document.createElement('p');
     explanation.className = 'hub-ranking-watchlist__intro';
-    explanation.textContent = 'These source-verified film-year records are not ranked because they do not yet have three distinct, permission-cleared professional critic scores.';
+    explanation.textContent = 'Verified films that have not earned a place in the ranking yet.';
     section.append(heading, explanation);
 
     for (const film of films) {
@@ -161,7 +161,7 @@
       if (!count) {
         status.textContent = result?.stale === true
           ? 'Ranking snapshot is stale. No current verified ranking is available.'
-          : `Critic ranking pending. Verified critic scores are not yet available.${unrankedCount ? ` ${unrankedCount} source-verified film records are listed below without ranking positions.` : ''}`;
+          : `Critic ranking pending. Verified critic scores are not yet available.${unrankedCount ? ` ${unrankedCount} verified films remain unranked.` : ''}`;
         return;
       }
 
@@ -169,10 +169,10 @@
       const minimumCritics = Number.isInteger(result?.minimumCritics) ? result.minimumCritics : 3;
       status.textContent = result?.stale === true
         ? `Ranking data is stale. Showing the last valid published chart of ${count} film${count === 1 ? '' : 's'}.`
-        : `${rankedFilms} eligible film${rankedFilms === 1 ? '' : 's'} ranked. At least ${minimumCritics} distinct, verified critics are required per film.${unrankedCount ? ` ${unrankedCount} other verified film records remain unranked below.` : ''}`;
+        : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
     })
     .catch(() => {
-      status.textContent = 'Ranking unavailable. Verified ranking data could not be loaded; no score or position has been added.';
+      status.textContent = 'Ranking unavailable. No score or position has been added.';
       updated.textContent = 'Last successful ranking: unavailable';
       showUnrankedVerifiedFilms();
     });

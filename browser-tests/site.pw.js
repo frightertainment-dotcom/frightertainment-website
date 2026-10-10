@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
 const pages = [
-  ['/', 'WELCOME'],
+  ['/', 'COME CLOSER'],
   ['/movies.html','HORROR'],
   ['/all-horror-movies.html','ALL HORROR'],
   ['/archive-film.html?id=Q166385','A Terrible Night'],
@@ -113,7 +113,7 @@ test('dynamic film records escape hostile text and reject credential-bearing sou
   expect(await page.evaluate(() => window.__filmXssRan)).toBe(false);
 });
 
-for (const [path, heading] of [['/', 'WELCOME'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
+for (const [path, heading] of [['/', 'COME CLOSER'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
   test(`desktop visual layout: ${path}`, async ({ browser }) => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await page.goto(path);
@@ -295,7 +295,7 @@ test('film and Top 20 pages offer main-content skip links', async ({ page }) => 
 test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
   await page.goto('/');
   const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').backgroundImage);
-  expect(artURL).toContain('/assets/hub-haunted.svg');
+  expect(artURL).toContain('/assets/worlds/home-threshold.webp');
   await page.goto('/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
   await expect(page.locator('.movie-card__official a')).toHaveCount(8);
@@ -325,6 +325,12 @@ test('upcoming release calendar excludes historical and already released films',
   expect(rows.every(row=>row.date>today&&row.url.startsWith('https://'))).toBe(true);
   expect(rows.map(row=>row.title)).not.toContain('28 Weeks Later');
   expect(rows.map(row=>row.title)).not.toContain('28 Years Later: The Bone Temple');
+  const clayface=calendar.locator('.hub-release-row').filter({hasText:'Clayface'});
+  await expect(clayface).toHaveCount(1);
+  await expect(clayface.locator('time')).toHaveCount(2);
+  await expect(clayface.locator('.hub-release-source')).toHaveCount(2);
+  await expect(clayface).toContainText('North America');
+  await expect(clayface).toContainText('International');
   await expect(calendar).not.toContainText('DATE PASSED');
   await expect(calendar).not.toContainText('2007');
 });
@@ -350,14 +356,13 @@ test('public film pages expose no private publisher snapshots and keep the Frigh
   await page.goto('/movies.html');
   const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
   await expect(card).toBeVisible();
-  await expect(card.locator('.movie-card__score')).toContainText('FRIGHT');
-  await expect(card.locator('.movie-card__score')).not.toContainText('%');
+  await expect(card.locator('.movie-card__score')).toHaveCount(0);
   const catalogue=await page.request.get('/data/movies.js');
   expect(await catalogue.text()).not.toContain('criticReferenceSnapshots');
   await card.getByRole('link',{name:'28 Years Later: The Bone Temple'}).first().click();
   await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
   await expect(page.locator('#film-detail')).toContainText('FRIGHT RATING');
-  await expect(page.locator('#film-detail')).toContainText('PENDING /10');
+  await expect(page.locator('#film-detail .film-score--pending')).toHaveText('Not rated yet.');
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
 
@@ -462,6 +467,30 @@ test('year jump expands target section and search is scoped to it',async({page})
   await expect(page.locator('#horror-year-2007 .horror-year__search')).toBeVisible();
   await expect(page.locator('#horror-year-2026')).not.toHaveAttribute('open','');
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('archive year selection tracks browser back and forward without leaving stale years open',async({page})=>{
+  await page.goto('/all-horror-movies.html');
+  await page.selectOption('#archive-jump','2007');
+  await expect(page).toHaveURL(/\?year=2007$/);
+  await page.selectOption('#archive-jump','2026');
+  await expect(page).toHaveURL(/\?year=2026$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\?year=2007$/);
+  await expect(page.locator('#archive-jump')).toHaveValue('2007');
+  await expect(page.locator('#horror-year-2007')).toHaveAttribute('open','');
+  await expect(page.locator('#horror-year-2026')).not.toHaveAttribute('open','');
+  await page.goForward();
+  await expect(page).toHaveURL(/\?year=2026$/);
+  await expect(page.locator('#horror-year-2026')).toHaveAttribute('open','');
+  await expect(page.locator('#horror-year-2007')).not.toHaveAttribute('open','');
+});
+test('territory-only release announcements are not assigned to original film-year archive records',async({page})=>{
+  await page.goto('/all-horror-movies.html?year=2026');
+  const year=page.locator('#horror-year-2026');
+  await expect(year).toHaveAttribute('open','');
+  await expect(year.locator('.horror-year__film-title', {hasText:'Crawlers'})).toHaveCount(0);
+  await expect(year.locator('.horror-year__film-title', {hasText:'Clayface'})).toHaveCount(0);
+  await expect(year.locator('.horror-year__film-title', {hasText:'Werwulf'})).toHaveCount(0);
 });
 
 test('all horror movie navigation is a sub-tab under main Movies tab',async({page})=>{
@@ -619,6 +648,21 @@ test('curated studio films have atmospheric original poster artwork, crew and so
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('DIRECTED BY');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('FEATURED CAST');
   await expect(page.locator('.fr-movie-hero__browse')).toHaveAttribute('href','/all-horror-movies.html?year=2026');
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('long horror titles wrap at word boundaries and the title-led art remains within a narrow mobile viewport',async({page})=>{
+  await page.setViewportSize({width:320,height:740});
+  await page.goto('/films/28-years-later-bone-temple/');
+  const measurements=await page.locator('.fr-movie-hero__art > strong').evaluate(el=>({
+    text:el.textContent,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,
+    overflowWrap:getComputedStyle(el).overflowWrap,wordBreak:getComputedStyle(el).wordBreak,
+    fontSize:parseFloat(getComputedStyle(el).fontSize),lineHeight:parseFloat(getComputedStyle(el).lineHeight)
+  }));
+  expect(measurements.text).toBe('28 Years Later: The Bone Temple');
+  expect(measurements.scrollWidth).toBeLessThanOrEqual(measurements.clientWidth+1);
+  expect(measurements.overflowWrap).not.toBe('anywhere');
+  expect(measurements.wordBreak).not.toBe('break-all');
+  expect(measurements.fontSize).toBeGreaterThanOrEqual(28);
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('Top 20 leaves unreviewed archive candidates unnumbered and does not pad the verified catalogue',async({page})=>{
@@ -900,6 +944,17 @@ test('six themed environments and review pages have desktop and mobile browser e
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: `${out}/${name}-mobile-first.png` });
     await page.screenshot({ path: `${out}/${name}-mobile-full.png`, fullPage: true });
+    if (['tv-shows', 'podcasts', 'games'].includes(name)) {
+      const firstRecommendation = page.locator('main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile').first();
+      const title = firstRecommendation.locator('h3');
+      const action = firstRecommendation.locator('.hub-tile__link');
+      await expect(title).toBeVisible();
+      await expect(action).toBeVisible();
+      const titleBox = await title.boundingBox();
+      const actionBox = await action.boundingBox();
+      expect(titleBox.y + titleBox.height).toBeLessThanOrEqual(844);
+      expect(actionBox.y + actionBox.height).toBeLessThanOrEqual(844);
+    }
     if (name === 'home') await page.locator('.hub-charts').screenshot({ path: `${out}/homepage-chart-mobile.png` });
   }
   for (const [name, route] of [['annual-chart-2026', '/top-20/2026/'], ['movie-archive', '/all-horror-movies.html']]) {

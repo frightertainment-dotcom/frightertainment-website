@@ -40,6 +40,8 @@
   const year = new Date().getUTCFullYear();
   const heading = document.querySelector('.hub-charts h2 em');
   if (heading) heading.textContent = 'FILMS · ' + year;
+  const chartFoot = document.querySelector('.hub-charts__foot');
+  if (chartFoot) chartFoot.textContent = year + ' · SOURCE-LINKED RANKINGS';
   const fullChart = document.querySelector('.hub-charts__all');
   if (fullChart) fullChart.href = '/top-20/' + year + '/';
   const isCompact = matchMedia('(max-width: 900px)').matches;
@@ -117,14 +119,18 @@
     let animationPosition = list.scrollTop;
     let manualPause = motionPreference.matches;
     let transientPause = false;
+    let inViewport = !('IntersectionObserver' in window);
     let reachedEnd = false;
     const updateControl = () => {
-      button.setAttribute('aria-pressed', String(!manualPause && !reachedEnd));
-      button.textContent = reachedEnd ? 'Restart slow chart scroll' : manualPause ? 'Start slow chart scroll' : 'Pause chart scroll';
+      button.disabled = motionPreference.matches;
+      button.setAttribute('aria-pressed', String(!manualPause && !reachedEnd && !motionPreference.matches));
+      button.textContent = motionPreference.matches ? 'Slow scroll off (reduced motion)' : reachedEnd ? 'Restart slow chart scroll' : manualPause ? 'Start slow chart scroll' : 'Pause chart scroll';
     };
     const stop = () => { if (frame) cancelAnimationFrame(frame); frame = 0; previousTime = 0; };
     const step = time => {
-      if (manualPause || transientPause || reachedEnd || motionPreference.matches) { stop(); return; }
+      if (manualPause || transientPause || !inViewport || document.hidden || reachedEnd || motionPreference.matches) { stop(); return; }
+      if (list.scrollHeight - list.clientHeight <= 2) { controls.hidden = true; stop(); return; }
+      controls.hidden = false;
       if (previousTime) {
         // Keep fractional progress outside scrollTop: Chromium can quantize its readback,
         // which otherwise discards each sub-pixel increment and stalls this slow scroll.
@@ -138,7 +144,7 @@
       frame = requestAnimationFrame(step);
     };
     const play = () => {
-      if (motionPreference.matches) return;
+      if (motionPreference.matches || !inViewport || document.hidden) return;
       if (reachedEnd) { list.scrollTop = 0; animationPosition = 0; reachedEnd = false; }
       else animationPosition = list.scrollTop;
       manualPause = false;
@@ -147,6 +153,7 @@
       frame = requestAnimationFrame(step);
     };
     const pause = () => { manualPause = true; stop(); updateControl(); };
+    controls.hidden = true;
     button.addEventListener('click', () => manualPause || reachedEnd ? play() : pause());
     list.addEventListener('pointerenter', () => { transientPause = true; stop(); });
     list.addEventListener('pointerleave', () => { transientPause = false; if (!manualPause && !reachedEnd) play(); });
@@ -163,8 +170,25 @@
     });
     list.addEventListener('wheel', pause, { passive: true });
     list.addEventListener('touchstart', pause, { passive: true, once: true });
+    list.addEventListener('pointerdown', pause, { passive: true });
+    list.addEventListener('keydown', event => {
+      if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)) pause();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else if (!manualPause && !transientPause && inViewport && !reachedEnd) play();
+    });
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        inViewport = entries[0]?.isIntersecting === true;
+        if (!inViewport) stop();
+        else if (!manualPause && !transientPause && !document.hidden && !reachedEnd) play();
+      }, { threshold: 0.15 });
+      observer.observe(list);
+    }
     motionPreference.addEventListener?.('change', event => {
       if (event.matches) { manualPause = true; stop(); }
+      else { manualPause = false; if (inViewport && !document.hidden) play(); }
       updateControl();
     });
     updateControl();
@@ -264,7 +288,7 @@
     } else if (data?.stale === true) {
       content.push(createState('Ranking data may be out of date', 'No current verified ranking is available.', 'stale'));
     } else {
-      content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available. A film needs at least three distinct, permission-cleared professional critics to qualify.'));
+      content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available.'));
     }
     const unranked = renderUnranked(year, rendered.ids);
     if (unranked) content.push(unranked);
@@ -278,7 +302,7 @@
     })
     .then(setResult)
     .catch(() => {
-      root.replaceChildren(createState('Ranking unavailable', 'Verified critic scores could not be refreshed. Please try again later.', 'unavailable'));
+      root.replaceChildren(createState('Ranking unavailable', 'The annual chart could not be refreshed. Please try again later.', 'unavailable'));
       const unranked = renderUnranked(year);
       if (unranked) root.append(unranked);
     })

@@ -173,22 +173,19 @@ test('staging daily ranking reports partial when one year publishes and another 
   const originalLog = console.log;
   const scheduledEvents = [];
   console.log = value => scheduledEvents.push(JSON.parse(value));
-  let result;
   try {
-    result = await stagingRankingWorker.scheduled({}, { DB });
+    await assert.rejects(stagingRankingWorker.scheduled({}, { DB }), /Failed to publish 1 of 2 annual ranking snapshots/);
   } finally {
     console.log = originalLog;
   }
   assert.equal(batches.length, 1);
-  assert.deepEqual(result.snapshots.map(row => [row.year, row.status]), [[2025, 'published'], [2026, 'failed']]);
-  assert.equal(result.status, 'partial');
-  assert.equal(result.publishedYears, 1);
-  assert.equal(result.failedYears, 1);
+  assert.deepEqual(scheduledEvents.find(event => event.event === 'daily_staging_rankings_run').years, [2025, 2026]);
+  assert.equal(scheduledEvents.find(event => event.event === 'daily_staging_rankings_run').status, 'partial');
+  assert.equal(scheduledEvents.find(event => event.event === 'daily_staging_rankings_run').publishedYears, 1);
+  assert.equal(scheduledEvents.find(event => event.event === 'daily_staging_rankings_run').failedYears, 1);
   assert.equal(failureLogs.length, 1);
-  assert.equal(scheduledEvents.at(-1).event, 'daily_staging_rankings_run');
-  assert.equal(scheduledEvents.at(-1).status, 'partial');
-  assert.equal(scheduledEvents.at(-1).publishedYears, 1);
-  assert.equal(scheduledEvents.at(-1).failedYears, 1);
+  assert.equal(scheduledEvents.at(-2).event, 'daily_staging_rankings_incomplete');
+  assert.equal(scheduledEvents.at(-1).event, 'daily_staging_rankings_failed');
 });
 
 test('staging daily ranking does not report published when no annual snapshot is created', async () => {
