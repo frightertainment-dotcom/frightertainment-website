@@ -1,4 +1,5 @@
 import { validateDataset } from '../src/core.js';
+import { tmdbRequest, sanitizeMedia } from './tmdb-media.js';
 
 const BASE = 'https://api.themoviedb.org/3';
 const posterPath = value => /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(value || '') ? value : null;
@@ -64,14 +65,17 @@ export async function refreshCommunityChart(env, year) {
 export async function refreshMovieArtwork(env, db) {
   const { results: approvedFilms = [] } = await db.prepare(`SELECT film_id AS id, title, release_year AS year, tmdb_id AS tmdbId
     FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1
-    ORDER BY film_id LIMIT 100`).all();
+    ORDER BY film_id LIMIT 36`).all();
   // Source-checked film files that have not yet been copied into the canonical D1 table.
   const extraFilms = [
     { id: 'other-mommy', title: 'Other Mommy', year: 2026, tmdbId: 1400837 },
     { id: '28-days-later', title: '28 Days Later', year: 2002 },
     { id: '28-weeks-later', title: '28 Weeks Later', year: 2007 }
   ];
-  const films = [...approvedFilms, ...extraFilms.filter(film => !approvedFilms.some(row => row.id === film.id))];
+  // Reserve at most 40 TMDB requests, leaving room for the D1 read/write/log calls
+  // on Cloudflare plans with a 50-subrequest ceiling. Further titles use /api/media.
+  const films = [...approvedFilms, ...extraFilms.filter(film => !approvedFilms.some(row => row.id === film.id))].slice(0, 36);
+  let enrichmentRequestsRemaining = 40 - films.length;
   // Verified editorial title variant: TMDB omits the sequel number in this entry.
   const verifiedIds = { 'ready-or-not-2': 1266127 };
   const results = new Array(films.length);
@@ -83,25 +87,34 @@ export async function refreshMovieArtwork(env, db) {
       try {
         const pinnedId = film.tmdbId || verifiedIds[film.id];
         const response = pinnedId
-          ? await tmdb(env, `/movie/${pinnedId}`, { language: 'en-GB' })
+          ? await tmdb(env, `/movie/${pinnedId}`, { language: 'en-US', append_to_response: 'videos,release_dates' })
           : await tmdb(env, '/search/movie', { query: film.title, include_adult: false, language: 'en-GB' });
         const candidates = pinnedId ? [response] : (response.results || []);
         const matches = candidates.filter(item => pinnedId || normalize(item.title) === normalize(film.title) ||
           normalize(item.original_title) === normalize(film.title));
-        const match = matches.filter(item => {
+        const nearby = matches.filter(item => {
           const releaseYear = Number(String(item.release_date || '').slice(0, 4));
           return releaseYear >= film.year - 1 && releaseYear <= film.year + 1;
-        }).sort((a, b) => Math.abs(Number(a.release_date.slice(0, 4)) - film.year) -
-            Math.abs(Number(b.release_date.slice(0, 4)) - film.year) || b.popularity - a.popularity)[0];
-        if (match && posterPath(match.poster_path)) results[index] = {
+        });
+        const exactYear = nearby.filter(item => Number(item.release_date.slice(0, 4)) === Number(film.year));
+        const match = pinnedId ? nearby[0] : exactYear.length === 1 ? exactYear[0] : exactYear.length === 0 && nearby.length === 1 ? nearby[0] : null;
+        if (match && posterPath(match.poster_path)) {
+          let metadata = sanitizeMedia(match, 'movie', env.DEFAULT_COUNTRY || 'GB');
+          if (!pinnedId && enrichmentRequestsRemaining > 0) {
+            enrichmentRequestsRemaining--;
+            try { metadata = sanitizeMedia(await tmdbRequest(env, `/movie/${match.id}`, { language: 'en-US', append_to_response: 'videos,release_dates' }), 'movie', env.DEFAULT_COUNTRY || 'GB') || metadata; } catch { /* Retain the matched basic metadata if enrichment is unavailable. */ }
+          }
+          results[index] = {
+          ...metadata,
           id: film.id, title: film.title, posterPath: posterPath(match.poster_path),
           tmdbId: match.id,
-          voteAverage: Number.isFinite(match.vote_average) && match.vote_average >= 0 && match.vote_average <= 10 ? match.vote_average : null,
-          voteCount: Number.isInteger(match.vote_count) && match.vote_count >= 0 ? match.vote_count : null,
+          voteAverage: metadata?.voteAverage ?? null,
+          voteCount: metadata?.voteCount ?? 0,
           sourceName: 'TMDB',
           sourceUrl: `https://www.themoviedb.org/movie/${match.id}`,
           territory: 'Global', checkedAt: day()
         };
+        }
       } catch { /* One missing title must not hide the other verified posters. */ }
     }
   }

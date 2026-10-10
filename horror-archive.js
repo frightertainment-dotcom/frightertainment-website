@@ -1,5 +1,5 @@
 /* All Horror Movies: indexed year-by-year titles from first-party film files
- * and the growing CC0 Wikidata reference snapshot. No licensed artwork/ratings.
+ * and the growing CC0 Wikidata reference snapshot, enriched through TMDB.
  * Rows render when a year is expanded, even for very large historic catalogues.
  */
 (() => {
@@ -29,14 +29,14 @@
       source:'Frightertainment verified film file',
       local:true
     })).filter(f=>f.year>=startYear&&f.year<=currentYear);
-  const validRecord=x=>x && /^Q[1-9][0-9]*$/.test(x.qid||'') &&
+  const validRecord=x=>x && !x.excludedFromMovieArchive && /^Q[1-9][0-9]*$/.test(x.qid||'') &&
     typeof x.title==='string' && x.title.trim().length>1 && x.title.length<=240 &&
     Number.isInteger(x.year) && x.year>=startYear && x.year<=currentYear+2 &&
     (!x.imdbId || /^tt\d{7,10}$/.test(x.imdbId));
   const normalizeWikidata=x=>({
     id:'wd:'+x.qid,
     title:x.title.trim(),
-    year:x.year,
+    year:x.year,imdbId:x.imdbId,
     // Always land on our own reliable detail page first. External IMDb records
     // can disappear, block access, or contain stale/mismatched Wikidata IDs.
     href:'/archive-film.html?id='+encodeURIComponent(x.qid),
@@ -49,7 +49,7 @@
     Number.isInteger(x.year) && x.year>=startYear && x.year<=currentYear &&
     /^https:\/\//.test(x.url||'');
   const normalizeManual=x=>({
-    id:x.id,title:x.title.trim(),year:x.year,
+    id:x.id,title:x.title.trim(),year:x.year,imdbId:x.imdbId,
     href:'/archive-film.html?id='+encodeURIComponent(x.id),
     linkLabel:'FILM DETAILS',
     source:'Manually checked source',local:true
@@ -58,6 +58,8 @@
   const grouped=new Map(years.map(y=>[y,[]]));
   const selectSource=raw=>{
     const records=new Map();
+    const imdbCounts=new Map();
+    for(const item of (raw?.films||[]))if(item.imdbId)imdbCounts.set(item.imdbId,(imdbCounts.get(item.imdbId)||0)+1);
     for(const record of (raw?.films||[])){
       if(validRecord(record)) records.set('wd:'+record.qid,normalizeWikidata(record));
     }
@@ -71,6 +73,7 @@
     // First-party film pages take priority when a title/year appears in Wikidata.
     const localKeys=new Set(officialLocal.map(x=>x.year+'|'+titleKey(x.title)));
     for(const record of records.values()){
+      if(record.imdbId&&imdbCounts.get(record.imdbId)>1)delete record.imdbId;
       if(record.year>currentYear || localKeys.has(record.year+'|'+titleKey(record.title)))continue;
       grouped.get(record.year)?.push(record);
     }
@@ -102,7 +105,7 @@
         const a=document.createElement('a');
         a.href=film.href;
         a.className='horror-vault-search__result';
-        a.append(node('strong','',film.title),node('span','',film.year+' · FILM DETAILS →'));
+        addMedia(a,film,node('strong','',film.title),film.year+' · FILM DETAILS →');
         results.append(a);
       }
       if(!matches.length)results.append(node('p','horror-year__empty','No matching film found. Try an alternative title.'));
@@ -116,6 +119,19 @@
     if(text!==undefined)n.textContent=text;
     return n;
   };
+  function addMedia(container,film,title,detail){
+    container.dataset.mediaType='movie';
+    container.dataset.mediaTitle=film.id==='manual:le-manoir-du-diable-1896'?'Le Manoir du diable':film.title;
+    container.dataset.mediaYear=String(film.year);
+    if(film.imdbId)container.dataset.mediaImdb=film.imdbId;
+    const poster=node('img','archive-media__poster');
+    poster.alt=film.title+' poster';poster.loading='lazy';poster.decoding='async';poster.hidden=true;
+    poster.dataset.mediaField='poster';
+    const copy=node('span','archive-media__copy');
+    const rating=node('span','archive-media__rating','TMDB rating loading…');rating.dataset.mediaField='rating';
+    copy.append(title,rating,node('span','horror-year__film-type',detail));
+    container.append(poster,copy);
+  }
   function renderYearContents(year,container){
     const items=grouped.get(year)||[];
     const panel=node('div','horror-year__panel');
@@ -132,8 +148,7 @@
       link.href=item.href;
       if(!item.local){link.target='_blank';link.rel='noopener noreferrer';}
       link.setAttribute('aria-label','View film information for '+item.title+' ('+year+')');
-      const type=node('span','horror-year__film-type',item.linkLabel);
-      link.append(node('span','horror-year__film-title',item.title),type);
+      addMedia(link,item,node('span','horror-year__film-title',item.title),item.linkLabel);
       // Entire card, including the right-hand FILM DETAILS label, is clickable.
       li.append(link);
       list.append(li);
@@ -161,10 +176,7 @@
     enableVaultSearch();
     const total=Array.from(grouped.values()).reduce((n,entries)=>n+entries.length,0);
     const yearsWithFilms=Array.from(grouped.values()).filter(entries=>entries.length).length;
-    const stamp=typeof raw?.updatedAt==='string'&&/^\d{4}-\d{2}-\d{2}/.test(raw.updatedAt)?
-      ' · Wikidata snapshot '+raw.updatedAt.slice(0,10):' · starter catalogue';
-    summary.textContent=total.toLocaleString('en-GB')+' indexed film links across '+yearsWithFilms+
-      ' years · 1896–'+currentYear+stamp+' · archive grows as verified records are added';
+    summary.textContent=total.toLocaleString('en-GB')+' horror films across '+yearsWithFilms+' years · 1896–'+currentYear;
     archive.replaceChildren();jump.replaceChildren();
     for(const year of years){
       const option=node('option','',String(year));option.value=String(year);jump.append(option);

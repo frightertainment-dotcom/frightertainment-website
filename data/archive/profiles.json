@@ -4697,7 +4697,13 @@
         }
       ],
       "sourceUrl": "https://www.wikidata.org/wiki/Q114764421",
-      "checkedAt": "2026-10-09"
+      "checkedAt": "2026-10-09",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q114764421",
+        "checkedAt": "2026-10-10"
+      }
     },
     "Q114802043": {
       "qid": "Q114802043",
@@ -6878,7 +6884,13 @@
         }
       ],
       "sourceUrl": "https://www.wikidata.org/wiki/Q130784448",
-      "checkedAt": "2026-10-09"
+      "checkedAt": "2026-10-09",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Comic book series, not an individual movie",
+        "sourceUrl": "https://www.dc.com/comics/absolute-green-lantern-2025/absolute-green-lantern-2025-1",
+        "checkedAt": "2026-10-10"
+      }
     },
     "Q131169946": {
       "qid": "Q131169946",

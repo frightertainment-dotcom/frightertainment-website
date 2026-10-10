@@ -35,19 +35,14 @@
       }
     }
   }
-  if (feature?.dataset.filmId) {
-    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => {
-        const item = data?.items?.find(value => value.id === feature.dataset.filmId);
-        if (!/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item?.posterPath || '')) return;
-        const image = document.createElement('img');
-        image.className = 'hub-feature__poster';
-        image.alt = 'TMDB poster for ' + item.title;
-        image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
-        image.addEventListener('error', () => image.remove(), { once: true });
-        feature.prepend(image);
-      }).catch(() => {});
+  if(feature?.dataset.filmId){
+    const movie=films.find(x=>x.id===feature.dataset.filmId);
+    feature.dataset.mediaType='movie';feature.dataset.mediaTitle=movie.title;feature.dataset.mediaEager='true';
+    feature.dataset.mediaYear=String((movie.claims||[]).find(x=>x.field==='filmYear')?.value || (movie.claims||[]).find(x=>x.field==='releaseDate')?.value.slice(0,4)||'');
+    const img=document.createElement('img');img.className='hub-feature__poster';img.dataset.mediaField='poster';img.hidden=true;feature.prepend(img);
+    const p=feature.querySelector('.hub-tile__content p');p.dataset.mediaField='overview';
+    const rating=document.createElement('span');rating.className='hub-feature__rating';rating.dataset.mediaField='rating';p.before(rating);
+    const button=document.createElement('button');button.className='fr-trailer-button';button.type='button';button.dataset.mediaField='trailer';button.hidden=true;feature.querySelector('.hub-tile__content').append(button);
   }
   const root = document.querySelector('#hub-ranking');
   if (!root) return;
@@ -247,7 +242,7 @@
       position.textContent = '#' + item.position;
       const title = document.createElement('a');
       title.textContent = item.title;
-      title.href = ratingKind === 'tmdb-community' ? safeSource(item.sourceUrl) || '/movies.html' : filmHref(item.filmId);
+      title.href = ratingKind === 'tmdb-community' ? '/media.html?type=movie&id='+encodeURIComponent(item.tmdbId || String(item.filmId).replace('tmdb-','')) : filmHref(item.filmId);
       const score = document.createElement('span');
       score.className = 'score';
       score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
@@ -256,6 +251,7 @@
       const count = document.createElement('span');
       count.textContent = ratingKind === 'tmdb-community' ? `${item.voteCount} TMDB community votes` : `${item.criticCount} distinct critics`;
       meta.append(count);
+      const trailer=document.createElement('button');trailer.className='fr-trailer-button';trailer.type='button';trailer.dataset.mediaTrailer='';trailer.dataset.mediaType='movie';trailer.dataset.tmdbId=String(item.tmdbId || String(item.filmId).replace('tmdb-',''));trailer.dataset.trailerTitle=item.title;trailer.textContent='▶ TRAILER';meta.append(trailer);
       const sources = (Array.isArray(item.sources) ? item.sources : []).slice(0, 4);
       for (const source of sources) {
         const href = safeSource(source?.url);

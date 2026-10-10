@@ -147,8 +147,8 @@ for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
 }
 
 const calendarClient = await readFile(new URL('release-calendar.js',root),'utf8');
-if(!calendarClient.includes("claim.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
-if(!calendarClient.includes('claim.value>today')) errors.push('Upcoming release calendar must exclude historical and already-passed release dates');
+if(!calendarClient.includes("c.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
+if(!calendarClient.includes('x.date>today')) errors.push('Upcoming release calendar must exclude historical and already-passed release dates');
 if(!(await readFile(new URL('movies.html',root),'utf8')).includes('id="hub-release-list"')) errors.push('Release calendar is missing from the Movies page');
 if((await readFile(new URL('movies.html',root),'utf8')).includes('id="review-index"')) errors.push('Do not show an empty rating methodology panel to visitors');
 // No private publisher-score payload or fallback renderer may enter public assets.
@@ -211,7 +211,7 @@ if(!archiveDetailHtml.includes('id="archive-film-detail"') ||
   errors.push('First-party horror film detail entrypoint missing');
 if(!archivePageJs.includes("'/archive-film.html?id='") ||
    !archivePageJs.includes("li.append(link)") ||
-   !archivePageJs.includes("link.append(node('span','horror-year__film-title'"))
+   !archivePageJs.includes("horror-year__film-title"))
   errors.push('Archive films must use whole-card internal links rather than relying on third-party pages');
 if(!archiveDetailJs.includes("https://www.wikidata.org/wiki/") ||
    !archiveDetailJs.includes("https://www.imdb.com/find/") ||

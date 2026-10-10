@@ -101,7 +101,7 @@
 
     for (const film of valid) {
       const row = document.createElement('article');
-      row.className = 'ranking-row';
+      row.className = 'ranking-row';row.dataset.mediaType='movie';row.dataset.tmdbId=String(film.tmdbId || String(film.filmId).replace('tmdb-',''));
       const place = document.createElement('div');
       place.className = 'ranking-row__place';
       const position = document.createElement('strong');
@@ -114,7 +114,7 @@
       details.className = 'ranking-row__film';
       const heading = document.createElement('h2');
       const title = document.createElement('a');
-      title.href = ratingKind === 'tmdb-community' ? safeHttps(film.sourceUrl) || '/movies.html' : filmHref(film.filmId);
+      title.href = ratingKind === 'tmdb-community' ? '/media.html?type=movie&id='+encodeURIComponent(film.tmdbId || String(film.filmId).replace('tmdb-','')) : filmHref(film.filmId);
       title.textContent = film.title;
       heading.append(title);
       const sourceList = document.createElement('p');
@@ -130,7 +130,7 @@
         link.textContent = `${String(source.publication || 'Review source').slice(0, 100)} · ${String(source.territory || 'Territory not stated').slice(0, 60)} · checked ${String(source.checkedAt || 'date unavailable').slice(0, 10)}`;
         sourceList.append(link);
       }
-      details.append(heading, sourceList);
+      const trailer=document.createElement('button');trailer.type='button';trailer.className='fr-trailer-button';trailer.dataset.mediaTrailer='';trailer.dataset.trailerTitle=film.title;trailer.textContent='▶ PLAY TRAILER';details.append(heading, sourceList,trailer);
 
       const score = document.createElement('div');
       score.className = 'ranking-row__score';
@@ -186,7 +186,7 @@
       const minimumCritics = Number.isInteger(result?.minimumCritics) ? result.minimumCritics : 3;
       status.textContent = result?.stale === true
         ? `Ranking data is stale. Showing the last valid published chart of ${count} film${count === 1 ? '' : 's'}.`
-        : ratingKind === 'tmdb-community' ? `${rankedFilms} horror film${rankedFilms === 1 ? '' : 's'} ranked by average TMDB community rating, with at least 50 votes each. These are viewer scores, not critic or Fright Ratings.` : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
+        : ratingKind === 'tmdb-community' ? `${rankedFilms} horror film${rankedFilms === 1 ? '' : 's'} ranked by average TMDB community rating, with at least 50 votes each. Scores are based on TMDB viewer votes.` : `${rankedFilms} film${rankedFilms === 1 ? '' : 's'} ranked.${unrankedCount ? ` ${unrankedCount} more verified films remain unranked below.` : ''}`;
     })
     .catch(() => {
       status.textContent = 'Ranking unavailable. No score or position has been added.';

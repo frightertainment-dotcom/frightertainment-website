@@ -50,7 +50,7 @@ test('generated film detail templates present a synopsis once and retain the sou
     assert.equal((html.match(/class="fr-movie-hero__synopsis"/g) || []).length, 1, `${file} should show its overview once`);
     assert.doesNotMatch(html, /class="film-page__synopsis"/, `${file} should not repeat its synopsis in a second prominent block`);
     assert.match(html, /class="source-list"/, `${file} must retain the sourced claim list`);
-    assert.match(html, /Not rated yet\./, `${file} must keep the empty rating truthful and compact`);
+    assert.doesNotMatch(html, /<h2>FRIGHT RATING<\/h2>/, `${file} must omit the retired Fright Rating section`);
     assert.doesNotMatch(html, /DAILY · VERIFIED|Updated by calendar date|permission-cleared reviews are not available/i, `${file} should not expose operational copy`);
   }
 });

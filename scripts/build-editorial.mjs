@@ -20,9 +20,11 @@ for (const category of collections) {
     const variant=arts[(index++)%arts.length];
     const external=item.sourceUrl.startsWith('https://');
     const longTitle=item.title.length>24?' hub-tile--long-title':'';
-    return '<article class="hub-tile '+variant+longTitle+'"><div class="hub-tile__wash" aria-hidden="true"></div>'+
+    const media=(category==='tv-shows'||category==='indie-movies')?' data-media-type="'+(category==='tv-shows'?'tv':'movie')+'" data-media-title="'+esc(item.title)+'"':'';
+    const mediaArt=media?'<img class="hub-editorial-poster" data-media-field="poster" alt="'+esc(item.title)+' poster" hidden>':'';
+    return '<article class="hub-tile '+variant+longTitle+'"'+media+'>'+mediaArt+'<div class="hub-tile__wash" aria-hidden="true"></div>'+
       '<div class="hub-tile__content"><span class="hub-kicker">'+esc(item.category)+'</span><h3>'+esc(item.title)+'</h3>'+
-      '<p>'+esc(item.description)+'</p><a class="hub-tile__link" href="'+esc(item.sourceUrl)+'"'+
+      '<p>'+esc(item.description)+'</p>'+(media?'<span class="hub-feature__rating" data-media-field="rating"></span><button type="button" class="fr-trailer-button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button>':'')+'<a class="hub-tile__link" href="'+esc(item.sourceUrl)+'"'+
       (external?' target="_blank" rel="noopener noreferrer"':'')+'>SOURCE: '+esc(item.sourceName)+'</a></div></article>';
   }).join('\n');
   const destination={

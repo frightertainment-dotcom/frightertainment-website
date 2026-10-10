@@ -10579,7 +10579,13 @@
       "qid": "Q6166233",
       "title": "Jaws",
       "year": 1975,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q6166233",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q3205649",
@@ -12503,7 +12509,13 @@
       "qid": "Q1990792",
       "title": "Alien",
       "year": 1979,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q1990792",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q182692",
@@ -15354,7 +15366,13 @@
       "qid": "Q617871",
       "title": "A Nightmare on Elm Street",
       "year": 1984,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q617871",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q2855091",
@@ -16290,7 +16308,13 @@
       "qid": "Q1616116",
       "title": "Critters",
       "year": 1986,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q1616116",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q24254504",
@@ -23439,7 +23463,13 @@
       "qid": "Q388659",
       "title": "Scream",
       "year": 1996,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q388659",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q605613",
@@ -23634,7 +23664,13 @@
       "qid": "Q20022604",
       "title": "Anaconda",
       "year": 1997,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q20022604",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q464042",
@@ -25154,7 +25190,13 @@
       "qid": "Q20022635",
       "title": "Lake Placid",
       "year": 1999,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q20022635",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q6494376",
@@ -29216,9 +29258,15 @@
     {
       "qid": "Q486239",
       "title": "Saw",
-      "year": 2003,
+      "year": 2004,
       "imdbId": "tt0387564",
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "dataAudit": {
+        "previousYear": 2003,
+        "reason": "Feature film release year corrected; 2003 belongs to the distinct short film",
+        "sourceUrl": "https://www.bfi.org.uk/film/58fd0003-8231-59ce-9e43-e613a24e78c1/saw",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q612036",
@@ -29517,7 +29565,13 @@
       "qid": "Q3166407",
       "title": "Wrong Turn",
       "year": 2003,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q3166407",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q388944",
@@ -36051,7 +36105,13 @@
       "qid": "Q2891967",
       "title": "Paranormal Activity",
       "year": 2007,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q2891967",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q381028",
@@ -42030,7 +42090,13 @@
       "qid": "Q16997013",
       "title": "Insidious",
       "year": 2010,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q16997013",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q16237765",
@@ -66551,7 +66617,13 @@
       "qid": "Q130784448",
       "title": "Absolute Green Lantern",
       "year": 2025,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Comic book series, not an individual movie",
+        "sourceUrl": "https://www.dc.com/comics/absolute-green-lantern-2025/absolute-green-lantern-2025-1",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q131553188",
@@ -67443,7 +67515,13 @@
       "qid": "Q114764421",
       "title": "V/H/S",
       "year": 2025,
-      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID",
+      "excludedFromMovieArchive": true,
+      "dataAudit": {
+        "reason": "Film franchise or series, not an individual movie",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q114764421",
+        "checkedAt": "2026-10-10"
+      }
     },
     {
       "qid": "Q124856152",

@@ -66,13 +66,16 @@
       const rows=summarise(items,selected.value).slice(0,4);
       content.replaceChildren();
       for(const item of rows){
-        const row=make('article','release-brief__item');
+        const row=make('article','release-brief__item');row.dataset.mediaType='movie';row.dataset.mediaTitle=item.title;
+        const poster=make('img','release-brief__poster');poster.dataset.mediaField='poster';poster.hidden=true;row.append(poster);
         const main=make('div','release-brief__item-main');
         const href=item.filmId&&/^[a-z0-9-]+$/.test(item.filmId)?
           '/films/'+encodeURIComponent(item.filmId)+'/':null;
         const title=make(href?'a':'strong','release-brief__title',item.title);
         if(href)title.href=href;
         main.append(title,make('span','release-brief__subtitle',detailMessage(item,selected.value)));
+        const rating=make('span','archive-media__rating');rating.dataset.mediaField='rating';
+        const trailer=make('button','fr-trailer-button','▶ PLAY TRAILER');trailer.type='button';trailer.dataset.mediaField='trailer';trailer.hidden=true;main.append(rating,trailer);
         const src=make('a','release-brief__source','SOURCE →');src.href=item.sourceUrl;src.target='_blank';src.rel='noopener noreferrer';
         src.setAttribute('aria-label','Read original source for '+item.title);
         row.append(main,src);content.append(row);

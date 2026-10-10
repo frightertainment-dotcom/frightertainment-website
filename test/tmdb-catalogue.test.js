@@ -54,3 +54,24 @@ test('poster match requires the approved film title and a nearby release year', 
     ]);
   } finally { globalThis.fetch = previous; }
 });
+
+test('artwork batch reserves requests for every poster lookup and caps enrichment before Cloudflare limits', async () => {
+  const previous = globalThis.fetch; let calls = 0;
+  const rows = Array.from({ length: 36 }, (_, i) => ({ id: `film-${i}`, title: `Film ${i}`, year: 2025 }));
+  globalThis.fetch = async url => {
+    calls++; const u = new URL(url);
+    if (u.pathname.endsWith('/search/movie')) {
+      const title = u.searchParams.get('query'); const number = Number(title.split(' ')[1]);
+      return reply({ results: [{ id: number + 1, title, release_date: '2025-01-01', poster_path: `/film-${number}.jpg`, vote_count: 100, vote_average: 7 }] });
+    }
+    const id = Number(u.pathname.split('/').at(-1));
+    return reply({ id, title: `Film ${id - 1}`, release_date: '2025-01-01', poster_path: `/film-${id - 1}.jpg`, vote_count: 100, vote_average: 7 });
+  };
+  const db = { prepare: () => ({ all: async () => ({ results: rows }) }) };
+  try {
+    const result = await refreshMovieArtwork(env, db);
+    assert.equal(result.items.length, 36);
+    assert.equal(calls, 40);
+    assert.ok(result.items.every(item => item.posterPath));
+  } finally { globalThis.fetch = previous; }
+});

@@ -11,6 +11,7 @@ import {
 } from './providers.js';
 import { importLicensedReviews } from './review-ingestion.js';
 import { refreshCommunityChart, refreshMovieArtwork } from './tmdb-catalogue.js';
+import { fetchMedia, fetchCatalogue } from './tmdb-media.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -158,6 +159,43 @@ async function handleMovieArtwork(env) {
   return json({ source: 'TMDB', updatedAt: dataset.updatedAt,
     status: dataset.status, items: dataset.items || [] }, 200,
     { 'cache-control': 'public, max-age=300' });
+}
+
+async function handleTMDBMedia(env, request, catalogue = false) {
+  if (env.TMDB_PREVIEW_ON_DEMAND !== 'true') return json({ error: 'Not available' }, 404);
+  const params = new URL(request.url).searchParams;
+  const type = params.get('type') || 'movie';
+  if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
+  const country = countryOf(request, env);
+  const currentYear = new Date().getUTCFullYear();
+  const year = params.has('year') ? Number(params.get('year')) : catalogue ? currentYear : null;
+  if (year !== null && (!Number.isInteger(year) || year < 1888 || year > currentYear + 2)) throw new HttpError(400, 'Invalid media year');
+  const options = { type, country, year };
+  if (catalogue) {
+    options.mode = params.get('mode') || 'archive';
+    options.page = Number(params.get('page') || 1);
+    options.query = (params.get('query') || '').trim();
+    if (!['archive', 'chart', 'top', 'trending', 'upcoming'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
+  } else {
+    options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
+    if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');
+    if (options.imdb && !/^tt[0-9]{7,10}$/.test(options.imdb)) throw new HttpError(400, 'Invalid IMDb identifier');
+    if (!options.id && !options.imdb && (!options.title || options.title.length > 240)) throw new HttpError(400, 'A media identifier or title is required');
+  }
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(options)));
+  const hash = [...new Uint8Array(digest)].slice(0, 12).map(n => n.toString(16).padStart(2, '0')).join('');
+  const kind = `tmdb-${catalogue ? 'list' : 'detail'}-${hash}`;
+  let dataset = await loadDataset(env.DB, kind, '');
+  if (dataset.status !== 'current') {
+    await refreshTask(env, kind, '', async () => {
+      const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
+      return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org', territory: 'Global', checkedAt: today() };
+    }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'preview-on-demand');
+    dataset = await loadDataset(env.DB, kind, '');
+  }
+  const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
+  if (catalogue) return json({ ...dataset, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=120' });
+  return json({ item: dataset.items?.[0] || null, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=300' });
 }
 
 async function handleDiscovery(env, request) {
@@ -422,6 +460,8 @@ async function fetchHandler(request, env) {
     if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
     if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
     if (path === '/api/movie-artwork' && request.method === 'GET') return await handleMovieArtwork(env);
+    if (path === '/api/media' && request.method === 'GET') return await handleTMDBMedia(env, request);
+    if (path === '/api/catalogue' && request.method === 'GET') return await handleTMDBMedia(env, request, true);
     if (path.startsWith('/api/films/') && request.method === 'GET') {
       let filmId;
       try { filmId = decodeURIComponent(path.slice('/api/films/'.length)); }

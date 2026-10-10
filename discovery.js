@@ -29,8 +29,8 @@
     const detailLink = filmId ? `<a href="${escapeHTML(filmHref(filmId))}">FILM FILE</a>` : '';
     const candidatePoster = kind === 'trending-horror' ? item.posterPath : artworkByTitle.get(titleKey(item.title))?.posterPath;
     const posterPath = /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(candidatePoster || '') ? candidatePoster : '';
-    const poster = posterPath ? `<img class="tmdb-poster" src="https://image.tmdb.org/t/p/w342${escapeHTML(posterPath)}" alt="Poster for ${escapeHTML(item.title)}" loading="lazy" decoding="async">` : '';
-    return `<article class="discovery-item${poster ? ' discovery-item--poster' : ''}">${poster}<div class="discovery-item__copy">${titleMarkup}<span class="discovery-item__source">${sourceLink(item)} ${detailLink}</span></div></article>`;
+    const poster = posterPath ? `<img class="tmdb-poster" data-media-field="poster" src="https://image.tmdb.org/t/p/w342${escapeHTML(posterPath)}" alt="Poster for ${escapeHTML(item.title)}" loading="lazy" decoding="async">` : '';
+    return `<article data-media-type="movie" data-media-title="${escapeHTML(item.title)}" ${item.tmdbId?`data-tmdb-id="${escapeHTML(item.tmdbId)}"`:""} class="discovery-item${poster ? ' discovery-item--poster' : ''}">${poster||`<img class="tmdb-poster" data-media-field="poster" alt="${escapeHTML(item.title)} poster" hidden>`}<div class="discovery-item__copy">${titleMarkup}<span class="archive-media__rating" data-media-field="rating"></span><button type="button" class="fr-trailer-button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button><span class="discovery-item__source">${sourceLink(item)} ${detailLink}</span></div></article>`;
   };
   function render() {
     for (const kind of kinds) {
@@ -111,9 +111,9 @@
         const source=community ? '<a href="'+escapeHTML(safeURL(item.sourceUrl))+'" target="_blank" rel="noopener noreferrer">TMDB →</a>' :
           (item.sources||[]).map(x=>'<a href="'+escapeHTML(safeURL(x.url))+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.publication)+' →</a>').join(' ');
         const posterPath = community && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
-        const poster = posterPath ? '<img class="tmdb-poster" src="https://image.tmdb.org/t/p/w185'+escapeHTML(posterPath)+'" alt="Poster for '+escapeHTML(item.title)+'" loading="lazy">' : '';
+        const poster = posterPath ? '<img class="tmdb-poster" data-media-field="poster" src="https://image.tmdb.org/t/p/w185'+escapeHTML(posterPath)+'" alt="Poster for '+escapeHTML(item.title)+'" loading="lazy">' : '';
         const label=community ? 'TMDB community rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.voteCount)+' votes' :
-          'Fright Rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel);
+          'Viewer rating '+(Number(item.averageScore)/10).toFixed(1)+'/10 · '+escapeHTML(item.criticCount)+' verified professional critics · '+escapeHTML(item.movementLabel);
         return '<article class="discovery-item'+(poster?' discovery-item--poster':'')+'">'+poster+'<div><strong><span class="ranking-position">#'+
           escapeHTML(item.position)+'</span> <a href="'+escapeHTML(href)+'">'+escapeHTML(item.title)+'</a></strong>'+
           '<span>'+label+'</span></div><span class="discovery-item__source">'+source+'</span></article>';

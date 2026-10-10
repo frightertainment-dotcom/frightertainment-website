@@ -43,8 +43,8 @@
     const scores = validReviews(movie).map(normalise);
     return scores.length >= 3 ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
   };
-  const recordHasDate = movie => releaseClaims(movie).length > 0;
-  const recordYear = movie => Number(firstClaim(movie, 'filmYear')?.value) || null;
+  const recordHasDate = movie => Boolean(artByFilm.get(movie.id)?.releaseDate || artByFilm.get(movie.id)?.firstReleaseDate || releaseClaims(movie).length);
+  const recordYear = movie => Number((artByFilm.get(movie.id)?.firstReleaseDate || '').slice(0,4)) || Number(firstClaim(movie, 'filmYear')?.value || firstClaim(movie,'releaseYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
   const listingYear = movie => recordYear(movie) || Number(firstClaim(movie, 'releaseYear')?.value || releaseClaims(movie)[0]?.value?.slice(0,4)) || null;
   const cardRelease = movie => {
     const claims = releaseClaims(movie);
@@ -68,7 +68,7 @@
       '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
       '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
       '<strong>'+escapeHTML(movie.title)+'</strong>'+
-      '<small>FRIGHTERTAINMENT ARTWORK</small></div>'+
+      '<small>MOVIE POSTER</small></div>'+
       '<div class="fr-movie-hero__info"><span class="hub-eyebrow">WELCOME TO THE HORROR FILE</span>'+
       '<h1>'+escapeHTML(movie.title)+'</h1>'+
       '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+
@@ -79,19 +79,13 @@
       '</div><a class="fr-movie-hero__browse" href="'+(recordYear(movie)?'/all-horror-movies.html?year='+encodeURIComponent(year):'/all-horror-movies.html')+'">'+(recordYear(movie)?'EXPLORE MORE HORROR FROM '+escapeHTML(year):'EXPLORE THE HORROR VAULT')+' →</a>'+
       '</div></section>';
   };
+  const pinnedIds = {'ready-or-not-2':1266127,'other-mommy':1400837};
+  const mediaAttrs = movie => `data-media-type="movie" data-media-title="${escapeHTML(movie.title)}" data-media-year="${listingYear(movie)||''}" ${artByFilm.get(movie.id)?.tmdbId || pinnedIds[movie.id] ? `data-tmdb-id="${artByFilm.get(movie.id)?.tmdbId || pinnedIds[movie.id]}"` : ''}`;
   const cardMarkup = movie => {
-    const score = frightIndex(movie);
-    const community = communityScore(movie);
-    const dates = releaseClaims(movie);
-    const displayYear = recordYear(movie) || 'YEAR UNCONFIRMED';
-    const label = dates.length ? 'SOURCE-CHECKED RELEASE' : 'DATE NOT CONFIRMED';
-    const genre = firstClaim(movie, 'genre')?.value || 'HORROR FILM';
-    const synopsis = firstClaim(movie, 'synopsis')?.value || 'Verified film identity; further plot information has not been added.';
-    const id = encodeURIComponent(movie.id);
-    const coverStyle = [...movie.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 6;
-    return `<article class="movie-card"><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details">${licensedPoster(movie) ? `<img class="licensed-poster" src="${escapeHTML(safeURL(movie.poster))}" alt="Licensed poster artwork for ${escapeHTML(movie.title)}" loading="lazy">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder" data-cover-style="${coverStyle}"><span class="poster-mini">FRIGHTERTAINMENT FILM FILE</span><strong>${escapeHTML(movie.title)}</strong><small>FRIGHTERTAINMENT ART</small></div></div>${tmdbArtwork(movie) ? `<img class="tmdb-card-poster" src="${escapeHTML(tmdbArtwork(movie))}" alt="TMDB poster for ${escapeHTML(movie.title)}" loading="lazy" decoding="async">` : ''} `}<span class="movie-card__date"><strong>${escapeHTML(displayYear)}</strong><span>${escapeHTML(dates.length > 1 ? 'TERRITORY DATES' : dates.length === 1 ? prettyDate(dates[0].value).toUpperCase() : 'DATE TBC')}</span></span><span class="movie-card__overlay">FILM DETAILS <span aria-hidden="true">></span></span></a>
-      <div class="movie-card__body"><div class="movie-card__eyebrow">${escapeHTML(genre)} <span class="movie-card__release-label">/ ${escapeHTML(label)}</span></div><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3>${score !== null ? `<span class="movie-card__score" aria-label="Fright Rating ${(score / 10).toFixed(1)} out of 10">${(score / 10).toFixed(1)}<small>/10</small></span>` :
-        community ? `<span class="movie-card__score" aria-label="TMDB community rating ${community.voteAverage.toFixed(1)} out of 10 from ${community.voteCount} votes"><small>TMDB </small>${community.voteAverage.toFixed(1)}<small>/10</small></span>` : ''}</div><p class="movie-card__text">${escapeHTML(synopsis)}</p><div class="movie-card__footer"><span>${escapeHTML(cardRelease(movie))}</span><a href="/films/${id}/">DETAILS ></a></div><div class="movie-card__official"><a href="${escapeHTML(safeURL(firstClaim(movie,'title')?.source||''))}" target="_blank" rel="noopener noreferrer">OFFICIAL FILM PAGE →</a>${licensedPoster(movie)? `<small>Poster © ${escapeHTML(movie.posterCredit)}</small>` : ''}</div></div></article>`;
+    const community=communityScore(movie), id=encodeURIComponent(movie.id), poster=tmdbArtwork(movie);
+    const synopsis=firstClaim(movie,'synopsis')?.value || '';
+    const official=safeURL(firstClaim(movie,'title')?.source||'');
+    return `<article class="movie-card" ${mediaAttrs(movie)}><a class="movie-card__art" href="/films/${id}/" aria-label="Read ${escapeHTML(movie.title)} film details" data-media-field="poster"><div class="movie-card__placeholder"><strong>${escapeHTML(movie.title)}</strong><small>Poster unavailable</small></div>${poster?`<img class="tmdb-card-poster" src="${escapeHTML(poster)}" alt="Poster for ${escapeHTML(movie.title)}" loading="lazy">`:''}</a><div class="movie-card__body"><div class="movie-card__headline"><h3><a href="/films/${id}/">${escapeHTML(movie.title)}</a></h3><span class="movie-card__score" data-media-field="rating">${community?'TMDB '+community.voteAverage.toFixed(1)+'/10':'Checking rating…'}</span></div><p class="movie-card__text" data-media-field="overview">${escapeHTML(synopsis)}</p><p class="movie-card__release" data-media-field="date">${escapeHTML(cardRelease(movie))}</p><div class="movie-card__actions"><a href="/films/${id}/">DETAILS →</a><button type="button" class="fr-trailer-button" data-media-field="trailer" ${movie.trailer?.videoId?`data-trailer-video="${escapeHTML(movie.trailer.videoId)}" data-trailer-title="${escapeHTML(movie.title)}"`:'hidden'}>▶ PLAY TRAILER</button>${official?`<a href="${escapeHTML(official)}" target="_blank" rel="noopener noreferrer">Official source ↗</a>`:''}</div></div></article>`;
   };
   const grid = $('#movie-grid');
   if (grid) {
@@ -170,23 +164,7 @@
   const trailerGrid = $('#trailer-grid');
   if (trailerGrid) {
     const verifiedTrailers = movies.filter(movie => movie.trailer && /^[A-Za-z0-9_-]{11}$/.test(movie.trailer.videoId || '') && safeURL(movie.trailer.source));
-    trailerGrid.innerHTML = verifiedTrailers.length ? verifiedTrailers.map(movie => `<article class="verified-trailer" data-film-id="${escapeHTML(movie.id)}"><div class="verified-trailer__screen"><div class="verified-trailer__type" aria-hidden="true"><span>FRIGHTERTAINMENT · VIDEO FILE</span><strong>${escapeHTML(movie.title)}</strong><small>OFFICIAL ${escapeHTML(movie.trailer.kind.toUpperCase())}</small></div><button class="button button--red" type="button" aria-label="Play official ${escapeHTML(movie.trailer.kind)}: ${escapeHTML(movie.title)}" data-play-video="${escapeHTML(movie.id)}">PLAY OFFICIAL ${escapeHTML(movie.trailer.kind)}</button><div class="verified-trailer__frame" id="home-trailer-${escapeHTML(movie.id)}" hidden></div></div><div class="verified-trailer__meta"><div><h3>${escapeHTML(movie.title)}</h3><p>OFFICIAL UPLOAD · ${escapeHTML(movie.trailer.channel)} · ${escapeHTML(movie.trailer.territory)}</p></div><a href="${escapeHTML(safeURL(movie.trailer.source))}" target="_blank" rel="noopener noreferrer">OFFICIAL VIDEO SOURCE →</a></div></article>`).join('') : '<div class="video-frame video-frame__empty-block"><div class="video-frame__empty">NO VERIFIED TRAILERS<span>Check back when an exact official studio or distributor upload has been confirmed.</span></div></div>';
-    trailerGrid.addEventListener('click', event => {
-      const button = event.target.closest('[data-play-video]');
-      if (!button) return;
-      const movie = movies.find(item => item.id === button.dataset.playVideo);
-      const trailer = movie?.trailer;
-      if (!movie || !trailer) return;
-      const frame = $(`#home-trailer-${CSS.escape(movie.id)}`, trailerGrid);
-      if (!frame || frame.querySelector('iframe')) return;
-      button.closest('.verified-trailer__screen')?.classList.add('is-playing');
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube-nocookie.com/embed/${trailer.videoId}?autoplay=1&rel=0&playsinline=1`;
-      iframe.title = `Official ${movie.title} ${trailer.kind}`;
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-      iframe.referrerPolicy = 'strict-origin-when-cross-origin'; iframe.allowFullscreen = true; iframe.loading = 'lazy';
-      frame.replaceChildren(iframe); frame.hidden = false; button.remove();
-    });
+    trailerGrid.innerHTML = verifiedTrailers.length ? verifiedTrailers.map(movie => `<article class="verified-trailer" data-film-id="${escapeHTML(movie.id)}"><div class="verified-trailer__screen"><div class="verified-trailer__type" aria-hidden="true"><span>FRIGHTERTAINMENT · VIDEO FILE</span><strong>${escapeHTML(movie.title)}</strong><small>OFFICIAL ${escapeHTML(movie.trailer.kind.toUpperCase())}</small></div><button class="button button--red" type="button" aria-label="Play official ${escapeHTML(movie.trailer.kind)}: ${escapeHTML(movie.title)}" data-trailer-video="${escapeHTML(movie.trailer.videoId)}" data-trailer-title="${escapeHTML(movie.title)}">PLAY OFFICIAL ${escapeHTML(movie.trailer.kind)}</button><div class="verified-trailer__frame" id="home-trailer-${escapeHTML(movie.id)}" hidden></div></div><div class="verified-trailer__meta"><div><h3>${escapeHTML(movie.title)}</h3><p>OFFICIAL UPLOAD · ${escapeHTML(movie.trailer.channel)} · ${escapeHTML(movie.trailer.territory)}</p></div><a href="${escapeHTML(safeURL(movie.trailer.source))}" target="_blank" rel="noopener noreferrer">OFFICIAL VIDEO SOURCE →</a></div></article>`).join('') : '<div class="video-frame video-frame__empty-block"><div class="video-frame__empty">NO VERIFIED TRAILERS<span>Check back when an exact official studio or distributor upload has been confirmed.</span></div></div>';
   }
 
   const claimMarkup = claim => {
@@ -209,77 +187,19 @@
       const marketNote = dates.length ? dates.map(claim => `${prettyDate(claim.value)} (${claim.territory})`).join('; ') : territoryReleaseYear ? `Territory release year ${escapeHTML(territoryReleaseYear.value)}; ${escapeHTML(territoryReleaseYear.territory)}.` : filmYear ? `Film year ${escapeHTML(filmYear.value)}; source: ${escapeHTML(filmYear.sourceName)}.` : 'A territory-specific release date has not been confirmed.';
       const synopsis = firstClaim(movie, 'synopsis');
       const synopsisSource = synopsis ? `<li class="film-claim"><div><strong>Synopsis source</strong><p>Summary shown above.</p><small>CHECKED ${escapeHTML(synopsis.checked)} · ${escapeHTML(synopsis.territory || 'Territory not stated')}</small></div><a href="${escapeHTML(safeURL(synopsis.source))}" target="_blank" rel="noopener noreferrer">${escapeHTML(synopsis.sourceName)} ></a></li>` : '';
-      page.innerHTML = `${movieHeroMarkup(movie)}<p class="film-status">${escapeHTML(marketNote)}</p>
-        <section class="film-section"><h2>FILM DETAILS</h2><ul class="source-list">${claims.filter(claim => claim.field !== 'synopsis').map(claimMarkup).join('')}${synopsisSource}</ul></section>
-        <section class="film-section"><h2>FRIGHT RATING</h2><p class="film-score${score === null ? ' film-score--pending' : ''}">${score === null ? 'Not rated yet.' : `${(score / 10).toFixed(1)} / 10`}</p>${sources ? `<ul class="source-list">${sources}</ul>` : ''}</section>
-        ${trailer ? `<section class="film-section"><h2>OFFICIAL TRAILER</h2><button class="button button--red" id="play-trailer">PLAY TRAILER</button><div class="video-frame" id="film-trailer" hidden></div><p>Official upload: ${escapeHTML(trailer.channel)}. <a href="${escapeHTML(safeURL(trailer.source))}" target="_blank" rel="noopener noreferrer">View primary trailer source ></a> · ${escapeHTML(trailer.territory)}</p></section>` : '<section class="film-section"><h2>TRAILER</h2><p>No official trailer linked yet.</p></section>'}
-        ${licensedPoster(movie) ? `<p class="film-credit">Artwork: ${escapeHTML(movie.posterCredit)} · ${escapeHTML(movie.posterPermission)}</p>` : ''}<p><a href="/movies.html#upcoming">← Back to film listings</a></p>`;
+      page.dataset.mediaEager='true';
+      page.dataset.mediaType='movie';page.dataset.mediaTitle=movie.title;
+      page.dataset.mediaYear=String(listingYear(movie)||'');
+      if(pinnedIds[movie.id])page.dataset.tmdbId=String(pinnedIds[movie.id]);
+      page.innerHTML = `${movieHeroMarkup(movie)}<p class="film-status" data-media-field="date">${escapeHTML(marketNote)}</p>
+        <section class="film-section film-section--rating"><h2>TMDB VIEWER RATING</h2><p class="film-score" data-media-field="rating">Checking rating…</p><p data-media-field="votes"></p><button class="fr-trailer-button" data-media-field="trailer" ${trailer?`data-trailer-video="${escapeHTML(trailer.videoId)}" data-trailer-title="${escapeHTML(movie.title)}"`:'hidden'}>▶ PLAY TRAILER</button></section>
+        <details class="film-section film-sources"><summary>Release sources and film details</summary><ul class="source-list">${claims.filter(claim => claim.field !== 'synopsis').map(claimMarkup).join('')}${synopsisSource}</ul></details>
+        <p class="tmdb-notice">This product uses the TMDB API but is not endorsed or certified by TMDB. <a href="/credits.html">Credits and attribution</a>.</p><p><a href="/movies.html#upcoming">← Back to film listings</a></p>`;
+      const art=page.querySelector('.fr-movie-hero__art');art.dataset.mediaField='poster';
+      const overview=page.querySelector('.fr-movie-hero__synopsis');overview.dataset.mediaField='overview';
+      const yearLabel=page.querySelector('.fr-movie-hero__genre');yearLabel.dataset.mediaField='year';
       document.title = `${movie.title} — Frightertainment`;
-      const play = $('#play-trailer', page);
-      if (play) play.addEventListener('click', () => {
-        const frame = $('#film-trailer', page);
-        const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube-nocookie.com/embed/${trailer.videoId}?autoplay=1&rel=0&playsinline=1`;
-        iframe.title = `Official ${movie.title} trailer`; iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'; iframe.referrerPolicy = 'strict-origin-when-cross-origin'; iframe.allowFullscreen = true; iframe.loading = 'lazy';
-        frame.replaceChildren(iframe); frame.hidden = false; play.remove();
-      });
     }
-  }
-
-  const filmHero = document.querySelector('.fr-movie-hero__art');
-  const filmPageId = document.body.dataset.filmId;
-  if (filmHero && /^[a-z0-9-]{1,80}$/.test(filmPageId || '')) {
-    fetch('/api/movie-artwork', { headers: { accept: 'application/json' } })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => {
-        const item = data?.items?.find(value => value.id === filmPageId);
-        if (!/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item?.posterPath || '')) return;
-        const image = document.createElement('img');
-        image.className = 'fr-movie-hero__poster';
-        image.src = 'https://image.tmdb.org/t/p/w500' + item.posterPath;
-        image.alt = 'TMDB poster for ' + item.title;
-        image.addEventListener('error', () => {
-          image.remove();
-          filmHero.classList.remove('has-tmdb-poster');
-          const sourceLabel = filmHero.querySelector('small');
-          if (sourceLabel) sourceLabel.textContent = 'FRIGHTERTAINMENT ARTWORK';
-        }, { once: true });
-        filmHero.prepend(image);
-        filmHero.classList.add('has-tmdb-poster');
-        filmHero.removeAttribute('role');
-        filmHero.removeAttribute('aria-label');
-        const label = filmHero.querySelector('small');
-        if (label) label.textContent = 'POSTER VIA TMDB';
-        const notice = document.createElement('p');
-        notice.className = 'tmdb-notice';
-        notice.textContent = 'Poster via TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. ';
-        const credits = document.createElement('a');
-        credits.href = '/credits.html';
-        credits.textContent = 'TMDB credits and attribution';
-        notice.append(credits);
-        filmHero.closest('.fr-movie-hero')?.after(notice);
-        if (Number.isFinite(item.voteAverage) && item.voteAverage > 0 &&
-            Number.isInteger(item.voteCount) && item.voteCount > 0) {
-          const section = document.createElement('section');
-          section.className = 'film-section';
-          const heading = document.createElement('h2');
-          heading.textContent = 'TMDB COMMUNITY RATING';
-          const rating = document.createElement('p');
-          rating.className = 'film-score';
-          rating.textContent = item.voteAverage.toFixed(1) + '/10';
-          const note = document.createElement('p');
-          note.textContent = item.voteCount + ' TMDB viewer votes. This is not a professional critic or Fright Rating.';
-          const source = document.createElement('a');
-          source.href = safeURL(item.sourceUrl);
-          source.textContent = 'View rating source on TMDB →';
-          source.target = '_blank';
-          source.rel = 'noopener noreferrer';
-          section.append(heading, rating, note, source);
-          const frightSection = [...document.querySelectorAll('.film-section')]
-            .find(value => value.querySelector('h2')?.textContent === 'FRIGHT RATING');
-          frightSection?.before(section);
-        }
-      }).catch(() => {});
   }
 
   const menu = $('.menu-toggle');
