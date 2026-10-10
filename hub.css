@@ -1256,3 +1256,41 @@ body[data-theme="podcasts"] main>.hub-catalog>.hub-tile .hub-tile__content{width
  .hub-body .release-brief__title{font-size:18px}
  .hub-body .hub-chart-row .score{font-size:18px}
 }
+
+
+/* Typography refinement: lighter logo-adjacent weight, calmer scale, clean mobile lines. */
+.hub-body :where(h1,h2,h3,h4,h5,h6,strong,b,button,.hub-tabs a,.hub-kicker,.hub-eyebrow,.eyebrow,.hub-chart-row .score,.hub-chart-row .movement){
+  font-weight:400!important;
+  font-synthesis:none;
+}
+.hub-body :where(h1,h2,h3,h4,h5,h6){
+  text-wrap:balance;
+  overflow-wrap:normal;
+  word-break:normal;
+  hyphens:none;
+}
+.hub-intro h1{font-size:clamp(28px,3.35vw,44px);line-height:1.08;max-width:100%}
+.hub-section .hub-page-intro h1{font-size:clamp(28px,3.8vw,52px);line-height:1.08;max-width:100%}
+.hub-intro>p,.hub-page-intro>p{font-size:clamp(14px,1.15vw,17px);line-height:1.45}
+.hub-tabs a{font-size:clamp(14px,1.05vw,17px);font-weight:400!important;white-space:nowrap;letter-spacing:0}
+.hub-showcase .hub-tile h3,.hub-catalog .hub-tile h3,.hub-feature h3{font-size:clamp(23px,2.2vw,30px);line-height:1.08;max-width:100%;text-wrap:balance}
+.hub-section .section-head h2,.hub-section .index-section h2,.hub-section .hub-charts h2,.hub-section .hub-release-head h2{
+  font-size:clamp(25px,3.4vw,42px);
+  line-height:1.08;
+  letter-spacing:.01em;
+  text-wrap:balance;
+}
+@media(max-width:640px){
+  .hub-intro h1{font-size:clamp(22px,6vw,29px);line-height:1.12}
+  .hub-section .hub-page-intro h1{font-size:clamp(22px,6vw,29px)!important;line-height:1.12}
+  .hub-intro>p,.hub-page-intro>p{font-size:15px;line-height:1.42}
+  .hub-tabs a{font-size:clamp(10px,3vw,13px);letter-spacing:-.015em}
+  .hub-showcase .hub-tile h3,.hub-catalog .hub-tile h3,.hub-feature h3{font-size:clamp(20px,5.4vw,24px);line-height:1.12}
+  .hub-section .section-head h2,.hub-section .index-section h2,.hub-section .hub-charts h2,.hub-section .hub-release-head h2{font-size:clamp(22px,5.8vw,28px);line-height:1.12}
+  .hub-body p:not(.tmdb-notice):not(.hub-rights-note):not(.release-brief__note){font-size:15px!important;line-height:1.45}
+}
+@media(max-width:380px){
+  .hub-tabs a{font-size:10px}
+  .hub-intro h1,.hub-section .hub-page-intro h1{font-size:22px!important}
+  .hub-showcase .hub-tile h3,.hub-catalog .hub-tile h3,.hub-feature h3{font-size:20px}
+}
