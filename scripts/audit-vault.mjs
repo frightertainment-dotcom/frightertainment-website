@@ -125,7 +125,7 @@ export async function auditVault(){
 }
 export async function writeAudit(){
   const report=await auditVault();
-  const dir=new URL('test-results/',root);
+  const dir=new URL('audit-results/',root);
   await mkdir(dir,{recursive:true});
   await writeFile(new URL('vault-audit.json',dir),JSON.stringify(report,null,2)+'\n');
   const s=report.summary;

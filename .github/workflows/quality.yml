@@ -85,5 +85,6 @@ jobs:
           name: browser-review
           path: |
             test-results/
+            audit-results/
             playwright-report/
           if-no-files-found: ignore
