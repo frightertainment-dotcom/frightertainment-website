@@ -1294,3 +1294,9 @@ body[data-theme="podcasts"] main>.hub-catalog>.hub-tile .hub-tile__content{width
   .hub-intro h1,.hub-section .hub-page-intro h1{font-size:22px!important}
   .hub-showcase .hub-tile h3,.hub-catalog .hub-tile h3,.hub-feature h3{font-size:20px}
 }
+
+/* Keep the home masthead line intact at phone widths without crowding the layout. */
+.hub-intro h1{font-size:clamp(23px,2.35vw,33px);white-space:nowrap;text-wrap:nowrap;transform:scaleX(.96);transform-origin:left center}
+@media(max-width:640px){
+  .hub-intro h1{font-size:clamp(17px,4.8vw,19px);white-space:nowrap;text-wrap:nowrap;transform:scaleX(.96);transform-origin:left center}
+}
