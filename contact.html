@@ -1,1 +1,44 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#080708"><meta name="description" content="Contact the Frightertainment team."><link rel="canonical" href="https://www.frightertainment.com/contact.html"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/hub.css"><title>Contact us | Frightertainment</title></head><body class="hub-body hub-section" data-theme="home"><a class="skip-link" href="#main">Skip to main content</a><div class="red-thread" aria-hidden="true"></div><div class="microbar hub-microbar"><div class="shell microbar__inner"><span><span class="pulse-dot"></span> THE DARK IS CALLING. STAY AWHILE.</span><span>ENTER IF YOU DARE.</span></div></div><header class="header hub-header"><div class="shell hub-header__inside"><a class="brand hub-brand" href="/" aria-label="Frightertainment home"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a><nav class="hub-tabs" aria-label="Main site sections"><a href="/">HOME</a><a href="/movies.html">MOVIES</a><a href="/tv-shows.html">TV SHOWS</a><a href="/cinema.html">CINEMA</a><a href="/indie-movies.html">INDIE MOVIES</a><a href="/podcasts.html">PODCASTS</a><a href="/games.html">GAMES</a></nav></div></header><main id="main" class="shell"><section class="hub-page-intro"><span class="hub-eyebrow">SEND A SIGNAL THROUGH THE DARK</span><h1>CONTACT <em>US.</em></h1><p>Have a film, show, podcast or game to share? Write to Frightertainment.</p></section><section class="contact-panel" aria-label="Contact form"><form id="contact-form"><label>YOUR TITLE<input name="title" maxlength="100" required autocomplete="name"></label><label>SUBJECT<input name="subject" maxlength="140" required></label><label>MESSAGE<textarea name="message" maxlength="5000" required></textarea></label><div class="sr-only" aria-hidden="true"><label>Leave this empty<input name="company" autocomplete="off" tabindex="-1"></label></div><button class="button button--red" type="submit">SEND MESSAGE →</button><p id="contact-status" class="contact-panel__status" role="status" aria-live="polite"></p></form><p>Prefer your own email app? Write to <a href="mailto:Frightertainment@gmail.com">Frightertainment@gmail.com</a>.</p></section></main><footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span><a href="/credits.html">CREDITS</a><a href="/contact.html">CONTACT US</a></div></footer><script src="/contact.js" defer></script></body></html>
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#080708"><meta name="description" content="Contact the Frightertainment team."><link rel="canonical" href="https://www.frightertainment.com/contact.html"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/hub.css"><title>Contact us | Frightertainment</title></head><body class="hub-body hub-section" data-theme="home"><a class="skip-link" href="#main">Skip to main content</a><div class="red-thread" aria-hidden="true"></div><div class="microbar hub-microbar"><div class="shell microbar__inner"><span><span class="pulse-dot"></span> THE DARK IS CALLING. STAY AWHILE.</span><span>ENTER IF YOU DARE.</span></div></div><header class="header hub-header"><div class="shell hub-header__inside"><a class="brand hub-brand" href="/" aria-label="Frightertainment home"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a><nav class="hub-tabs" aria-label="Main site sections"><a href="/">HOME</a><a href="/movies.html">MOVIES</a><a href="/tv-shows.html">TV SHOWS</a><a href="/cinema.html">CINEMA</a><a href="/indie-movies.html">INDIE MOVIES</a><a href="/podcasts.html">PODCASTS</a><a href="/games.html">GAMES</a></nav></div></header><main id="main" class="shell">
+  <section class="hub-page-intro contact-intro" aria-labelledby="contact-heading">
+    <span class="hub-eyebrow">SEND A SIGNAL THROUGH THE DARK</span>
+    <h1 id="contact-heading">CONTACT <em>US.</em></h1>
+    <p>Found a film we should feature? Got an independent horror project, podcast, game or story to share? We'd love to hear from you.</p>
+    <nav class="contact-jumps" aria-label="Choose how to contact Frightertainment">
+      <a href="#contact-form">USE THE CONTACT FORM <span aria-hidden="true">↓</span></a>
+      <a href="#email-frightertainment">EMAIL US DIRECTLY <span aria-hidden="true">↓</span></a>
+    </nav>
+  </section>
+  <div class="contact-methods">
+    <section class="contact-panel contact-panel--form" aria-labelledby="message-heading">
+      <span class="hub-eyebrow">01 · SEND A MESSAGE</span>
+      <h2 id="message-heading">WRITE FROM <em>THE DARK.</em></h2>
+      <p>Send your enquiry to the Frightertainment inbox using the form below.</p>
+      <form id="contact-form" method="post" action="/api/contact">
+        <label for="contact-name">YOUR NAME
+          <input id="contact-name" name="title" maxlength="100" required autocomplete="name" placeholder="Your name">
+        </label>
+        <label for="contact-email">YOUR EMAIL ADDRESS
+          <input id="contact-email" name="email" type="email" maxlength="254" inputmode="email" required autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com">
+        </label>
+        <label for="contact-subject">SUBJECT
+          <input id="contact-subject" name="subject" maxlength="140" required placeholder="What would you like to share?">
+        </label>
+        <label for="contact-message">MESSAGE
+          <textarea id="contact-message" name="message" minlength="5" maxlength="5000" required placeholder="Tell us everything…"></textarea>
+        </label>
+        <div class="sr-only" aria-hidden="true"><label>Leave this empty<input name="company" autocomplete="off" tabindex="-1"></label></div>
+        <button class="button button--red contact-send" type="submit">SEND MESSAGE <span aria-hidden="true">→</span></button>
+        <p id="contact-status" class="contact-panel__status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="contact-privacy">Your name, email and message are used to respond to your enquiry. Please don't send sensitive personal information.</p>
+    </section>
+    <aside class="contact-direct" id="email-frightertainment" aria-labelledby="direct-heading">
+      <span class="hub-eyebrow">02 · DIRECT EMAIL</span>
+      <h2 id="direct-heading">OPEN YOUR <em>EMAIL APP.</em></h2>
+      <p>Prefer to write in your own email app? Get straight through to Frightertainment.</p>
+      <a class="contact-direct__button" href="mailto:Frightertainment@gmail.com?subject=Frightertainment%20enquiry">EMAIL FRIGHTERTAINMENT <span aria-hidden="true">↗</span></a>
+      <p class="contact-direct__address">Frightertainment@gmail.com</p>
+      <p class="contact-direct__note">Either way, your message goes to the Frightertainment inbox. No account or sign-in needed.</p>
+    </aside>
+  </div>
+</main><footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span><a href="/credits.html">CREDITS</a><a href="/contact.html">CONTACT US</a></div></footer><script src="/contact.js" defer></script></body></html>

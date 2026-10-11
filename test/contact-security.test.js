@@ -7,7 +7,7 @@ const make = (data,headers={}) => new Request('https://frightertainment.com/api/
   headers:{'content-type':'application/json','origin':'https://frightertainment.com',...headers},
   body:typeof data==='string'?data:JSON.stringify(data)
 });
-const good={title:'Viewer',subject:'Film suggestion',message:'Please consider this film for the site.',company:''};
+const good={title:'Viewer',email:'viewer@example.com',subject:'Film suggestion',message:'Please consider this film for the site.',company:''};
 
 test('contact submissions go only to the fixed publisher inbox and reject foreign origins',async()=>{
   let count=0,sent;
@@ -22,7 +22,10 @@ test('contact submissions go only to the fixed publisher inbox and reject foreig
   assert.equal(count,1);
   assert.equal(sent.to,'Frightertainment@gmail.com');
   assert.equal(sent.from,'contact@frightertainment.com');
-  assert.ok(!JSON.stringify(await result.json()).includes(good.message));
+  assert.equal(sent.replyTo,'viewer@example.com');
+  const submitted=await result.json();
+  assert.equal(submitted.delivered,true);
+  assert.ok(!JSON.stringify(submitted).includes(good.message));
   assert.equal(result.headers.get('cache-control'),'no-store');
   assert.equal(result.headers.get('x-content-type-options'),'nosniff');
   assert.equal(result.headers.get('cross-origin-resource-policy'),'same-origin');
@@ -48,4 +51,33 @@ test('honeypot never sends and missing mail provider fails safely',async()=>{
   assert.equal(sends,0);
   assert.equal((await onRequestPost({request:make(good),env:{}})).status,503);
   assert.equal((await onRequest({})).status,405);
+});
+
+test('contact requires a safe reply email and rejects header injection and invalid shapes',async()=>{
+  const env={EMAIL:{send:async()=>{throw Error('Should not send invalid submissions');}}};
+  for(const email of ['','x','nobody@local','bad @domain.com','visitor@example.com\\r\\nBcc: attacker@example.com']){
+    const result=await onRequestPost({request:make({...good,email}),env});
+    assert.equal(result.status,400,'Unsafe email: '+email);
+  }
+  assert.equal((await onRequestPost({request:make({...good,email:{value:'viewer@example.com'}}),env})).status,400);
+});
+test('Pages contact form uses the private mailer service and never lets visitors choose the destination',async()=>{
+  let saved,called=0;
+  const env={CONTACT_DELIVERY:{fetch:async(url,opts)=>{
+    called++;saved={url:String(url),method:opts.method,body:JSON.parse(opts.body)};
+    return new Response(JSON.stringify({ok:true}),{status:200});
+  }}};
+  const response=await onRequestPost({request:make({...good,to:'attacker@example.invalid'}),env});
+  assert.equal(response.status,200);
+  assert.equal((await response.json()).delivered,true);
+  assert.equal(called,1);
+  assert.equal(saved.url,'https://frightertainment-contact-mailer.internal/send');
+  assert.equal(saved.method,'POST');
+  assert.deepEqual(saved.body,{title:good.title,email:good.email,subject:good.subject,message:good.message});
+});
+test('mailer rejection fails closed without claiming delivery',async()=>{
+  const env={CONTACT_DELIVERY:{fetch:async()=>new Response('No delivery',{status:503})}};
+  const response=await onRequestPost({request:make(good),env});
+  assert.equal(response.status,503);
+  assert.equal((await response.json()).ok,undefined);
 });

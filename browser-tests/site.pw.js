@@ -1169,3 +1169,38 @@ test('TV chart is year-specific and Games chart has a sourced, consistent rating
   await expect(page.locator('.fr-game-chart a[href*="steamdb.info/stats/gameratings/2026/"]')).toBeVisible();
   await expect(page.locator('.fr-game-spotlight iframe')).toHaveAttribute('src',/store.steampowered.com\/widget\/3219630/);
 });
+test('Contact page presents both direct email and a working form with reply address',async({page})=>{
+  await page.goto('/contact.html');
+  const direct=page.getByRole('link',{name:/EMAIL FRIGHTERTAINMENT/i});
+  await expect(direct).toHaveAttribute('href',/^mailto:Frightertainment@gmail.com\?subject=/);
+  await expect(page.locator('#contact-email')).toHaveAttribute('type','email');
+  let received;
+  await page.route('**/api/contact',async route=>{
+    received=route.request().postDataJSON();
+    await route.fulfill({status:200,json:{ok:true,delivered:true}});
+  });
+  await page.locator('#contact-name').fill('Site visitor');
+  await page.locator('#contact-email').fill('visitor@example.com');
+  await page.locator('#contact-subject').fill('Indie horror recommendation');
+  await page.locator('#contact-message').fill('I have an independent horror film recommendation.');
+  await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
+  await expect(page.locator('#contact-status')).toContainText('accepted for delivery');
+  expect(received).toMatchObject({title:'Site visitor',email:'visitor@example.com',subject:'Indie horror recommendation'});
+  await expect(page.locator('#contact-email')).toHaveValue('');
+});
+test('Contact form shows a prefilled mailto fallback without losing unsent text',async({page})=>{
+  await page.goto('/contact.html');
+  await page.route('**/api/contact',route=>route.fulfill({status:503,json:{error:'Delivery unavailable'}}));
+  await page.locator('#contact-name').fill('Test visitor');
+  await page.locator('#contact-email').fill('visitor@example.com');
+  await page.locator('#contact-subject').fill('A film to feature');
+  await page.locator('#contact-message').fill('Here is the film I wanted to suggest.');
+  await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
+  await expect(page.locator('#contact-status')).toContainText('Nothing has been submitted');
+  const fallback=page.locator('#contact-status a');
+  await expect(fallback).toHaveAttribute('href',/^mailto:Frightertainment@gmail.com/);
+  const url=await fallback.getAttribute('href');
+  expect(decodeURIComponent(url)).toContain('visitor@example.com');
+  expect(decodeURIComponent(url)).toContain('A film to feature');
+  await expect(page.locator('#contact-message')).toHaveValue('Here is the film I wanted to suggest.');
+});

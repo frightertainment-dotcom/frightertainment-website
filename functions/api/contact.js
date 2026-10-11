@@ -55,28 +55,36 @@ export async function onRequestPost({request,env}) {
     return reply(400,{error:'Invalid message.'});
   }
   if (parsed.company) return reply(200,{ok:true}); // Honeypot: no email is sent.
-  const {title,subject,message} = parsed;
-  if (typeof title !== 'string' || typeof subject !== 'string' || typeof message !== 'string') {
-    return reply(400,{error:'Complete the title, subject and message.'});
+  const {title,email,subject,message} = parsed;
+  if (typeof title !== 'string' || typeof email !== 'string' ||
+      typeof subject !== 'string' || typeof message !== 'string') {
+    return reply(400,{error:'Complete your name, email, subject and message.'});
   }
-  const name = title.trim(), topic = subject.trim(), text = message.trim();
-  if (!name || name.length > 100 || !topic || topic.length > 140 ||
-      text.length < 5 || text.length > 5000 ||
-      /[\x00-\x1f\x7f]/.test(name) || /[\x00-\x1f\x7f]/.test(topic) ||
-      /\x00/.test(text)) {
-    return reply(400,{error:'Complete the title, subject and message.'});
+  const name=title.trim(), replyEmail=email.trim(), topic=subject.trim(), text=message.trim();
+  if (!name || name.length>100 || !topic || topic.length>140 ||
+      replyEmail.length>254 || !/^[^\\s@\\x00-\\x1f\\x7f]+@[^\\s@\\x00-\\x1f\\x7f]+\\.[A-Za-z]{2,}$/.test(replyEmail) ||
+      text.length<5 || text.length>5000 ||
+      /[\x00-\x1f\x7f]/.test(name) || /[\x00-\x1f\x7f]/.test(topic) || /\x00/.test(text)) {
+    return reply(400,{error:'Complete your name, valid email, subject and message.'});
   }
-  if (!env.EMAIL) return reply(503,{error:'Direct delivery is not configured. Use the email link.'});
+  if (!env.CONTACT_DELIVERY && !env.EMAIL) return reply(503,{error:'Contact form delivery is temporarily unavailable. Use the direct email link.'});
   try {
-    await env.EMAIL.send({
-      to:'Frightertainment@gmail.com',
-      from:'contact@frightertainment.com',
-      subject:'Frightertainment contact: '+topic,
-      text:'Title: '+name+'\nSubject: '+topic+'\n\n'+text
-    });
-    return reply(200,{ok:true});
-  } catch {
-    return reply(503,{error:'Delivery is temporarily unavailable. Use the email link.'});
+    if(env.CONTACT_DELIVERY){
+      const delivery=await env.CONTACT_DELIVERY.fetch('https://frightertainment-contact-mailer.internal/send',{
+        method:'POST',headers:{'content-type':'application/json'},
+        body:JSON.stringify({title:name,email:replyEmail,subject:topic,message:text})
+      });
+      if(!delivery.ok)throw new Error('Delivery service declined request');
+    }else{
+      await env.EMAIL.send({
+        to:'Frightertainment@gmail.com',from:'contact@frightertainment.com',
+        replyTo:replyEmail,subject:'Frightertainment contact: '+topic,
+        text:'From: '+name+'\nReply email: '+replyEmail+'\nSubject: '+topic+'\n\n'+text
+      });
+    }
+    return reply(200,{ok:true,delivered:true});
+  }catch{
+    return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.'});
   }
 }
 export function onRequest(){return reply(405,{error:'Method not allowed.'});}

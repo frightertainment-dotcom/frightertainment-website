@@ -1,20 +1,40 @@
 (() => {
-  const form=document.querySelector('#contact-form'),status=document.querySelector('#contact-status');
-  if(!form)return;
+  'use strict';
+  const form=document.querySelector('#contact-form');
+  const status=document.querySelector('#contact-status');
+  if(!form||!status)return;
+  const emailLink=fields=>{
+    const from='From: '+fields.title+'\nReply email: '+fields.email+'\n\n'+fields.message;
+    return 'mailto:Frightertainment@gmail.com?subject='+encodeURIComponent(fields.subject)+'&body='+encodeURIComponent(from);
+  };
   form.addEventListener('submit',async event=>{
     event.preventDefault();
+    if(!form.reportValidity())return;
     const fields=Object.fromEntries(new FormData(form));
-    const button=form.querySelector('button[type="submit"]');button.disabled=true;status.textContent='Sending…';
+    const submit=form.querySelector('button[type="submit"]');
+    if(submit.disabled)return;
+    submit.disabled=true;
+    status.replaceChildren(document.createTextNode('Sending your message…'));
     try{
-      const response=await fetch('/api/contact',{method:'POST',headers:{'content-type':'application/json','accept':'application/json'},body:JSON.stringify(fields)});
+      const response=await fetch('/api/contact',{
+        method:'POST',
+        headers:{'content-type':'application/json','accept':'application/json'},
+        body:JSON.stringify(fields)
+      });
       const result=await response.json();
-      if(!response.ok)throw new Error(result.error || 'Message could not be sent');
-      form.reset();status.textContent='Your message was sent. Thank you.';
+      if(!response.ok||result?.ok!==true||result?.delivered!==true){
+        throw new Error('Email delivery unavailable');
+      }
+      form.reset();
+      status.textContent='Your message has been accepted for delivery. Thank you for getting in touch!';
     }catch{
-      status.replaceChildren(document.createTextNode('The direct form is unavailable. '));
-      const link=document.createElement('a');link.textContent='Open your email app with this message';
-      link.href='mailto:Frightertainment@gmail.com?subject='+encodeURIComponent(fields.subject)+'&body='+encodeURIComponent('Title: '+fields.title+'\n\n'+fields.message);
-      status.append(link,document.createTextNode(' or use the address below.'));
-    }finally{button.disabled=false;}
+      status.replaceChildren(document.createTextNode('The form could not send your message. Nothing has been submitted. '));
+      const link=document.createElement('a');
+      link.href=emailLink(fields);
+      link.textContent='Open your email app with your message ready';
+      status.append(link,document.createTextNode(' — your form text is still here if you want to copy it.'));
+    }finally{
+      submit.disabled=false;
+    }
   });
 })();
