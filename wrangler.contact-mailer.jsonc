@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "frightertainment-contact-mailer",
+  "main": "worker/contact-mailer.js",
+  "compatibility_date": "2026-10-10",
+  "workers_dev": false,
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "Frightertainment@gmail.com",
+      "allowed_sender_addresses": ["contact@frightertainment.com"]
+    }
+  ]
+}

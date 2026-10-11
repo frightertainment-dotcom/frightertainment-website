@@ -53,6 +53,24 @@
       "sourceName": "Netflix",
       "sourceUrl": "https://www.netflix.com/gb/title/80209229",
       "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "tv-shows-expanded-6",
+      "title": "Yellowjackets",
+      "category": "SURVIVAL · PSYCHOLOGICAL HORROR",
+      "description": "A stranded football team carries terrifying secrets into adulthood.",
+      "sourceName": "Paramount+",
+      "sourceUrl": "https://www.paramountplus.com/shows/yellowjackets/",
+      "checkedAt": "2026-10-09"
+    },
+    {
+      "id": "tv-shows-expanded-7",
+      "title": "Evil",
+      "category": "SUPERNATURAL · INVESTIGATION",
+      "description": "A psychologist and two investigators confront cases where faith meets the unexplained.",
+      "sourceName": "Paramount+",
+      "sourceUrl": "https://www.paramountplus.com/shows/evil/",
+      "checkedAt": "2026-10-09"
     }
   ],
   "podcasts": [
@@ -109,6 +127,33 @@
       "sourceName": "Fool & Scholar",
       "sourceUrl": "https://www.foolandscholar.com/the-white-vault-1",
       "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "podcasts-expanded-6",
+      "title": "Malevolent",
+      "category": "COSMIC HORROR · AUDIO DRAMA",
+      "description": "An investigator wakes without his sight, guided by an untrustworthy voice.",
+      "sourceName": "Harlan Guthrie / Apple Podcasts",
+      "sourceUrl": "https://podcasts.apple.com/gb/podcast/malevolent/id1525652021",
+      "checkedAt": "2026-10-09"
+    },
+    {
+      "id": "podcasts-expanded-7",
+      "title": "Spooked",
+      "category": "PARANORMAL · TRUE STORIES",
+      "description": "Firsthand supernatural encounters, told by the people who experienced them.",
+      "sourceName": "Snap Studios / Apple Podcasts",
+      "sourceUrl": "https://podcasts.apple.com/gb/podcast/spooked/id1279361017",
+      "checkedAt": "2026-10-09"
+    },
+    {
+      "id": "podcasts-expanded-8",
+      "title": "Radio Rental",
+      "category": "UNSETTLING ENCOUNTERS · ANTHOLOGY",
+      "description": "Disturbing real-life accounts presented from a strange video rental store.",
+      "sourceName": "Tenderfoot TV",
+      "sourceUrl": "https://tenderfoot.tv/tftv-shows/radio-rental/",
+      "checkedAt": "2026-10-09"
     }
   ],
   "games": [
@@ -119,7 +164,8 @@
       "description": "Investigate hauntings with friends and try to survive.",
       "sourceName": "Kinetic Games",
       "sourceUrl": "https://www.kineticgames.co.uk/phasmophobia",
-      "checkedAt": "2026-10-08"
+      "checkedAt": "2026-10-08",
+      "steamId": 739630
     },
     {
       "id": "games-1",
@@ -137,7 +183,8 @@
       "description": "An engineer explores a derelict spacecraft filled with horrors.",
       "sourceName": "Electronic Arts",
       "sourceUrl": "https://www.ea.com/games/dead-space",
-      "checkedAt": "2026-10-08"
+      "checkedAt": "2026-10-08",
+      "steamId": 1693980
     },
     {
       "id": "games-3",
@@ -146,7 +193,8 @@
       "description": "Return to a fogbound town shaped by grief and dread.",
       "sourceName": "Konami",
       "sourceUrl": "https://www.konami.com/games/us/en/topics/2440/",
-      "checkedAt": "2026-10-08"
+      "checkedAt": "2026-10-08",
+      "steamId": 2124490
     },
     {
       "id": "games-4",
@@ -155,7 +203,8 @@
       "description": "Uncover the horrors within the halls of Castle Brennenburg.",
       "sourceName": "Frictional Games",
       "sourceUrl": "https://frictionalgames.com/games/",
-      "checkedAt": "2026-10-08"
+      "checkedAt": "2026-10-08",
+      "steamId": 57300
     },
     {
       "id": "games-5",
@@ -164,7 +213,38 @@
       "description": "A journey through the desert leads into disturbing darkness.",
       "sourceName": "Frictional Games",
       "sourceUrl": "https://frictionalgames.com/games/",
-      "checkedAt": "2026-10-08"
+      "checkedAt": "2026-10-08",
+      "steamId": 999220
+    },
+    {
+      "id": "games-expanded-6",
+      "title": "Outlast",
+      "category": "FIRST-PERSON · SURVIVAL HORROR",
+      "description": "Investigate an abandoned asylum with little more than a night-vision camera.",
+      "sourceName": "Red Barrels",
+      "sourceUrl": "https://redbarrelsgames.com/games/",
+      "checkedAt": "2026-10-09",
+      "steamId": 238320
+    },
+    {
+      "id": "games-expanded-7",
+      "title": "The Mortuary Assistant",
+      "category": "OCCULT · SIMULATION HORROR",
+      "description": "Prepare bodies during a night shift while supernatural threats gather.",
+      "sourceName": "DarkStone Digital / Steam",
+      "sourceUrl": "https://store.steampowered.com/app/1295920/The_Mortuary_Assistant/",
+      "checkedAt": "2026-10-09",
+      "steamId": 1295920
+    },
+    {
+      "id": "games-expanded-8",
+      "title": "Still Wakes the Deep",
+      "category": "NARRATIVE · COSMIC HORROR",
+      "description": "Survive an impossible terror aboard a collapsing North Sea oil rig.",
+      "sourceName": "The Chinese Room / Steam",
+      "sourceUrl": "https://store.steampowered.com/app/1622910/Still_Wakes_the_Deep/",
+      "checkedAt": "2026-10-09",
+      "steamId": 1622910
     }
   ],
   "indie-movies": [
@@ -221,6 +301,33 @@
       "sourceName": "Focus Features",
       "sourceUrl": "/films/nosferatu/",
       "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "indie-movies-expanded-6",
+      "title": "Talk to Me",
+      "category": "INDEPENDENT · SUPERNATURAL HORROR",
+      "description": "Friends unleash something dreadful through a ritual involving an embalmed hand.",
+      "sourceName": "A24",
+      "sourceUrl": "https://a24films.com/films/talk-to-me",
+      "checkedAt": "2026-10-09"
+    },
+    {
+      "id": "indie-movies-expanded-7",
+      "title": "Hereditary",
+      "category": "INDEPENDENT · OCCULT HORROR",
+      "description": "A bereaved family unravels a terrifying inheritance.",
+      "sourceName": "A24",
+      "sourceUrl": "https://a24films.com/films/hereditary",
+      "checkedAt": "2026-10-09"
+    },
+    {
+      "id": "indie-movies-expanded-8",
+      "title": "Saint Maud",
+      "category": "INDEPENDENT · PSYCHOLOGICAL HORROR",
+      "description": "A deeply religious nurse becomes obsessed with saving her patient's soul.",
+      "sourceName": "A24",
+      "sourceUrl": "https://a24films.com/films/saint-maud",
+      "checkedAt": "2026-10-09"
     }
   ]
 }

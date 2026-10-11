@@ -7,8 +7,8 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const publicFiles = [
-  'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
-  'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-archive.js', 'archive-film.js',
+  'index.html', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
+  'media.html', 'media-ui.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js', 'streaming-watch.js', 'horror-archive.js', 'archive-film.js',
   'styles.css', 'hub.css', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
@@ -20,6 +20,8 @@ for (const directory of ['assets', 'films', 'top-20']) {
 await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
 await cp(new URL('data/editorial-releases.json', root), new URL('data/editorial-releases.json', destination));
+await cp(new URL('data/cinema-screenings.json', root), new URL('data/cinema-screenings.json', destination));
+await cp(new URL('data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
 await cp(new URL('data/archive/profiles.json', root), new URL('data/archive/profiles.json', destination));
@@ -44,8 +46,10 @@ await writeFile(new URL('robots.txt', destination),
   'User-agent: *\nDisallow: /\n');
 const sharedHeaders = await readFile(new URL('_headers', root), 'utf8');
 if (!sharedHeaders.startsWith('/*')) throw new Error('Shared security headers are missing the Pages _headers rule');
-await writeFile(new URL('_headers', destination), sharedHeaders.replace('/*',
-  '/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Cache-Control: no-store'));
+const previewHeaders = sharedHeaders.replace('  Cache-Control: no-cache, must-revalidate', '  Cache-Control: no-store');
+if (!previewHeaders.includes('Cache-Control: no-store')) throw new Error('Protected preview must use no-store');
+await writeFile(new URL('_headers', destination),
+  previewHeaders.replace('/*', '/*\n  X-Robots-Tag: noindex, nofollow, noarchive'));
 // Keep static pages free of Functions invocation charges.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]

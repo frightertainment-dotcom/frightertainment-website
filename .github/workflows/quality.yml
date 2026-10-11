@@ -18,17 +18,24 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Audit dependencies for high-severity advisories
+        run: npm audit --audit-level=high
       - run: npm run build:pages
       - run: npm run check
+      - name: Audit every historical Horror Vault record and record media provenance gaps
+        run: npm run audit:vault
       - run: npm run build:preview
       - name: Verify isolated, non-indexable preview bundle
         run: |
           test -f dist/index.html
           test -f dist/release-brief.js
           test -f dist/data/editorial-releases.json
+          test -f dist/data/streaming-discovery.json
+          test -f dist/straight-to-stream.js
+          grep -q 'id="straight-to-stream"' dist/movies.html
           grep -q 'data-release-brief' dist/index.html
           test -f dist/home-discovery.js
-          grep -q 'src="/home-discovery.js"' dist/index.html
+          grep -Eq 'src="/home-discovery\.js\?v=[0-9a-f]{12}"' dist/index.html
           test -f dist/all-horror-movies.html
           test -f dist/archive-film.html
           test -f dist/archive-film.js
@@ -39,6 +46,7 @@ jobs:
           test -f dist/films/other-mommy/index.html
           grep -q 'Disallow: /' dist/robots.txt
           grep -q 'X-Robots-Tag: noindex' dist/_headers
+          grep -q 'Cache-Control: no-store' dist/_headers
           ! test -e dist/scripts
           ! test -e dist/worker
           ! test -e dist/.github
@@ -59,10 +67,15 @@ jobs:
           test -f dist/indie-movies.html
           test -f dist/podcasts.html
           test -f dist/games.html
+          test -f dist/streaming-discovery.json || test -f dist/data/streaming-discovery.json
+          test -f dist/straight-to-stream.js
           test -f dist/films/other-mommy/index.html
           test -f dist/top-20/2026/index.html
           test -f dist/sitemap.xml
           test -f dist/_routes.json
+          grep -q 'Cache-Control: no-cache, must-revalidate' dist/_headers
+          grep -Eq 'href="/hub\.css\?v=[0-9a-f]{12}"' dist/movies.html
+          grep -Eq 'src="/release-calendar\.js\?v=[0-9a-f]{12}"' dist/movies.html
           grep -q 'Sitemap: https://www.frightertainment.com/sitemap.xml' dist/robots.txt
           ! grep -qi 'noindex' dist/_headers
           ! grep -qi 'Disallow: /' dist/robots.txt
@@ -77,5 +90,6 @@ jobs:
           name: browser-review
           path: |
             test-results/
+            audit-results/
             playwright-report/
           if-no-files-found: ignore

@@ -5,16 +5,16 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
 const publicFiles = [
-  'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html',
+  'index.html', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'all-horror-movies.html', 'archive-film.html',
   'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html',
   'film.html',
-  'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
-  'hub.js', 'release-calendar.js', 'release-brief.js',
+  'media.html', 'media-ui.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
+  'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js', 'streaming-watch.js',
   'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
-  'data/movies.js', 'data/editorial-releases.json',
+  'data/movies.js', 'data/editorial-releases.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 
@@ -69,8 +69,8 @@ if (!headers.startsWith('/*') || !headers.includes('Content-Security-Policy:') |
 }
 await writeFile(new URL('_headers', destination), headers);
 
-// Pages Functions are available only at /api/* (the production project initially
-// has no D1 binding, so unlicensed/provider-dependent APIs must fail safely).
+// Pages Functions are available only at /api/* and use environment-specific
+// approved D1 and API secret bindings. No provider credentials enter dist/.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version: 1, include: ['/api/*'], exclude: []
 }));

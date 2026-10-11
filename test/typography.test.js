@@ -15,31 +15,36 @@ async function htmlFiles(directory) {
   return files;
 }
 
-test('all directly served HTML pages declare the shared display and body fonts', async () => {
+test('all directly served HTML pages load the shared typography stylesheet', async () => {
   const files = await htmlFiles(process.cwd());
   assert.ok(files.length > 0);
   for (const file of files) {
     const html = await readFile(file, 'utf8');
-    assert.match(html, /fonts\.googleapis\.com\/css2\?family=Barlow\+Condensed/, `${file} must load Barlow Condensed directly`);
-    assert.match(html, /family=Bebas\+Neue/, `${file} must load the OFL-licensed display face directly`);
-    assert.match(html, /family=Cormorant\+Garamond:wght@500;600;700/, `${file} must load the cinematic display face directly`);
-    assert.match(html, /family=DM\+Sans/, `${file} must load DM Sans directly`);
+    assert.match(html, /stylesheet[^>]+styles\.css/, `${file} must load the shared typography stylesheet`);
   }
 });
 
-test('section and film display typography uses the licensed horror display face with a safe fallback', async () => {
+test('site-wide typography uses readable Times New Roman and the supplied page wordmarks', async () => {
   const css = await readFile(join(process.cwd(), 'hub.css'), 'utf8');
-  assert.match(css, /--font-horror:'Cormorant Garamond',Georgia,serif/);
-  assert.match(css, /\.hub-intro h1,\.hub-page-intro h1[^\n]*font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
-  assert.match(css, /\.hub-section \.fr-movie-hero__info h1\{font-family:var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
-  assert.match(css, /\.hub-chart-row a\{font:700 16px\/1\.1 var\(--font-room,var\(--font-horror,var\(--font-display\)\)\)/);
+  const baseCss = await readFile(join(process.cwd(), 'styles.css'), 'utf8');
+  assert.match(baseCss, /--font-display:'Times New Roman',Georgia,serif;--font-body:'Times New Roman',Georgia,serif/);
+  assert.doesNotMatch(baseCss, /UnifrakturMaguntia/);
+  assert.match(css, /--font-horror:'Times New Roman',Georgia,serif/);
+  assert.match(css, /--font-room:'Times New Roman',Georgia,serif/);
+  assert.match(css, /font-family:"Times New Roman",Times,serif!important/);
+  assert.doesNotMatch(css, /UnifrakturMaguntia/);
+  for (const [page, image] of [['movies.html','page-title-movies.png'],['all-horror-movies.html','page-title-movies.png'],['tv-shows.html','page-title-tv-shows.png'],['cinema.html','page-title-cinema.png'],['indie-movies.html','page-title-indie-movies.png'],['podcasts.html','page-title-podcasts.png'],['games.html','page-title-games.png']]) {
+    const html = await readFile(join(process.cwd(), page), 'utf8');
+    assert.match(html, /class="hub-page-title hub-page-title--wordmark" aria-label=/);
+    assert.match(html, new RegExp('/assets/' + image.replaceAll('.', '\\.')));
+    assert.match(html, /class="sr-only"/);
+  }
 });
 
-test('Cormorant Garamond license and fallback behavior are documented', async () => {
+test('Times New Roman and accessible section wordmarks are documented', async () => {
   const docs = await readFile(join(process.cwd(), 'TYPOGRAPHY.md'), 'utf8');
-  assert.match(docs, /SIL Open Font License 1\.1/);
-  assert.match(docs, /Georgia/);
-  assert.match(docs, /Cormorant Garamond/);
+  assert.match(docs, /Times New Roman/);
+  assert.match(docs, /accessible text heading/);
 });
 
 test('generated film detail templates present a synopsis once and retain the sourced claim list', async () => {
@@ -50,6 +55,7 @@ test('generated film detail templates present a synopsis once and retain the sou
     assert.equal((html.match(/class="fr-movie-hero__synopsis"/g) || []).length, 1, `${file} should show its overview once`);
     assert.doesNotMatch(html, /class="film-page__synopsis"/, `${file} should not repeat its synopsis in a second prominent block`);
     assert.match(html, /class="source-list"/, `${file} must retain the sourced claim list`);
-    assert.match(html, /at least three distinct professional critics have eligible, verified reviews/, `${file} must retain Fright Rating eligibility requirements`);
+    assert.doesNotMatch(html, /<h2>FRIGHT RATING<\/h2>/, `${file} must omit the retired Fright Rating section`);
+    assert.doesNotMatch(html, /DAILY · VERIFIED|Updated by calendar date|permission-cleared reviews are not available/i, `${file} should not expose operational copy`);
   }
 });

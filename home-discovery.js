@@ -11,6 +11,8 @@
   const search = document.querySelector('#home-search');
   let payloads = {};
   let rankingItems = [];
+  let artworkByTitle = new Map();
+  const titleKey = value => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   function render() {
     const query = search.value.trim().toLocaleLowerCase();
     for (const kind of kinds) {
@@ -21,24 +23,35 @@
       items = items.filter(item => `${item.title || ''} ${item.provider || ''}`.toLocaleLowerCase().includes(query)).slice(0, 4);
       node.innerHTML = items.map(item => {
         if (kind === 'rankings') {
-          const links = (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} →</a>` : '').join(' ');
-          const scoreLabel=`Fright Rating ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
-          return `<article><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${scoreLabel}</span><small>${links}</small></article>`;
+          const community = payloads.rankingsRatingKind === 'tmdb-community';
+          const links = community ? (safeUrl(item.sourceUrl) ? `<a href="${escape(safeUrl(item.sourceUrl))}" target="_blank" rel="noopener noreferrer">TMDB →</a>` : '') :
+            (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} →</a>` : '').join(' ');
+          const scoreLabel = community ? `TMDB community rating ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.voteCount)} votes` :
+            `Viewer rating ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
+          const posterPath = community && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
+          const poster = posterPath ? `<img class="home-discovery__poster" data-media-field="poster" src="https://image.tmdb.org/t/p/w185${escape(posterPath)}" alt="Poster for ${escape(item.title)}" loading="lazy">` : '';
+          return `<article data-media-type="movie" data-media-title="${escape(item.title)}" ${item.tmdbId?`data-tmdb-id="${escape(item.tmdbId)}"`:""} class="${poster ? 'home-discovery__item--poster' : ''}">${poster||`<img class="home-discovery__poster" data-media-field="poster" alt="${escape(item.title)} poster" hidden>`}<div><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${scoreLabel}</span><button class="fr-trailer-button" type="button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button><small>${links}</small></div></article>`;
         }
         const date = item.releaseDate ? ` · ${escape(item.releaseDate)} (${escape(item.releaseTerritory || item.territory || '')})` : '';
         const extra = kind === 'streaming-releases' ? (item.releaseMode === 'unconfirmed' ? 'Release path unconfirmed' : escape(item.releaseMode)) : kind === 'trending-horror' ? (payloads[kind]?.status==='editorial'?'Recently added to UK horror streaming':'Weekly popularity · not a score') : '';
         const href = safeUrl(item.sourceUrl);
-        return `<article><strong>${escape(item.title)}</strong><span>${escape(item.provider || item.status || extra)}${date}</span><small>${href ? `<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(item.sourceName || 'Source')} →</a>` : ''} · ${escape(item.territory)} · checked ${escape(item.checkedAt)}</small></article>`;
+        const candidatePoster = kind === 'trending-horror' ? item.posterPath : artworkByTitle.get(titleKey(item.title))?.posterPath;
+        const posterPath = /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(candidatePoster || '') ? candidatePoster : '';
+        const poster = posterPath ? `<img class="home-discovery__poster" data-media-field="poster" src="https://image.tmdb.org/t/p/w342${escape(posterPath)}" alt="Poster for ${escape(item.title)}" loading="lazy" decoding="async">` : '';
+        return `<article data-media-type="movie" data-media-title="${escape(item.title)}" ${item.tmdbId?`data-tmdb-id="${escape(item.tmdbId)}"`:""} class="${poster ? 'home-discovery__item--poster' : ''}">${poster||`<img class="home-discovery__poster" data-media-field="poster" alt="${escape(item.title)} poster" hidden>`}<div><strong>${escape(item.title)}</strong><span>${escape(item.provider || item.status || extra)}${date}</span><span class="archive-media__rating" data-media-field="rating"></span><button class="fr-trailer-button" type="button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button><small>${href ? `<a href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(item.sourceName || 'Source')} →</a>` : ''} · ${escape(item.territory)} · checked ${escape(item.checkedAt)}</small></div></article>`;
       }).join('');
       if (updated) {
         const time = kind === 'rankings' ? payloads.rankingsUpdatedAt : payloads[kind]?.updatedAt;
         const stale = kind === 'rankings' ? payloads.rankingsStale : payloads[kind]?.status === 'stale';
-        updated.textContent = time ? `${kind === 'rankings' ? 'Last published ranking' : 'Last updated'}: ${new Date(time).toLocaleString('en-GB')} · ${stale ? 'stale data' : 'verified snapshot'}` : kind === 'rankings' ? 'Last successful ranking: none' : 'Last updated: no verified data';
+        updated.textContent = time ? `${kind === 'rankings' && payloads.rankingsRatingKind === 'tmdb-community' ? 'TMDB checked' : kind === 'rankings' ? 'Last published ranking' : 'Last updated'}: ${new Date(time).toLocaleString('en-GB')} · ${stale ? 'stale data' : 'verified snapshot'}` : kind === 'rankings' ? 'Last successful ranking: none' : 'Last updated: no verified data';
+      }
+      if (kind === 'rankings' && state && payloads.rankingsRatingKind === 'tmdb-community') {
+        state.textContent = items.length ? 'TMDB community votes · minimum 50 votes · viewer ratings, not critic scores.' : 'No titles have met the 50-vote minimum yet.';
       }
       if (items.length && state && payloads[kind]?.status==='editorial') {
         state.textContent='From UK release announcements, with dates and source links.';
       }
-      if (!items.length && !query) {
+      if (!items.length && !query && !(kind === 'rankings' && payloads.rankingsRatingKind === 'tmdb-community')) {
         const empty = kind === 'rankings'
           ? payloads.rankingsStale ? 'Ranking data is stale; no current verified chart is available.' : 'Critic ranking pending: verified critic scores are not yet available.'
           : kind === 'theatrical-releases' ? 'No recent cinema listings here yet.'
@@ -46,7 +59,7 @@
           : kind === 'coming-soon' ? 'No upcoming releases in this feed.'
           : 'No current popularity chart.';
         state.textContent = empty;
-      } else if (items.length && state && payloads[kind]?.status!=='editorial') state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
+      } else if (items.length && state && kind !== 'rankings' && payloads[kind]?.status!=='editorial') state.textContent = `${items.length} verified listing${items.length === 1 ? '' : 's'} for ${country.options[country.selectedIndex].text}.`;
     }
     const sources = [...new Set(kinds.flatMap(kind => (payloads[kind]?.items || []).map(item => item.sourceName).filter(Boolean)))];
     document.querySelector('#home-attribution').textContent = sources.length
@@ -89,16 +102,20 @@
   async function load() {
     const query=encodeURIComponent(country.value);
     // Independent failures must not blank the other source-fed panels.
-    const [discovery,rankings,editorial]=await Promise.all([
+    const [discovery,rankings,editorial,artwork]=await Promise.all([
       fetch('/api/discovery?country='+query,{headers:{accept:'application/json'}})
         .then(r=>r.ok?r.json():null).catch(()=>null),
       fetch('/api/rankings?year='+rankingYear,{headers:{accept:'application/json'}})
         .then(r=>r.ok?r.json():null).catch(()=>null),
       fetch('/data/editorial-releases.json',{headers:{accept:'application/json'}})
+        .then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch('/api/movie-artwork',{headers:{accept:'application/json'}})
         .then(r=>r.ok?r.json():null).catch(()=>null)
     ]);
     payloads=discovery?.datasets||{};
     rankingItems=Array.isArray(rankings?.items)?rankings.items:[];
+    artworkByTitle = new Map((artwork?.items || []).map(item => [titleKey(item.title), item]));
+    payloads.rankingsRatingKind = rankings?.ratingKind || 'professional-critics';
     payloads.rankingsUpdatedAt=rankings?.updatedAt||null;
     payloads.rankingsStale=rankings?.stale===true;
     populateEditorial(editorial);

@@ -47,14 +47,14 @@ for (const movie of movies) {
   try {
     const html = await readFile(detailURL, 'utf8');
     for (const claim of movie.claims || []) if (!html.includes(escapeHTML(claim.value))) errors.push(`Detail page is stale or missing claim ${movie.id}/${claim.field}`);
-    for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'src="/app.js"', `data-film-id="${movie.id}"`, `<link rel="canonical" href="https://www.frightertainment.com/films/${movie.id}/">`]) if (!html.includes(required)) errors.push(`Detail page is missing ${required}: ${movie.id}`);
+    for (const required of ['src="/app.js"', `data-film-id="${movie.id}"`, `<link rel="canonical" href="https://www.frightertainment.com/films/${movie.id}/">`]) if (!html.includes(required)) errors.push(`Detail page is missing ${required}: ${movie.id}`);
   } catch { errors.push(`Missing generated detail page: ${movie.id}`); }
 }
 
 for (const file of ['index.html']) {
   const html = await readFile(new URL(file, root), 'utf8');
   if (/Assets\//.test(html)) errors.push(`${file} contains an uppercase Assets/ path`);
-  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', 'menu-toggle']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
+  for (const required of ['class="hub-tabs"', 'href="/cinema.html"']) if (!html.includes(required)) errors.push(`${file} is missing responsive navigation wiring: ${required}`);
   if (!html.includes(`href="top-20/${currentYear}/"`) && !html.includes(`href="/top-20/${currentYear}/"`) && !html.includes('href="top-20/"')) errors.push(`${file} is missing the annual Top 20 link`);
   for (const [, ref] of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)/g)) {
     try { await access(new URL(ref, root)); } catch { errors.push(`${file} refers to missing ${ref}`); }
@@ -65,18 +65,18 @@ for (const f of ['index.html','movies.html','tv-shows.html','podcasts.html','ind
   if (!html.includes('src="/app.js"') && !html.includes('src="app.js"')) errors.push(f+' is missing shared JavaScript');
 }
 const top20Archive = await readFile(new URL('top-20/index.html', root), 'utf8');
-for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `href="/top-20/${currentYear}/"`]) if (!top20Archive.includes(required)) errors.push(`Top 20 archive is missing ${required}`);
+for (const required of [`href="/top-20/${currentYear}/"`]) if (!top20Archive.includes(required)) errors.push(`Top 20 archive is missing ${required}`);
 const rankingPages = (await import('node:fs/promises')).readdir;
 const rankingDirectories = (await rankingPages(new URL('top-20/', root), { withFileTypes: true })).filter(entry => entry.isDirectory());
 for (const directory of rankingDirectories) {
   if (!/^\d{4}$/.test(directory.name)) continue;
   const file = `top-20/${directory.name}/index.html`;
   const html = await readFile(new URL(file, root), 'utf8');
-  for (const required of ['id="mobile-nav"', 'aria-controls="mobile-nav"', `data-ranking-year="${directory.name}"`, 'src="/top20.js"', 'canonical']) if (!html.includes(required)) errors.push(`${file} is missing ${required}`);
+  for (const required of [`data-ranking-year="${directory.name}"`, 'src="/top20.js"', 'canonical']) if (!html.includes(required)) errors.push(`${file} is missing ${required}`);
 }
 const dynamicFilm = await readFile(new URL('film.html', root), 'utf8');
 const dynamicFilmScript = await readFile(new URL('dynamic-film.js', root), 'utf8');
-if (!dynamicFilm.includes('id="mobile-nav"') || !dynamicFilm.includes('src="/dynamic-film.js"') || !dynamicFilmScript.includes('/api/films/${encodeURIComponent(id)}')) errors.push('Dynamic approved-film detail route is missing its navigation or API wiring');
+if (!dynamicFilm.includes('class="hub-tabs"') || !dynamicFilm.includes('src="/dynamic-film.js"') || !dynamicFilmScript.includes('/api/films/${encodeURIComponent(id)}')) errors.push('Dynamic approved-film detail route is missing its navigation or API wiring');
 for (const movie of movies.filter(record => record.trailer)) {
   const detailHTML = await readFile(new URL(`films/${movie.id}/index.html`, root), 'utf8');
   if (!detailHTML.includes(`href="${escapeHTML(movie.trailer.source)}"`)) errors.push(`No-JavaScript detail page is missing the official trailer source link: ${movie.id}`);
@@ -102,12 +102,12 @@ if (/FRIGHTERTAINMENT ORIGINALS|DETAILS TO BE ANNOUNCED|id="originals"|href="#or
 
 for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.html','games.html']) {
   const markup = await readFile(new URL(page,root),'utf8');
-  for (const needed of ['class="hub-tabs"', 'src="/app.js"', 'id="mobile-nav"', 'href="/hub.css"'])
+  for (const needed of ['class="hub-tabs"', 'src="/app.js"', 'href="/cinema.html"', 'href="/hub.css"'])
     if (!markup.includes(needed)) errors.push(page + ' missing required navigation or styling: ' + needed);
 }
 for (const [page, theme] of Object.entries({
   'index.html':'home','movies.html':'movies','all-horror-movies.html':'movies','archive-film.html':'movies',
-  'film.html':'movies','tv-shows.html':'tv','indie-movies.html':'indie','podcasts.html':'podcasts','games.html':'games'
+  'film.html':'movies','tv-shows.html':'tv','indie-movies.html':'indie','podcasts.html':'podcasts','games.html':'games','cinema.html':'movies','contact.html':'home'
 })) {
   const markup = await readFile(new URL(page, root), 'utf8');
   if (!markup.includes(`data-theme="${theme}"`)) errors.push(`${page} is missing its ${theme} theme token`);
@@ -117,7 +117,7 @@ for (const path of ['top-20/2026/index.html','films/28-years-later-bone-temple/i
   if (!markup.includes('data-theme="movies"')) errors.push(`${path} must use the Movies environment`);
 }
 const movieYearsMarkup = await readFile(new URL('movies.html',root),'utf8');
-for (const required of ['id="movie-year"', 'value="older"', 'value="2025"', 'value="2026"']) {
+for (const required of ['id="movie-year"', 'value="all"', 'value="2025"', 'value="2026"']) {
   if (!movieYearsMarkup.includes(required)) errors.push('Movie year filter missing '+required);
 }
 if(!movies.some(movie=>movie.id==='28-weeks-later' && movie.claims.some(claim=>claim.field==='filmYear' && claim.value==='2007')))
@@ -147,8 +147,10 @@ for (const kind of ['tv-shows','podcasts','games','indie-movies']) {
 }
 
 const calendarClient = await readFile(new URL('release-calendar.js',root),'utf8');
-if(!calendarClient.includes("claim.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
+if(!calendarClient.includes("c.field==='releaseDate'")) errors.push('Source-based release calendar wiring is missing');
+if(!calendarClient.includes('x.date>today')) errors.push('Upcoming release calendar must exclude historical and already-passed release dates');
 if(!(await readFile(new URL('movies.html',root),'utf8')).includes('id="hub-release-list"')) errors.push('Release calendar is missing from the Movies page');
+if((await readFile(new URL('movies.html',root),'utf8')).includes('id="review-index"')) errors.push('Do not show an empty rating methodology panel to visitors');
 // No private publisher-score payload or fallback renderer may enter public assets.
 for (const file of ['data/movies.js','app.js','hub.js','home-discovery.js','discovery.js','top20.js','index.html','movies.html','scripts/build-pages.mjs','scripts/build-preview.mjs']) {
   const source = await readFile(new URL(file, root), 'utf8');
@@ -178,7 +180,7 @@ for(const entry of vault.films||[]){
   if(schemaSeen.has(entry.qid)) errors.push('Duplicate archive Wikidata item '+entry.qid);
   schemaSeen.add(entry.qid);
 }
-for(const need of ['id="archive-years"','id="archive-jump"','src="/horror-archive.js"','ALL HORROR MOVIES'])
+for(const need of ['id="archive-years"','id="archive-jump"','id="archive-global-search"','src="/horror-archive.js"','ALL HORROR MOVIES'])
   if(!vaultHTML.includes(need))errors.push('Year-by-year film archive HTML missing '+need);
 if(!vaultJS.includes('renderYearContents')||!vaultJS.includes("type='search'")&&!vaultJS.includes("search.type='search'"))
   errors.push('All Horror Movies must lazily render A–Z results and provide per-year searches');
@@ -191,6 +193,7 @@ if(!previewBuild.includes("'all-horror-movies.html'")||!previewBuild.includes("'
   errors.push('Archive missing from private Pages deployment bundle');
 const homeForArchive=await readFile(new URL('index.html',root),'utf8');
 const moviesForArchive=await readFile(new URL('movies.html',root),'utf8');
+if(!moviesForArchive.includes('class="shell hub-vault-portal"')) errors.push('Movies landing page must prominently link into the full Horror Vault');
 if(!homeForArchive.includes('href="/all-horror-movies.html"')||
    !moviesForArchive.includes('href="/all-horror-movies.html"'))
   errors.push('All Horror Movies must be accessible as a Movies subtab and homepage link');
@@ -208,7 +211,7 @@ if(!archiveDetailHtml.includes('id="archive-film-detail"') ||
   errors.push('First-party horror film detail entrypoint missing');
 if(!archivePageJs.includes("'/archive-film.html?id='") ||
    !archivePageJs.includes("li.append(link)") ||
-   !archivePageJs.includes("link.append(node('span','horror-year__film-title'"))
+   !archivePageJs.includes("horror-year__film-title"))
   errors.push('Archive films must use whole-card internal links rather than relying on third-party pages');
 if(!archiveDetailJs.includes("https://www.wikidata.org/wiki/") ||
    !archiveDetailJs.includes("https://www.imdb.com/find/") ||

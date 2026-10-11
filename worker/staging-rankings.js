@@ -30,7 +30,8 @@ export async function calculateDailyRanking(db, now = new Date()) {
   for (const year of years) {
     try {
       const payload = await publishAnnualRankingSnapshot(db, year, now, 'cron-staging');
-      snapshots.push({ year, rankedRows: payload?.rankedFilms || 0, status: 'published' });
+      if (!payload) throw new Error(`Annual ranking snapshot for ${year} was not created`);
+      snapshots.push({ year, rankedRows: payload.rankedFilms, status: 'published' });
     } catch (error) {
       const issue = errorDetails(error);
       try { await logRun(db, { task: `ranking-${year}`, status: 'failed', startedAt, finishedAt: new Date().toISOString(), error: issue }); }
@@ -39,13 +40,24 @@ export async function calculateDailyRanking(db, now = new Date()) {
       log('staging_ranking_snapshot_failed_last_good_retained', { year, error: issue });
     }
   }
-  const succeededYears = snapshots.filter(row => row.status === 'published').length;
+  const publishedYears = snapshots.filter(row => row.status === 'published').length;
   const failedYears = snapshots.filter(row => row.status === 'failed').length;
-  const status = failedYears === 0 ? 'published' : succeededYears === 0 ? 'failed' : 'partial';
+  const status = snapshots.length === 0
+    ? 'failed'
+    : failedYears === 0
+      ? 'published'
+      : publishedYears === 0
+        ? 'failed'
+        : 'partial';
   return {
     updatedAt: now.toISOString(),
     rankedRows: snapshots.reduce((total, row) => total + row.rankedRows, 0),
-    status, snapshots, succeededYears, failedYears, method
+    publishedYears,
+    succeededYears: publishedYears,
+    failedYears,
+    status,
+    snapshots,
+    method
   };
 }
 
@@ -53,17 +65,27 @@ export default {
   async scheduled(_controller, env, _ctx) {
     try {
       const result = await calculateDailyRanking(env.DB);
+      log('daily_staging_rankings_run', {
+        rankedRows: result.rankedRows,
+        publishedYears: result.publishedYears || 0,
+        failedYears: result.failedYears || 0,
+        status: result.status,
+        years: result.snapshots?.map(row => row.year) || []
+      });
       if (result.status === 'skipped') return result;
-      if (result.failedYears > 0) {
+      if (result.status !== 'published') {
         log('daily_staging_rankings_incomplete', {
           status: result.status,
           succeededYears: result.succeededYears,
           failedYears: result.failedYears,
-          failedFilmYears: result.snapshots.filter(row => row.status === 'failed').map(row => row.year)
+          failedFilmYears: result.snapshots?.filter(row => row.status === 'failed').map(row => row.year) || []
         });
         // Surface partial failure to Cloudflare Cron monitoring, even when another
-        // year was successfully published. Per-year failure details are logged above.
-        throw new Error(`Failed to publish ${result.failedYears} of ${result.snapshots.length} annual ranking snapshots`);
+        // year was successfully published. Empty runs must not report success either.
+        const errorMessage = result.failedYears > 0
+          ? `Failed to publish ${result.failedYears} of ${result.snapshots?.length || 0} annual ranking snapshots (run status: ${result.status})`
+          : `Annual ranking run status was ${result.status}: no yearly snapshots were published`;
+        throw new Error(errorMessage);
       }
       log('daily_staging_rankings_updated', { rankedRows: result.rankedRows, status: result.status, years: result.snapshots.map(row => row.year) });
       return result;

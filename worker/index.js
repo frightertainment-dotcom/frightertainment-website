@@ -10,6 +10,8 @@ import {
   refreshStreaming, refreshStreamingReleases, refreshTheatricalReleases, refreshTrending
 } from './providers.js';
 import { importLicensedReviews } from './review-ingestion.js';
+import { refreshCommunityChart, refreshMovieArtwork } from './tmdb-catalogue.js';
+import { fetchMedia, fetchCatalogue } from './tmdb-media.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -20,7 +22,15 @@ const JSON_HEADERS = {
   'content-security-policy': "default-src 'none'; base-uri 'none'; frame-ancestors 'none'",
   'permissions-policy': 'camera=(), microphone=(), geolocation=()'
 };
+// Both private preview and production require an explicit approved, attributed,
+ // encrypted server-side TMDB credential. A preview-only opt-in must not
+ // accidentally leave the production catalogue switched off.
+const tmdbReady = env => env.TMDB_NONCOMMERCIAL_USE_APPROVED === 'true'
+  && env.TMDB_ATTRIBUTION_READY === 'true'
+  && typeof env.TMDB_READ_ACCESS_TOKEN === 'string'
+  && env.TMDB_READ_ACCESS_TOKEN.length > 0;
 const countryPattern = /^[A-Z]{2}$/;
+const cinemaPreviewCountries=new Set(['GB','US','CA','AU','IE']);
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const nowIso = () => new Date().toISOString();
 const today = () => nowIso().slice(0, 10);
@@ -99,6 +109,20 @@ async function handleRanking(env, request) {
   const yearValue = new URL(request.url).searchParams.get('year') || String(new Date().getUTCFullYear());
   const year = Number(yearValue);
   if (!Number.isInteger(year) || year < 1888 || year > new Date().getUTCFullYear() + 2) return json({ error: 'Invalid ranking year' }, 400);
+  if (tmdbReady(env)) {
+    const kind = `tmdb-community-${year}`;
+    let dataset = await loadDataset(env.DB, kind, '');
+    if (dataset.status !== 'current') {
+      await refreshTask(env, kind, '', () => refreshCommunityChart(env, year),
+        24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+      dataset = await loadDataset(env.DB, kind, '');
+    }
+    return json({ year, ratingKind: 'tmdb-community', minimumVotes: 50,
+      methodology: 'TMDB community vote average out of 10, ranked among horror films with at least 50 votes and a primary release date in this year up to today. Not a professional critic score or Frightertainment Fright Rating.',
+      items: dataset.items || [], rankedFilms: dataset.items?.length || 0,
+      updatedAt: dataset.updatedAt, stale: dataset.status === 'stale',
+      status: dataset.status }, 200, { 'cache-control': 'public, max-age=60' });
+  }
   if (!(await hasRankingSchema(env.DB))) {
     return json({ year, status: 'pending', minimumCritics: MINIMUM_CRITICS, methodology: RANKING_METHOD,
       rankedFilms: 0, pendingFilmCount: 0, pendingFilms: [], items: [], updatedAt: null,
@@ -132,8 +156,80 @@ async function handleRanking(env, request) {
     { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
 }
 
+async function handleMovieArtwork(env) {
+  if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
+  let dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
+  if (dataset.status !== 'current') {
+    await refreshTask(env, 'tmdb-movie-artwork', '',
+      () => refreshMovieArtwork(env, env.DB), 7 * 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+    dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
+  }
+  return json({ source: 'TMDB', updatedAt: dataset.updatedAt,
+    status: dataset.status, items: dataset.items || [] }, 200,
+    { 'cache-control': 'public, max-age=300' });
+}
+
+async function handleTMDBMedia(env, request, catalogue = false) {
+  if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
+  const params = new URL(request.url).searchParams;
+  const type = params.get('type') || 'movie';
+  if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
+  const cinemaMode=catalogue && ['cinema','cinema-recent'].includes(params.get('mode'));
+  const watchMode=catalogue && params.get('mode')==='streaming-watch';
+  const requestedCinemaCountry=params.get('country') || env.DEFAULT_COUNTRY || 'GB';
+  if(cinemaMode && !cinemaPreviewCountries.has(requestedCinemaCountry)) throw new HttpError(400,'Unsupported cinema country');
+  if(watchMode && !['GB','US'].includes(requestedCinemaCountry)) throw new HttpError(400,'Unsupported streaming country');
+  const country=(cinemaMode||watchMode) ? requestedCinemaCountry : countryOf(request,env);
+  const currentYear = new Date().getUTCFullYear();
+  const year = watchMode && params.get('year')==='all' ? null
+    :params.has('year') ? Number(params.get('year')) : catalogue ? currentYear : null;
+  if (year !== null && (!Number.isInteger(year) || year < 1888 || year > currentYear + 2)) throw new HttpError(400, 'Invalid media year');
+  const options = { type, country, year };
+  if (catalogue) {
+    options.mode = params.get('mode') || 'archive';
+    options.page = Number(params.get('page') || 1);
+    options.query = (params.get('query') || '').trim();
+    if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema', 'cinema-recent','streaming-watch'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
+    if(watchMode){
+      options.access=params.get('access')||'all';
+      if(type!=='movie'||!['all','subscription','free','rent-buy'].includes(options.access)||options.query)
+        throw new HttpError(400,'Invalid streaming provider filters');
+      options.catalogueVersion=5;
+    }
+    if (cinemaMode) options.catalogueVersion = 4;
+  } else {
+    options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
+    if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');
+    if (options.imdb && !/^tt[0-9]{7,10}$/.test(options.imdb)) throw new HttpError(400, 'Invalid IMDb identifier');
+    if (!options.id && !options.imdb && (!options.title || options.title.length > 240)) throw new HttpError(400, 'A media identifier or title is required');
+  }
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(options)));
+  const hash = [...new Uint8Array(digest)].slice(0, 12).map(n => n.toString(16).padStart(2, '0')).join('');
+  const kind = `tmdb-${catalogue ? 'list' : 'detail'}-${hash}`;
+  let dataset = await loadDataset(env.DB, kind, '');
+  if (dataset.status !== 'current') {
+    await refreshTask(env, kind, '', async () => {
+      const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
+      return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org', territory: 'Global', checkedAt: today() };
+    }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'tmdb-request-on-demand');
+    dataset = await loadDataset(env.DB, kind, '');
+  }
+  const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
+  if (catalogue) return json({ ...dataset, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=120' });
+  return json({ item: dataset.items?.[0] || null, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=300' });
+}
+
 async function handleDiscovery(env, request) {
   const country = countryOf(request, env);
+  // Pages Functions have no cron. When TMDB is configured in the current
+  // environment, refresh approved discovery data on demand using D1 snapshots.
+  if (tmdbReady(env)) {
+    const trending = await loadDataset(env.DB, 'trending-horror', country);
+    if (trending.status !== 'current') {
+      await refreshTask(env, 'trending-horror', country, () => refreshTrending(env, country),
+        36 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+    }
+  }
   const kinds = ['coming-soon', 'streaming-availability', 'streaming-releases', 'theatrical-releases', 'trending-horror'];
   const datasets = await Promise.all(kinds.map(async kind => [kind, await loadDataset(env.DB, kind, country)]));
   return json({ country, updatedAt: datasets.map(([, data]) => data.updatedAt).filter(Boolean).sort().at(-1) || null,
@@ -384,6 +480,9 @@ async function fetchHandler(request, env) {
   try {
     if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
     if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
+    if (path === '/api/movie-artwork' && request.method === 'GET') return await handleMovieArtwork(env);
+    if (path === '/api/media' && request.method === 'GET') return await handleTMDBMedia(env, request);
+    if (path === '/api/catalogue' && request.method === 'GET') return await handleTMDBMedia(env, request, true);
     if (path.startsWith('/api/films/') && request.method === 'GET') {
       let filmId;
       try { filmId = decodeURIComponent(path.slice('/api/films/'.length)); }

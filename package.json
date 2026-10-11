@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build:pages": "node scripts/build-pages.mjs && node scripts/build-editorial.mjs",
-    "check": "node scripts/check-content.mjs && node scripts/check-links.mjs",
+    "check": "npm run check:syntax && node scripts/check-content.mjs && node scripts/check-links.mjs && node scripts/check-streaming-discovery.mjs",
+    "audit:vault": "node scripts/audit-vault.mjs",
     "test": "node --test",
     "test:browser": "playwright test",
     "sync:manual-films": "node scripts/sync-manual-films.mjs",
@@ -16,9 +17,10 @@
     "worker:dev": "wrangler dev --persist-to .wrangler/discovery",
     "worker:migrations:local": "wrangler d1 migrations apply frightertainment-discovery --local --persist-to .wrangler/discovery",
     "serve": "python3 -m http.server 8080",
-    "build:preview": "npm run build:pages && node scripts/build-preview.mjs",
-    "build:production": "npm run build:pages && node scripts/build-production.mjs",
-    "check:published": "node scripts/check-published-links.mjs"
+    "build:preview": "npm run build:pages && node scripts/build-preview.mjs && node scripts/version-public-assets.mjs",
+    "build:production": "npm run build:pages && node scripts/build-production.mjs && node scripts/version-public-assets.mjs",
+    "check:published": "node scripts/check-published-links.mjs",
+    "check:syntax": "node scripts/check-js-syntax.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",

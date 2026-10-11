@@ -1,10 +1,58 @@
 (() => {
+  // A rotating, sourced feature: prefer a film actually released recently, then
+  // the closest verified upcoming release. No fabricated availability or score.
+  const feature=document.querySelector('.hub-feature');
+  const films=Array.isArray(window.FR_MOVIES)?window.FR_MOVIES:[];
+  if(feature&&films.length){
+    const today=new Date().toISOString().slice(0,10);
+    const recent=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+    const future=new Date(Date.now()+45*86400000).toISOString().slice(0,10);
+    const releases=films.flatMap(film=>(film.claims||[])
+      .filter(c=>c.field==='releaseDate'&&/^\d{4}-\d{2}-\d{2}$/.test(c.value||'')&&
+        /^https:\/\//.test(c.source||'')&&/theatrical|cinema/i.test(c.label||''))
+      .map(claim=>({film,claim})));
+    const sortRecent=(a,b)=>b.claim.value.localeCompare(a.claim.value)||
+      a.film.title.localeCompare(b.film.title);
+    const sortUpcoming=(a,b)=>a.claim.value.localeCompare(b.claim.value)||
+      a.film.title.localeCompare(b.film.title);
+    const latest=releases.filter(x=>x.claim.value<=today&&x.claim.value>=recent).sort(sortRecent)[0];
+    const upcoming=releases.filter(x=>x.claim.value>today&&x.claim.value<=future).sort(sortUpcoming)[0];
+    const chosen=latest||upcoming;
+    if(chosen&&/^[a-z0-9-]+$/.test(chosen.film.id)){
+      const kicker=feature.querySelector('.hub-kicker');
+      const title=feature.querySelector('h3');
+      const description=feature.querySelector('.hub-tile__content p');
+      const link=feature.querySelector('.hub-tile__link');
+      if(kicker&&title&&description&&link){
+        const synopsis=(chosen.film.claims||[]).find(x=>x.field==='synopsis')?.value;
+        kicker.textContent=latest?'RECENT HORROR RELEASE · OFFICIAL FILM FILE':'COMING HORROR · OFFICIAL FILM FILE';
+        title.textContent=chosen.film.title;
+        description.textContent=typeof synopsis==='string'&&synopsis.length>15?
+          synopsis:'Enter the latest film file and explore its official release announcement.';
+        link.href='/films/'+encodeURIComponent(chosen.film.id)+'/';
+        feature.dataset.filmId = chosen.film.id;
+        link.setAttribute('aria-label','Explore '+chosen.film.title+' film details');
+      }
+    }
+  }
+  if(feature?.dataset.filmId){
+    const movie=films.find(x=>x.id===feature.dataset.filmId);
+    feature.dataset.mediaType='movie';feature.dataset.mediaTitle=movie.title;feature.dataset.mediaEager='true';
+    feature.dataset.mediaYear=String((movie.claims||[]).find(x=>x.field==='filmYear')?.value || (movie.claims||[]).find(x=>x.field==='releaseDate')?.value.slice(0,4)||'');
+    const img=document.createElement('img');img.className='hub-feature__poster';img.dataset.mediaField='poster';img.hidden=true;feature.prepend(img);
+    const p=feature.querySelector('.hub-tile__content p');p.dataset.mediaField='overview';
+    const rating=document.createElement('span');rating.className='hub-feature__rating';rating.dataset.mediaField='rating';p.before(rating);
+    const button=document.createElement('button');button.className='fr-trailer-button';button.type='button';button.dataset.mediaField='trailer';button.hidden=true;feature.querySelector('.hub-tile__content').append(button);
+  }
   const root = document.querySelector('#hub-ranking');
   if (!root) return;
 
   const year = new Date().getUTCFullYear();
+  let ratingKind = 'professional-critics';
   const heading = document.querySelector('.hub-charts h2 em');
   if (heading) heading.textContent = 'FILMS · ' + year;
+  const chartFoot = document.querySelector('.hub-charts__foot');
+  if (chartFoot) chartFoot.textContent = year + ' · SOURCE-LINKED RANKINGS';
   const fullChart = document.querySelector('.hub-charts__all');
   if (fullChart) fullChart.href = '/top-20/' + year + '/';
   const isCompact = matchMedia('(max-width: 900px)').matches;
@@ -82,14 +130,18 @@
     let animationPosition = list.scrollTop;
     let manualPause = motionPreference.matches;
     let transientPause = false;
+    let inViewport = !('IntersectionObserver' in window);
     let reachedEnd = false;
     const updateControl = () => {
-      button.setAttribute('aria-pressed', String(!manualPause && !reachedEnd));
-      button.textContent = reachedEnd ? 'Restart slow chart scroll' : manualPause ? 'Start slow chart scroll' : 'Pause chart scroll';
+      button.disabled = motionPreference.matches;
+      button.setAttribute('aria-pressed', String(!manualPause && !reachedEnd && !motionPreference.matches));
+      button.textContent = motionPreference.matches ? 'Slow scroll off (reduced motion)' : reachedEnd ? 'Restart slow chart scroll' : manualPause ? 'Start slow chart scroll' : 'Pause chart scroll';
     };
     const stop = () => { if (frame) cancelAnimationFrame(frame); frame = 0; previousTime = 0; };
     const step = time => {
-      if (manualPause || transientPause || reachedEnd || motionPreference.matches) { stop(); return; }
+      if (manualPause || transientPause || !inViewport || document.hidden || reachedEnd || motionPreference.matches) { stop(); return; }
+      if (list.scrollHeight - list.clientHeight <= 2) { controls.hidden = true; stop(); return; }
+      controls.hidden = false;
       if (previousTime) {
         // Keep fractional progress outside scrollTop: Chromium can quantize its readback,
         // which otherwise discards each sub-pixel increment and stalls this slow scroll.
@@ -103,7 +155,7 @@
       frame = requestAnimationFrame(step);
     };
     const play = () => {
-      if (motionPreference.matches) return;
+      if (motionPreference.matches || !inViewport || document.hidden) return;
       if (reachedEnd) { list.scrollTop = 0; animationPosition = 0; reachedEnd = false; }
       else animationPosition = list.scrollTop;
       manualPause = false;
@@ -112,6 +164,7 @@
       frame = requestAnimationFrame(step);
     };
     const pause = () => { manualPause = true; stop(); updateControl(); };
+    controls.hidden = true;
     button.addEventListener('click', () => manualPause || reachedEnd ? play() : pause());
     list.addEventListener('pointerenter', () => { transientPause = true; stop(); });
     list.addEventListener('pointerleave', () => { transientPause = false; if (!manualPause && !reachedEnd) play(); });
@@ -128,8 +181,25 @@
     });
     list.addEventListener('wheel', pause, { passive: true });
     list.addEventListener('touchstart', pause, { passive: true, once: true });
+    list.addEventListener('pointerdown', pause, { passive: true });
+    list.addEventListener('keydown', event => {
+      if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)) pause();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else if (!manualPause && !transientPause && inViewport && !reachedEnd) play();
+    });
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        inViewport = entries[0]?.isIntersecting === true;
+        if (!inViewport) stop();
+        else if (!manualPause && !transientPause && !document.hidden && !reachedEnd) play();
+      }, { threshold: 0.15 });
+      observer.observe(list);
+    }
     motionPreference.addEventListener?.('change', event => {
       if (event.matches) { manualPause = true; stop(); }
+      else { manualPause = false; if (inViewport && !document.hidden) play(); }
       updateControl();
     });
     updateControl();
@@ -145,7 +215,7 @@
         typeof item.title === 'string' && item.title.trim().length > 0 && item.title.length <= 240 &&
         Number.isInteger(item.position) && item.position >= 1 && item.position <= 20 && !seenPositions.has(item.position) &&
         Number.isInteger(item.averageScore) && item.averageScore >= 0 && item.averageScore <= 100 &&
-        Number.isInteger(item.criticCount) && item.criticCount >= 3 && !seenFilms.has(item.filmId);
+        (ratingKind === 'tmdb-community' ? Number.isInteger(item.voteCount) && item.voteCount >= 50 : Number.isInteger(item.criticCount) && item.criticCount >= 3) && !seenFilms.has(item.filmId);
       if (ok) { seenFilms.add(item.filmId); seenPositions.add(item.position); }
       return ok;
     }).sort((a, b) => a.position - b.position).slice(0, previewLimit);
@@ -165,22 +235,23 @@
       movement.className = 'movement';
       const kind = movementText === 'NEW' ? 'new' : movementText.startsWith('UP') ? 'up' : movementText.startsWith('DOWN') ? 'down' : 'same';
       movement.dataset.kind = kind;
-      movement.textContent = movementText === '—' ? 'UNCHANGED' : movementText;
-      movement.setAttribute('aria-label', movementText === '—' ? 'Position unchanged' : `Position movement ${movementText.toLowerCase()}`);
+      movement.textContent = ratingKind === 'tmdb-community' ? 'TMDB' : movementText === '—' ? 'UNCHANGED' : movementText;
+      movement.setAttribute('aria-label', ratingKind === 'tmdb-community' ? 'TMDB community chart' : movementText === '—' ? 'Position unchanged' : `Position movement ${movementText.toLowerCase()}`);
       const position = document.createElement('span');
       position.className = 'position';
       position.textContent = '#' + item.position;
       const title = document.createElement('a');
       title.textContent = item.title;
-      title.href = filmHref(item.filmId);
+      title.href = ratingKind === 'tmdb-community' ? '/media.html?type=movie&id='+encodeURIComponent(item.tmdbId || String(item.filmId).replace('tmdb-','')) : filmHref(item.filmId);
       const score = document.createElement('span');
       score.className = 'score';
       score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
       const meta = document.createElement('div');
       meta.className = 'chart-meta';
       const count = document.createElement('span');
-      count.textContent = `${item.criticCount} distinct critics`;
+      count.textContent = ratingKind === 'tmdb-community' ? `${item.voteCount} TMDB community votes` : `${item.criticCount} distinct critics`;
       meta.append(count);
+      const trailer=document.createElement('button');trailer.className='fr-trailer-button';trailer.type='button';trailer.dataset.mediaTrailer='';trailer.dataset.mediaType='movie';trailer.dataset.tmdbId=String(item.tmdbId || String(item.filmId).replace('tmdb-',''));trailer.dataset.trailerTitle=item.title;trailer.textContent='▶ TRAILER';meta.append(trailer);
       const sources = (Array.isArray(item.sources) ? item.sources : []).slice(0, 4);
       for (const source of sources) {
         const href = safeSource(source?.url);
@@ -193,7 +264,16 @@
         link.title = `${source.territory || 'Territory not stated'} · checked ${source.checkedAt || 'date not stated'}`;
         meta.append(link);
       }
-      row.append(position, title, score, movement, meta);
+      if (ratingKind === 'tmdb-community' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '')) {
+        const poster = document.createElement('img');
+        poster.className = 'hub-chart-poster';
+        poster.alt = 'Poster for ' + item.title;
+        poster.src = 'https://image.tmdb.org/t/p/w185' + item.posterPath;
+        poster.loading = 'lazy';
+        poster.addEventListener('error', () => poster.remove(), { once: true });
+        row.classList.add('hub-chart-row--poster');
+        row.append(position, poster, title, score, movement, meta);
+      } else row.append(position, title, score, movement, meta);
       list.append(row);
     }
     const ids = new Set(valid.map(item => item.filmId));
@@ -215,6 +295,12 @@
 
   function finish() { root.setAttribute('aria-busy', 'false'); }
   function setResult(data) {
+    ratingKind = data?.ratingKind === 'tmdb-community' ? 'tmdb-community' : 'professional-critics';
+    if (ratingKind === 'tmdb-community') {
+      document.querySelector('.hub-charts .hub-eyebrow').textContent = 'TMDB COMMUNITY RATING /10';
+      document.querySelector('.hub-charts__top p').textContent = 'Horror films released this year, ranked by average TMDB viewer rating (50 votes minimum).';
+      chartFoot.textContent = year + ' · TMDB COMMUNITY CHART';
+    }
     const dataItems = Array.isArray(data?.items) ? data.items : [];
     const rendered = renderRows(dataItems);
     const content = [];
@@ -223,15 +309,15 @@
       else content.push(rendered.node);
       const updated = document.createElement('p');
       updated.className = 'hub-ranking__updated';
-      updated.textContent = formatDate(data?.updatedAt) ? `Last published ranking snapshot: ${formatDate(data.updatedAt)}` : 'Last published ranking snapshot: not available';
+      updated.textContent = formatDate(data?.updatedAt) ? `TMDB data checked: ${formatDate(data.updatedAt)}` : 'TMDB data check unavailable';
       content.push(updated);
       if (data?.stale === true) content.push(createState('Ranking data may be out of date', 'Showing the last valid ranking while its sources are reviewed.', 'stale'));
     } else if (data?.stale === true) {
       content.push(createState('Ranking data may be out of date', 'No current verified ranking is available.', 'stale'));
     } else {
-      content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available. A film needs at least three distinct, permission-cleared professional critics to qualify.'));
+      content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available.'));
     }
-    const unranked = renderUnranked(year, rendered.ids);
+    const unranked = ratingKind === 'tmdb-community' ? null : renderUnranked(year, rendered.ids);
     if (unranked) content.push(unranked);
     root.replaceChildren(...content);
   }
@@ -243,7 +329,7 @@
     })
     .then(setResult)
     .catch(() => {
-      root.replaceChildren(createState('Ranking unavailable', 'Verified critic scores could not be refreshed. Please try again later.', 'unavailable'));
+      root.replaceChildren(createState('Ranking unavailable', 'The annual chart could not be refreshed. Please try again later.', 'unavailable'));
       const unranked = renderUnranked(year);
       if (unranked) root.append(unranked);
     })
