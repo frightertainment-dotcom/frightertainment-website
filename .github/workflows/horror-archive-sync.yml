@@ -5,12 +5,6 @@ on:
   schedule:
     # Weekly once this workflow is present on the default branch.
     - cron: '15 6 * * 1'
-  push:
-    branches: ['codex/frightertainment-v1']
-    paths:
-      - '.github/workflows/horror-archive-sync.yml'
-      - 'scripts/sync-horror-archive.mjs'
-      - 'data/archive/refresh-request.json'
 
 permissions:
   contents: write
@@ -27,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/frightertainment-v1
+          ref: codex/frightertainment-redesign-tmdb-preview
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
@@ -43,7 +37,7 @@ jobs:
       - name: Propose updated reference catalogue on staging branch
         shell: bash
         env:
-          TARGET_BRANCH: codex/frightertainment-v1
+          TARGET_BRANCH: codex/frightertainment-redesign-tmdb-preview
         run: |
           git config user.name "frightertainment-archive-bot"
           git config user.email "frightertainment-archive-bot@users.noreply.github.com"
