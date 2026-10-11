@@ -1280,7 +1280,7 @@ test('Infirmary enters the 2026 Horror Vault and its first-party film file keeps
   await expect(page.locator('#archive-film-detail')).toContainText('STREAMING / DIGITAL SERVICE');
   await expect(page.locator('#archive-film-detail')).toContainText('Shudder');
   await expect(page.locator('#archive-film-detail')).toContainText('2 October 2026');
-  await expect(page.locator('#archive-film-detail a')).toHaveAttribute('href',/letterboxd/);
+  await expect(page.locator('#archive-film-detail a').filter({hasText:'PLATFORM RELEASE SOURCE'})).toHaveAttribute('href',/letterboxd/);
 });
 test('All streaming links, including pre-2025 library films and future premieres, open source-backed detail pages',async({page})=>{
   for(const [term,year] of [['manual:stream-shudder-gb-the-beast-within-2024','2024'],
