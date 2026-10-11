@@ -209,13 +209,13 @@
           ?streaming.entries.find(x=>x.id===wanted):null;
         if(!entry||typeof entry.title!=='string'||!Number.isInteger(entry.filmYear)||
            entry.filmYear<1896||entry.filmYear>new Date().getUTCFullYear()+2||
-           !/^d{4}-d{2}-d{2}$/.test(entry.streamDate||'')||
-           !/^https://[^/s]+/.test(entry.sourceUrl||'')){
+           !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(entry.streamDate||'')||
+           !/^https:\/\/[^/\s]+/.test(entry.sourceUrl||'')){
           error('That streaming film is not in the current source-checked inventory.');return;
         }
         const page={
           title:entry.title,year:entry.filmYear,sourceUrl:entry.sourceUrl,
-          watchUrl:/^https://[^/s]+/.test(entry.watchUrl||'')?entry.watchUrl:null,
+          watchUrl:/^https:\/\/[^/\s]+/.test(entry.watchUrl||'')?entry.watchUrl:null,
           platform:entry.platform,access:entry.access,streamDate:entry.streamDate,dateBasis:entry.dateBasis,
           synopsis:entry.synopsis,tmdbId:entry.tmdbId,streaming:true
         };
