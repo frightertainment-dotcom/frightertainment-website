@@ -304,3 +304,42 @@ test('private Preview loads TMDB posters on demand and keeps the bearer token se
     globalThis.fetch = oldFetch;
   }
 });
+
+
+test('streaming-watch serves the already-published GB and US provider snapshots using their matching D1 keys',async()=>{
+  for(const country of ['GB','US']){
+    const lookups=[];
+    const record={
+      payload_json:JSON.stringify({kind:'tmdb-list-region-fixture',country,territory:country,
+        sourceName:'TMDB',sourceUrl:'https://www.themoviedb.org',checkedAt:'2026-10-11',
+        items:[{id:'tmdb-movie-211',tmdbId:211,title:'Streaming Horror A',
+          territory:country,providerRegion:country,providerNames:['Shudder'],
+          accessTypes:['subscription'],firstReleaseDate:'2026-04-01',
+          releaseDate:null,releaseTerritory:null,sourceName:'TMDB',
+          sourceUrl:'https://www.themoviedb.org/movie/211',checkedAt:'2026-10-11'}]}),
+      source_name:'TMDB',updated_at:'2026-10-11T13:42:27.571Z',
+      expires_at:'2099-01-01T00:00:00Z'
+    };
+    const DB={prepare(sql){
+      assert.match(sql,/FROM current_datasets c JOIN dataset_snapshots s/);
+      return{bind(...args){this.args=args;return this;},
+        async first(){lookups.push(this.args);return this.args[1]===country?record:null;}};
+    }};
+    const env={DB,DEFAULT_COUNTRY:'GB',DISCOVERY_COUNTRIES:'GB',
+      TMDB_NONCOMMERCIAL_USE_APPROVED:'true',TMDB_ATTRIBUTION_READY:'true',
+      TMDB_READ_ACCESS_TOKEN:'fixture-token'};
+    const route='https://site.test/api/catalogue?type=movie&mode=streaming-watch&country='+country+
+      '&year=2026&access=subscription&page=1';
+    const result=await worker.fetch(new Request(route),env);
+    assert.equal(result.status,200,country+' stored provider data must be read using its region key');
+    const data=await result.json();
+    assert.equal(data.status,'current');
+    assert.equal(data.stale,false);
+    assert.equal(data.items.length,1);
+    assert.equal(data.items[0].territory,country);
+    assert.equal(data.items[0].releaseDate,null,'regional watching does not claim a local film premiere');
+    assert.equal(data.items[0].firstReleaseDate,'2026-04-01');
+    assert.equal(lookups.length,1,'a fresh region-specific snapshot should not trigger a provider refresh');
+    assert.equal(lookups[0][1],country,'loadDataset must use the same D1 country key as publishing');
+  }
+});
