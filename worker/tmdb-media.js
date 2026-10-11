@@ -130,7 +130,13 @@ export async function fetchStreamingAvailability(env,options) {
         watchLink=u.href;
     }catch{}
     const item=sanitizeMedia(raw,'movie',region);
-    return item?{...item,providerNames,accessTypes,watchLink,
+    // A provider's regional viewing rights do NOT verify a regional film premiere.
+    // Keep the film's original release date separately, without assigning it to GB/US.
+    return item?{...item,
+      territory:region,
+      releaseDate:null,releaseTerritory:null,releaseCountry:'Global',
+      releaseLabel:'First release is global; provider availability is regional',
+      providerNames,accessTypes,watchLink,
       providerSourceName:'TMDB / JustWatch',providerRegion:region,
       providerCheckedAt:today(),streamingPremiereVerified:false}:null;
   });
