@@ -1742,3 +1742,43 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
 body[data-theme="games"] .fr-game-spotlight__media .fr-player-gate { width:100%; }
 @media(max-width:640px) { .fr-player-gate{ min-height:170px } .fr-player-gate--apple{ min-height:160px } .fr-player-gate__content{ padding:13px 14px; gap:6px } .fr-player-gate__button{ font-size:13px } }
 @media(prefers-reduced-motion:reduce) { .fr-player-gate__button{transition:none} }
+
+/* 11 October homepage polish: posters should never squeeze copy sideways on phones.
+   Preserve original horror artwork, section themes, logo and seven-link navigation. */
+@media(max-width:640px){
+  body.hub-home .hub-feature .hub-tile__content{
+    width:100%;
+    max-width:100%;
+    position:relative;
+    z-index:2;
+  }
+  body.hub-home .hub-feature__poster{
+    right:-3%;
+    max-width:45%;
+    opacity:.37;
+    filter:brightness(.75) saturate(.85);
+  }
+  body.hub-home .hub-showcase__bottom .hub-tile.has-tmdb-poster .hub-tile__content,
+  body.hub-home .hub-showcase__bottom .hub-tile.has-podcast-cover .hub-tile__content{
+    width:100%;
+    max-width:100%;
+  }
+  body.hub-home .hub-showcase__bottom .hub-editorial-poster{
+    width:42%;
+    opacity:.52;
+  }
+  body.hub-home .hub-showcase__bottom .hub-tile__wash{
+    background:linear-gradient(90deg,rgba(7,6,10,.98) 0%,rgba(7,6,10,.94) 46%,rgba(7,6,10,.75) 70%,rgba(7,6,10,.34) 100%);
+  }
+  body.hub-home .hub-showcase__bottom .hub-tile :is(h3,.hub-kicker,.hub-tile__link,.fr-trailer-button){
+    max-width:100%;
+    overflow-wrap:break-word;
+    white-space:normal;
+    text-shadow:0 2px 8px #000;
+  }
+  body.hub-home .hub-showcase__bottom .hub-tile__link{
+    min-height:44px;
+    line-height:1.2;
+    padding-block:9px;
+  }
+}
