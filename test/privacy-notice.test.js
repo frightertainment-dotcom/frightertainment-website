@@ -44,3 +44,22 @@ test('embedded media never contains an eagerly loaded Apple or Steam iframe',asy
   assert.match(loader,/\.fr-player-gate__button/);
   assert.match(loader,/document\.createElement\('iframe'\)/);
 });
+
+test('visitor-facing contact form requests no identifying fields and privacy notice describes Gmail storage',async()=>{
+  const form=await readFile(new URL('../contact.html',import.meta.url),'utf8');
+  assert.match(form,/name="nickname" maxlength="60"/);
+  assert.match(form,/name="message" minlength="5" maxlength="5000" required/);
+  assert.doesNotMatch(form,/<input\b[^>]*\bname="(?:email|title|subject)"/i);
+  assert.doesNotMatch(form,/<label\b[^>]*for="contact-email"/i);
+  assert.match(form,/No name or email address is requested/);
+  assert.match(form,/anonymous message form cannot receive replies/);
+  assert.match(form,/mailto:Frightertainment@gmail.com/);
+  const privacy=await readFile(new URL('../privacy.html',import.meta.url),'utf8');
+  for(const required of ['asks only for a message and an optional nickname',
+    'does not ask for your real name, email address or subject',
+    'delivered to our Gmail inbox, not stored in the website database',
+    'Cloudflare may process visitors', 'IP addresses', 'If you choose the separate direct-email link',
+    'Messages delivered to our Gmail inbox remain there until deleted']){
+    assert.ok(privacy.includes(required),'privacy notice missing: '+required);
+  }
+});

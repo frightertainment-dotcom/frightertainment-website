@@ -63,3 +63,67 @@ test('the Cloudflare restricted mailer binding targets the verified lower-case d
   assert.equal(config.send_email[0].destination_address,'frightertainment@gmail.com');
   assert.deepEqual(config.send_email[0].allowed_sender_addresses,['contact@frightertainment.com']);
 });
+
+const anonymousRoute='https://frightertainment-contact-mailer.internal/send-anonymous';
+const anonymousReq=(body={nickname:'',message:'I found a creepy short film.'},url=anonymousRoute)=>
+  new Request(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+test('new private message route sends optional nickname without storing a reply address',async()=>{
+  let sent;
+  const r=await sendPrivateContact(anonymousReq({nickname:'Night Owl',message:'Here is my horror suggestion.'}),
+    {EMAIL:{send:async data=>{sent=data;return{messageId:'accepted-test'};}}});
+  assert.equal(r.status,200);
+  assert.deepEqual(await r.json(),{ok:true});
+  assert.equal(sent.to,'frightertainment@gmail.com');
+  assert.equal(sent.from,'contact@frightertainment.com');
+  assert.equal(sent.subject,'Frightertainment private message');
+  assert.equal(sent.replyTo,undefined);
+  assert.equal(sent.text,'Nickname: Night Owl\n\nHere is my horror suggestion.');
+});
+test('anonymous Worker uses default Anonymous nickname when no nickname field is sent',async()=>{
+  let sent;
+  const r=await sendPrivateContact(anonymousReq({message:'I have a new horror movie recommendation.'}),
+    {EMAIL:{send:async data=>{sent=data;return{messageId:'accepted-test'};}}});
+  assert.equal(r.status,200);
+  assert.equal(sent.text,'Nickname: Anonymous\n\nI have a new horror movie recommendation.');
+  assert.equal(sent.replyTo,undefined);
+});
+test('private anonymous route rejects identity fields, malicious headers and extra body keys',async()=>{
+  let sends=0;
+  const env={EMAIL:{send:async()=>{sends++;return{messageId:'should-not-send'};}}};
+  for(const bad of [
+    {nickname:'G',message:'Legitimate-looking message',email:'visitor@example.com'},
+    {nickname:'G',message:'Legitimate-looking message',replyTo:'reply@example.com'},
+    {nickname:'G',message:'Legitimate-looking message',title:'Real name'},
+    {nickname:'G',message:'Legitimate-looking message',subject:'Chosen subject'},
+    {nickname:'G',message:'Legitimate-looking message',to:'attacker@example.com'},
+    {nickname:'G\r\nBcc: attacker@example.com',message:'Legitimate-looking message'},
+    {nickname:'X'.repeat(61),message:'Legitimate-looking message'},
+    {nickname:null,message:'Legitimate-looking message'},
+    {nickname:'G',message:'tiny'},
+    {nickname:'G',message:'X'.repeat(5100)}
+  ]) {
+    const res=await sendPrivateContact(anonymousReq(bad),env);
+    assert.ok([400,413].includes(res.status),'bad input accepted: '+JSON.stringify(bad).slice(0,90));
+    assert.equal((await res.json()).ok,undefined);
+  }
+  assert.equal(sends,0);
+});
+test('anonymous Worker failure does not confirm delivery or disclose visitor text',async()=>{
+  const body={nickname:'Hidden',message:'A private message that must not leak.'};
+  const acceptedWithoutReceipt=await sendPrivateContact(anonymousReq(body),{EMAIL:{send:async()=>({})}});
+  assert.equal(acceptedWithoutReceipt.status,503);
+  assert.equal((await acceptedWithoutReceipt.json()).code,'FT-WORKER-NO-ACCEPTANCE');
+  const rejected=await sendPrivateContact(anonymousReq(body),{EMAIL:{send:async()=>{throw Error('E_RECIPIENT_NOT_ALLOWED');}}});
+  assert.equal(rejected.status,503);
+  const json=await rejected.json();
+  assert.equal(json.code,'FT-WORKER-RECIPIENT');
+  assert.ok(!JSON.stringify(json).includes(body.message));
+  assert.ok(!JSON.stringify(json).includes(body.nickname));
+});
+test('older private /send endpoint remains backwards compatible until production migration',async()=>{
+  let sent;
+  const res=await sendPrivateContact(req(base),{EMAIL:{send:async data=>{sent=data;return{messageId:'legacy-confirmed'};}}});
+  assert.equal(res.status,200);
+  assert.equal(sent.replyTo,base.email);
+  assert.match(sent.subject,/^Frightertainment contact:/);
+});

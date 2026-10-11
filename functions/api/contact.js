@@ -54,30 +54,32 @@ export async function onRequestPost({request,env}) {
   if (invalid || !parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     return reply(400,{error:'Invalid message.',code:'FT-INVALID-JSON'});
   }
-  if (parsed.company || parsed.ft_trap_blank) return reply(200,{ok:true}); // Honeypot: no email is sent; never claim delivery.
-  const {title,email,subject,message} = parsed;
-  if (typeof title !== 'string' || typeof email !== 'string' ||
-      typeof subject !== 'string' || typeof message !== 'string') {
-    return reply(400,{error:'Complete your name, email, subject and message.',code:'FT-INVALID-FIELDS'});
+  // Do not accept even optional identity or reply-address fields.
+  if(!Object.keys(parsed).every(key=>['nickname','message','ft_trap_blank'].includes(key))) {
+    return reply(400,{error:'Only an optional nickname and message are accepted.',code:'FT-INVALID-FIELDS'});
   }
-  const name=title.trim(), replyEmail=email.trim(), topic=subject.trim(), text=message.trim();
-  if (!name || name.length>100 || !topic || topic.length>140 ||
-      replyEmail.length>254 || !/^[^\s@\x00-\x1f\x7f]+@[^\s@\x00-\x1f\x7f]+\.[A-Za-z]{2,}$/.test(replyEmail) ||
-      text.length<5 || text.length>5000 ||
-      /[\x00-\x1f\x7f]/.test(name) || /[\x00-\x1f\x7f]/.test(topic) || /\x00/.test(text)) {
-    return reply(400,{error:'Complete your name, valid email, subject and message.',code:'FT-INVALID-FIELDS'});
+  if(parsed.ft_trap_blank) return reply(200,{ok:true}); // Anti-spam trap; no delivery claim.
+  const nickname=parsed.nickname===undefined?'':parsed.nickname;
+  const message=parsed.message;
+  if(typeof nickname!=='string'||typeof message!=='string') {
+    return reply(400,{error:'Enter your message.',code:'FT-INVALID-FIELDS'});
   }
-  if (!env.CONTACT_DELIVERY && !env.EMAIL) {
-    return reply(503,{error:'Contact form delivery is temporarily unavailable. Use the direct email link.',code:'FT-NO-DELIVERY-BINDING'});
+  const alias=nickname.trim(),text=message.trim();
+  if(alias.length>60||/[\x00-\x1f\x7f]/.test(alias)||
+     text.length<5||text.length>5000||text.includes('\x00')) {
+    return reply(400,{error:'Enter a valid message of 5 to 5000 characters.',code:'FT-INVALID-FIELDS'});
+  }
+  if(!env.CONTACT_DELIVERY) {
+    return reply(503,{error:'Message delivery is temporarily unavailable. Use the direct email link.',code:'FT-NO-DELIVERY-BINDING'});
   }
   try {
     if (env.CONTACT_DELIVERY) {
       let delivery;
       try {
-        delivery=await env.CONTACT_DELIVERY.fetch('https://frightertainment-contact-mailer.internal/send',{
+        delivery=await env.CONTACT_DELIVERY.fetch('https://frightertainment-contact-mailer.internal/send-anonymous',{
           method:'POST',
           headers:{'content-type':'application/json'},
-          body:JSON.stringify({title:name,email:replyEmail,subject:topic,message:text})
+          body:JSON.stringify({nickname:alias,message:text})
         });
       } catch (error) {
         console.error('frightertainment_contact_binding_failed',{type:String(error?.name||'UnknownError').slice(0,60)});
@@ -107,12 +109,6 @@ export async function onRequestPost({request,env}) {
       if (confirmation?.ok !== true) {
         return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-UNCONFIRMED'});
       }
-    } else {
-      await env.EMAIL.send({
-        to:'frightertainment@gmail.com',from:'contact@frightertainment.com',
-        replyTo:replyEmail,subject:'Frightertainment contact: '+topic,
-        text:'From: '+name+'\nReply email: '+replyEmail+'\nSubject: '+topic+'\n\n'+text
-      });
     }
     return reply(200,{ok:true,delivered:true});
   } catch (error) {

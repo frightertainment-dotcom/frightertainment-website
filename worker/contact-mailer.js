@@ -23,7 +23,8 @@ const classifySendFailure=error=>{
 };
 
 export async function sendPrivateContact(request,env){
-  if(request.method!=='POST'||new URL(request.url).pathname!=='/send')return reply(404,{error:'Not found'});
+  const path=new URL(request.url).pathname;
+  if(request.method!=='POST'||!['/send','/send-anonymous'].includes(path))return reply(404,{error:'Not found'});
   if(!env.EMAIL)return reply(503,{error:'Email service unavailable',code:'FT-WORKER-NO-EMAIL'});
   const declared=Number(request.headers.get('content-length')||0);
   if(declared>7000||Number.isNaN(declared))return reply(413,{error:'Message too long'});
@@ -33,6 +34,31 @@ export async function sendPrivateContact(request,env){
     if(buffer.byteLength>7000)return reply(413,{error:'Message too long'});
     body=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(buffer));
   }catch{return reply(400,{error:'Invalid message'});}
+  if(path==='/send-anonymous'){
+    // The anonymous path must not accept identifying fields or a reply destination.
+    if(!body||typeof body!=='object'||Array.isArray(body)||
+      !Object.keys(body).every(key=>['nickname','message'].includes(key))) {
+      return reply(400,{error:'Invalid private message'});
+    }
+    const {nickname='',message}=body;
+    if(typeof nickname!=='string'||nickname.trim().length>60||
+      /[\x00-\x1f\x7f]/.test(nickname)||typeof message!=='string'||
+      message.trim().length<5||message.trim().length>5000||
+      message.includes('\x00'))return reply(400,{error:'Invalid private message'});
+    try{
+      const accepted=await env.EMAIL.send({
+        to:RECIPIENT,from:SENDER,
+        subject:'Frightertainment private message',
+        text:'Nickname: '+(nickname.trim()||'Anonymous')+'\n\n'+message.trim()
+      });
+      if(!accepted?.messageId)return reply(503,{error:'Delivery not confirmed',code:'FT-WORKER-NO-ACCEPTANCE'});
+      return reply(200,{ok:true});
+    }catch(error){
+      const code=classifySendFailure(error);
+      console.error('frightertainment_private_message_delivery_failed',{code});
+      return reply(503,{error:'Delivery failed',code});
+    }
+  }
   const {title,email,subject,message}=body||{};
   if(!safeHeader(title)||title.length>100||!safeHeader(subject)||subject.length>140||
     typeof email!=='string'||email.length>254||!emailPattern.test(email)||
