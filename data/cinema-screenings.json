@@ -219,9 +219,9 @@
           "edition": "new",
           "reach": "general",
           "tier": "independent",
-          "distributor": "US theatrical release calendar",
-          "sourceUrl": "https://www.showtimes.com/movies-coming-soon/horror-films/",
-          "note": "US horror-film release calendar lists 13 November; venue reach should be checked."
+          "distributor": "Bleecker Street / Cinemark",
+          "sourceUrl": "https://www.cinemark.com/movies/victorian-psycho",
+          "note": "Cinemark's US listing confirms a 13 November theatrical date; check local screening schedules."
         }
       ]
     },
@@ -253,6 +253,18 @@
           "distributor": "TOHO / Canadian Cineplex",
           "sourceUrl": "https://www.cineplex.com/movie/godzilla-minus-zero-japanese-west",
           "note": "Cineplex lists a Canadian opening on 6 November; IMAX previews may vary by location."
+        },
+        {
+          "id": "victorian-psycho-ca-2026",
+          "title": "Victorian Psycho",
+          "filmYear": 2026,
+          "date": "2026-11-13",
+          "edition": "new",
+          "reach": "general",
+          "tier": "independent",
+          "distributor": "Cineplex",
+          "sourceUrl": "https://www.cineplex.com/movie/victorian-psycho",
+          "note": "Canadian Cineplex confirms 13 November; check individual cinema availability."
         }
       ]
     },
@@ -295,7 +307,7 @@
           "reach": "general",
           "tier": "studio",
           "distributor": "TOHO / Event Cinemas",
-          "sourceUrl": "https://www.eventcinemas.com.au/eventsfestivals",
+          "sourceUrl": "https://www.eventcinemas.com.au/movie/godzilla-minus-zero",
           "note": "Australian Event Cinemas lists 5 November; selected IMAX previews start 3 November."
         }
       ]
