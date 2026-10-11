@@ -786,6 +786,21 @@
       "sourceUrl": "https://www.movieinsider.com/new-on/vod-digital/2026",
       "sourceName": "Movie Insider upcoming film-specific VOD listing",
       "chartEligible": true
+    },
+    {
+      "id": "insidious-digital-gb",
+      "title": "Insidious: Out of the Further",
+      "filmYear": 2026,
+      "streamDate": "2026-10-09",
+      "platform": "Digital rent/buy",
+      "access": "rent-buy",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "digital-home",
+      "sourceUrl": "https://www.justwatch.com/uk/movie/insidious-the-bleeding-world",
+      "sourceName": "JustWatch UK October 2026 digital rent and purchase storefront listing",
+      "watchUrl": "https://www.justwatch.com/uk/movie/insidious-the-bleeding-world"
     }
   ]
 }
