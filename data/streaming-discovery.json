@@ -705,7 +705,7 @@
       "id": "last-chance-motel-free-gb",
       "title": "Last Chance Motel",
       "filmYear": 2026,
-      "streamDate": "2026-10-06",
+      "streamDate": "2026-09-28",
       "platform": "BloodStream",
       "access": "free",
       "countries": [
@@ -713,7 +713,8 @@
       ],
       "premiereKind": "new-to-platform",
       "sourceUrl": "https://www.justwatch.com/uk/movie/last-chance-motel",
-      "sourceName": "UK availability listing for free BloodStream access"
+      "sourceName": "JustWatch UK free availability checked 28 September 2026; first streaming date not verified",
+      "dateBasis": "listed-by"
     },
     {
       "id": "portal-to-hell-rent-us",
@@ -799,8 +800,9 @@
       ],
       "premiereKind": "digital-home",
       "sourceUrl": "https://www.justwatch.com/uk/movie/insidious-the-bleeding-world",
-      "sourceName": "JustWatch UK October 2026 digital rent and purchase storefront listing",
-      "watchUrl": "https://www.justwatch.com/uk/movie/insidious-the-bleeding-world"
+      "sourceName": "JustWatch UK rent/buy availability checked 9 October 2026; digital launch date not asserted",
+      "watchUrl": "https://www.justwatch.com/uk/movie/insidious-the-bleeding-world",
+      "dateBasis": "listed-by"
     }
   ]
 }
