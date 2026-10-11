@@ -1,169 +1,347 @@
 {
-  "schemaVersion": 1,
-  "territory": "GB",
+  "schemaVersion": 2,
   "checkedAt": "2026-10-11",
-  "coverage": "Evidence-backed UK and cinema-chain release diary. A venue listing is proof of that screening only; general theatrical classification is not evidence that every cinema is showing a title.",
+  "coverage": "Country-specific, evidence-backed horror cinema release and screening diary; a venue or distributor listing does not guarantee showtimes at every cinema.",
   "priorityPolicy": "Group by month first; within a month source-confirmed major studio/general releases first, special re-screenings next and select independent cinema events last. Months always remain in chronological order.",
-  "screenings": [
-    {
-      "id": "clayface-2026-uk",
-      "title": "Clayface",
-      "filmYear": 2026,
-      "date": "2026-10-23",
-      "edition": "new",
-      "reach": "general",
-      "tier": "studio",
-      "distributor": "Warner Bros / DC Studios",
-      "genre": "Body horror / supernatural thriller",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "tmdbId": 1400940,
-      "note": "UK distributor's dated 23 October release on Screen's calendar; international launch begins 21 October."
+  "territories": {
+    "GB": {
+      "name": "United Kingdom",
+      "coverage": "Evidence-backed UK and cinema-chain release diary. A venue listing is proof of that screening only; general theatrical classification is not evidence that every cinema is showing a title.",
+      "screenings": [
+        {
+          "id": "clayface-2026-uk",
+          "title": "Clayface",
+          "filmYear": 2026,
+          "date": "2026-10-23",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Warner Bros / DC Studios",
+          "genre": "Body horror / supernatural thriller",
+          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "tmdbId": 1400940,
+          "note": "UK distributor's dated 23 October release on Screen's calendar; international launch begins 21 October."
+        },
+        {
+          "id": "dracula-1958-cineworld",
+          "title": "Dracula",
+          "filmYear": 1958,
+          "date": "2026-10-16",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Cineworld Horror Film Season",
+          "genre": "Classic Hammer horror",
+          "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
+          "note": "4K restoration event; select screenings at participating Cineworld sites."
+        },
+        {
+          "id": "the-others-2001-cineworld",
+          "title": "The Others",
+          "filmYear": 2001,
+          "date": "2026-10-20",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Cineworld Horror Film Season",
+          "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
+          "note": "25th-anniversary screening; availability varies by venue."
+        },
+        {
+          "id": "scream-1996-uk",
+          "title": "Scream",
+          "filmYear": 1996,
+          "date": "2026-10-23",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Park Circus / Cineworld Horror Film Season",
+          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "note": "30th anniversary: release-week screenings; Cineworld additionally lists 26 October."
+        },
+        {
+          "id": "from-dusk-till-dawn-1996-cineworld",
+          "title": "From Dusk Till Dawn",
+          "filmYear": 1996,
+          "date": "2026-10-24",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Cineworld Horror Film Season",
+          "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
+          "note": "30th-anniversary event; select showings."
+        },
+        {
+          "id": "donnie-darko-2001-uk",
+          "title": "Donnie Darko",
+          "filmYear": 2001,
+          "date": "2026-10-30",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Arrow Films / Cineworld",
+          "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
+          "note": "25th-anniversary 4K restoration; participating venues only."
+        },
+        {
+          "id": "the-devils-1971-uk",
+          "title": "The Devils",
+          "filmYear": 1971,
+          "date": "2026-10-30",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "BFI",
+          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "note": "Ken Russell's The Devils: BFI re-release; check participating cinemas."
+        },
+        {
+          "id": "nightborn-2026-uk",
+          "title": "Nightborn",
+          "filmYear": 2026,
+          "date": "2026-10-30",
+          "edition": "new",
+          "reach": "general",
+          "tier": "independent",
+          "distributor": "Picturehouse",
+          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "note": "Picturehouse-distributed UK cinema release; venue reach not independently established."
+        },
+        {
+          "id": "godzilla-minus-zero-uk",
+          "title": "Godzilla Minus Zero",
+          "filmYear": 2026,
+          "date": "2026-11-06",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Toho / Anime Ltd",
+          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "note": "UK distributor release date, 6 November; check individual cinema programmes."
+        },
+        {
+          "id": "exorcist-1973-norwich-2026",
+          "title": "The Exorcist",
+          "filmYear": 1973,
+          "date": "2026-11-05",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Picturehouse / Evolution of Horror",
+          "sourceUrl": "https://www.picturehouses.com/cinema/001",
+          "note": "Cinema City Norwich event programme lists Thursday 5 November, 5:30pm, with Evolution of Horror hosts. Event page lists 6 November as the film programme release date; this is a single-venue special screening."
+        },
+        {
+          "id": "grip-terror-peckham-2026",
+          "title": "In the Grip of Terror",
+          "filmYear": 2026,
+          "date": "2026-11-02",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "British Horror Studio / Amicus Productions",
+          "sourceUrl": "https://amicushorror.co.uk/in-the-grip-of-terror-uk-cinema-dates/",
+          "note": "Peckhamplex screening 2 November, 8:30pm; Southport Bijou 19 November. Selected venues, not wide release."
+        },
+        {
+          "id": "onslaught-2026-uk",
+          "title": "Onslaught",
+          "filmYear": 2026,
+          "date": "2026-12-11",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Universal Pictures",
+          "genre": "Action slasher horror",
+          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "note": "UK release-calendar listing for 11 December. Nationwide coverage to be checked."
+        },
+        {
+          "id": "they-live-1988-oxford-2026",
+          "title": "They Live",
+          "filmYear": 1988,
+          "date": "2026-10-30",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Phoenix Picturehouse, Oxford",
+          "sourceUrl": "https://www.picturehouses.com/cinema/phoenix-picturehouse",
+          "note": "Select Phoenix Picturehouse Oxford screening on 30 October; not a nationwide re-release."
+        }
+      ]
     },
-    {
-      "id": "dracula-1958-cineworld",
-      "title": "Dracula",
-      "filmYear": 1958,
-      "date": "2026-10-16",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Cineworld Horror Film Season",
-      "genre": "Classic Hammer horror",
-      "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
-      "note": "4K restoration event; select screenings at participating Cineworld sites."
+    "US": {
+      "name": "United States",
+      "coverage": "US studio, distributor and individual cinema release evidence.",
+      "screenings": [
+        {
+          "id": "devils-us-restoration-2026",
+          "title": "The Devils",
+          "filmYear": 1971,
+          "date": "2026-10-16",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "Warner Bros. Clockwork / 4K restoration",
+          "sourceUrl": "https://www.bfi.org.uk/news/ken-russells-devils-definitive-4k-restoration-launch-ahead-major-bfi-retrospective",
+          "note": "One-week US engagement beginning 16 October; check participating venues."
+        },
+        {
+          "id": "clayface-us-2026",
+          "title": "Clayface",
+          "filmYear": 2026,
+          "date": "2026-10-23",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Warner Bros. Pictures / DC Studios",
+          "sourceUrl": "https://www.clayfacemovie.com/tickets/",
+          "note": "Distributor confirms the North American theatrical opening on 23 October.",
+          "tmdbId": 1400940
+        },
+        {
+          "id": "godzilla-minus-zero-us-2026",
+          "title": "Godzilla Minus Zero",
+          "filmYear": 2026,
+          "date": "2026-11-06",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "TOHO / GKIDS",
+          "sourceUrl": "https://gkids.com/2026/10/06/tickets-now-on-sale-for-godzilla-minus-zero/",
+          "note": "US-wide cinema release 6 November; limited IMAX early-access shows begin 3 November."
+        },
+        {
+          "id": "victorian-psycho-us-2026",
+          "title": "Victorian Psycho",
+          "filmYear": 2026,
+          "date": "2026-11-13",
+          "edition": "new",
+          "reach": "general",
+          "tier": "independent",
+          "distributor": "US theatrical release calendar",
+          "sourceUrl": "https://www.showtimes.com/movies-coming-soon/horror-films/",
+          "note": "US horror-film release calendar lists 13 November; venue reach should be checked."
+        }
+      ]
     },
-    {
-      "id": "the-others-2001-cineworld",
-      "title": "The Others",
-      "filmYear": 2001,
-      "date": "2026-10-20",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Cineworld Horror Film Season",
-      "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
-      "note": "25th-anniversary screening; availability varies by venue."
+    "CA": {
+      "name": "Canada",
+      "coverage": "Canadian cinema-chain listings and distributor-backed dates.",
+      "screenings": [
+        {
+          "id": "clayface-ca-2026",
+          "title": "Clayface",
+          "filmYear": 2026,
+          "date": "2026-10-23",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Warner Bros. Pictures / Cineplex",
+          "sourceUrl": "https://www.cineplex.com/movie/clayface",
+          "note": "Canadian Cineplex listing confirms a 23 October opening; participating locations vary.",
+          "tmdbId": 1400940
+        },
+        {
+          "id": "godzilla-minus-zero-ca-2026",
+          "title": "Godzilla Minus Zero",
+          "filmYear": 2026,
+          "date": "2026-11-06",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "TOHO / Canadian Cineplex",
+          "sourceUrl": "https://www.cineplex.com/movie/godzilla-minus-zero-japanese-west",
+          "note": "Cineplex lists a Canadian opening on 6 November; IMAX previews may vary by location."
+        }
+      ]
     },
-    {
-      "id": "scream-1996-uk",
-      "title": "Scream",
-      "filmYear": 1996,
-      "date": "2026-10-23",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Park Circus / Cineworld Horror Film Season",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "note": "30th anniversary: release-week screenings; Cineworld additionally lists 26 October."
+    "AU": {
+      "name": "Australia",
+      "coverage": "Australian cinema chain and distributor release evidence.",
+      "screenings": [
+        {
+          "id": "clayface-au-2026",
+          "title": "Clayface",
+          "filmYear": 2026,
+          "date": "2026-10-22",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Warner Bros. Pictures / Event Cinemas",
+          "sourceUrl": "https://www.clayfacemovie.com.au/",
+          "note": "Official Australian distributor site confirms cinema release Thursday 22 October.",
+          "tmdbId": 1400940
+        },
+        {
+          "id": "crawlers-au-2026",
+          "title": "Crawlers",
+          "filmYear": 2026,
+          "date": "2026-10-29",
+          "edition": "new",
+          "reach": "general",
+          "tier": "independent",
+          "distributor": "Event Cinemas Australia",
+          "sourceUrl": "https://www.eventcinemas.com.au/movie/crawlers",
+          "note": "Event Cinemas lists 29 October in Australia; check selected cinema sessions.",
+          "tmdbId": 1376400
+        },
+        {
+          "id": "godzilla-minus-zero-au-2026",
+          "title": "Godzilla Minus Zero",
+          "filmYear": 2026,
+          "date": "2026-11-05",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "TOHO / Event Cinemas",
+          "sourceUrl": "https://www.eventcinemas.com.au/eventsfestivals",
+          "note": "Australian Event Cinemas lists 5 November; selected IMAX previews start 3 November."
+        }
+      ]
     },
-    {
-      "id": "from-dusk-till-dawn-1996-cineworld",
-      "title": "From Dusk Till Dawn",
-      "filmYear": 1996,
-      "date": "2026-10-24",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Cineworld Horror Film Season",
-      "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
-      "note": "30th-anniversary event; select showings."
-    },
-    {
-      "id": "donnie-darko-2001-uk",
-      "title": "Donnie Darko",
-      "filmYear": 2001,
-      "date": "2026-10-30",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Arrow Films / Cineworld",
-      "sourceUrl": "https://www.cineworld.co.uk/events/81435-horror-film-season-2026/",
-      "note": "25th-anniversary 4K restoration; participating venues only."
-    },
-    {
-      "id": "the-devils-1971-uk",
-      "title": "The Devils",
-      "filmYear": 1971,
-      "date": "2026-10-30",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "BFI",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "note": "Ken Russell's The Devils: BFI re-release; check participating cinemas."
-    },
-    {
-      "id": "nightborn-2026-uk",
-      "title": "Nightborn",
-      "filmYear": 2026,
-      "date": "2026-10-30",
-      "edition": "new",
-      "reach": "general",
-      "tier": "independent",
-      "distributor": "Picturehouse",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "note": "Picturehouse-distributed UK cinema release; venue reach not independently established."
-    },
-    {
-      "id": "godzilla-minus-zero-uk",
-      "title": "Godzilla Minus Zero",
-      "filmYear": 2026,
-      "date": "2026-11-06",
-      "edition": "new",
-      "reach": "general",
-      "tier": "studio",
-      "distributor": "Toho / Anime Ltd",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "note": "UK distributor release date, 6 November; check individual cinema programmes."
-    },
-    {
-      "id": "exorcist-1973-norwich-2026",
-      "title": "The Exorcist",
-      "filmYear": 1973,
-      "date": "2026-11-05",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Picturehouse / Evolution of Horror",
-      "sourceUrl": "https://www.picturehouses.com/cinema/001",
-      "note": "Cinema City Norwich event programme lists Thursday 5 November, 5:30pm, with Evolution of Horror hosts. Event page lists 6 November as the film programme release date; this is a single-venue special screening."
-    },
-    {
-      "id": "grip-terror-peckham-2026",
-      "title": "In the Grip of Terror",
-      "filmYear": 2026,
-      "date": "2026-11-02",
-      "edition": "new",
-      "reach": "limited",
-      "tier": "independent",
-      "distributor": "British Horror Studio / Amicus Productions",
-      "sourceUrl": "https://amicushorror.co.uk/in-the-grip-of-terror-uk-cinema-dates/",
-      "note": "Peckhamplex screening 2 November, 8:30pm; Southport Bijou 19 November. Selected venues, not wide release."
-    },
-    {
-      "id": "onslaught-2026-uk",
-      "title": "Onslaught",
-      "filmYear": 2026,
-      "date": "2026-12-11",
-      "edition": "new",
-      "reach": "general",
-      "tier": "studio",
-      "distributor": "Universal Pictures",
-      "genre": "Action slasher horror",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "note": "UK release-calendar listing for 11 December. Nationwide coverage to be checked."
-    },
-    {
-      "id": "they-live-1988-oxford-2026",
-      "title": "They Live",
-      "filmYear": 1988,
-      "date": "2026-10-30",
-      "edition": "re-release",
-      "reach": "limited",
-      "tier": "special",
-      "distributor": "Phoenix Picturehouse, Oxford",
-      "sourceUrl": "https://www.picturehouses.com/cinema/phoenix-picturehouse",
-      "note": "Select Phoenix Picturehouse Oxford screening on 30 October; not a nationwide re-release."
+    "IE": {
+      "name": "Ireland",
+      "coverage": "Republic of Ireland cinemas, BFI distribution and distributor territory announcements.",
+      "screenings": [
+        {
+          "id": "clayface-ie-2026",
+          "title": "Clayface",
+          "filmYear": 2026,
+          "date": "2026-10-23",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Warner Bros. Pictures / IMC Cinemas",
+          "sourceUrl": "https://imc.ie/advance-bookings/thurles/",
+          "note": "IMC Thurles, Republic of Ireland, lists 23 October screenings; other venues vary.",
+          "tmdbId": 1400940
+        },
+        {
+          "id": "devils-ie-2026",
+          "title": "The Devils",
+          "filmYear": 1971,
+          "date": "2026-10-30",
+          "edition": "re-release",
+          "reach": "limited",
+          "tier": "special",
+          "distributor": "BFI Distribution / Warner Bros. Clockwork",
+          "sourceUrl": "https://www.bfi.org.uk/news/ken-russells-devils-definitive-4k-restoration-launch-ahead-major-bfi-retrospective",
+          "note": "UK and Ireland 4K restoration from 30 October; Light House Cinema Dublin lists screenings."
+        },
+        {
+          "id": "godzilla-minus-zero-ie-2026",
+          "title": "Godzilla Minus Zero",
+          "filmYear": 2026,
+          "date": "2026-11-06",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "TOHO / Piece of Magic Entertainment",
+          "sourceUrl": "https://godzilla.com/blogs/news/godzilla-minus-zero-global-release-dates",
+          "note": "Distributor's global schedule confirms 6 November release in Ireland."
+        }
+      ]
     }
-  ]
+  }
 }
