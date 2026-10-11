@@ -47,6 +47,7 @@ jobs:
           grep -q 'Disallow: /' dist/robots.txt
           grep -q 'X-Robots-Tag: noindex' dist/_headers
           grep -q 'Cache-Control: no-store' dist/_headers
+          ! grep -q 'data-cf-beacon' dist/index.html
           ! test -e dist/scripts
           ! test -e dist/worker
           ! test -e dist/.github
@@ -74,6 +75,9 @@ jobs:
           test -f dist/sitemap.xml
           test -f dist/_routes.json
           grep -q 'Cache-Control: no-cache, must-revalidate' dist/_headers
+          grep -q 'data-cf-beacon' dist/index.html
+          grep -q 'data-cf-beacon' dist/films/other-mommy/index.html
+          grep -q 'https://static.cloudflareinsights.com/beacon.min.js' dist/index.html
           grep -Eq 'href="/hub\.css\?v=[0-9a-f]{12}"' dist/movies.html
           grep -Eq 'src="/release-calendar\.js\?v=[0-9a-f]{12}"' dist/movies.html
           grep -q 'Sitemap: https://www.frightertainment.com/sitemap.xml' dist/robots.txt
