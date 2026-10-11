@@ -145,7 +145,9 @@
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
       "watchUrl": "https://watch.shudder.com/interstitial/1014987",
       "synopsis": "Recovered bodycam footage traces a security guard's terrifying first night in an abandoned hospital.",
-      "chartEligible": true
+      "chartEligible": true,
+      "imdbId": "tt35682658",
+      "imdbSourceUrl": "https://www.imdb.com/title/tt35682658/"
     },
     {
       "id": "shudder-gb-harbinger-2026",
@@ -206,7 +208,9 @@
       "sourceName": "Shudder UK October 2026 film calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
       "synopsis": "A found-footage anthology where music and sound turn deadly.",
-      "chartEligible": true
+      "chartEligible": true,
+      "imdbId": "tt43739386",
+      "imdbSourceUrl": "https://www.imdb.com/title/tt43739386/"
     },
     {
       "id": "shudder-gb-jitters-2026",
@@ -439,7 +443,9 @@
       "sourceUrl": "https://letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder/detail/",
       "sourceName": "Shudder US October 2026 film calendar",
       "watchUrl": "https://watch.shudder.com/interstitial/1014987",
-      "chartEligible": true
+      "chartEligible": true,
+      "imdbId": "tt35682658",
+      "imdbSourceUrl": "https://www.imdb.com/title/tt35682658/"
     },
     {
       "id": "shudder-us-vhs-mixtape",
@@ -454,7 +460,9 @@
       "premiereKind": "platform-original",
       "sourceUrl": "https://letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder/detail/",
       "sourceName": "Shudder US October 2026 film calendar",
-      "chartEligible": true
+      "chartEligible": true,
+      "imdbId": "tt43739386",
+      "imdbSourceUrl": "https://www.imdb.com/title/tt43739386/"
     },
     {
       "id": "shudder-us-hallowarrior",
@@ -501,7 +509,9 @@
       "sourceUrl": "https://tubitv.com/the-t/articles/buzzkill-crashes-tubis-party-on-september-25",
       "sourceName": "Tubi original-premiere announcement",
       "watchUrl": "https://tubitv.com/en-gb/movies/100061020/buzzkill",
-      "chartEligible": true
+      "chartEligible": true,
+      "imdbId": "tt39319437",
+      "imdbSourceUrl": "https://www.imdb.com/title/tt39319437/"
     },
     {
       "id": "tubi-pumpkinhead-2",

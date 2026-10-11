@@ -63,6 +63,7 @@
     const wrap=node('article','fr-stream__card');wrap.dataset.mediaType='movie';
     wrap.dataset.mediaTitle=e.title;wrap.dataset.mediaYear=String(e.filmYear);
     if(Number.isInteger(e.tmdbId)&&e.tmdbId>0)wrap.dataset.tmdbId=String(e.tmdbId);
+    else if(/^tt[0-9]{7,10}$/.test(e.imdbId||''))wrap.dataset.mediaImdb=e.imdbId;
     const art=node('a','fr-stream__art');art.href=filmPage(e);
     const image=node('img','fr-stream__poster');image.hidden=true;
     image.alt='Poster for '+e.title;image.loading='lazy';image.decoding='async';image.dataset.mediaField='poster';
@@ -110,6 +111,7 @@
     const rated=await Promise.all(candidates.map(async e=>{
       const params={type:'movie'};
       if(Number.isInteger(e.tmdbId)&&e.tmdbId>0)params.id=String(e.tmdbId);
+      else if(/^tt[0-9]{7,10}$/.test(e.imdbId||''))params.imdb=e.imdbId;
       else {params.title=e.title;params.year=String(e.filmYear);}
       try{
         const item=await window.FRMedia.get(params);

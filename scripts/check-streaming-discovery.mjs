@@ -37,6 +37,9 @@ export async function auditStreaming(){
       errors.push('Missing/unsafe release source: '+e?.id);
     if(e.watchUrl&&!goodUrl(e.watchUrl))errors.push('Bad watching link: '+e?.id);
     if(e.tmdbId&&(!Number.isInteger(e.tmdbId)||e.tmdbId<1))errors.push('Invalid pinned TMDB ID: '+e?.id);
+    if(e.imdbId&&(!/^tt[0-9]{7,10}$/.test(e.imdbId)||
+      e.imdbSourceUrl!=='https://www.imdb.com/title/'+e.imdbId+'/'))
+      errors.push('Invalid or unsourced IMDb identity: '+e?.id);
     if(e.dateBasis&&e.dateBasis!=='listed-by')errors.push('Unsupported date semantics: '+e?.id);
     if(e.chartEligible&&!['platform-original','digital-premiere'].includes(e.premiereKind))
       errors.push('Unverified original/digital premiere in streaming mini chart: '+e?.id);

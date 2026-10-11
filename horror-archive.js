@@ -100,6 +100,7 @@
       known.add(key);
       grouped.get(e.filmYear)?.push({
         id:'manual:stream-'+e.id,title:e.title.trim(),year:e.filmYear,
+        imdbId:/^tt[0-9]{7,10}$/.test(e.imdbId||'')?e.imdbId:null,
         href:'/archive-film.html?id='+encodeURIComponent('manual:stream-'+e.id),
         linkLabel:'STREAMING FILM DETAILS',
         source:'Source-checked '+e.platform+' film release',local:true

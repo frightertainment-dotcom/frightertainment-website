@@ -215,6 +215,7 @@
         }
         const page={
           title:entry.title,year:entry.filmYear,sourceUrl:entry.sourceUrl,
+          imdbId:/^tt[0-9]{7,10}$/.test(entry.imdbId||'')?entry.imdbId:null,
           watchUrl:/^https:\/\/[^/\s]+/.test(entry.watchUrl||'')?entry.watchUrl:null,
           platform:entry.platform,access:entry.access,streamDate:entry.streamDate,dateBasis:entry.dateBasis,
           synopsis:entry.synopsis,tmdbId:entry.tmdbId,streaming:true
