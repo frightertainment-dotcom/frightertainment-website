@@ -23,3 +23,20 @@ test('privacy page is included only through the same explicit public/preview all
   const sitemap=await readFile(new URL('../sitemap.xml',import.meta.url),'utf8');
   assert.match(sitemap,/www\.frightertainment\.com\/privacy\.html/);
 });
+
+
+test('embedded media never contains an eagerly loaded Apple or Steam iframe',async()=>{
+  for(const [file,provider,count] of [['podcasts.html','apple',3],['games.html','steam',11]]){
+    const html=await readFile(new URL('../'+file,import.meta.url),'utf8');
+    assert.doesNotMatch(html,/<iframe[^>]*\bsrc=/i,'unexpected third-party connection: '+file);
+    assert.equal(html.split('data-player-provider="'+provider+'"').length-1,count);
+    assert.match(html,/src="\/embed-consent\.js"/,'missing deliberate loading mechanism: '+file);
+    assert.match(html,/data-player-url="https:\/\//);
+  }
+  const notice=await readFile(new URL('../privacy.html',import.meta.url),'utf8');
+  assert.match(notice,/apple\.com\/legal\/privacy\/data\/en\/apple-podcasts-web/);
+  assert.match(notice,/store\.steampowered\.com\/privacy_agreement/);
+  const loader=await readFile(new URL('../embed-consent.js',import.meta.url),'utf8');
+  assert.match(loader,/\.fr-player-gate__button/);
+  assert.match(loader,/document\.createElement\('iframe'\)/);
+});
