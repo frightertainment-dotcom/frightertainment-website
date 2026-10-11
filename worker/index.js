@@ -206,16 +206,19 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(options)));
   const hash = [...new Uint8Array(digest)].slice(0, 12).map(n => n.toString(16).padStart(2, '0')).join('');
   const kind = `tmdb-${catalogue ? 'list' : 'detail'}-${hash}`;
-  let dataset = await loadDataset(env.DB, kind, '');
+  // Streaming provider snapshots are stored under their actual region, not
+  // the empty/global D1 key. Scope every read and refresh consistently.
+  const datasetCountry = watchMode ? country : '';
+  let dataset = await loadDataset(env.DB, kind, datasetCountry);
   if (dataset.status !== 'current') {
-    await refreshTask(env, kind, '', async () => {
+    await refreshTask(env, kind, datasetCountry, async () => {
       const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
       // Provider availability is territory-bound; never store a GB/US provider
       // snapshot as "Global", which the D1 provenance validator must reject.
       return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org',
         territory: watchMode ? country : 'Global', checkedAt: today() };
     }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'tmdb-request-on-demand');
-    dataset = await loadDataset(env.DB, kind, '');
+    dataset = await loadDataset(env.DB, kind, datasetCountry);
   }
   const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
   if (catalogue) return json({ ...dataset, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=120' });
