@@ -44,38 +44,60 @@ export async function onRequestPost({request,env}) {
   const fetchSite = request.headers.get('sec-fetch-site');
   if ((origin && origin !== new URL(request.url).origin) ||
       (fetchSite && !['same-origin','none'].includes(fetchSite))) {
-    return reply(403,{error:'This form can only be sent from Frightertainment.'});
+    return reply(403,{error:'This form can only be sent from Frightertainment.',code:'FT-ORIGIN'});
   }
   if (request.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !== 'application/json') {
-    return reply(415,{error:'Use the contact form.'});
+    return reply(415,{error:'Use the contact form.',code:'FT-CONTENT-TYPE'});
   }
   const {parsed,tooLarge,invalid} = await readLimitedJSON(request);
-  if (tooLarge) return reply(413,{error:'Message is too long.'});
+  if (tooLarge) return reply(413,{error:'Message is too long.',code:'FT-PAYLOAD-LIMIT'});
   if (invalid || !parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    return reply(400,{error:'Invalid message.'});
+    return reply(400,{error:'Invalid message.',code:'FT-INVALID-JSON'});
   }
-  if (parsed.company) return reply(200,{ok:true}); // Honeypot: no email is sent.
+  if (parsed.company || parsed.ft_trap_blank) return reply(200,{ok:true}); // Honeypot: no email is sent; never claim delivery.
   const {title,email,subject,message} = parsed;
   if (typeof title !== 'string' || typeof email !== 'string' ||
       typeof subject !== 'string' || typeof message !== 'string') {
-    return reply(400,{error:'Complete your name, email, subject and message.'});
+    return reply(400,{error:'Complete your name, email, subject and message.',code:'FT-INVALID-FIELDS'});
   }
   const name=title.trim(), replyEmail=email.trim(), topic=subject.trim(), text=message.trim();
   if (!name || name.length>100 || !topic || topic.length>140 ||
       replyEmail.length>254 || !/^[^\s@\x00-\x1f\x7f]+@[^\s@\x00-\x1f\x7f]+\.[A-Za-z]{2,}$/.test(replyEmail) ||
       text.length<5 || text.length>5000 ||
       /[\x00-\x1f\x7f]/.test(name) || /[\x00-\x1f\x7f]/.test(topic) || /\x00/.test(text)) {
-    return reply(400,{error:'Complete your name, valid email, subject and message.'});
+    return reply(400,{error:'Complete your name, valid email, subject and message.',code:'FT-INVALID-FIELDS'});
   }
-  if (!env.CONTACT_DELIVERY && !env.EMAIL) return reply(503,{error:'Contact form delivery is temporarily unavailable. Use the direct email link.'});
+  if (!env.CONTACT_DELIVERY && !env.EMAIL) {
+    return reply(503,{error:'Contact form delivery is temporarily unavailable. Use the direct email link.',code:'FT-NO-DELIVERY-BINDING'});
+  }
   try {
-    if(env.CONTACT_DELIVERY){
-      const delivery=await env.CONTACT_DELIVERY.fetch('https://frightertainment-contact-mailer.internal/send',{
-        method:'POST',headers:{'content-type':'application/json'},
-        body:JSON.stringify({title:name,email:replyEmail,subject:topic,message:text})
-      });
-      if(!delivery.ok)throw new Error('Delivery service declined request');
-    }else{
+    if (env.CONTACT_DELIVERY) {
+      let delivery;
+      try {
+        delivery=await env.CONTACT_DELIVERY.fetch('https://frightertainment-contact-mailer.internal/send',{
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body:JSON.stringify({title:name,email:replyEmail,subject:topic,message:text})
+        });
+      } catch (error) {
+        console.error('frightertainment_contact_binding_failed',{type:String(error?.name||'UnknownError').slice(0,60)});
+        return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-MAILER-CONNECTION'});
+      }
+      if (!delivery.ok) {
+        // The mailer is private. Never expose its detailed error text or the message itself.
+        console.error('frightertainment_contact_mailer_rejected',{status:delivery.status});
+        return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-MAILER-'+delivery.status});
+      }
+      if (!(delivery.headers.get('content-type')||'').toLowerCase().includes('application/json')) {
+        return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-NONJSON'});
+      }
+      let confirmation;
+      try { confirmation=await delivery.json(); }
+      catch { return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-BAD-JSON'}); }
+      if (confirmation?.ok !== true) {
+        return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-UNCONFIRMED'});
+      }
+    } else {
       await env.EMAIL.send({
         to:'Frightertainment@gmail.com',from:'contact@frightertainment.com',
         replyTo:replyEmail,subject:'Frightertainment contact: '+topic,
@@ -83,8 +105,9 @@ export async function onRequestPost({request,env}) {
       });
     }
     return reply(200,{ok:true,delivered:true});
-  }catch{
-    return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.'});
+  } catch (error) {
+    console.error('frightertainment_contact_delivery_failed',{type:String(error?.name||'UnknownError').slice(0,60)});
+    return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-DELIVERY-ERROR'});
   }
 }
 export function onRequest(){return reply(405,{error:'Method not allowed.'});}

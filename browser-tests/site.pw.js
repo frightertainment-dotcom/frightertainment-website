@@ -1206,6 +1206,41 @@ test('Contact page presents both direct email and a working form with reply addr
   expect(received).toMatchObject({title:'Site visitor',email:'visitor@example.com',subject:'Indie horror recommendation'});
   await expect(page.locator('#contact-email')).toHaveValue('');
 });
+
+test('mobile browser autofill does not target a semantically named hidden company field',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/contact.html');
+  await expect(page.locator('[name="company"]')).toHaveCount(0);
+  await expect(page.locator('[name="ft_trap_blank"]')).toHaveCount(1);
+  let data;
+  await page.route('**/api/contact',async route=>{
+    data=route.request().postDataJSON();
+    await route.fulfill({status:200,json:{ok:true,delivered:true}});
+  });
+  await page.locator('#contact-name').fill('Visitor');
+  await page.locator('#contact-email').fill('visitor@example.com');
+  await page.locator('#contact-subject').fill('Test');
+  await page.locator('#contact-message').fill('A test of the contact form.');
+  await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
+  await expect(page.locator('#contact-status')).toContainText('accepted for delivery');
+  expect(data.ft_trap_blank).toBe('');
+  expect(data.company).toBeUndefined();
+});
+
+test('contact form identifies an HTML authentication or API interception without claiming success',async({page})=>{
+  await page.goto('/contact.html');
+  await page.route('**/api/contact',route=>route.fulfill({
+    status:200,contentType:'text/html',body:'<!doctype html><title>Access</title><p>Please sign in</p>'
+  }));
+  await page.locator('#contact-name').fill('Visitor');
+  await page.locator('#contact-email').fill('visitor@example.com');
+  await page.locator('#contact-subject').fill('Test');
+  await page.locator('#contact-message').fill('Testing authentication response.');
+  await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
+  await expect(page.locator('#contact-status')).toContainText('could not confirm delivery');
+  await expect(page.locator('#contact-status')).toContainText('Reference: FT-NONJSON-200');
+  await expect(page.locator('#contact-message')).toHaveValue('Testing authentication response.');
+});
 test('Contact form shows a prefilled mailto fallback without losing unsent text',async({page})=>{
   await page.goto('/contact.html');
   await page.route('**/api/contact',route=>route.fulfill({status:503,json:{error:'Delivery unavailable'}}));
@@ -1214,7 +1249,8 @@ test('Contact form shows a prefilled mailto fallback without losing unsent text'
   await page.locator('#contact-subject').fill('A film to feature');
   await page.locator('#contact-message').fill('Here is the film I wanted to suggest.');
   await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
-  await expect(page.locator('#contact-status')).toContainText('Nothing has been submitted');
+  await expect(page.locator('#contact-status')).toContainText('could not confirm delivery');
+  await expect(page.locator('#contact-status')).toContainText('Reference: FT-HTTP-503');
   const fallback=page.locator('#contact-status a');
   await expect(fallback).toHaveAttribute('href',/^mailto:Frightertainment@gmail.com/);
   const url=await fallback.getAttribute('href');

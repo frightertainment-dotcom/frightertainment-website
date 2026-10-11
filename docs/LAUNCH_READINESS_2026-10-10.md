@@ -53,3 +53,14 @@ A full manual verification of every external destination and every official trai
 - The review branch now replaces Apple Podcasts and Steam `iframe` embeds on Games/Podcasts with click-to-load, provider-labelled placeholders. No external iframe exists before deliberate visitor activation; `embed-consent.js` validates exact provider hosts and embed paths before creating one. The linked notice accurately describes this feature. **Validation gate:** run fresh Playwright tests checking zero network requests before activation, then one allowed iframe after activation, keyboard access and responsive widths. Review actual third-party cookie policies before publication.
 - Cloudflare RUM is on and may process eligible performance metrics. Validate the real telemetry behavior and any additional website analytics services before public launch.
 - This security review is a draft branch intended to target the current private preview. DO NOT merge into main, deploy publicly, disable Access or release without owner acceptance and verification.
+
+## Failed owner mobile contact test — 11 October 2026 (10:27 UK local)
+An authenticated phone user submitted the contact form and saw the generic fallback ("The form could not send your message"). This proves the real browser-to-inbox delivery chain is NOT yet verified. Previous standalone Cloudflare Email Sending delivery evidence must **not** be described as a successful contact form test. Site remains private.
+
+A targeted **review-only** fix:
+- Renames the hidden `company` anti-spam field to nonsemantic `ft_trap_blank` to reduce the risk that mobile browser contact-detail autofill silently triggers a false bot rejection. The backend still recognises the old `company` key to catch bots; it never claims delivery for either filled honeypot.
+- Makes the browser report non-sensitive failure references (`FT-AUTH-REDIRECT`, `FT-NONJSON-<status>`, `FT-HTTP-<status>`, `FT-MAILER-<status>`, `FT-MAILER-CONNECTION`, etc.), while keeping the unsent message and email-app fallback.
+- The Pages endpoint now validates the mailer's JSON success acknowledgement rather than trusting HTTP 200 alone. It includes safe response codes for rejection or binding errors without exposing submitted names, emails or message text.
+- Adds unit integration checks across the Pages handler and private mailer; Playwright covers mobile autofill, success/fallback and HTML interception.
+- This does NOT establish that the issue was caused by autofill. It might instead be Access authentication, a binding error or upstream email failure. **A new authenticated real submission and inbox receipt are mandatory before launch.**
+- Keep Cloudflare Access, production auto-deploy disabled and public launch on HOLD. Do not expose unrestricted diagnostic endpoints or contact contents in logs.
