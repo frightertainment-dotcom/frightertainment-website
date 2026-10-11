@@ -20,7 +20,7 @@ test('contact submissions go only to the fixed publisher inbox and reject foreig
   const result=await onRequestPost({request:make(good,{'sec-fetch-site':'same-origin'}),env});
   assert.equal(result.status,200);
   assert.equal(count,1);
-  assert.equal(sent.to,'Frightertainment@gmail.com');
+  assert.equal(sent.to,'frightertainment@gmail.com');
   assert.equal(sent.from,'contact@frightertainment.com');
   assert.equal(sent.replyTo,'viewer@example.com');
   const submitted=await result.json();
@@ -91,7 +91,7 @@ test('private Pages and Worker mailer exchange an actual JSON confirmation',asyn
   assert.equal(response.status,200);
   const data=await response.json();
   assert.equal(data.delivered,true);
-  assert.equal(sent.to,'Frightertainment@gmail.com');
+  assert.equal(sent.to,'frightertainment@gmail.com');
   assert.equal(sent.replyTo,good.email);
   assert.equal(sent.subject,'Frightertainment contact: '+good.subject);
 });
@@ -123,4 +123,27 @@ test('backend explains upstream delivery failures with safe reference codes',asy
     assert.ok(!JSON.stringify(json).includes(good.message));
     assert.ok(!JSON.stringify(json).includes('secret upstream details'));
   }
+});
+
+test('the Pages contact endpoint preserves known private mailer error codes without leaking arbitrary messages',async()=>{
+  const verifiedCodes=['FT-WORKER-NO-EMAIL','FT-WORKER-NO-ACCEPTANCE','FT-WORKER-SENDER','FT-WORKER-RECIPIENT','FT-WORKER-RATE-LIMIT','FT-WORKER-VALIDATION','FT-WORKER-SEND-FAILED'];
+  for (const code of verifiedCodes){
+    const env={CONTACT_DELIVERY:{fetch:async()=>new Response(JSON.stringify({ok:false,code}),{
+      status:503,headers:{'content-type':'application/json'}
+    })}};
+    const response=await onRequestPost({request:make(good),env});
+    assert.equal(response.status,503);
+    const body=await response.json();
+    assert.equal(body.code,code);
+    assert.equal(body.delivered,undefined);
+  }
+  const hostile={CONTACT_DELIVERY:{fetch:async()=>new Response(JSON.stringify({
+    ok:false,code:'FT-WORKER-PRIVATE-DETAILS\nUSER_EMAIL',
+    error:'private provider error and customer details'
+  }),{status:503,headers:{'content-type':'application/json'}})}};
+  const denied=await onRequestPost({request:make(good),env:hostile});
+  assert.equal(denied.status,503);
+  const data=await denied.json();
+  assert.equal(data.code,'FT-MAILER-503');
+  assert.ok(!JSON.stringify(data).includes('private provider error'));
 });

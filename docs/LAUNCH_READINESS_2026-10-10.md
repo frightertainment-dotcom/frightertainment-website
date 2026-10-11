@@ -64,3 +64,14 @@ A targeted **review-only** fix:
 - Adds unit integration checks across the Pages handler and private mailer; Playwright covers mobile autofill, success/fallback and HTML interception.
 - This does NOT establish that the issue was caused by autofill. It might instead be Access authentication, a binding error or upstream email failure. **A new authenticated real submission and inbox receipt are mandatory before launch.**
 - Keep Cloudflare Access, production auto-deploy disabled and public launch on HOLD. Do not expose unrestricted diagnostic endpoints or contact contents in logs.
+
+## Confirmed upstream mailer failure — owner test 11 October 2026, 11:16 BST (10:16 UTC)
+The owner retried the updated Access-protected form on Android: subject "Test", message "Testing this". The UI displayed `Reference: FT-MAILER-503`. The Pages Function was invoked and called `CONTACT_DELIVERY`, which returned HTTP 503. This excludes missing browser validation as the immediate failure, but does not distinguish the mailer runtime's missing `EMAIL` binding from Cloudflare Email Sending rejection until the Worker returns an explicit cause. **PUBLIC LAUNCH REMAINS BLOCKED.**
+
+Audit of earlier proof: the 03:59 UTC Cloudflare-sent email observed in Gmail was accepted through the **Email Sending REST API**, not the private Worker. That email did not validate the full browser → Pages → service binding → Worker → provider → Gmail chain.
+
+Verified Cloudflare settings immediately following the failure: Worker script exists, private (no public Worker route), and its `EMAIL` send binding points to `Frightertainment@gmail.com`; account-level verified destination is `frightertainment@gmail.com` (lowercase). Email addresses generally compare case-insensitively, so a case mismatch is a **hypothesis, not a proven root cause**. The proposed review fixes recipient and binding configuration to exactly the verified lowercase address.
+
+Code remediation in this private-review branch: verify Cloudflare EmailSendResult `messageId`, distinguish no EMAIL binding versus sender/recipient restrictions and provider failures via fixed FT-WORKER-* codes, and propagate only allowlisted codes from the private Worker through Pages. Never expose exception text or contact contents to visitors; Worker logs contain categories only. Test integration with fixtures, deploy the PRIVATE mailer separately (the Pages build does not deploy `worker/contact-mailer.js`), and inspect runtime telemetry. Re-test the owner's form and independently check Gmail receipt before closing launch gate.
+
+**Neither passing GitHub tests nor successfully deploying the Worker constitutes proof of real email delivery.** Keep Cloudflare Access and production deployment restrictions unchanged.
