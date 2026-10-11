@@ -43,7 +43,8 @@ for (const [path, heading] of pages) {
         claims: [{ label: 'Film year', value: '2026', territory: 'GB', sourceName: 'Fixture source', source: 'https://example.invalid/film', checked: '2026-10-08' }]
       })
     }));
-    await page.goto(path);
+    // Embedded podcast/game players can hold the browser load event open.
+    await page.goto(path,{waitUntil:'domcontentloaded'});
     await expect(page.locator('h1').first()).toContainText(heading, { ignoreCase: true });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     await page.evaluate(async () => {
