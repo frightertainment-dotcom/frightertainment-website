@@ -37,11 +37,13 @@ test('podcast JSON API is not frameable and does not grant third-party CORS acce
  assert.doesNotMatch(source,/access-control-allow-origin/i);
 });
 
+
 test('Cloudflare automatic Web Analytics beacon is allowed by the shared CSP without broadening script access', async () => {
   const headers = await readFile(new URL('../_headers', import.meta.url), 'utf8');
-  const csp = headers.split('\\n').find(line => line.trim().startsWith('Content-Security-Policy:'));
+  const csp = headers.split(String.fromCharCode(10)).find(line => line.trim().startsWith('Content-Security-Policy:'));
   assert.ok(csp, 'Missing shared Content-Security-Policy header');
-  const directives = new Map(csp.replace(/^\\s*Content-Security-Policy:\\s*/, '').split(';').map(part => part.trim()).filter(Boolean).map(part => {
+  const policy = csp.slice(csp.indexOf('Content-Security-Policy:') + 'Content-Security-Policy:'.length).trim();
+  const directives = new Map(policy.split(';').map(part => part.trim()).filter(Boolean).map(part => {
     const space = part.indexOf(' ');
     return [space < 0 ? part : part.slice(0, space), space < 0 ? '' : part.slice(space + 1)];
   }));
