@@ -216,10 +216,29 @@ test('TMDB region provider discovery separates a Shudder subscription, free Plex
   assert.deepEqual(gb.items[0].accessTypes,['subscription','free']);
   assert.deepEqual(gb.items[0].providerNames,['Shudder','Plex']);
   assert.equal(gb.items[0].streamingPremiereVerified,false);
+  assert.equal(gb.country,'GB');
+  assert.equal(gb.items[0].territory,'GB');
+  assert.equal(gb.items[0].releaseDate,null,'Global first premiere must not be relabelled as a UK premiere');
+  assert.equal(gb.items[0].releaseTerritory,null);
+  assert.equal(gb.items[0].firstReleaseDate,'2025-03-17');
+  const {validateDataset}=await import('../src/core.js');
+  const scoped=(result)=>({
+    ...result,kind:'tmdb-list-stream-test',sourceName:'TMDB',
+    sourceUrl:'https://www.themoviedb.org',territory:result.country,
+    checkedAt:new Date().toISOString().slice(0,10)
+  });
+  assert.doesNotThrow(()=>validateDataset(scoped(gb)),
+    'GB provider listings must pass the same territorial D1 contract as other datasets');
+  assert.throws(()=>validateDataset({...scoped(gb),territory:'Global'}),/Dataset territory/,
+    'The former bug was incorrectly marking country-specific provider data Global');
   const us=await fetchStreamingAvailability(env,{country:'US',mode:'streaming-watch',page:1,year:2025,access:'rent-buy'});
   assert.deepEqual(us.items.map(x=>x.title),['Streaming Horror B']);
   assert.deepEqual(us.items[0].accessTypes,['rent-buy']);
   assert.equal(us.items[0].providerNames[0],'Amazon Video');
+  assert.equal(us.items[0].territory,'US');
+  assert.equal(us.items[0].releaseDate,null);
+  assert.equal(us.items[0].firstReleaseDate,'2025-05-09');
+  assert.doesNotThrow(()=>validateDataset(scoped(us)));
  }finally{globalThis.fetch=old;}
 });
 

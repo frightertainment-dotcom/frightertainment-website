@@ -210,7 +210,10 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   if (dataset.status !== 'current') {
     await refreshTask(env, kind, '', async () => {
       const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
-      return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org', territory: 'Global', checkedAt: today() };
+      // Provider availability is territory-bound; never store a GB/US provider
+      // snapshot as "Global", which the D1 provenance validator must reject.
+      return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org',
+        territory: watchMode ? country : 'Global', checkedAt: today() };
     }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'tmdb-request-on-demand');
     dataset = await loadDataset(env.DB, kind, '');
   }
