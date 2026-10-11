@@ -84,9 +84,19 @@ export async function onRequestPost({request,env}) {
         return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-MAILER-CONNECTION'});
       }
       if (!delivery.ok) {
-        // The mailer is private. Never expose its detailed error text or the message itself.
-        console.error('frightertainment_contact_mailer_rejected',{status:delivery.status});
-        return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-MAILER-'+delivery.status});
+        // Worker failures have fixed, non-sensitive codes; never expose raw upstream errors.
+        let code='FT-MAILER-'+delivery.status;
+        if ((delivery.headers.get('content-type')||'').toLowerCase().includes('application/json')) {
+          try {
+            const failure=await delivery.json();
+            if (typeof failure?.code === 'string' &&
+                /^FT-WORKER-(?:NO-EMAIL|NO-ACCEPTANCE|SENDER|RECIPIENT|RATE-LIMIT|VALIDATION|SEND-FAILED)$/.test(failure.code)) {
+              code=failure.code;
+            }
+          } catch {}
+        }
+        console.error('frightertainment_contact_mailer_rejected',{status:delivery.status,code});
+        return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code});
       }
       if (!(delivery.headers.get('content-type')||'').toLowerCase().includes('application/json')) {
         return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-NONJSON'});
@@ -99,7 +109,7 @@ export async function onRequestPost({request,env}) {
       }
     } else {
       await env.EMAIL.send({
-        to:'Frightertainment@gmail.com',from:'contact@frightertainment.com',
+        to:'frightertainment@gmail.com',from:'contact@frightertainment.com',
         replyTo:replyEmail,subject:'Frightertainment contact: '+topic,
         text:'From: '+name+'\nReply email: '+replyEmail+'\nSubject: '+topic+'\n\n'+text
       });
