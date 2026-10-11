@@ -6,19 +6,6 @@
   "priorityPolicy": "Group by month first; within a month source-confirmed major studio/general releases first, special re-screenings next and select independent cinema events last. Months always remain in chronological order.",
   "screenings": [
     {
-      "id": "whalefall-2026-uk",
-      "title": "Whalefall",
-      "filmYear": 2025,
-      "date": "2026-10-16",
-      "edition": "new",
-      "reach": "general",
-      "tier": "studio",
-      "distributor": "20th Century Studios / Disney",
-      "genre": "Creature-survival thriller",
-      "sourceUrl": "https://press.disney.co.uk/news/new-trailer-for-epic-and-emotional-survival-thriller-whalefall-based-on-the-acclaimed-novel-available-now",
-      "note": "UK cinema opening confirmed; cinema-chain coverage varies."
-    },
-    {
       "id": "clayface-2026-uk",
       "title": "Clayface",
       "filmYear": 2026,
@@ -130,29 +117,16 @@
       "note": "UK distributor release date, 6 November; check individual cinema programmes."
     },
     {
-      "id": "ebenezer-2026-uk",
-      "title": "Ebenezer",
-      "filmYear": 2026,
-      "date": "2026-11-13",
-      "edition": "new",
-      "reach": "general",
-      "tier": "studio",
-      "distributor": "Paramount Pictures",
-      "genre": "Gothic supernatural / dark fantasy",
-      "sourceUrl": "https://www.paramount.com/movies",
-      "note": "Ghost-story fantasy; included under supernatural cinema, not asserted to be straight horror."
-    },
-    {
       "id": "exorcist-1973-norwich-2026",
       "title": "The Exorcist",
       "filmYear": 1973,
-      "date": "2026-11-06",
+      "date": "2026-11-05",
       "edition": "re-release",
       "reach": "limited",
       "tier": "special",
       "distributor": "Picturehouse / Evolution of Horror",
-      "sourceUrl": "https://www.picturehouses.com/movie-details/001/HO00018476/evolution-of-horror-presents-the-exorcist",
-      "note": "Special event screening linked to Darkest Chapter, Norwich; not a nationwide re-release."
+      "sourceUrl": "https://www.picturehouses.com/cinema/001",
+      "note": "Cinema City Norwich event programme lists Thursday 5 November, 5:30pm, with Evolution of Horror hosts. Event page lists 6 November as the film programme release date; this is a single-venue special screening."
     },
     {
       "id": "grip-terror-peckham-2026",
@@ -178,6 +152,18 @@
       "genre": "Action slasher horror",
       "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
       "note": "UK release-calendar listing for 11 December. Nationwide coverage to be checked."
+    },
+    {
+      "id": "they-live-1988-oxford-2026",
+      "title": "They Live",
+      "filmYear": 1988,
+      "date": "2026-10-30",
+      "edition": "re-release",
+      "reach": "limited",
+      "tier": "special",
+      "distributor": "Phoenix Picturehouse, Oxford",
+      "sourceUrl": "https://www.picturehouses.com/cinema/phoenix-picturehouse",
+      "note": "Select Phoenix Picturehouse Oxford screening on 30 October; not a nationwide re-release."
     }
   ]
 }
