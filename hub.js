@@ -30,6 +30,10 @@
         description.textContent=typeof synopsis==='string'&&synopsis.length>15?
           synopsis:'Enter the latest film file and explore its official release announcement.';
         link.href='/films/'+encodeURIComponent(chosen.film.id)+'/';
+        // The default tile links to the Horror Vault. When it becomes a
+        // rotating film feature, its visible CTA must match its new target.
+        const arrow = link.querySelector('span[aria-hidden="true"]');
+        link.replaceChildren(document.createTextNode('VIEW FILM DETAILS '), ...(arrow ? [arrow] : []));
         feature.dataset.filmId = chosen.film.id;
         link.setAttribute('aria-label','Explore '+chosen.film.title+' film details');
       }
