@@ -6,6 +6,10 @@ test('the draft privacy and cookies page is readable and linked from visitor pag
   for(const required of ['Frightertainment@gmail.com','Cloudflare','Google Fonts','Apple Podcasts','Steam','YouTube','Information Commissioner','legitimate interests','local storage','right to object'])
     assert.ok(notice.toLowerCase().includes(required.toLowerCase()),'notice missing '+required);
   assert.match(notice,/rel="canonical" href="https:\/\/www\.frightertainment\.com\/privacy\.html"/);
+  assert.match(notice,/independent, non-commercial horror entertainment website run by an individual/);
+  assert.match(notice,/It is not a registered company and does not currently sell products or services/);
+  assert.match(notice,/The individual operating the website handles privacy enquiries/);
+  assert.doesNotMatch(notice,/\b(?:Ltd|Limited|Inc|LLC)\b/,'Do not invent a corporate legal form');
   for(const file of ['index.html','contact.html','credits.html','movies.html','tv-shows.html','cinema.html','indie-movies.html','podcasts.html','games.html','all-horror-movies.html','archive-film.html','film.html','media.html']){
     const page=await readFile(new URL('../'+file,import.meta.url),'utf8');
     assert.match(page, /href="\/privacy\.html"/,'missing accessible privacy footer link: '+file);
