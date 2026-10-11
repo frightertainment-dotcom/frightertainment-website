@@ -28,6 +28,13 @@
     'digital-home':'HOME RELEASE AFTER CINEMA'
   };
   let all=[],state={country:'GB',year:String(yr),access:'all',visible:8},requestNumber=0;
+  // Film-year filters roll forward automatically every January without a hand edit.
+  yearChoice.replaceChildren(...[yr,yr-1].map(y=>{
+    const opt=document.createElement('option');opt.value=String(y);
+    opt.textContent=y+' FILMS';return opt;
+  }));
+  const allYears=document.createElement('option');allYears.value='all';
+  allYears.textContent='ALL YEARS / NEW ARRIVALS';yearChoice.append(allYears);
   const valid=e=>e&&/^[a-z0-9-]+$/.test(e.id||'')&&typeof e.title==='string'&&
     /^\d{4}-\d{2}-\d{2}$/.test(e.streamDate||'')&&Number.isInteger(e.filmYear)&&
     ['free','subscription','rent-buy'].includes(e.access)&&
