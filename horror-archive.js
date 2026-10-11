@@ -82,6 +82,33 @@
       entries.sort((a,b)=>collator.compare(a.title,b.title)||collator.compare(a.id,b.id));
     }
   };
+
+  // Source-verified streaming-first records fill gaps in the 2025/2026 Horror Vault.
+  // Streaming availability never rewrites a film's original release year.
+  function addStreamingSupplement(source){
+    const today=new Date().toISOString().slice(0,10);
+    const entries=source?.schemaVersion===1&&Array.isArray(source.entries)?source.entries:[];
+    const known=new Set([...grouped.values()].flat().map(x=>x.year+'|'+titleKey(x.title)));
+    for(const e of entries){
+      if(!e||!/^[a-z0-9-]+$/.test(e.id||'')||
+        typeof e.title!=='string'||e.title.trim().length<2||
+        !Number.isInteger(e.filmYear)||e.filmYear<2025||e.filmYear>currentYear||
+        !/^\d{4}-\d{2}-\d{2}$/.test(e.streamDate||'')||e.streamDate>today||
+        !/^https:\/\/[^/\s]+/.test(e.sourceUrl||''))continue;
+      const key=e.filmYear+'|'+titleKey(e.title);
+      if(known.has(key))continue;
+      known.add(key);
+      grouped.get(e.filmYear)?.push({
+        id:'manual:stream-'+e.id,title:e.title.trim(),year:e.filmYear,
+        href:'/archive-film.html?id='+encodeURIComponent('manual:stream-'+e.id),
+        linkLabel:'STREAMING FILM DETAILS',
+        source:'Source-checked '+e.platform+' film release',local:true
+      });
+    }
+    for(const rows of grouped.values()){
+      rows.sort((a,b)=>collator.compare(a.title,b.title)||collator.compare(a.id,b.id));
+    }
+  }
   function enableVaultSearch(){
     const field=document.getElementById('archive-global-search');
     const results=document.getElementById('archive-global-results');
@@ -171,8 +198,9 @@
     panel.append(tally,list,nothing);container.append(searchLabel,panel);filter();
     container.dataset.rendered='true';
   }
-  function showArchive(raw){
+  function showArchive(raw,streaming){
     selectSource(raw);
+    addStreamingSupplement(streaming);
     enableVaultSearch();
     const total=Array.from(grouped.values()).reduce((n,entries)=>n+entries.length,0);
     const yearsWithFilms=Array.from(grouped.values()).filter(entries=>entries.length).length;
@@ -232,12 +260,16 @@
       }
     });
   }
-  fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
-    .then(async response=>{
-      if(!response.ok)throw new Error('Archive snapshot unavailable');
-      return response.json();
-    }).then(showArchive).catch(()=>{
-      showArchive({updatedAt:null,films:[],manual:[]});
+  Promise.all([
+    fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
+      .then(async response=>{
+        if(!response.ok)throw new Error('Archive snapshot unavailable');
+        return response.json();
+      }),
+    fetch('/data/streaming-discovery.json',{headers:{accept:'application/json'}})
+      .then(async response=>response.ok?response.json():null).catch(()=>null)
+  ]).then(([archiveData,streamingData])=>showArchive(archiveData,streamingData)).catch(()=>{
+      showArchive({updatedAt:null,films:[],manual:[]},null);
       const note=node('p','horror-archive__offline','Archive sync is temporarily unavailable. Existing Frightertainment film files remain accessible; try again shortly.');
       summary.after(note);
     });

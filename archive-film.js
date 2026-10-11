@@ -32,12 +32,14 @@
   const render=(film)=>{
     const card=make('div','archive-detail__content');
     const overline=make('span','hub-eyebrow','FRIGHTERTAINMENT · ALL HORROR MOVIES');
-    const label=make('p','archive-detail__label','HISTORICAL FILM RECORD · '+film.year);
+    const label=make('p','archive-detail__label',
+      (film.streaming?'STREAMING HORROR · ORIGINAL FILM YEAR ':'HISTORICAL FILM RECORD · ')+film.year);
     card.append(overline,heading(film.title),label);
     const media=make('div','archive-detail__media');
     media.dataset.mediaType='movie';media.dataset.mediaTitle=id==='manual:le-manoir-du-diable-1896'?'Le Manoir du diable':film.title;
     media.dataset.mediaYear=String(film.year);media.dataset.mediaEager='true';
     if(film.imdbId)media.dataset.mediaImdb=film.imdbId;
+    if(Number.isInteger(film.tmdbId)&&film.tmdbId>0)media.dataset.tmdbId=String(film.tmdbId);
     const art=make('div','archive-detail__art');
     const poster=make('img','archive-detail__poster');
     poster.alt=film.title+' poster';poster.dataset.mediaField='poster';poster.hidden=true;poster.decoding='async';
@@ -60,6 +62,22 @@
       idFact.append(make('span','','IMDb'),make('strong','',film.imdbId));
       info.append(idFact);
     }
+    if(film.streaming){
+      const platform=make('div','archive-detail__fact');
+      platform.append(make('span','','STREAMING / DIGITAL SERVICE'),make('strong','',film.platform));
+      const access=make('div','archive-detail__fact');
+      access.append(make('span','','VIEWING OPTION'),make('strong','',
+        film.access==='free'?'Free to watch (adverts possible)':
+        film.access==='rent-buy'?'Digital rent or purchase':'Included with paid subscription'));
+      const date=make('div','archive-detail__fact');
+      const pretty=new Intl.DateTimeFormat('en-GB',{dateStyle:'long',timeZone:'UTC'})
+        .format(new Date(film.streamDate+'T12:00:00Z'));
+      date.append(make('span','','SOURCE-LINKED PLATFORM DATE'),make('strong','',pretty));
+      info.append(platform,access,date);
+      const text=make('p','archive-detail__intro',film.synopsis||
+        'This horror film has a source-linked streaming or digital release. Availability may change; check the provider.');
+      card.append(text);
+    }
     card.append(info);
 
     const buttons=make('div','archive-detail__actions');
@@ -69,7 +87,8 @@
     buttons.append(link('FIND MOVIE ON IMDb →',imdbSearch(film.title,film.year),
       film.imdbId?'archive-detail__link':'archive-detail__link archive-detail__link--main'));
     if(film.qid) buttons.append(link('WIKIDATA SOURCE →',sourceUrl(film.qid)));
-    if(film.sourceUrl)buttons.append(link('FILM SOURCE →',film.sourceUrl));
+    if(film.sourceUrl)buttons.append(link(film.streaming?'PLATFORM RELEASE SOURCE →':'FILM SOURCE →',film.sourceUrl));
+    if(film.streaming&&film.watchUrl)buttons.append(link('CHECK WATCHING OPTIONS →',film.watchUrl));
     card.append(buttons);
 
     const bottom=make('div','archive-detail__footer');
@@ -170,12 +189,38 @@
     error('That film identifier is invalid. Browse the archive and choose a title.');
     return;
   }
-  fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
-    .then(async response=>{
-      if(!response.ok)throw new Error('The film reference catalogue is temporarily unavailable');
-      return response.json();
-    })
-    .then(data=>{
+  Promise.all([
+    fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
+      .then(async response=>{
+        if(!response.ok)throw new Error('The film reference catalogue is temporarily unavailable');
+        return response.json();
+      }),
+    id.startsWith('manual:stream-')
+      ? fetch('/data/streaming-discovery.json',{headers:{accept:'application/json'}})
+          .then(async r=>r.ok?r.json():null).catch(()=>null)
+      : Promise.resolve(null)
+  ])
+    .then(([data,streaming])=>{
+      if(id.startsWith('manual:stream-')){
+        const wanted=id.slice('manual:stream-'.length);
+        const entry=streaming?.schemaVersion===1&&Array.isArray(streaming.entries)
+          ?streaming.entries.find(x=>x.id===wanted):null;
+        if(!entry||typeof entry.title!=='string'||!Number.isInteger(entry.filmYear)||
+           entry.filmYear<1896||entry.filmYear>new Date().getUTCFullYear()+2||
+           !/^d{4}-d{2}-d{2}$/.test(entry.streamDate||'')||
+           !/^https://[^/s]+/.test(entry.sourceUrl||'')){
+          error('That streaming film is not in the current source-checked inventory.');return;
+        }
+        const page={
+          title:entry.title,year:entry.filmYear,sourceUrl:entry.sourceUrl,
+          watchUrl:/^https://[^/s]+/.test(entry.watchUrl||'')?entry.watchUrl:null,
+          platform:entry.platform,access:entry.access,streamDate:entry.streamDate,
+          synopsis:entry.synopsis,tmdbId:entry.tmdbId,streaming:true
+        };
+        render(page);
+        addExtras(data,page);
+        return;
+      }
       // Wikidata can occasionally give two different films the same IMDb ID.
       // Such identifiers cannot safely be presented as exact links.
       const imdbCounts=new Map();
