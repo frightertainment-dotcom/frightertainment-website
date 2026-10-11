@@ -299,7 +299,7 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
   for(const [route,count] of [['/tv-shows.html',8],['/podcasts.html',9],['/games.html',9],['/indie-movies.html',9]]){
     await page.goto(route);
     await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(count);
-    await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(count);
+    await expect(page.locator('.hub-editorial-more a.hub-tile__link[href]')).toHaveCount(count);
   }
   await page.goto('/podcasts.html');
   await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
