@@ -1258,7 +1258,8 @@ test('Straight to Stream respects country, original film-year and future-only vi
 test('the new horror-stream mini chart ranks only qualifying TMDB ratings, never invented figures',async({page})=>{
   await page.route('**/api/media?**',route=>{
     const args=new URL(route.request().url()).searchParams;
-    const title=args.get('title')||'';
+    const imdbNames={'tt35682658':'Infirmary','tt43739386':'V/H/S/Mixtape','tt39319437':'Buzzkill'};
+    const title=args.get('title')||imdbNames[args.get('imdb')]||'';
     const rows={'Infirmary':[8.9,165],'V/H/S/Mixtape':[7.5,230],'Buzzkill':[8.1,82],
       'The Mortuary Assistant':[9.9,7]};
     const pair=rows[title];
