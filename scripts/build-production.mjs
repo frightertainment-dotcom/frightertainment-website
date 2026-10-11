@@ -9,12 +9,12 @@ const publicFiles = [
   'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html',
   'film.html',
   'media.html', 'media-ui.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
-  'hub.js', 'release-calendar.js', 'release-brief.js', 'straight-to-stream.js',
+  'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js',
   'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
-  'data/movies.js', 'data/editorial-releases.json', 'data/streaming-discovery.json',
+  'data/movies.js', 'data/editorial-releases.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 

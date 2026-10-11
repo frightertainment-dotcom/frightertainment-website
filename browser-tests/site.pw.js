@@ -1332,3 +1332,20 @@ test('Streaming film year options include past Shudder premiere records and warn
  await expect(s.locator('[data-stream-list]')).toContainText('V/H/S/85');
  await expect(s.locator('[data-stream-list]')).toContainText('CHECK CURRENT AVAILABILITY');
 });
+test('UK cinema diary orders months chronologically while ranking studio ahead of indie within each month',async({page})=>{
+ await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[],page:1,totalPages:1,screeningComplete:true}}));
+ await page.route('**/api/media?**',route=>route.fulfill({json:{item:null}}));
+ await page.goto('/cinema.html');
+ const listing=page.locator('#upcoming-cinema');
+ await expect(listing.locator('.fr-cinema-month').first()).toContainText('OCTOBER 2026');
+ await expect(listing.locator('.fr-cinema-month')).toContainText(['OCTOBER 2026','NOVEMBER 2026','DECEMBER 2026']);
+ const rows=listing.locator('.fr-cinema-diary__item--verified');
+ const titles=await rows.locator('.fr-cinema-diary__title').allTextContents();
+ expect(titles.indexOf('Clayface')).toBeGreaterThanOrEqual(0);
+ expect(titles.indexOf('Clayface')).toBeLessThan(titles.indexOf('In the Grip of Terror'));
+ await expect(listing).toContainText('RE-RELEASE SCREENINGS');
+ await expect(listing).toContainText('LIMITED CINEMAS');
+ await expect(listing).toContainText('GENERAL RELEASE');
+ await page.locator('#cinema-country').selectOption('US');
+ await expect(listing.locator('.fr-cinema-month')).toHaveCount(0);
+});

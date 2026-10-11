@@ -130,7 +130,13 @@ export async function fetchCatalogue(env, options) {
           : String(a.release_date).localeCompare(String(b.release_date)));
         const theatrical = matches[0];
         return theatrical ? {...sanitizeMedia(raw,type,region),releaseDate:theatrical.release_date.slice(0,10),
-          releaseCountry:region,theatricalDate:theatrical.release_date.slice(0,10)} : null;
+          releaseCountry:region,theatricalDate:theatrical.release_date.slice(0,10),
+          cinemaReleaseType:theatrical.type,
+          // Re-release requires a real previous release date, not simply old production year.
+          cinemaReissue:(dates?.release_dates||[]).some(other=>[2,3].includes(other.type)&&
+            String(other.release_date||'').slice(0,10)<theatrical.release_date.slice(0,10)&&
+            Number(String(other.release_date||'').slice(0,4))<Number(theatrical.release_date.slice(0,4))),
+          majorProduction:independentAssessment(raw).classification==='major-studio-production'} : null;
       }
       if (kind === 'indie') {
         const assessment = independentAssessment(raw);

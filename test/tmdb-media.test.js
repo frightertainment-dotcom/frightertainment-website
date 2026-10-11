@@ -167,3 +167,26 @@ test('recent cinema uses the chosen territory and only returns its theatrical re
     assert.equal(d.items[0].releaseCountry,'AU');
   }finally{globalThis.fetch=oldFetch;}
 });
+test('cinema data carries explicit limited-versus-general screening types without claiming universal coverage',async()=>{
+ const orig=globalThis.fetch;
+ const dt=new Date(Date.now()+17*86400000).toISOString().slice(0,10);
+ globalThis.fetch=async url=>{
+  const u=new URL(url);if(u.pathname.includes('/discover/'))return reply({total_pages:1,total_results:2,results:[
+    {id:111,title:'General Studio Horror',release_date:dt,genre_ids:[27],poster_path:'/general.jpg'},
+    {id:112,title:'Tiny Independent Horror',release_date:dt,genre_ids:[27],poster_path:'/indie.jpg'}
+  ]});
+  const id=Number(u.pathname.split('/').at(-1));
+  return reply({id,title:id===111?'General Studio Horror':'Tiny Independent Horror',release_date:dt,
+    poster_path:'/cover.jpg',genre_ids:[27],production_companies:id===111?[{name:'Warner Bros Pictures'}]:[{name:'Independent Workshop'}],
+    release_dates:{results:[{iso_3166_1:'GB',release_dates:[{type:id===111?3:2,release_date:dt+'T00:00:00Z'}]}]}});
+ };
+ try{
+  const r=await fetchCatalogue(env,{type:'movie',mode:'cinema',page:1,country:'GB',year:new Date().getUTCFullYear()});
+  assert.equal(r.items.length,2);
+  assert.equal(r.items[0].cinemaReleaseType,3);
+  assert.equal(r.items[0].majorProduction,true);
+  assert.equal(r.items[1].cinemaReleaseType,2);
+  assert.equal(r.items[1].majorProduction,false);
+  assert.equal(r.items.every(x=>x.cinemaReissue===false),true);
+ }finally{globalThis.fetch=orig}
+});

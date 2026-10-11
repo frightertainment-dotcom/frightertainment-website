@@ -1647,3 +1647,39 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
 @media(max-width:660px){.fr-stream__meta,.fr-stream__access-label,.fr-stream__release{font-size:13px!important}
 .fr-stream__summary{font-size:14px!important;line-height:1.45}.fr-stream__rank{padding:18px 15px}
 .fr-stream__rank-status{font-size:13px!important}.fr-stream__selectors select{min-height:46px;font-size:13px}}
+
+/* Source-verified monthly UK cinema release diary. Months never get reordered by fame. */
+.fr-cinema-diary__intro{max-width:86ch;color:#c6d3c8;font-size:clamp(14px,1.25vw,17px)!important;line-height:1.48}
+.fr-cinema-month{grid-column:1/-1;margin:26px 0 4px;padding:15px 10px 12px;
+  font:700 clamp(24px,2.8vw,36px)/1.08 "Times New Roman",Times,serif;
+  letter-spacing:.09em;border-bottom:1px solid var(--red);color:#eaf1e8}
+.fr-cinema-diary__item{grid-column:1/-1;display:grid;grid-template-columns:115px minmax(0,1fr);
+  gap:18px;padding:clamp(15px,2.1vw,23px);min-width:0;
+  background:linear-gradient(120deg,#121d17,#08100c);border:1px solid color-mix(in srgb,var(--edge) 85%,transparent)}
+.fr-cinema-diary__item--unconfirmed{opacity:.86;display:block}
+.fr-cinema-diary__item--unconfirmed .fr-media-card{background:transparent}
+.fr-cinema-diary__media{position:relative;min-height:150px;aspect-ratio:2/3;border:1px solid var(--edge);overflow:hidden;
+  background:radial-gradient(circle at 30% 25%,#2d5142,#07110e 75%);display:grid;place-items:center;text-align:center}
+.fr-cinema-diary__poster{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.fr-cinema-diary__poster[hidden]{display:none!important}
+.fr-cinema-diary__placeholder{font-size:11px;letter-spacing:.08em;padding:6px;color:#d9e4db}
+.fr-cinema-diary__media.has-tmdb-poster .fr-cinema-diary__placeholder{display:none}
+.fr-cinema-diary__copy{display:grid;align-content:start;gap:8px;min-width:0}
+.fr-cinema-diary__date{font-weight:700;font-size:clamp(16px,1.45vw,20px);color:#efefe8}
+.fr-cinema-flags{display:flex;flex-wrap:wrap;gap:7px}
+.fr-cinema-pill{padding:5px 8px;font-size:clamp(10px,.95vw,12px);letter-spacing:.04em;
+  border:1px solid color-mix(in srgb,var(--red) 56%,var(--edge));color:#d7e6d8}
+.fr-cinema-pill--reach{background:#16281f}
+.fr-cinema-pill--unverified{color:#dcc89e;border-color:#716044}
+.fr-cinema-diary__title{font:700 clamp(25px,2.8vw,38px)/1.05 "Times New Roman",Times,serif;
+  margin:2px 0;color:#fff;overflow-wrap:break-word}
+.fr-cinema-diary__credit,.fr-cinema-diary__note{margin:0;font-size:clamp(13px,1.2vw,16px)!important;line-height:1.45;color:#b6c6b7}
+.fr-cinema-diary__source{font-weight:700;text-decoration:underline;color:#d2edd8;overflow-wrap:anywhere}
+.fr-cinema-diary__rating{font-size:14px;color:#d1e8c9}
+.fr-cinema-diary__item .fr-trailer-button{justify-self:start}
+.fr-cinema-diary__empty{padding:18px;font-size:15px}
+@media(max-width:660px){.fr-cinema-diary__item{grid-template-columns:85px minmax(0,1fr);gap:11px;padding:13px}
+ .fr-cinema-diary__media{min-height:120px}.fr-cinema-diary__title{font-size:clamp(20px,5.2vw,26px)}
+ .fr-cinema-diary__date{font-size:16px}.fr-cinema-pill{font-size:10px}
+ .fr-cinema-diary__credit,.fr-cinema-diary__note{font-size:13px!important}
+ .fr-cinema-diary__intro{font-size:14px!important}}
