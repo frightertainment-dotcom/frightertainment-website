@@ -61,7 +61,7 @@ function decorateHubLayout(html) {
     .replace(/<button class="menu-toggle"[^>]*>[\s\S]*?<\/button>/, '')
     .replace(/<a class="header__action"[^>]*>[\s\S]*?<\/a>/,'')
     .replace('</head>', '<link rel="stylesheet" href="/hub.css"></head>')
-    .replace('</div></footer>', '<a href="/contact.html">CONTACT US</a></div></footer>')
+    .replace('</div></footer>', '<a href="/contact.html">CONTACT US</a><a href="/privacy.html">PRIVACY</a></div></footer>')
     .replace('</body>', '<script src="/media-ui.js" defer></script></body>');
 }
 
@@ -119,6 +119,6 @@ homepage = homepage.replace(/\/top-20\/\d{4}\//g, `/top-20/${currentYear}/`)
   .replace(/OF \d{4}/g, `OF ${currentYear}`);
 await writeFile(homepagePath, homepage);
 
-const locations = [`${base}/`, ...['movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html'].map(file => `${base}/${file}`), `${base}/top-20/`, ...yearLocations, ...movies.map(movie => `${base}/films/${movie.id}/`)];
+const locations = [`${base}/`, ...['movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html','contact.html','privacy.html'].map(file => `${base}/${file}`), `${base}/top-20/`, ...yearLocations, ...movies.map(movie => `${base}/films/${movie.id}/`)];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${locations.map(location => `  <url><loc>${location}</loc></url>`).join('\n')}\n</urlset>\n`;
 await writeFile(new URL('../sitemap.xml', import.meta.url), sitemap);
