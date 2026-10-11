@@ -65,7 +65,7 @@ test('Pages contact form uses the private mailer service and never lets visitors
   let saved,called=0;
   const env={CONTACT_DELIVERY:{fetch:async(url,opts)=>{
     called++;saved={url:String(url),method:opts.method,body:JSON.parse(opts.body)};
-    return new Response(JSON.stringify({ok:true}),{status:200});
+    return new Response(JSON.stringify({ok:true}),{status:200,headers:{'content-type':'application/json'}});
   }}};
   const response=await onRequestPost({request:make({...good,to:'attacker@example.invalid'}),env});
   assert.equal(response.status,200);
@@ -80,4 +80,47 @@ test('mailer rejection fails closed without claiming delivery',async()=>{
   const response=await onRequestPost({request:make(good),env});
   assert.equal(response.status,503);
   assert.equal((await response.json()).ok,undefined);
+});
+
+test('private Pages and Worker mailer exchange an actual JSON confirmation',async()=>{
+  const {sendPrivateContact}=await import('../worker/contact-mailer.js');
+  let sent;
+  const workerEnv={EMAIL:{send:async value=>{sent=value;return{messageId:'mock-accepted'};}}};
+  const env={CONTACT_DELIVERY:{fetch:(url,options)=>sendPrivateContact(new Request(url,options),workerEnv)}};
+  const response=await onRequestPost({request:make({...good,ft_trap_blank:''}),env});
+  assert.equal(response.status,200);
+  const data=await response.json();
+  assert.equal(data.delivered,true);
+  assert.equal(sent.to,'Frightertainment@gmail.com');
+  assert.equal(sent.replyTo,good.email);
+  assert.equal(sent.subject,'Frightertainment contact: '+good.subject);
+});
+test('nonsemantic hidden trap blocks bots while legitimate autofilled contact details remain valid',async()=>{
+  let delivered=0;
+  const env={EMAIL:{send:async()=>{delivered++;}}};
+  const trapped=await onRequestPost({request:make({...good,ft_trap_blank:'bot text'}),env});
+  assert.equal(trapped.status,200);
+  assert.equal((await trapped.json()).delivered,undefined);
+  assert.equal(delivered,0);
+  const valid=await onRequestPost({request:make({...good,ft_trap_blank:'',company:''}),env});
+  assert.equal(valid.status,200);
+  assert.equal((await valid.json()).delivered,true);
+  assert.equal(delivered,1);
+});
+test('backend explains upstream delivery failures with safe reference codes',async()=>{
+  const statuses=[
+    [{fetch:async()=>new Response('Unable',{status:503})},'FT-MAILER-503'],
+    [{fetch:async()=>new Response('Unexpected html',{status:200,headers:{'content-type':'text/html'}})},'FT-MAILER-NONJSON'],
+    [{fetch:async()=>new Response(JSON.stringify({ok:false}),{status:200,headers:{'content-type':'application/json'}})},'FT-MAILER-UNCONFIRMED'],
+    [{fetch:async()=>{throw Error('secret upstream details');}},'FT-MAILER-CONNECTION']
+  ];
+  for(const [delivery,code] of statuses){
+    const response=await onRequestPost({request:make(good),env:{CONTACT_DELIVERY:delivery}});
+    assert.equal(response.status,503);
+    const json=await response.json();
+    assert.equal(json.code,code);
+    assert.equal(json.delivered,undefined);
+    assert.ok(!JSON.stringify(json).includes(good.message));
+    assert.ok(!JSON.stringify(json).includes('secret upstream details'));
+  }
 });
