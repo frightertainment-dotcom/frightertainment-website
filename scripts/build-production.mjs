@@ -1,6 +1,7 @@
 // Production-only release bundle: intentionally distinct from the Access-protected preview.
 // Ship only public website files. Never copy source code, fixtures, Worker code, keys or reviews.
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { injectWebAnalytics } from './web-analytics-beacon.mjs';
 
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
@@ -53,6 +54,21 @@ if (/criticReferenceSnapshots|frightertainment-private-preview|TEST_FIXTURE_RANK
   throw new Error('Private/licence-restricted critic reference data detected in public catalogue');
 }
 await validateHtml(destination);
+
+// Explicit production instrumentation. Preview remains untracked so editorial QA
+// and owner-only checks never inflate public visitor analytics.
+const publicWebAnalyticsSiteToken = 'f8adaba13e524ed7ab5d523a2fe2120f';
+async function instrumentPublicHtml(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const current = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
+    if (entry.isDirectory()) { await instrumentPublicHtml(current); continue; }
+    if (!entry.name.endsWith('.html')) continue;
+    const html = await readFile(current, 'utf8');
+    await writeFile(current, injectWebAnalytics(html, publicWebAnalyticsSiteToken));
+  }
+}
+await instrumentPublicHtml(destination);
+
 
 const robots = await readFile(new URL('robots.txt', root), 'utf8');
 if (!/^User-agent:\s*\*/im.test(robots) ||
