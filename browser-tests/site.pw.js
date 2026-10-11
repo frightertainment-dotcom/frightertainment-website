@@ -1460,3 +1460,81 @@ test('live region provider discovery is clearly separate from historically sourc
  await panel.getByRole('button',{name:'NEXT PROVIDERS'}).click();
  await expect.poll(()=>calls.at(-1)?.page).toBe('2');
 });
+
+
+test('homepage indie showcase features a real sourced film, not a generic placeholder', async ({page}) => {
+  await page.goto('/');
+  const indie = page.locator('.hub-showcase__bottom .hub-indie');
+  await expect(indie).toContainText('LONGLEGS');
+  await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/films/longlegs/');
+  await expect(indie).toHaveAttribute('data-media-title', 'Longlegs');
+  await expect(indie.locator('[data-media-field="poster"]')).toHaveCount(1);
+  await expect(page.locator('head link[href*="fonts.googleapis.com"]')).toHaveCount(0);
+});
+
+test('optional homepage discovery does not fetch extra provider data until opened', async ({page}) => {
+  const calls = { discovery: 0, artwork: 0, rankings: 0 };
+  await page.route('**/api/discovery?**', route => {
+    calls.discovery++;
+    return route.fulfill({json:{datasets:{},country:'GB'}});
+  });
+  await page.route('**/api/movie-artwork', route => {
+    calls.artwork++;
+    return route.fulfill({json:{items:[]}});
+  });
+  await page.route('**/api/rankings?year=*', route => {
+    calls.rankings++;
+    return route.fulfill({json:{status:'pending',items:[]}});
+  });
+  await page.goto('/');
+  await expect(page.locator('#hub-ranking')).toHaveAttribute('aria-busy', 'false');
+  expect(calls).toEqual({ discovery:0, artwork:0, rankings:1 });
+  const disclosure = page.locator('#live-discovery');
+  await disclosure.locator('summary').click();
+  await expect.poll(() => calls.discovery).toBe(1);
+  await expect.poll(() => calls.artwork).toBe(1);
+  await expect.poll(() => calls.rankings).toBe(2);
+  await disclosure.locator('summary').click();
+  await disclosure.locator('summary').click();
+  await expect(disclosure).toHaveAttribute('open', '');
+  expect(calls).toEqual({ discovery:1, artwork:1, rankings:2 });
+});
+
+test('poster-enriched homepage cards never shove text or controls outside the mobile tile', async ({page}) => {
+  await page.route('**/api/media?**', route => {
+    const query = new URL(route.request().url()).searchParams;
+    const title = query.get('title') || 'Longlegs';
+    return route.fulfill({json:{item:{
+      tmdbId:12345,mediaType:'movie',title,posterPath:'/poster.jpg',
+      voteAverage:7.4,voteCount:500,firstReleaseDate:'2024-01-01',
+      overview:'A chilling horror mystery.',trailer:{key:'12345678901'}
+    },status:'ready'}});
+  });
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({width,height:844});
+    await page.goto('/');
+    const indie=page.locator('.hub-showcase__bottom .hub-indie');
+    await indie.scrollIntoViewIfNeeded();
+    await expect(indie).toHaveAttribute('data-media-status','ready');
+    const result = await indie.evaluate(tile => {
+      const rect=tile.getBoundingClientRect();
+      const content=tile.querySelector('.hub-tile__content').getBoundingClientRect();
+      const controls=[...tile.querySelectorAll('h3,a.hub-tile__link,button.fr-trailer-button')].filter(el=>getComputedStyle(el).display!=='none').map(el=>el.getBoundingClientRect());
+      return {
+        tileOverflow:tile.scrollWidth>tile.clientWidth+1,
+        contentRight:content.right,
+        tileRight:rect.right,
+        contentLeft:content.left,
+        tileLeft:rect.left,
+        controlsInside:controls.every(box=>box.left>=rect.left-2 && box.right<=rect.right+2),
+        contentRatio:content.width/rect.width
+      };
+    });
+    expect(result.tileOverflow,'indie card scrolls sideways').toBe(false);
+    expect(result.contentLeft).toBeGreaterThanOrEqual(result.tileLeft-2);
+    expect(result.contentRight).toBeLessThanOrEqual(result.tileRight+2);
+    expect(result.controlsInside,'indie title or buttons clipped').toBe(true);
+    expect(result.contentRatio).toBeGreaterThan(.85);
+    await expect.poll(() => page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }
+});
