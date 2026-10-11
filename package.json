@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build:pages": "node scripts/build-pages.mjs && node scripts/build-editorial.mjs",
-    "check": "node scripts/check-content.mjs && node scripts/check-links.mjs",
+    "check": "node scripts/check-content.mjs && node scripts/check-links.mjs && node scripts/check-streaming-discovery.mjs",
     "audit:vault": "node scripts/audit-vault.mjs",
     "test": "node --test",
     "test:browser": "playwright test",

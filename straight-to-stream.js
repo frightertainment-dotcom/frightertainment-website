@@ -74,8 +74,9 @@
     const heading=node('h4','fr-stream__title');const title=node('a','',e.title);title.href=filmPage(e);heading.append(title);
     const meta=node('p','fr-stream__meta',e.platform+' · '+e.filmYear+' film');
     const access=node('p','fr-stream__access-label',accessLabels[e.access]);
-    const date=node('p','fr-stream__release',e.streamDate>today?'ANNOUNCED FOR '+fmt(e.streamDate):
-      'STREAM / DIGITAL DATE · '+fmt(e.streamDate));
+    const when=e.dateBasis==='listed-by'?'SOURCE AVAILABILITY CHECKED BY '+fmt(e.streamDate)
+      :e.streamDate>today?'ANNOUNCED FOR '+fmt(e.streamDate):'STREAM / DIGITAL RELEASE · '+fmt(e.streamDate);
+    const date=node('p','fr-stream__release',when);
     const rating=node('span','fr-stream__rating','Checking TMDB rating…');rating.dataset.mediaField='rating';
     const description=node('p','fr-stream__summary',e.synopsis||summary(e));
     const actions=node('div','fr-stream__actions');

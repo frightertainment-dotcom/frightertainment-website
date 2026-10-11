@@ -72,7 +72,9 @@
       const date=make('div','archive-detail__fact');
       const pretty=new Intl.DateTimeFormat('en-GB',{dateStyle:'long',timeZone:'UTC'})
         .format(new Date(film.streamDate+'T12:00:00Z'));
-      date.append(make('span','','SOURCE-LINKED PLATFORM DATE'),make('strong','',pretty));
+      date.append(make('span','',
+        film.dateBasis==='listed-by'?'PROVIDER AVAILABILITY CHECKED BY':'SOURCE-LINKED PLATFORM RELEASE'),
+        make('strong','',pretty));
       info.append(platform,access,date);
       const text=make('p','archive-detail__intro',film.synopsis||
         'This horror film has a source-linked streaming or digital release. Availability may change; check the provider.');
@@ -214,7 +216,7 @@
         const page={
           title:entry.title,year:entry.filmYear,sourceUrl:entry.sourceUrl,
           watchUrl:/^https://[^/s]+/.test(entry.watchUrl||'')?entry.watchUrl:null,
-          platform:entry.platform,access:entry.access,streamDate:entry.streamDate,
+          platform:entry.platform,access:entry.access,streamDate:entry.streamDate,dateBasis:entry.dateBasis,
           synopsis:entry.synopsis,tmdbId:entry.tmdbId,streaming:true
         };
         render(page);
