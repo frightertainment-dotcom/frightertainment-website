@@ -48,7 +48,7 @@ test('Cloudflare automatic Web Analytics beacon is allowed by the shared CSP wit
     return [space < 0 ? part : part.slice(0, space), space < 0 ? '' : part.slice(space + 1)];
   }));
   assert.equal(directives.get('script-src'), "'self' https://static.cloudflareinsights.com/beacon.min.js");
-  assert.equal(directives.get('connect-src'), "'self'", 'Automatic Web Analytics reports to same-origin /cdn-cgi/rum');
+  assert.equal(directives.get('connect-src'), "'self' https://cloudflareinsights.com", 'Manual beacon sends data to the approved Cloudflare Insights endpoint');
   assert.equal(directives.get('object-src'), "'none'");
   assert.equal(directives.get('frame-ancestors'), "'none'");
   assert.doesNotMatch(csp, /'unsafe-inline'|'unsafe-eval'/);
