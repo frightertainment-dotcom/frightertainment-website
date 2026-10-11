@@ -1187,76 +1187,90 @@ test('TV chart is year-specific and Games chart has a sourced, consistent rating
   await spotlight.locator('button').click();
   await expect(spotlight.locator('iframe')).toHaveAttribute('src','https://store.steampowered.com/widget/3219630/');
 });
-test('Contact page presents both direct email and a working form with reply address',async({page})=>{
+test('Contact page offers an optional nickname, private message and separate replyable direct email',async({page})=>{
   await page.goto('/contact.html');
   const direct=page.getByRole('link',{name:/EMAIL FRIGHTERTAINMENT/i});
   await expect(direct).toHaveAttribute('href',/^mailto:Frightertainment@gmail.com\?subject=/);
-  await expect(page.locator('#contact-email')).toHaveAttribute('type','email');
+  await expect(page.locator('#contact-name')).toHaveCount(0);
+  await expect(page.locator('#contact-email')).toHaveCount(0);
+  await expect(page.locator('#contact-subject')).toHaveCount(0);
+  await expect(page.locator('[name="email"]')).toHaveCount(0);
+  await expect(page.locator('#contact-nickname')).toHaveAttribute('name','nickname');
+  await expect(page.locator('#contact-message')).toHaveAttribute('required','');
+  await expect(page.locator('.contact-privacy')).toContainText('No name or email address is requested');
   let received;
   await page.route('**/api/contact',async route=>{
     received=route.request().postDataJSON();
     await route.fulfill({status:200,json:{ok:true,delivered:true}});
   });
-  await page.locator('#contact-name').fill('Site visitor');
-  await page.locator('#contact-email').fill('visitor@example.com');
-  await page.locator('#contact-subject').fill('Indie horror recommendation');
-  await page.locator('#contact-message').fill('I have an independent horror film recommendation.');
+  await page.locator('#contact-nickname').fill('Night Owl');
+  await page.locator('#contact-message').fill('A horror film for Frightertainment to check out.');
   await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
   await expect(page.locator('#contact-status')).toContainText('accepted for delivery');
-  expect(received).toMatchObject({title:'Site visitor',email:'visitor@example.com',subject:'Indie horror recommendation'});
-  await expect(page.locator('#contact-email')).toHaveValue('');
+  expect(received).toEqual({
+    nickname:'Night Owl',message:'A horror film for Frightertainment to check out.',
+    ft_trap_blank:''
+  });
+  await expect(page.locator('#contact-nickname')).toHaveValue('');
+  await expect(page.locator('#contact-message')).toHaveValue('');
 });
 
-test('mobile browser autofill does not target a semantically named hidden company field',async({page})=>{
+test('anonymous form works with no nickname and leaves identity inputs absent on a phone',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto('/contact.html');
   await expect(page.locator('[name="company"]')).toHaveCount(0);
   await expect(page.locator('[name="ft_trap_blank"]')).toHaveCount(1);
+  await expect(page.locator('#contact-nickname')).toHaveValue('');
   let data;
   await page.route('**/api/contact',async route=>{
     data=route.request().postDataJSON();
     await route.fulfill({status:200,json:{ok:true,delivered:true}});
   });
-  await page.locator('#contact-name').fill('Visitor');
-  await page.locator('#contact-email').fill('visitor@example.com');
-  await page.locator('#contact-subject').fill('Test');
-  await page.locator('#contact-message').fill('A test of the contact form.');
+  await page.locator('#contact-message').fill('Just writing with no name or email address.');
   await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
-  await expect(page.locator('#contact-status')).toContainText('accepted for delivery');
-  expect(data.ft_trap_blank).toBe('');
-  expect(data.company).toBeUndefined();
+  await expect(page.locator('#contact-status')).toContainText('No reply is possible through this form');
+  expect(data).toEqual({nickname:'',message:'Just writing with no name or email address.',ft_trap_blank:''});
 });
 
-test('contact form identifies an HTML authentication or API interception without claiming success',async({page})=>{
+test('private message form remains usable from narrow phones through desktop without sideways scrolling',async({page})=>{
+  await page.goto('/contact.html');
+  for(const width of [320,375,390,768,1440]){
+    await page.setViewportSize({width,height:844});
+    await expect(page.locator('#contact-nickname')).toBeVisible();
+    await expect(page.locator('#contact-message')).toBeVisible();
+    await expect(page.getByRole('button',{name:/SEND MESSAGE/i})).toBeVisible();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),'Contact page overflow at '+width).toBe(true);
+  }
+});
+
+test('contact form identifies intercepted authentication HTML without claiming success',async({page})=>{
   await page.goto('/contact.html');
   await page.route('**/api/contact',route=>route.fulfill({
     status:200,contentType:'text/html',body:'<!doctype html><title>Access</title><p>Please sign in</p>'
   }));
-  await page.locator('#contact-name').fill('Visitor');
-  await page.locator('#contact-email').fill('visitor@example.com');
-  await page.locator('#contact-subject').fill('Test');
-  await page.locator('#contact-message').fill('Testing authentication response.');
+  await page.locator('#contact-message').fill('Testing an intercepted private message.');
   await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
   await expect(page.locator('#contact-status')).toContainText('could not confirm delivery');
   await expect(page.locator('#contact-status')).toContainText('Reference: FT-NONJSON-200');
-  await expect(page.locator('#contact-message')).toHaveValue('Testing authentication response.');
+  await expect(page.locator('#contact-message')).toHaveValue('Testing an intercepted private message.');
 });
-test('Contact form shows a prefilled mailto fallback without losing unsent text',async({page})=>{
+
+test('failed anonymous form preserves message and warns that direct email reveals sender address',async({page})=>{
   await page.goto('/contact.html');
   await page.route('**/api/contact',route=>route.fulfill({status:503,json:{error:'Delivery unavailable'}}));
-  await page.locator('#contact-name').fill('Test visitor');
-  await page.locator('#contact-email').fill('visitor@example.com');
-  await page.locator('#contact-subject').fill('A film to feature');
-  await page.locator('#contact-message').fill('Here is the film I wanted to suggest.');
+  await page.locator('#contact-nickname').fill('VHS Ghost');
+  await page.locator('#contact-message').fill('A scary independent film recommendation.');
   await page.getByRole('button',{name:/SEND MESSAGE/i}).click();
   await expect(page.locator('#contact-status')).toContainText('could not confirm delivery');
   await expect(page.locator('#contact-status')).toContainText('Reference: FT-HTTP-503');
+  await expect(page.locator('#contact-status')).toContainText('reveals your sender email address');
   const fallback=page.locator('#contact-status a');
   await expect(fallback).toHaveAttribute('href',/^mailto:Frightertainment@gmail.com/);
-  const url=await fallback.getAttribute('href');
-  expect(decodeURIComponent(url)).toContain('visitor@example.com');
-  expect(decodeURIComponent(url)).toContain('A film to feature');
-  await expect(page.locator('#contact-message')).toHaveValue('Here is the film I wanted to suggest.');
+  const value=await fallback.getAttribute('href');
+  expect(decodeURIComponent(value)).toContain('VHS Ghost');
+  expect(decodeURIComponent(value)).toContain('A scary independent film recommendation.');
+  expect(decodeURIComponent(value)).not.toContain('visitor@example.com');
+  await expect(page.locator('#contact-message')).toHaveValue('A scary independent film recommendation.');
 });
 
 
