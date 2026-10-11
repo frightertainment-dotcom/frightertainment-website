@@ -186,8 +186,10 @@ if(!vaultJS.includes('renderYearContents')||!vaultJS.includes("type='search'")&&
   errors.push('All Horror Movies must lazily render A–Z results and provide per-year searches');
 if(!vaultUpdater.includes('existing=new Map')||!vaultUpdater.includes('Insufficient complete response'))
   errors.push('Long-lived archive updater must preserve prior records and reject partial import');
-if(!vaultWorkflow.includes('contents: write')||!vaultWorkflow.includes('refresh-request.json'))
-  errors.push('Archive weekly workflow and prompt-friendly refresh trigger are missing');
+if(!vaultWorkflow.includes('contents: write')||!vaultWorkflow.includes('workflow_dispatch:')||
+   !vaultWorkflow.includes('schedule:')||
+   !vaultWorkflow.includes('TARGET_BRANCH: codex/frightertainment-redesign-tmdb-preview'))
+  errors.push('Archive weekly workflow and current protected-preview refresh target are missing');
 if(!previewBuild.includes("'all-horror-movies.html'")||!previewBuild.includes("'horror-archive.js'")||
    !previewBuild.includes('data/archive/horror-films.json'))
   errors.push('Archive missing from private Pages deployment bundle');
