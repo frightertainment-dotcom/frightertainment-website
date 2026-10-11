@@ -1272,11 +1272,12 @@ test('the new horror-stream mini chart ranks only qualifying TMDB ratings, never
   });
   await page.goto('/movies.html');
   const chart=page.locator('#straight-to-stream [data-stream-chart]');
-  await expect(chart.locator('li')).toHaveCount(3);
-  const titles=await chart.locator('li .fr-stream__rank-info a').allTextContents();
+  const ranked=chart.locator('li.fr-stream__rank-row:not(.fr-stream__rank-row--pending)');
+  await expect(ranked).toHaveCount(3);
+  const titles=await ranked.locator('.fr-stream__rank-info a').allTextContents();
   expect(titles).toEqual(['Infirmary','Buzzkill','V/H/S/Mixtape']);
-  await expect(chart).not.toContainText('The Mortuary Assistant');
-  await expect(chart.locator('li')).toHaveCount(3);
+  await expect(ranked).not.toContainText('The Mortuary Assistant');
+  expect(await chart.locator('li.fr-stream__rank-row--pending').count()).toBeGreaterThan(0);
   await expect(chart).toContainText('8.9/10');
 });
 test('Infirmary enters the 2026 Horror Vault and its first-party film file keeps streaming dates separate',async({page})=>{
@@ -1311,7 +1312,7 @@ test('All streaming links, including pre-2025 library films and future premieres
 });
 
 
-test('streaming chart does not manufacture numbered Top Five places for unrated premieres',async({page})=>{
+test('streaming chart does not invent numbered Top Ten places for unrated premieres',async({page})=>{
   await page.route('**/api/media?**',route=>route.fulfill({json:{item:null,status:'unavailable'}}));
   await page.goto('/movies.html');
   const panel=page.locator('#straight-to-stream');
@@ -1319,7 +1320,7 @@ test('streaming chart does not manufacture numbered Top Five places for unrated 
   await expect(rows.first()).toBeVisible();
   await expect(rows.first().locator('.fr-stream__rank-number')).toHaveText('—');
   await expect(rows.first()).toContainText('UNRANKED');
-  await expect(panel.locator('[data-stream-chart-status]')).toContainText('not yet ranked');
+  await expect(panel.locator('[data-stream-chart-status]')).toContainText('numbered ranking');
   await expect(panel.locator('[data-stream-chart]')).not.toContainText('10/10');
 });
 test('Streaming film year options include past Shudder premiere records and warn when current access is unknown',async({page})=>{
@@ -1329,7 +1330,7 @@ test('Streaming film year options include past Shudder premiere records and warn
   await expect(s.locator('[data-stream-year] option[value="'+year+'"]')).toHaveCount(1);
  await s.locator('[data-stream-country]').selectOption('US');
  await s.locator('[data-stream-year]').selectOption('2023');
- await expect(s.locator('[data-stream-list]')).toContainText('V/H/S/85');
+ await expect(s.locator('[data-stream-list]')).toContainText('The Puppetman');
  await expect(s.locator('[data-stream-list]')).toContainText('CHECK CURRENT AVAILABILITY');
 });
 test('UK cinema diary orders months chronologically while ranking studio ahead of indie within each month',async({page})=>{
@@ -1348,4 +1349,13 @@ test('UK cinema diary orders months chronologically while ranking studio ahead o
  await expect(listing).toContainText('GENERAL RELEASE');
  await page.locator('#cinema-country').selectOption('US');
  await expect(listing.locator('.fr-cinema-month')).toHaveCount(0);
+});
+test('older sourced streaming films join their original-year Horror Vault without overwriting historic records',async({page})=>{
+ await page.goto('/all-horror-movies.html?year=2023');
+ const y=page.locator('#horror-year-2023');
+ await expect(y).toHaveAttribute('open','');
+ await expect(y).toContainText('Brooklyn 45');
+ await page.goto('/archive-film.html?id='+encodeURIComponent('manual:stream-shudder-us-premiere-the-puppetman-2023-10-13'));
+ await expect(page.locator('#archive-film-detail h1')).toHaveText('The Puppetman');
+ await expect(page.locator('#archive-film-detail')).toContainText('2023');
 });

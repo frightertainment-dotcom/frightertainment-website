@@ -20,3 +20,9 @@ test('source-backed UK cinema diary never labels an unknown cinema rollout as na
  assert.ok(d.screenings.some(x=>x.filmYear===1973&&x.edition==='re-release'));
  assert.ok(d.screenings.some(x=>x.tier==='independent'&&x.reach==='limited'));
 });
+
+test('Cinema editorial diary does not invent a particular day out of a multi-day screening window',async()=>{
+ const d=JSON.parse(await readFile(new URL('../data/cinema-screenings.json',import.meta.url),'utf8'));
+ assert.equal(d.screenings.some(x=>x.id==='in-the-grip-of-terror-sale-2026'),false);
+ assert.ok(d.screenings.some(x=>x.id==='grip-terror-peckham-2026'&&x.date==='2026-11-02'));
+});

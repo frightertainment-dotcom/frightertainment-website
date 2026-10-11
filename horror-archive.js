@@ -83,7 +83,7 @@
     }
   };
 
-  // Source-verified streaming-first records fill gaps in the 2025/2026 Horror Vault.
+  // Source-linked streaming premieres and later platform arrivals can supplement ANY past film year.
   // Streaming availability never rewrites a film's original release year.
   function addStreamingSupplement(source){
     const today=new Date().toISOString().slice(0,10);
@@ -92,7 +92,7 @@
     for(const e of entries){
       if(!e||!/^[a-z0-9-]+$/.test(e.id||'')||
         typeof e.title!=='string'||e.title.trim().length<2||
-        !Number.isInteger(e.filmYear)||e.filmYear<2025||e.filmYear>currentYear||
+        !Number.isInteger(e.filmYear)||e.filmYear<startYear||e.filmYear>currentYear||
         !/^\d{4}-\d{2}-\d{2}$/.test(e.streamDate||'')||e.streamDate>today||
         !/^https:\/\/[^/\s]+/.test(e.sourceUrl||''))continue;
       const key=e.filmYear+'|'+titleKey(e.title);

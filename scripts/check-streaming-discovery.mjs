@@ -85,3 +85,5 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
   console.log('Straight to Stream audit:',report.records+' source listings, '+JSON.stringify(report.accessBreakdown),'errors:',report.errors.length);
   if(report.errors.length){console.error(report.errors.join('\n'));process.exitCode=1;}
 }
+
+// The catalogue deliberately separates historic streaming premieres from current service offers.
