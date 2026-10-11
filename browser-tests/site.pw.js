@@ -1181,7 +1181,11 @@ test('TV chart is year-specific and Games chart has a sourced, consistent rating
   await expect(page.locator('#halloween-title')).toContainText('HALLOWEEN');
   await expect(page.locator('.fr-game-chart__rows li')).toHaveCount(5);
   await expect(page.locator('.fr-game-chart a[href*="steamdb.info/stats/gameratings/2026/"]')).toBeVisible();
-  await expect(page.locator('.fr-game-spotlight iframe')).toHaveAttribute('src',/store.steampowered.com\/widget\/3219630/);
+  const spotlight=page.locator('.fr-game-spotlight .fr-player-gate--steam');
+  await expect(spotlight).toHaveAttribute('data-player-url','https://store.steampowered.com/widget/3219630/');
+  await expect(page.locator('.fr-game-spotlight iframe')).toHaveCount(0);
+  await spotlight.locator('button').click();
+  await expect(spotlight.locator('iframe')).toHaveAttribute('src','https://store.steampowered.com/widget/3219630/');
 });
 test('Contact page presents both direct email and a working form with reply address',async({page})=>{
   await page.goto('/contact.html');
