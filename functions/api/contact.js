@@ -62,7 +62,7 @@ export async function onRequestPost({request,env}) {
   }
   const name=title.trim(), replyEmail=email.trim(), topic=subject.trim(), text=message.trim();
   if (!name || name.length>100 || !topic || topic.length>140 ||
-      replyEmail.length>254 || !/^[^\\s@\\x00-\\x1f\\x7f]+@[^\\s@\\x00-\\x1f\\x7f]+\\.[A-Za-z]{2,}$/.test(replyEmail) ||
+      replyEmail.length>254 || !/^[^\s@\x00-\x1f\x7f]+@[^\s@\x00-\x1f\x7f]+\.[A-Za-z]{2,}$/.test(replyEmail) ||
       text.length<5 || text.length>5000 ||
       /[\x00-\x1f\x7f]/.test(name) || /[\x00-\x1f\x7f]/.test(topic) || /\x00/.test(text)) {
     return reply(400,{error:'Complete your name, valid email, subject and message.'});
