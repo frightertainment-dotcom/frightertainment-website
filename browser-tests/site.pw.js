@@ -299,7 +299,7 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
   for(const [route,count] of [['/tv-shows.html',8],['/podcasts.html',9],['/games.html',9],['/indie-movies.html',9]]){
     await page.goto(route);
     await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(count);
-    await expect(page.locator('.hub-editorial-more a[href]')).toHaveCount(count);
+    await expect(page.locator('.hub-editorial-more a.hub-tile__link[href]')).toHaveCount(count);
   }
   await page.goto('/podcasts.html');
   await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
@@ -1181,7 +1181,11 @@ test('TV chart is year-specific and Games chart has a sourced, consistent rating
   await expect(page.locator('#halloween-title')).toContainText('HALLOWEEN');
   await expect(page.locator('.fr-game-chart__rows li')).toHaveCount(5);
   await expect(page.locator('.fr-game-chart a[href*="steamdb.info/stats/gameratings/2026/"]')).toBeVisible();
-  await expect(page.locator('.fr-game-spotlight iframe')).toHaveAttribute('src',/store.steampowered.com\/widget\/3219630/);
+  const spotlight=page.locator('.fr-game-spotlight .fr-player-gate--steam');
+  await expect(spotlight).toHaveAttribute('data-player-url','https://store.steampowered.com/widget/3219630/');
+  await expect(page.locator('.fr-game-spotlight iframe')).toHaveCount(0);
+  await spotlight.locator('button').click();
+  await expect(spotlight.locator('iframe')).toHaveAttribute('src','https://store.steampowered.com/widget/3219630/');
 });
 test('Contact page presents both direct email and a working form with reply address',async({page})=>{
   await page.goto('/contact.html');

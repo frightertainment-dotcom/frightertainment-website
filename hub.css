@@ -1724,3 +1724,21 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
 @media(max-width:1100px){.fr-watch__results{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.fr-watch__results{grid-template-columns:minmax(0,1fr)}
   .fr-watch__card{grid-template-columns:clamp(86px,24vw,115px) minmax(0,1fr)}}
+
+
+/* Visitor-activated embeds: no Apple Podcasts or Steam iframe loads before choice. */
+.fr-player-gate { display:flex; align-items:center; min-width:0; width:min(100%,480px); max-width:100%; min-height:190px; margin:10px 0 12px; overflow:hidden; border:1px solid rgba(170,56,65,.7); background:linear-gradient(125deg,rgba(52,14,25,.93),rgba(9,10,17,.97) 70%); box-shadow:inset 2px 0 rgba(209,63,78,.65); clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%); }
+.fr-player-gate--apple { width:min(100%,520px); min-height:175px; }
+.fr-player-gate__content { display:grid; gap:8px; width:100%; min-width:0; padding:16px 18px; }
+.fr-player-gate__eyebrow { display:block; color:#ffb7b8; font-size:12px; letter-spacing:.1em; font-weight:700; }
+.fr-player-gate__description { color:#f0e7e7; font-size:clamp(15px,1.15vw,17px); line-height:1.35; }
+.fr-player-gate__button { width:fit-content; max-width:100%; padding:8px 13px; background:#a63242; border:1px solid #d86c78; border-radius:3px; color:#fff; font-size:14px; font-weight:700; text-align:left; line-height:1.25; letter-spacing:.035em; cursor:pointer; transition:background-color .16s ease,border-color .16s ease; }
+.fr-player-gate__button:hover,.fr-player-gate__button:focus-visible { background:#be4051; border-color:#ffc6cc; }
+.fr-player-gate__button:focus-visible { outline:2px solid #fff; outline-offset:3px; }
+.fr-player-gate__note { color:#d1c7cb; font-size:12px; line-height:1.4; }
+.fr-player-gate__note a { color:#ffbec4; text-decoration:underline; text-underline-offset:2px; }
+.fr-player-gate.is-loaded { display:block; min-height:0; overflow:visible; border:0; background:transparent; box-shadow:none; clip-path:none; }
+.fr-player-gate.is-loaded .podcast-player,.fr-player-gate.is-loaded .game-store-widget { display:block; width:100%; max-width:100%; margin:0; }
+body[data-theme="games"] .fr-game-spotlight__media .fr-player-gate { width:100%; }
+@media(max-width:640px) { .fr-player-gate{ min-height:170px } .fr-player-gate--apple{ min-height:160px } .fr-player-gate__content{ padding:13px 14px; gap:6px } .fr-player-gate__button{ font-size:13px } }
+@media(prefers-reduced-motion:reduce) { .fr-player-gate__button{transition:none} }

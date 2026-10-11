@@ -22,7 +22,12 @@ for (const category of collections) {
     const longTitle=item.title.length>24?' hub-tile--long-title':'';
     const media=(category==='tv-shows'||category==='indie-movies')?' data-media-type="'+(category==='tv-shows'?'tv':'movie')+'" data-media-title="'+esc(item.title)+'"':'';
     const mediaArt=media?'<img class="hub-editorial-poster" data-media-field="poster" alt="'+esc(item.title)+' poster" hidden>':'';
-    const gameArt=category==='games' && Number.isInteger(item.steamId)?'<iframe class="game-store-widget" title="Official Steam artwork and store information for '+esc(item.title)+'" loading="lazy" src="https://store.steampowered.com/widget/'+item.steamId+'/" referrerpolicy="strict-origin-when-cross-origin"></iframe>':'';
+    const gameArt=category==='games' && Number.isInteger(item.steamId)?
+      `<div class="fr-player-gate fr-player-gate--steam" data-player-provider="steam" data-player-url="https://store.steampowered.com/widget/${item.steamId}/" data-player-title="Official Steam artwork and store information for ${esc(item.title)}">`+
+      `<div class="fr-player-gate__content"><span class="fr-player-gate__eyebrow">EXTERNAL STEAM PLAYER</span>`+
+      `<div class="fr-player-gate__description">Explore the official Steam game widget.</div>`+
+      `<button class="fr-player-gate__button" type="button" aria-label="Load STEAM player: Official Steam artwork and store information for ${esc(item.title)}">LOAD STEAM PLAYER <span aria-hidden="true">↗</span></button>`+
+      `<div class="fr-player-gate__note">Only connects to Steam after you click. They may use cookies. <a href="/privacy.html">PRIVACY</a></div></div></div>`:'';
     const gameTrailer=category==='games' && /^[A-Za-z0-9_-]{11}$/.test(item.trailerVideoId||'')?'<button type="button" class="fr-trailer-button" data-trailer-video="'+item.trailerVideoId+'" data-trailer-title="'+esc(item.title)+'">▶ PLAY TRAILER</button>':'';
     return '<article class="hub-tile '+variant+longTitle+'"'+media+'>'+mediaArt+'<div class="hub-tile__wash" aria-hidden="true"></div>'+
       '<div class="hub-tile__content"><span class="hub-kicker">'+esc(item.category)+'</span><h3>'+esc(item.title)+'</h3>'+
