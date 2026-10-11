@@ -84,7 +84,67 @@ async function mapBounded(items, fn) {
   if (errors.length) throw new Error('TMDB catalogue detail refresh incomplete');
   return results.filter(Boolean);
 }
+// Watching offers are NOT proof that the film first premiered on a streaming platform.
+export async function fetchStreamingAvailability(env,options) {
+  const region=options.country==='US'?'US':'GB';
+  const access=['subscription','free','rent-buy'].includes(options.access)?options.access:'all';
+  const kinds={
+    all:['flatrate','free','ads','rent','buy'],
+    subscription:['flatrate'],
+    free:['free','ads'],
+    'rent-buy':['rent','buy']
+  };
+  const page=Number(options.page)||1,year=Number(options.year);
+  const query={
+    language:'en-GB',include_adult:false,include_video:false,page,
+    with_genres:27,watch_region:region,
+    with_watch_monetization_types:kinds[access].join('|'),
+    sort_by:'popularity.desc','primary_release_date.lte':today()
+  };
+  if(Number.isInteger(year)&&year>=1888&&year<=new Date().getUTCFullYear()){
+    query['primary_release_date.gte']=year+'-01-01';
+    query['primary_release_date.lte']=year+'-12-31'<today()?year+'-12-31':today();
+  }
+  const discovered=await tmdbRequest(env,'/discover/movie',query);
+  const candidates=(discovered.results||[]).filter(x=>x.adult!==true&&
+    Number.isInteger(x.id)&&Array.isArray(x.genre_ids)&&x.genre_ids.includes(27));
+  const verified=await mapBounded(candidates.slice(0,20),async raw=>{
+    const data=await tmdbRequest(env,'/movie/'+raw.id+'/watch/providers');
+    const local=data.results?.[region];
+    if(!local)return null;
+    const groups={
+      subscription:local.flatrate||[],
+      free:[...(local.free||[]),...(local.ads||[])],
+      'rent-buy':[...(local.rent||[]),...(local.buy||[])]
+    };
+    const accessTypes=Object.entries(groups).filter(([,options])=>options.length)
+      .map(([kind])=>kind);
+    if(!accessTypes.length||(access!=='all'&&!accessTypes.includes(access)))return null;
+    const active=access==='all'?Object.values(groups).flat():groups[access];
+    const providerNames=[...new Set((active||[]).filter(x=>typeof x.provider_name==='string')
+      .map(x=>x.provider_name.slice(0,60)))].slice(0,6);
+    let watchLink=null;
+    try{
+      const u=new URL(local.link);
+      if(u.protocol==='https:'&&u.hostname==='www.themoviedb.org'&&!u.username&&!u.password)
+        watchLink=u.href;
+    }catch{}
+    const item=sanitizeMedia(raw,'movie',region);
+    return item?{...item,providerNames,accessTypes,watchLink,
+      providerSourceName:'TMDB / JustWatch',providerRegion:region,
+      providerCheckedAt:today(),streamingPremiereVerified:false}:null;
+  });
+  const seen=new Set();
+  const items=verified.filter(x=>!seen.has(x.tmdbId)&&seen.add(x.tmdbId));
+  const totalPages=Math.min(500,Math.max(1,Number(discovered.total_pages)||1));
+  return {items,page,nextPage:page<totalPages?page+1:null,totalPages,
+    country:region,year:Number.isInteger(year)&&year>=1888?year:null,access,
+    mode:'streaming-watch',providerSourceName:'TMDB / JustWatch',checkedAt:today(),
+    methodology:'Regional watching offers from TMDB powered by JustWatch. These do not establish first premiere or theatrical history. Free/ad-supported, subscription and digital rent/buy are distinct; check providers for current rights and prices.'};
+}
+
 export async function fetchCatalogue(env, options) {
+  if(options.mode==='streaming-watch')return fetchStreamingAvailability(env,options);
   const kind = options.type; const type = kind === 'tv' ? 'tv' : 'movie';
   const mode = options.mode === 'chart' ? 'top' : options.mode;
   const year = Number(options.year); const page = Number(options.page) || 1;

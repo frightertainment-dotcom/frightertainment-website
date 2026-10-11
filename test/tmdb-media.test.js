@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { officialTrailer, sanitizeMedia, fetchMedia, fetchCatalogue, independentAssessment } from '../worker/tmdb-media.js';
+import { officialTrailer, sanitizeMedia, fetchMedia, fetchCatalogue, fetchStreamingAvailability, independentAssessment } from '../worker/tmdb-media.js';
 const env = { TMDB_NONCOMMERCIAL_USE_APPROVED: 'true', TMDB_ATTRIBUTION_READY: 'true', TMDB_READ_ACCESS_TOKEN: 'private-fixture' };
 const reply = body => new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
 
@@ -189,4 +189,36 @@ test('cinema data carries explicit limited-versus-general screening types withou
   assert.equal(r.items[1].majorProduction,false);
   assert.equal(r.items.every(x=>x.cinemaReissue===false),true);
  }finally{globalThis.fetch=orig}
+});
+test('TMDB region provider discovery separates a Shudder subscription, free Plex and rent/buy by country',async()=>{
+ const old=globalThis.fetch,queries=[];
+ globalThis.fetch=async url=>{
+  const u=new URL(url);queries.push(u);
+  if(u.pathname==='/3/discover/movie')return reply({total_pages:2,total_results:2,results:[
+    {id:211,title:'Streaming Horror A',genre_ids:[27],poster_path:'/a.jpg',release_date:'2025-03-17',vote_average:7.6,vote_count:90},
+    {id:212,title:'Streaming Horror B',genre_ids:[27],poster_path:'/b.jpg',release_date:'2025-05-09',vote_average:6.4,vote_count:80}
+  ]});
+  if(u.pathname==='/3/movie/211/watch/providers')return reply({results:{GB:{
+    flatrate:[{provider_name:'Shudder'}],ads:[{provider_name:'Plex'}],
+    link:'https://www.themoviedb.org/movie/211/watch?locale=GB'
+  }}});
+  if(u.pathname==='/3/movie/212/watch/providers')return reply({results:{US:{
+    rent:[{provider_name:'Amazon Video'}],
+    link:'https://www.themoviedb.org/movie/212/watch?locale=US'
+  }}});
+  throw Error('Unexpected TMDB call '+u);
+ };
+ try{
+  const gb=await fetchStreamingAvailability(env,{country:'GB',mode:'streaming-watch',page:1,year:2025,access:'all'});
+  assert.equal(queries[0].searchParams.get('watch_region'),'GB');
+  assert.equal(queries[0].searchParams.get('with_watch_monetization_types'),'flatrate|free|ads|rent|buy');
+  assert.deepEqual(gb.items.map(x=>x.title),['Streaming Horror A']);
+  assert.deepEqual(gb.items[0].accessTypes,['subscription','free']);
+  assert.deepEqual(gb.items[0].providerNames,['Shudder','Plex']);
+  assert.equal(gb.items[0].streamingPremiereVerified,false);
+  const us=await fetchStreamingAvailability(env,{country:'US',mode:'streaming-watch',page:1,year:2025,access:'rent-buy'});
+  assert.deepEqual(us.items.map(x=>x.title),['Streaming Horror B']);
+  assert.deepEqual(us.items[0].accessTypes,['rent-buy']);
+  assert.equal(us.items[0].providerNames[0],'Amazon Video');
+ }finally{globalThis.fetch=old;}
 });

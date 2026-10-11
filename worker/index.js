@@ -175,18 +175,27 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   const type = params.get('type') || 'movie';
   if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
   const cinemaMode=catalogue && ['cinema','cinema-recent'].includes(params.get('mode'));
+  const watchMode=catalogue && params.get('mode')==='streaming-watch';
   const requestedCinemaCountry=params.get('country') || env.DEFAULT_COUNTRY || 'GB';
   if(cinemaMode && !cinemaPreviewCountries.has(requestedCinemaCountry)) throw new HttpError(400,'Unsupported cinema country');
-  const country=cinemaMode ? requestedCinemaCountry : countryOf(request,env);
+  if(watchMode && !['GB','US'].includes(requestedCinemaCountry)) throw new HttpError(400,'Unsupported streaming country');
+  const country=(cinemaMode||watchMode) ? requestedCinemaCountry : countryOf(request,env);
   const currentYear = new Date().getUTCFullYear();
-  const year = params.has('year') ? Number(params.get('year')) : catalogue ? currentYear : null;
+  const year = watchMode && params.get('year')==='all' ? null
+    :params.has('year') ? Number(params.get('year')) : catalogue ? currentYear : null;
   if (year !== null && (!Number.isInteger(year) || year < 1888 || year > currentYear + 2)) throw new HttpError(400, 'Invalid media year');
   const options = { type, country, year };
   if (catalogue) {
     options.mode = params.get('mode') || 'archive';
     options.page = Number(params.get('page') || 1);
     options.query = (params.get('query') || '').trim();
-    if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema', 'cinema-recent'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
+    if (!['archive', 'chart', 'top', 'trending', 'upcoming', 'cinema', 'cinema-recent','streaming-watch'].includes(options.mode) || !Number.isInteger(options.page) || options.page < 1 || options.page > 500 || options.query.length > 240) throw new HttpError(400, 'Invalid catalogue parameters');
+    if(watchMode){
+      options.access=params.get('access')||'all';
+      if(type!=='movie'||!['all','subscription','free','rent-buy'].includes(options.access)||options.query)
+        throw new HttpError(400,'Invalid streaming provider filters');
+      options.catalogueVersion=5;
+    }
     if (cinemaMode) options.catalogueVersion = 4;
   } else {
     options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
