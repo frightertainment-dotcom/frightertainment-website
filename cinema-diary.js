@@ -15,28 +15,42 @@
    /^\d{4}-\d{2}-\d{2}$/.test(e.date||'')&&Number.isInteger(e.filmYear)&&
    ['new','re-release'].includes(e.edition)&&['general','limited'].includes(e.reach)&&
    ['studio','special','independent'].includes(e.tier)&&sourceSafe(e.sourceUrl);
- function merge(source,tmdb){
+ const countryNames={GB:'United Kingdom',US:'United States',CA:'Canada',AU:'Australia',IE:'Ireland'};
+ function merge(source,tmdb,country='GB'){
    const now=today(),out=[],known=new Set();
-   const curated=source?.schemaVersion===1&&source.territory==='GB'?source.screenings||[]:[];
+   if(!Object.hasOwn(countryNames,country))return out;
+   // The source ledger is specific to one territory; never reuse UK dates abroad.
+   const curated=source?.schemaVersion===2
+     ? source.territories?.[country]?.screenings||[]
+     : source?.schemaVersion===1&&source.territory===country ? source.screenings||[] : [];
    for(const e of curated){
      if(!validate(e)||e.date<now)continue;
-     out.push({...e,verified:true});known.add(month(e.date)+'|'+key(e.title));
+     const identity=month(e.date)+'|'+key(e.title);
+     if(known.has(identity))continue;
+     out.push({...e,country,verified:true});known.add(identity);
    }
    for(const raw of tmdb||[]){
-     if(!/^\d{4}-\d{2}-\d{2}$/.test(raw.theatricalDate||'')||raw.theatricalDate<now)continue;
-     const identity=month(raw.theatricalDate)+'|'+key(raw.title);
+     const date=raw.theatricalDate;
+     if(!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||date<now)continue;
+     if(raw.releaseCountry!==country)continue;
+     // TMDB reports release events, not independently verified first theatrical
+     // bookings. Previously released films, suspected reissues and movies with
+     // unknown first-release history require a linked editorial screening source.
+     if(!/^\d{4}-\d{2}-\d{2}$/.test(raw.firstReleaseDate||'')||
+       raw.firstReleaseDate<now||raw.cinemaReissue===true||raw.hasPriorLocalCinemaRelease===true)continue;
+     const identity=month(date)+'|'+key(raw.title);
      if(known.has(identity))continue;
      known.add(identity);
-     out.push({...raw,date:raw.theatricalDate,edition:raw.cinemaReissue===true?'re-release':'new',
-       verified:false,reach:raw.cinemaReleaseType===2?'limited':'general',
+     out.push({...raw,date,country,edition:'new',verified:false,
+       reach:raw.cinemaReleaseType===2?'limited':'general',
        tier:'unverified',majorProduction:raw.majorProduction===true});
    }
-   return out.sort((a,b)=>month(a.date).localeCompare(month(b.date))||priority(a)-priority(b)||
-     a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
+   return out.sort((a,b)=>month(a.date).localeCompare(month(b.date))||
+     priority(a)-priority(b)||a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
  }
  const el=(tag,cls,str)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(str!==undefined)x.textContent=str;return x};
- function render(list,source,tmdb,tmdbCard){
-   const all=merge(source,tmdb);list.replaceChildren();
+ function render(list,source,tmdb,tmdbCard,country='GB'){
+   const all=merge(source,tmdb,country);list.replaceChildren();
    let active='';
    for(const row of all){
      const m=month(row.date);
@@ -47,19 +61,19 @@
        const inner=card.firstElementChild;
        if(!inner)continue;
        const badges=el('div','fr-cinema-flags');
-       badges.append(el('span','fr-cinema-pill',row.cinemaReissue?'RE-RELEASE / SCREENING':row.reach==='limited'?'LIMITED CINEMAS':'GENERAL CINEMA RELEASE'));
-       badges.append(el('span','fr-cinema-pill fr-cinema-pill--unverified','TMDB DATE · VENUES UNCONFIRMED'));
+       badges.append(el('span','fr-cinema-pill',row.reach==='limited'?'LIMITED CINEMAS':'GENERAL CINEMA RELEASE'));
+       badges.append(el('span','fr-cinema-pill fr-cinema-pill--unverified','TMDB-REPORTED DATE · CHECK LOCAL CINEMA'));
        inner.prepend(badges);shell.append(inner);list.append(shell);continue;
      }
      const card=el('article','fr-cinema-diary__item fr-cinema-diary__item--verified');
-     card.dataset.mediaType='movie';card.dataset.mediaTitle=row.title;card.dataset.mediaYear=String(row.filmYear);
+     card.dataset.mediaType='movie';card.dataset.cinemaCountry=country;card.dataset.mediaTitle=row.title;card.dataset.mediaYear=String(row.filmYear);
      if(Number.isInteger(row.tmdbId)&&row.tmdbId>0)card.dataset.tmdbId=String(row.tmdbId);
      const title=el('h4','fr-cinema-diary__title',row.title);
      const date=el('span','fr-cinema-diary__date',pretty(row.date));
      const label=el('div','fr-cinema-flags');
      label.append(el('span','fr-cinema-pill',row.edition==='re-release'?'RE-RELEASE SCREENINGS':'NEW CINEMA RELEASE'));
      label.append(el('span','fr-cinema-pill fr-cinema-pill--reach',row.reach==='limited'?'LIMITED CINEMAS':'GENERAL RELEASE · VENUES VARY'));
-     const credits=el('p','fr-cinema-diary__credit',row.distributor||'UK release listing');
+     const credits=el('p','fr-cinema-diary__credit',row.distributor||(countryNames[country]||'Regional')+' release listing');
      const note=el('p','fr-cinema-diary__note',row.note||'Check the screening source for confirmed venues.');
      const sourceLink=el('a','fr-cinema-diary__source','VIEW VERIFIED SCREENING SOURCE ↗');
      sourceLink.href=sourceSafe(row.sourceUrl);sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';
@@ -71,11 +85,11 @@
      const trailer=el('button','fr-trailer-button','▶ TRAILER');trailer.type='button';trailer.dataset.mediaField='trailer';trailer.hidden=true;copy.append(trailer);
      card.append(media,copy);list.append(card);
    }
-   if(!all.length)list.append(el('p','fr-cinema-diary__empty','No future source-checked UK cinema dates yet. Check the next release update.'));
+   if(!all.length)list.append(el('p','fr-cinema-diary__empty','No upcoming '+(countryNames[country]||'regional')+' cinema dates are listed yet. Check back after the next verified release update.'));
    return {count:all.length,curated:all.filter(x=>x.verified).length,reported:all.filter(x=>!x.verified).length,months:[...new Set(all.map(x=>month(x.date)))]};
  }
  let promise=null;
  const load=()=>promise||(promise=fetch('/data/cinema-screenings.json',{headers:{accept:'application/json'}})
    .then(r=>r.ok?r.json():null).catch(()=>null));
- window.FR_CINEMA_DIARY={merge,render,load,validate};
+ window.FR_CINEMA_DIARY={merge,render,load,validate,countryNames};
 })();

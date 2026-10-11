@@ -168,7 +168,7 @@ export async function fetchCatalogue(env, options) {
   const path = search ? `/search/${type}` : `/discover/${type}`;
   const first = await tmdbRequest(env, path, parameters);
   const totalPages = Math.min(500, Number(first.total_pages) || 1);
-  // Both independent status and UK theatrical dates need detail verification.
+  // Both independent status and regional theatrical dates need detail verification.
   // Screen a bounded two-page pool so a page of false candidates is not shown as empty.
   const extra = (kind === 'indie' || cinema) && !search && page < totalPages ? await tmdbRequest(env, path, { ...parameters, page: page + 1 }) : null;
   let candidates = [...(first.results || []), ...(extra?.results || [])].filter(raw => raw.adult !== true && safePoster(raw.poster_path) && Number.isInteger(raw.id));
@@ -181,22 +181,26 @@ export async function fetchCatalogue(env, options) {
       if (cinema) {
         const region = options.country || 'GB';
         const dates = raw.release_dates?.results?.find(entry => entry.iso_3166_1 === region);
-        const matches = (dates?.release_dates || []).filter(entry => {
-          const released = date(String(entry.release_date || '').slice(0,10));
-          return [2,3].includes(entry.type) && released &&
-            (recentCinema ? released >= recentFrom && released <= today() : released > today());
-        }).sort((a,b) => recentCinema
-          ? String(b.release_date).localeCompare(String(a.release_date))
-          : String(a.release_date).localeCompare(String(b.release_date)));
+        const localTheatrical = (dates?.release_dates || []).filter(entry =>
+          [2,3].includes(entry.type) && date(String(entry.release_date || '').slice(0,10)))
+          .sort((a,b)=>String(a.release_date).localeCompare(String(b.release_date)));
+        const matches = localTheatrical.filter(entry => {
+          const released = entry.release_date.slice(0,10);
+          return recentCinema ? released >= recentFrom && released <= today() : released > today();
+        });
+        // The very first local cinema opening may be reported by TMDB.
+        // A *later* local entry is a possible reissue or repeat engagement.
+        // Only the source-backed editorial diary may publish those as a re-release.
         const theatrical = matches[0];
-        return theatrical ? {...sanitizeMedia(raw,type,region),releaseDate:theatrical.release_date.slice(0,10),
+        if(!theatrical || localTheatrical[0]?.release_date.slice(0,10) <
+          theatrical.release_date.slice(0,10))return null;
+        const firstRelease = date(raw.release_date);
+        if(!recentCinema && (!firstRelease || firstRelease < today()))return null;
+        return {...sanitizeMedia(raw,type,region),releaseDate:theatrical.release_date.slice(0,10),
           releaseCountry:region,theatricalDate:theatrical.release_date.slice(0,10),
-          cinemaReleaseType:theatrical.type,
-          // Re-release requires a real previous release date, not simply old production year.
-          cinemaReissue:(dates?.release_dates||[]).some(other=>[2,3].includes(other.type)&&
-            String(other.release_date||'').slice(0,10)<theatrical.release_date.slice(0,10)&&
-            Number(String(other.release_date||'').slice(0,4))<Number(theatrical.release_date.slice(0,4))),
-          majorProduction:independentAssessment(raw).classification==='major-studio-production'} : null;
+          cinemaReleaseType:theatrical.type,cinemaReissue:false,hasPriorLocalCinemaRelease:false,
+          cinemaEvidence:'TMDB regional date, not independently confirmed venues',
+          majorProduction:independentAssessment(raw).classification==='major-studio-production'};
       }
       if (kind === 'indie') {
         const assessment = independentAssessment(raw);
