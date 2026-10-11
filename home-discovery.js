@@ -27,7 +27,7 @@
           const links = community ? (safeUrl(item.sourceUrl) ? `<a href="${escape(safeUrl(item.sourceUrl))}" target="_blank" rel="noopener noreferrer">TMDB →</a>` : '') :
             (item.sources || []).map(source => safeUrl(source.url) ? `<a href="${escape(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escape(source.publication)} →</a>` : '').join(' ');
           const scoreLabel = community ? `TMDB community rating ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.voteCount)} votes` :
-            `Viewer rating ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
+            `Professional critic average ${(Number(item.averageScore) / 10).toFixed(1)}/10 · ${escape(item.criticCount)} verified professional critics · ${escape(item.movementLabel)}`;
           const posterPath = community && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? item.posterPath : '';
           const poster = posterPath ? `<img class="home-discovery__poster" data-media-field="poster" src="https://image.tmdb.org/t/p/w185${escape(posterPath)}" alt="Poster for ${escape(item.title)}" loading="lazy">` : '';
           return `<article data-media-type="movie" data-media-title="${escape(item.title)}" ${item.tmdbId?`data-tmdb-id="${escape(item.tmdbId)}"`:""} class="${poster ? 'home-discovery__item--poster' : ''}">${poster||`<img class="home-discovery__poster" data-media-field="poster" alt="${escape(item.title)} poster" hidden>`}<div><strong>#${escape(item.position)} ${escape(item.title)}</strong><span>${scoreLabel}</span><button class="fr-trailer-button" type="button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button><small>${links}</small></div></article>`;
@@ -121,7 +121,40 @@
     populateEditorial(editorial);
     render();
   }
-  country.addEventListener('change', load);
+  // The discovery drawer is optional. Wait for a visitor to open it before
+  // requesting provider lists, artwork and a second rankings snapshot.
+  // This leaves the homepage chart and release bulletin fast on initial load.
+  const drawer = document.querySelector('#live-discovery');
+  let loadedCountry = null;
+  let loading = null;
+  function loadWhenNeeded() {
+    if (loading) return loading;
+    if (loadedCountry === country.value) return Promise.resolve();
+    const requestedCountry = country.value;
+    loading = load()
+      .then(() => { loadedCountry = requestedCountry; })
+      .finally(() => {
+        loading = null;
+        // A country change while a previous request was running must not
+        // leave the newly chosen territory showing another country's data.
+        if (drawer?.open && country.value !== loadedCountry) loadWhenNeeded();
+      });
+    return loading;
+  }
+  function revealDiscovery() {
+    if (drawer?.open) loadWhenNeeded();
+  }
+  drawer?.addEventListener('toggle', revealDiscovery);
+  country.addEventListener('change', () => {
+    loadedCountry = null;
+    if (drawer?.open) loadWhenNeeded();
+  });
   search.addEventListener('input', render);
-  load();
+  // Honour a direct link into the optional discovery area without forcing
+  // the hidden widget to fetch data for every ordinary homepage visitor.
+  const hash = window.location.hash.slice(1);
+  if (drawer && (hash === drawer.id || (hash && drawer.querySelector('#' + CSS.escape(hash))))) {
+    drawer.open = true;
+  }
+  revealDiscovery();
 })();
