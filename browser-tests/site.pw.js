@@ -1538,3 +1538,31 @@ test('poster-enriched homepage cards never shove text or controls outside the mo
     await expect.poll(() => page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
 });
+
+
+test('rotating film feature CTA always agrees with its actual destination', async ({page}) => {
+  const today = new Date().toISOString().slice(0,10);
+  let records = [{
+    id:'qa-current-horror',editorialStatus:'approved',title:'QA Current Horror',
+    claims:[{field:'releaseDate',value:today,source:'https://example.com/source',label:'UK theatrical release'}]
+  }];
+  await page.route('**/data/movies.js*',route=>route.fulfill({
+    status:200,contentType:'application/javascript',
+    body:'window.FR_MOVIES = '+JSON.stringify(records)+';'
+  }));
+  await page.goto('/');
+  const feature=page.locator('.hub-feature');
+  await expect(feature).toHaveAttribute('data-film-id','qa-current-horror');
+  const cta=feature.locator('a.hub-tile__link');
+  await expect(cta).toHaveAttribute('href','/films/qa-current-horror/');
+  await expect(cta).toContainText('VIEW FILM DETAILS');
+  await expect(cta).toHaveAttribute('aria-label','Explore QA Current Horror film details');
+  await expect(cta).not.toContainText('OPEN THE COMPLETE HORROR VAULT');
+
+  // When there is no verified recent/upcoming release, the default Horror
+  // Vault feature and its original destination must remain truthful.
+  records=[];
+  await page.reload();
+  await expect(page.locator('.hub-feature a.hub-tile__link')).toHaveAttribute('href','/all-horror-movies.html');
+  await expect(page.locator('.hub-feature a.hub-tile__link')).toContainText('OPEN THE COMPLETE HORROR VAULT');
+});
