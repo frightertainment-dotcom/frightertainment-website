@@ -572,7 +572,7 @@ test('imported horror vault retains thousands of indexed records and every year 
     const known=new Set([...local,...archived,...manual].map(f=>key(f.title,f.year)));
     let freshStreaming=0;
     for(const film of stream.entries||[]){
-      if(!Number.isInteger(film.filmYear)||film.filmYear<2025||film.filmYear>currentYear||
+      if(!Number.isInteger(film.filmYear)||film.filmYear<1896||film.filmYear>currentYear||
          !/^\d{4}-\d{2}-\d{2}$/.test(film.streamDate)||film.streamDate>now)continue;
       const identity=key(film.title,film.filmYear);
       if(known.has(identity))continue;
@@ -1276,7 +1276,7 @@ test('the new horror-stream mini chart ranks only qualifying TMDB ratings, never
   await expect(ranked).toHaveCount(3);
   const titles=await ranked.locator('.fr-stream__rank-info a').allTextContents();
   expect(titles).toEqual(['Infirmary','Buzzkill','V/H/S/Mixtape']);
-  await expect(ranked).not.toContainText('The Mortuary Assistant');
+  expect((await ranked.allTextContents()).join(' ')).not.toContain('The Mortuary Assistant');
   expect(await chart.locator('li.fr-stream__rank-row--pending').count()).toBeGreaterThan(0);
   await expect(chart).toContainText('8.9/10');
 });
