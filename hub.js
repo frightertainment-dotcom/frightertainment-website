@@ -298,7 +298,7 @@
     ratingKind = data?.ratingKind === 'tmdb-community' ? 'tmdb-community' : 'professional-critics';
     if (ratingKind === 'tmdb-community') {
       document.querySelector('.hub-charts .hub-eyebrow').textContent = 'TMDB COMMUNITY RATING /10';
-      document.querySelector('.hub-charts__top p').textContent = 'Horror films released this year, ranked by average TMDB viewer rating (50 votes minimum).';
+      document.querySelector('.hub-charts__top p').textContent = 'Horror films released this year, ranked by TMDB viewer rating (50 votes minimum). Homepage preview: up to ' + previewLimit + ' films; open the annual chart for all 20.';
       chartFoot.textContent = year + ' · TMDB COMMUNITY CHART';
     }
     const dataItems = Array.isArray(data?.items) ? data.items : [];
