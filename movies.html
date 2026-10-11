@@ -13,7 +13,65 @@
 <header class="header hub-header" id="top"><div class="shell hub-header__inside">
 <a class="brand hub-brand" href="/" aria-label="Frightertainment home"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a>
 <nav class="hub-tabs" aria-label="Main site sections"><a href="/">HOME</a><a href="/movies.html" class="active" aria-current="page">MOVIES</a><a href="/tv-shows.html">TV SHOWS</a><a href="/cinema.html">CINEMA</a><a href="/indie-movies.html">INDIE MOVIES</a><a href="/podcasts.html">PODCASTS</a><a href="/games.html">GAMES</a></nav>
-</div></header><main id="main"><section class="shell hub-page-intro"><span class="hub-eyebrow">THE CURSED CINEMA VAULT</span><h1 class="hub-page-title hub-page-title--wordmark" aria-label="HORROR MOVIES"><span class="sr-only">HORROR MOVIES</span><img class="hub-page-wordmark" src="/assets/page-title-movies.png" alt="" aria-hidden="true"></h1><p>Enter the vault for new releases, film histories and stories from every era.</p><nav class="hub-subtabs" aria-label="Movies sub-sections"><a href="/movies.html" aria-current="page" class="active">LATEST &amp; DISCOVERY</a><a href="/all-horror-movies.html">ALL HORROR MOVIES <span aria-hidden="true">→</span></a><a href="/top-20/">TOP 20 BY YEAR</a></nav><nav class="hub-section-jumps" aria-label="Movie sections"><a href="#discovery">FIND A FILM</a><a href="/cinema.html">IN CINEMAS</a></nav></section>
+</div></header><main id="main"><section class="shell hub-page-intro"><span class="hub-eyebrow">THE CURSED CINEMA VAULT</span><h1 class="hub-page-title hub-page-title--wordmark" aria-label="HORROR MOVIES"><span class="sr-only">HORROR MOVIES</span><img class="hub-page-wordmark" src="/assets/page-title-movies.png" alt="" aria-hidden="true"></h1><p>Enter the vault for new releases, film histories and stories from every era.</p><nav class="hub-subtabs" aria-label="Movies sub-sections"><a href="/movies.html" aria-current="page" class="active">LATEST &amp; DISCOVERY</a><a href="/all-horror-movies.html">ALL HORROR MOVIES <span aria-hidden="true">→</span></a><a href="/top-20/">TOP 20 BY YEAR</a></nav><nav class="hub-section-jumps" aria-label="Movie sections"><a href="#straight-to-stream">STRAIGHT TO STREAM</a><a href="#discovery">FIND A FILM</a><a href="/cinema.html">IN CINEMAS</a></nav></section>
+
+<section id="straight-to-stream" class="shell fr-stream" aria-labelledby="fr-stream-heading">
+  <div class="fr-stream__hero">
+    <div class="fr-stream__hero-copy">
+      <span class="hub-eyebrow">A NEW NIGHTMARE · WATCH FROM HOME</span>
+      <h2 id="fr-stream-heading">STRAIGHT TO <em>STREAM.</em></h2>
+      <p>Horror premieres, free scares and new digital releases — including films that never reached your local cinema. Source-checked, organised by film year and viewing cost.</p>
+    </div>
+    <div class="fr-stream__hero-symbol" aria-hidden="true"><span>NO TICKET</span><strong>REQUIRED.</strong></div>
+  </div>
+  <div class="fr-stream__filters" aria-label="Explore new streaming horror">
+    <div class="fr-stream__selectors">
+      <label for="fr-stream-country">YOUR COUNTRY
+        <select id="fr-stream-country" data-stream-country>
+          <option value="GB">UNITED KINGDOM</option>
+          <option value="US">UNITED STATES</option>
+        </select>
+      </label>
+      <label for="fr-stream-year">FILM RELEASE YEAR
+        <select id="fr-stream-year" data-stream-year>
+          <option value="2026">2026 FILMS</option>
+          <option value="2025">2025 FILMS</option>
+          <option value="all">ALL YEARS / NEW ARRIVALS</option>
+        </select>
+      </label>
+    </div>
+    <div class="fr-stream__access" role="group" aria-label="Choose streaming price type">
+      <button type="button" data-stream-access="all" class="active" aria-pressed="true">ALL RELEASES</button>
+      <button type="button" data-stream-access="subscription" aria-pressed="false">WITH SUBSCRIPTION</button>
+      <button type="button" data-stream-access="free" aria-pressed="false">FREE TO WATCH</button>
+      <button type="button" data-stream-access="rent-buy" aria-pressed="false">RENT OR BUY</button>
+    </div>
+    <p class="fr-stream__legend">Subscription isn't free: it means included with your paid plan. “Free” may have adverts. Rent/buy is a separate digital purchase. Listings and rights vary by country.</p>
+  </div>
+  <div class="fr-stream__layout">
+    <div class="fr-stream__discover">
+      <div class="fr-stream__content-head">
+        <h3>RECENT <em>DROPS.</em></h3>
+        <p data-stream-status role="status" aria-live="polite">Checking sourced streaming releases…</p>
+      </div>
+      <div data-stream-list class="fr-stream__list"></div>
+      <button type="button" class="fr-stream__more" data-stream-more hidden>SHOW MORE STREAMING HORROR ↓</button>
+    </div>
+    <aside class="fr-stream__rank" aria-labelledby="fr-stream-rank-heading">
+      <span class="hub-eyebrow">ANNUAL STREAMING-FILM CHART</span>
+      <h3 id="fr-stream-rank-heading">THE STREAMING <em>FRIGHT FIVE.</em></h3>
+      <p>Viewer-rated streaming and digital-first horror premieres from this sourced selection. TMDB scores only; at least 20 viewer votes to qualify.</p>
+      <p class="fr-stream__rank-year" data-stream-chart-year>2026 · UK</p>
+      <ol class="fr-stream__rank-list" data-stream-chart></ol>
+      <p class="fr-stream__rank-status" data-stream-chart-status role="status" aria-live="polite">Checking viewer ratings…</p>
+      <p class="fr-stream__rank-note">A developing chart, not a worldwide Top 5 or a professional critics' ranking. Low-scored horror can still be brilliant.</p>
+    </aside>
+  </div>
+  <div class="fr-stream__footer">
+    <p>Platform additions aren't automatically new films. We preserve a movie's <strong>original film year</strong> in the <a href="/all-horror-movies.html">Horror Vault</a> — even if it reached streaming years later.</p>
+    <p>Sources are linked on every film. Availability is an announcement, not a live viewing guarantee. Always check the provider.</p>
+  </div>
+</section>
 <section class="shell release-brief release-brief--movies" aria-label="New horror on UK streaming and cinema">
   <div data-release-brief><p>Checking new horror releases…</p></div>
 </section>
@@ -59,4 +117,4 @@
     </section>
 
 </details>
-</main><footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span> <a href="/credits.html">CREDITS</a> <a href="/contact.html">CONTACT US</a></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/discovery.js" defer></script><script src="/release-calendar.js" defer></script><script src="/release-brief.js" defer></script><script src="/media-ui.js" defer></script></body></html>
+</main><footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span> <a href="/credits.html">CREDITS</a> <a href="/contact.html">CONTACT US</a></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/discovery.js" defer></script><script src="/release-calendar.js" defer></script><script src="/release-brief.js" defer></script><script src="/straight-to-stream.js" defer></script><script src="/media-ui.js" defer></script></body></html>
