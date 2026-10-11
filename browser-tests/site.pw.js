@@ -1359,3 +1359,33 @@ test('older sourced streaming films join their original-year Horror Vault withou
  await expect(page.locator('#archive-film-detail h1')).toHaveText('The Puppetman');
  await expect(page.locator('#archive-film-detail')).toContainText('2023');
 });
+
+test('live region provider discovery is clearly separate from historically sourced streaming premieres',async({page})=>{
+ const calls=[];
+ await page.route('**/api/catalogue?**',route=>{
+  const p=new URL(route.request().url()).searchParams;
+  if(p.get('mode')!=='streaming-watch')return route.continue();
+  calls.push(Object.fromEntries(p));
+  return route.fulfill({json:{items:[{tmdbId:14,title:'Horror Provider Example',
+   firstReleaseDate:'2024-07-12',voteCount:180,voteAverage:6.4,posterPath:'/example.jpg',
+   accessTypes:p.get('access')==='rent-buy'?['rent-buy']:['subscription','free'],
+   providerNames:['Shudder','Plex'],
+   watchLink:'https://www.themoviedb.org/movie/14/watch?locale=GB'}],
+   checkedAt:'2026-10-11',page:Number(p.get('page')),nextPage:2,totalPages:2}});
+ });
+ await page.goto('/movies.html');const section=page.locator('#straight-to-stream'),panel=section.locator('.fr-watch');
+ await expect(panel).toContainText('WHAT CAN I WATCH TONIGHT?');
+ await expect(panel.locator('.fr-watch__card')).toHaveCount(0);
+ await panel.getByRole('button',{name:'FIND AVAILABLE HORROR FILMS'}).click();
+ await expect(panel.locator('.fr-watch__card')).toHaveCount(1);
+ await expect(panel).toContainText('Horror Provider Example');
+ await expect(panel).toContainText('FREE / AD-SUPPORTED');
+ expect(calls[0]).toMatchObject({type:'movie',mode:'streaming-watch',country:'GB',access:'all'});
+ await section.locator('[data-stream-year]').selectOption('2024');
+ await expect.poll(()=>calls.at(-1)?.year).toBe('2024');
+ await section.getByRole('button',{name:'RENT OR BUY'}).click();
+ await expect.poll(()=>calls.at(-1)?.access).toBe('rent-buy');
+ await expect(panel).toContainText('DIGITAL RENT / BUY');
+ await panel.getByRole('button',{name:'NEXT PROVIDERS'}).click();
+ await expect.poll(()=>calls.at(-1)?.page).toBe('2');
+});
