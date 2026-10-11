@@ -28,13 +28,18 @@
     'digital-home':'HOME RELEASE AFTER CINEMA'
   };
   let all=[],state={country:'GB',year:String(yr),access:'all',visible:8},requestNumber=0;
-  // Film-year filters roll forward automatically every January without a hand edit.
-  yearChoice.replaceChildren(...[yr,yr-1].map(y=>{
-    const opt=document.createElement('option');opt.value=String(y);
-    opt.textContent=y+' FILMS';return opt;
-  }));
-  const allYears=document.createElement('option');allYears.value='all';
-  allYears.textContent='ALL YEARS / NEW ARRIVALS';yearChoice.append(allYears);
+  // Show all actual catalogued film years instead of an artificial two-year menu.
+  function populateYears(records){
+    const years=[...new Set(records.map(e=>e.filmYear).filter(y=>Number.isInteger(y)&&y<=yr))].sort((a,b)=>b-a);
+    const previous=state.year;
+    yearChoice.replaceChildren(...years.map(y=>{
+      const opt=document.createElement('option');opt.value=String(y);opt.textContent=y+' FILMS';return opt;
+    }));
+    const allYears=document.createElement('option');allYears.value='all';allYears.textContent='ALL FILM YEARS';
+    yearChoice.append(allYears);
+    state.year=years.includes(Number(previous))?previous:'all';
+    yearChoice.value=state.year;
+  }
   const valid=e=>e&&/^[a-z0-9-]+$/.test(e.id||'')&&typeof e.title==='string'&&
     /^\d{4}-\d{2}-\d{2}$/.test(e.streamDate||'')&&Number.isInteger(e.filmYear)&&
     ['free','subscription','rent-buy'].includes(e.access)&&
@@ -81,8 +86,11 @@
     const type=node('span','fr-stream__kind',classLabels[e.premiereKind]);
     const heading=node('h4','fr-stream__title');const title=node('a','',e.title);title.href=filmPage(e);heading.append(title);
     const meta=node('p','fr-stream__meta',e.platform+' · '+e.filmYear+' film');
+    if(e.availabilityStatus==='historical-premiere-check-current-service')
+      meta.append(node('span','fr-stream__historic',' · PAST PREMIERE'));
     const access=node('p','fr-stream__access-label',accessLabels[e.access]);
     const when=e.dateBasis==='listed-by'?'SOURCE AVAILABILITY CHECKED BY '+fmt(e.streamDate)
+      :e.dateBasis==='original-platform-premiere'?'ORIGINAL SERVICE PREMIERE · '+fmt(e.streamDate)+' · CHECK CURRENT AVAILABILITY'
       :e.streamDate>today?'ANNOUNCED FOR '+fmt(e.streamDate):'STREAM / DIGITAL RELEASE · '+fmt(e.streamDate);
     const date=node('p','fr-stream__release',when);
     const rating=node('span','fr-stream__rating','Checking TMDB rating…');rating.dataset.mediaField='rating';
@@ -101,9 +109,10 @@
     wrap.append(art,content);
     return wrap;
   };
+  // Year chart covers films with source-checked digital arrivals, NOT just service Originals.
+  // 'New to service' after cinema is eligible, but never described as streaming-first.
   const rankingCandidates=()=>all.filter(e=>e.filmYear===Number(state.year==='all'?yr:state.year)
-      &&e.countries.includes(state.country)&&e.streamDate<=today&&e.chartEligible===true&&
-      ['platform-original','digital-premiere'].includes(e.premiereKind));
+      &&e.countries.includes(state.country)&&e.streamDate<=today);
   const norm=t=>String(t||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/^the\s+/,'').replace(/[^a-z0-9]+/g,' ').trim();
   async function renderChart(){
     const revision=++requestNumber;
@@ -114,7 +123,7 @@
     if(!choices.length){chartStatus.textContent='No confirmed streaming-first premieres in this country and film year yet.';return;}
     if(!window.FRMedia?.get){chartStatus.textContent='Viewer ratings are temporarily unavailable.';return;}
     chartStatus.textContent='Checking TMDB viewer votes on the source-listed premieres…';
-    const candidates=choices.filter((e,i,arr)=>arr.findIndex(x=>norm(x.title)===norm(e.title))===i).slice(0,14);
+    const candidates=choices.filter((e,i,arr)=>arr.findIndex(x=>norm(x.title)===norm(e.title))===i).slice(0,32);
     const rated=await Promise.all(candidates.map(async e=>{
       const params={type:'movie'};
       if(Number.isInteger(e.tmdbId)&&e.tmdbId>0)params.id=String(e.tmdbId);
@@ -123,26 +132,26 @@
       try{
         const item=await window.FRMedia.get(params);
         if(!item||norm(item.title)!==norm(e.title)||!Number.isFinite(item.voteAverage)||
-          item.voteAverage<=0||!Number.isInteger(item.voteCount)||item.voteCount<20)return null;
+          item.voteAverage<=0||!Number.isInteger(item.voteCount)||item.voteCount<10)return null;
         return {item,e};
       }catch{return null;}
     }));
     if(revision!==requestNumber)return;
     const charted=rated.filter(Boolean).sort((a,b)=>b.item.voteAverage-a.item.voteAverage||
-      b.item.voteCount-a.item.voteCount||a.e.title.localeCompare(b.e.title)).slice(0,5);
+      b.item.voteCount-a.item.voteCount||a.e.title.localeCompare(b.e.title)).slice(0,10);
     // A new horror film may not have enough TMDB votes for a meaningful ranking.
     // Keep useful source-backed titles visible but label them UNRANKED, never #1–#5.
     if(!charted.length){
-      for(const e of candidates.slice(0,5)){
+      for(const e of candidates.slice(0,10)){
         const li=node('li','fr-stream__rank-row fr-stream__rank-row--pending');
         const number=node('span','fr-stream__rank-number','—');
         const detail=node('span','fr-stream__rank-info');
         const title=node('a','',e.title);title.href=filmPage(e);
-        detail.append(title,node('small','',e.platform+' · awaiting TMDB viewer ratings'));
+        detail.append(title,node('small','',e.platform+' · under 10 matched viewer votes'));
         li.append(number,detail,node('strong','fr-stream__rank-score','UNRANKED'));
         chart.append(li);
       }
-      chartStatus.textContent='These premieres are not yet ranked: no matched film has 20 TMDB votes. Scores will appear when they qualify.';
+      chartStatus.textContent='No film qualifies for a numbered ranking yet. Discoveries remain visible without invented scores.';
       return;
     }
     for(let i=0;i<charted.length;i++){
@@ -155,9 +164,17 @@
       const score=node('strong','fr-stream__rank-score',item.voteAverage.toFixed(1)+'/10');
       li.append(number,detail,score);chart.append(li);
     }
-    chartStatus.textContent=charted.length
-      ?'TMDB community scores · rated titles from '+candidates.length+' sourced premieres · refreshed on request.'
-      :'No eligible film has 20 verified TMDB votes yet. Scores appear here as audiences rate them.';
+    // Show the remaining films as a watchlist, never as fake Top 10 positions.
+    const ranked=new Set(charted.map(x=>norm(x.e.title)));
+    const pending=candidates.filter(e=>!ranked.has(norm(e.title))).slice(0,Math.max(0,10-charted.length));
+    for(const e of pending){
+      const li=node('li','fr-stream__rank-row fr-stream__rank-row--pending');
+      const detail=node('span','fr-stream__rank-info');const title=node('a','',e.title);title.href=filmPage(e);
+      detail.append(title,node('small','',e.platform+' · score pending'));
+      li.append(node('span','fr-stream__rank-number','—'),detail,node('strong','fr-stream__rank-score','UNRANKED'));
+      chart.append(li);
+    }
+    chartStatus.textContent=charted.length+' rated · '+pending.length+' unranked · 10+ matched TMDB votes required for a numbered position.';
   }
   function paint(){
     const matches=all.filter(e=>e.countries.includes(state.country)&&
@@ -199,7 +216,7 @@
     .then(async response=>response.ok?response.json():null)
     .then(data=>{
       if(data?.schemaVersion!==1||!Array.isArray(data.entries))throw new Error('Streaming inventory missing');
-      all=data.entries.filter(valid);paint();
+      all=data.entries.filter(valid);populateYears(all);paint();
     })
     .catch(()=>{
       stateText.textContent='Source-linked streaming releases are temporarily unavailable.';

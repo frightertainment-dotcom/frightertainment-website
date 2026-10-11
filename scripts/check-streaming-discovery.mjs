@@ -40,7 +40,7 @@ export async function auditStreaming(){
     if(e.imdbId&&(!/^tt[0-9]{7,10}$/.test(e.imdbId)||
       e.imdbSourceUrl!=='https://www.imdb.com/title/'+e.imdbId+'/'))
       errors.push('Invalid or unsourced IMDb identity: '+e?.id);
-    if(e.dateBasis&&e.dateBasis!=='listed-by')errors.push('Unsupported date semantics: '+e?.id);
+    if(e.dateBasis&&!['listed-by','original-platform-premiere'].includes(e.dateBasis))errors.push('Unsupported date semantics: '+e?.id);
     if(e.chartEligible&&!['platform-original','digital-premiere'].includes(e.premiereKind))
       errors.push('Unverified original/digital premiere in streaming mini chart: '+e?.id);
   }

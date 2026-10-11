@@ -1322,3 +1322,13 @@ test('streaming chart does not manufacture numbered Top Five places for unrated 
   await expect(panel.locator('[data-stream-chart-status]')).toContainText('not yet ranked');
   await expect(panel.locator('[data-stream-chart]')).not.toContainText('10/10');
 });
+test('Streaming film year options include past Shudder premiere records and warn when current access is unknown',async({page})=>{
+ await page.goto('/movies.html');const s=page.locator('#straight-to-stream');
+ await expect(s.locator('[data-stream-status]')).toContainText('source-linked');
+ for(const year of ['2021','2022','2023','2024','2025','2026'])
+  await expect(s.locator('[data-stream-year] option[value="'+year+'"]')).toHaveCount(1);
+ await s.locator('[data-stream-country]').selectOption('US');
+ await s.locator('[data-stream-year]').selectOption('2023');
+ await expect(s.locator('[data-stream-list]')).toContainText('V/H/S/85');
+ await expect(s.locator('[data-stream-list]')).toContainText('CHECK CURRENT AVAILABILITY');
+});

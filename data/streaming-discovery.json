@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "checkedAt": "2026-10-11",
-  "coverage": "Documented platform arrivals and original digital releases; not an exhaustive or real-time rights feed. Stream date is NOT necessarily original film year. Listings are country-scoped; subscribers may still need a paid plan, and availability may change.",
-  "methodology": "Only verified original/platform-exclusive film premieres are treated as streaming-first candidates; catalogue arrivals and post-theatrical digital releases are labelled separately. Ratings appear only when TMDB confirms title/year and voter counts.",
+  "coverage": "Documented platform arrivals and original digital releases; not an exhaustive or real-time rights feed. Stream date is NOT necessarily original film year. Listings are country-scoped; subscribers may still need a paid plan, and availability may change.; historical US Shudder platform-release dates 2021–2026. Current rights/availability not independently verified.",
+  "methodology": "Only verified original/platform-exclusive film premieres are treated as streaming-first candidates; catalogue arrivals and post-theatrical digital releases are labelled separately. Ratings appear only when TMDB confirms title/year and voter counts. Historical Shudder premieres are past facts, not a statement of present-day viewing access.",
   "entries": [
     {
       "id": "shudder-gb-the-beast-within-2024",
@@ -813,6 +813,754 @@
       "sourceName": "JustWatch UK rent/buy availability checked 9 October 2026; digital launch date not asserted",
       "watchUrl": "https://www.justwatch.com/uk/movie/insidious-the-bleeding-world",
       "dateBasis": "listed-by"
+    },
+    {
+      "id": "shudder-us-premiere-v-h-s-94-2021-10-06",
+      "title": "V/H/S/94",
+      "filmYear": 2021,
+      "streamDate": "2021-10-06",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-advent-calendar-2021-12-02",
+      "title": "The Advent Calendar",
+      "filmYear": 2021,
+      "streamDate": "2021-12-02",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-hellbender-2022-02-24",
+      "title": "Hellbender",
+      "filmYear": 2021,
+      "streamDate": "2022-02-24",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-seed-2022-03-10",
+      "title": "The Seed",
+      "filmYear": 2021,
+      "streamDate": "2022-03-10",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-deadstream-2022-10-06",
+      "title": "Deadstream",
+      "filmYear": 2022,
+      "streamDate": "2022-10-06",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-sissy-2022-09-29",
+      "title": "Sissy",
+      "filmYear": 2022,
+      "streamDate": "2022-09-29",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-v-h-s-99-2022-10-20",
+      "title": "V/H/S/99",
+      "filmYear": 2022,
+      "streamDate": "2022-10-20",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-mad-god-2022-06-16",
+      "title": "Mad God",
+      "filmYear": 2021,
+      "streamDate": "2022-06-16",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-last-thing-mary-saw-2022-01-20",
+      "title": "The Last Thing Mary Saw",
+      "filmYear": 2021,
+      "streamDate": "2022-01-20",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-saloum-2022-09-08",
+      "title": "Saloum",
+      "filmYear": 2021,
+      "streamDate": "2022-09-08",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-brooklyn-45-2023-06-09",
+      "title": "Brooklyn 45",
+      "filmYear": 2023,
+      "streamDate": "2023-06-09",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-perpetrator-2023-09-01",
+      "title": "Perpetrator",
+      "filmYear": 2023,
+      "streamDate": "2023-09-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-elevator-game-2023-09-15",
+      "title": "Elevator Game",
+      "filmYear": 2023,
+      "streamDate": "2023-09-15",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-v-h-s-85-2023-10-06",
+      "title": "V/H/S/85",
+      "filmYear": 2023,
+      "streamDate": "2023-10-06",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-puppetman-2023-10-13",
+      "title": "The Puppetman",
+      "filmYear": 2023,
+      "streamDate": "2023-10-13",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-night-of-the-hunted-2023-10-20",
+      "title": "Night of the Hunted",
+      "filmYear": 2023,
+      "streamDate": "2023-10-20",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-hell-house-llc-origins-the-carmichael-manor-2023-10-30",
+      "title": "Hell House LLC Origins: The Carmichael Manor",
+      "filmYear": 2023,
+      "streamDate": "2023-10-30",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": false
+    },
+    {
+      "id": "shudder-us-premiere-birth-rebirth-2023-11-10",
+      "title": "Birth/Rebirth",
+      "filmYear": 2023,
+      "streamDate": "2023-11-10",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": false
+    },
+    {
+      "id": "shudder-us-premiere-the-sacrifice-game-2023-12-08",
+      "title": "The Sacrifice Game",
+      "filmYear": 2023,
+      "streamDate": "2023-12-08",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-destroy-all-neighbors-2024-01-12",
+      "title": "Destroy All Neighbors",
+      "filmYear": 2024,
+      "streamDate": "2024-01-12",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-history-of-evil-2024-02-23",
+      "title": "History of Evil",
+      "filmYear": 2024,
+      "streamDate": "2024-02-23",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-you-ll-never-find-me-2024-03-22",
+      "title": "You'll Never Find Me",
+      "filmYear": 2023,
+      "streamDate": "2024-03-22",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-infested-2024-04-26",
+      "title": "Infested",
+      "filmYear": 2023,
+      "streamDate": "2024-04-26",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-nightwatch-demons-are-forever-2024-05-17",
+      "title": "Nightwatch: Demons Are Forever",
+      "filmYear": 2023,
+      "streamDate": "2024-05-17",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-hell-hole-2024-08-23",
+      "title": "Hell Hole",
+      "filmYear": 2024,
+      "streamDate": "2024-08-23",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-demon-disorder-2024-09-06",
+      "title": "The Demon Disorder",
+      "filmYear": 2024,
+      "streamDate": "2024-09-06",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-v-h-s-beyond-2024-10-04",
+      "title": "V/H/S/Beyond",
+      "filmYear": 2024,
+      "streamDate": "2024-10-04",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-mads-2024-10-18",
+      "title": "Mads",
+      "filmYear": 2024,
+      "streamDate": "2024-10-18",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-oddity-2024-09-27",
+      "title": "Oddity",
+      "filmYear": 2024,
+      "streamDate": "2024-09-27",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": false
+    },
+    {
+      "id": "shudder-us-premiere-the-dead-thing-2025-02-14",
+      "title": "The Dead Thing",
+      "filmYear": 2024,
+      "streamDate": "2025-02-14",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-rule-of-jenny-pen-2025-03-28",
+      "title": "The Rule of Jenny Pen",
+      "filmYear": 2024,
+      "streamDate": "2025-03-28",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": false
+    },
+    {
+      "id": "shudder-us-premiere-dead-mail-2025-04-18",
+      "title": "Dead Mail",
+      "filmYear": 2024,
+      "streamDate": "2025-04-18",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-frewaka-2025-04-25",
+      "title": "Fréwaka",
+      "filmYear": 2024,
+      "streamDate": "2025-04-25",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-house-on-eden-2025-07-25",
+      "title": "House on Eden",
+      "filmYear": 2025,
+      "streamDate": "2025-07-25",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-night-of-the-reaper-2025-09-19",
+      "title": "Night of the Reaper",
+      "filmYear": 2025,
+      "streamDate": "2025-09-19",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-smothered-2026-05-29",
+      "title": "Smothered",
+      "filmYear": 2026,
+      "streamDate": "2026-05-29",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-the-voices-of-our-mother-2026-06-19",
+      "title": "The Voices of Our Mother",
+      "filmYear": 2026,
+      "streamDate": "2026-06-19",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-forbidden-fruits-2026-06-26",
+      "title": "Forbidden Fruits",
+      "filmYear": 2026,
+      "streamDate": "2026-06-26",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": false
+    },
+    {
+      "id": "shudder-us-premiere-saccharine-2026-07-24",
+      "title": "Saccharine",
+      "filmYear": 2026,
+      "streamDate": "2026-07-24",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-nightborn-2026-07-31",
+      "title": "Nightborn",
+      "filmYear": 2026,
+      "streamDate": "2026-07-31",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-penny-lane-is-dead-2026-08-28",
+      "title": "Penny Lane Is Dead",
+      "filmYear": 2026,
+      "streamDate": "2026-08-28",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-parasomnia-2026-09-04",
+      "title": "Parasomnia",
+      "filmYear": 2026,
+      "streamDate": "2026-09-04",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-goody-goody-2026-09-18",
+      "title": "Goody Goody",
+      "filmYear": 2026,
+      "streamDate": "2026-09-18",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-premiere-bloody-tennis-2026-09-25",
+      "title": "Bloody Tennis",
+      "filmYear": 2026,
+      "streamDate": "2026-09-25",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder original programming history: dated platform appearance",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Shudder_original_programming",
+      "availabilityStatus": "historical-premiere-check-current-service",
+      "dateBasis": "original-platform-premiere",
+      "chartEligible": true
     }
   ]
 }
