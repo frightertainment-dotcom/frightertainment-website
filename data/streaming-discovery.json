@@ -1,0 +1,791 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-11",
+  "coverage": "Documented platform arrivals and original digital releases; not an exhaustive or real-time rights feed. Stream date is NOT necessarily original film year. Listings are country-scoped; subscribers may still need a paid plan, and availability may change.",
+  "methodology": "Only verified original/platform-exclusive film premieres are treated as streaming-first candidates; catalogue arrivals and post-theatrical digital releases are labelled separately. Ratings appear only when TMDB confirms title/year and voter counts.",
+  "entries": [
+    {
+      "id": "shudder-gb-the-beast-within-2024",
+      "title": "The Beast Within",
+      "filmYear": 2024,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-bloodthirsty-2020",
+      "title": "Bloodthirsty",
+      "filmYear": 2020,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-bury-me-twice-2022",
+      "title": "Bury Me Twice",
+      "filmYear": 2022,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-diabolic-2025",
+      "title": "Diabolic",
+      "filmYear": 2025,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-the-ghost-2024",
+      "title": "The Ghost",
+      "filmYear": 2024,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-lake-mungo-revisited-2025",
+      "title": "Lake Mungo Revisited",
+      "filmYear": 2025,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-let-the-wrong-one-in-2021",
+      "title": "Let the Wrong One In",
+      "filmYear": 2021,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-orphan-first-kill-2022",
+      "title": "Orphan: First Kill",
+      "filmYear": 2022,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-terrifier-3-2024",
+      "title": "Terrifier 3",
+      "filmYear": 2024,
+      "streamDate": "2026-10-01",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-infirmary-2026",
+      "title": "Infirmary",
+      "filmYear": 2026,
+      "streamDate": "2026-10-02",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "watchUrl": "https://watch.shudder.com/interstitial/1014987",
+      "synopsis": "Recovered bodycam footage traces a security guard's terrifying first night in an abandoned hospital.",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-gb-harbinger-2026",
+      "title": "Harbinger",
+      "filmYear": 2026,
+      "streamDate": "2026-10-05",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "Newly listed 2026 horror on Shudder."
+    },
+    {
+      "id": "shudder-gb-god-of-frogs-2026",
+      "title": "God of Frogs",
+      "filmYear": 2026,
+      "streamDate": "2026-10-07",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A new horror film joining Shudder's October catalogue."
+    },
+    {
+      "id": "shudder-gb-the-monster-within-2026",
+      "title": "The Monster Within",
+      "filmYear": 2026,
+      "streamDate": "2026-10-07",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A 2026 horror film arriving on Shudder."
+    },
+    {
+      "id": "shudder-gb-v-h-s-mixtape-2026",
+      "title": "V/H/S/Mixtape",
+      "filmYear": 2026,
+      "streamDate": "2026-10-09",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A found-footage anthology where music and sound turn deadly.",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-gb-jitters-2026",
+      "title": "Jitters",
+      "filmYear": 2026,
+      "streamDate": "2026-10-12",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A 2026 horror film joining Shudder."
+    },
+    {
+      "id": "shudder-gb-the-mill-killers-2024",
+      "title": "The Mill Killers",
+      "filmYear": 2024,
+      "streamDate": "2026-10-14",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-dog-soldiers-2002",
+      "title": "Dog Soldiers",
+      "filmYear": 2002,
+      "streamDate": "2026-10-15",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-werewolves-2024",
+      "title": "Werewolves",
+      "filmYear": 2024,
+      "streamDate": "2026-10-15",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-hallowarrior-2026",
+      "title": "Hallowarrior",
+      "filmYear": 2026,
+      "streamDate": "2026-10-16",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A Shudder Original horror premiere.",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-gb-crazy-lips-2000",
+      "title": "Crazy Lips",
+      "filmYear": 2000,
+      "streamDate": "2026-10-19",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-gore-from-outer-space-2001",
+      "title": "Gore from Outer Space",
+      "filmYear": 2001,
+      "streamDate": "2026-10-19",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-play-dead-2022",
+      "title": "Play Dead",
+      "filmYear": 2022,
+      "streamDate": "2026-10-19",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-survive-style-5-2004",
+      "title": "Survive Style 5+",
+      "filmYear": 2004,
+      "streamDate": "2026-10-19",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-the-north-witch-2024",
+      "title": "The North Witch",
+      "filmYear": 2024,
+      "streamDate": "2026-10-21",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-the-cycle-2026",
+      "title": "The Cycle",
+      "filmYear": 2026,
+      "streamDate": "2026-10-23",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "platform-original",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A new Shudder Original horror premiere.",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-gb-deviant-2017",
+      "title": "Deviant",
+      "filmYear": 2017,
+      "streamDate": "2026-10-26",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-the-r-i-p-man-2025",
+      "title": "The R.I.P Man",
+      "filmYear": 2025,
+      "streamDate": "2026-10-28",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+    },
+    {
+      "id": "shudder-gb-big-baby-2025",
+      "title": "Big Baby",
+      "filmYear": 2025,
+      "streamDate": "2026-10-30",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "platform-exclusive",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A 2025 horror film receiving a 2026 Shudder Exclusive release."
+    },
+    {
+      "id": "shudder-gb-hunting-matthew-nichols-2024",
+      "title": "Hunting Matthew Nichols",
+      "filmYear": 2024,
+      "streamDate": "2026-10-31",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "platform-exclusive",
+      "sourceName": "Shudder UK October 2026 film calendar",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "synopsis": "A found-footage mystery receiving its Shudder Exclusive release."
+    },
+    {
+      "id": "shudder-us-infirmary",
+      "title": "Infirmary",
+      "filmYear": 2026,
+      "streamDate": "2026-10-02",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder/detail/",
+      "sourceName": "Shudder US October 2026 film calendar",
+      "watchUrl": "https://watch.shudder.com/interstitial/1014987",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-vhs-mixtape",
+      "title": "V/H/S/Mixtape",
+      "filmYear": 2026,
+      "streamDate": "2026-10-09",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder/detail/",
+      "sourceName": "Shudder US October 2026 film calendar",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-hallowarrior",
+      "title": "Hallowarrior",
+      "filmYear": 2026,
+      "streamDate": "2026-10-16",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder/detail/",
+      "sourceName": "Shudder US October 2026 film calendar",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-us-the-cycle",
+      "title": "The Cycle",
+      "filmYear": 2026,
+      "streamDate": "2026-10-23",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder/detail/",
+      "sourceName": "Shudder US October 2026 film calendar",
+      "chartEligible": true
+    },
+    {
+      "id": "tubi-buzzkill",
+      "title": "Buzzkill",
+      "filmYear": 2026,
+      "streamDate": "2026-09-25",
+      "platform": "Tubi",
+      "access": "free",
+      "countries": [
+        "GB",
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://tubitv.com/the-t/articles/buzzkill-crashes-tubis-party-on-september-25",
+      "sourceName": "Tubi original-premiere announcement",
+      "watchUrl": "https://tubitv.com/en-gb/movies/100061020/buzzkill",
+      "chartEligible": true
+    },
+    {
+      "id": "tubi-pumpkinhead-2",
+      "title": "R.L. Stine's Pumpkinhead 2",
+      "filmYear": 2026,
+      "streamDate": "2026-10-09",
+      "platform": "Tubi",
+      "access": "free",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://tubitv.com/the-t/articles/rl-stines-pumpkinhead-2-turns-redhaven-into-a-nightmare",
+      "sourceName": "Tubi 2026 original-premiere announcement",
+      "watchUrl": "https://tubitv.com/movies/100065059/r-l-stine-s-pumpkinhead-2",
+      "chartEligible": true
+    },
+    {
+      "id": "tubi-pumpkinhead-2025",
+      "title": "R.L. Stine's Pumpkinhead",
+      "filmYear": 2025,
+      "streamDate": "2025-10-17",
+      "platform": "Tubi",
+      "access": "free",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://corporate.tubitv.com/press/tubi-carves-out-spooky-good-fun-with-new-original-movie-r-l-stines-pumpkinhead/",
+      "sourceName": "Tubi 2025 original film press release",
+      "watchUrl": "https://tubitv.com/movies/100046939/r-l-stine-s-pumpkinhead",
+      "chartEligible": true
+    },
+    {
+      "id": "tubi-match-2025",
+      "title": "Match",
+      "filmYear": 2025,
+      "streamDate": "2025-10-03",
+      "platform": "Tubi",
+      "access": "free",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://corporate.tubitv.com/press/whats-coming-to-tubi-in-october-3/",
+      "sourceName": "Tubi October 2025 original schedule",
+      "chartEligible": true
+    },
+    {
+      "id": "tubi-adopted-2-2025",
+      "title": "Adopted 2",
+      "filmYear": 2025,
+      "streamDate": "2025-10-10",
+      "platform": "Tubi",
+      "access": "free",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://corporate.tubitv.com/press/tubi-announces-terror-on-tubi-lineup/",
+      "sourceName": "Tubi September 2025 press release",
+      "chartEligible": true
+    },
+    {
+      "id": "tubi-glamping-2025",
+      "title": "Glamping",
+      "filmYear": 2025,
+      "streamDate": "2025-10-24",
+      "platform": "Tubi",
+      "access": "free",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://corporate.tubitv.com/press_cat/press-releases/page/5/",
+      "sourceName": "Tubi October 2025 original film notice",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-vhs-halloween-2025",
+      "title": "V/H/S/Halloween",
+      "filmYear": 2025,
+      "streamDate": "2025-10-03",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB",
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://www.youtube.com/watch?v=l8XxoeV5LRU",
+      "sourceName": "Official Shudder trailer with exclusive October 3 release",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-other-2025",
+      "title": "Other",
+      "filmYear": 2025,
+      "streamDate": "2025-10-17",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://www.amcglobalmedia.com/2025/08/28/shudder-launches-biggest-ever-programming-event-season-of-screams-featuring-a-monster-lineup-of-new-films-series-and-live-watch-parties-on-shudder-tv-from-sept/",
+      "sourceName": "AMC Networks Shudder 2025 premiere announcement",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-hellhouse-lineage-2025",
+      "title": "Hell House LLC: Lineage",
+      "filmYear": 2025,
+      "streamDate": "2025-10-30",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceUrl": "https://www.amcglobalmedia.com/2025/08/28/shudder-launches-biggest-ever-programming-event-season-of-screams-featuring-a-monster-lineup-of-new-films-series-and-live-watch-parties-on-shudder-tv-from-sept/",
+      "sourceName": "AMC Networks Shudder schedule after August theatrical release"
+    },
+    {
+      "id": "shudder-mother-of-flies-2026",
+      "title": "Mother of Flies",
+      "filmYear": 2025,
+      "streamDate": "2026-01-23",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB",
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://www.youtube.com/watch?v=ZhbowAJxWfo",
+      "sourceName": "Official Shudder premiere announcement",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-bodycam-2026",
+      "title": "Bodycam",
+      "filmYear": 2025,
+      "streamDate": "2026-03-13",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB",
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://images.amcnetworks.com/amcnetworks.com/wp-content/uploads/2026/02/March-2026-Programming-Highlights.pdf",
+      "sourceName": "AMC Networks Shudder March 2026 programme",
+      "chartEligible": true
+    },
+    {
+      "id": "shudder-mortuary-assistant-2026",
+      "title": "The Mortuary Assistant",
+      "filmYear": 2026,
+      "streamDate": "2026-03-27",
+      "platform": "Shudder",
+      "access": "subscription",
+      "countries": [
+        "GB",
+        "US"
+      ],
+      "premiereKind": "platform-original",
+      "sourceUrl": "https://www.amcglobalmedia.com/2026/02/18/amc-networks-march-streaming-highlights-include-dark-winds-the-city-is-ours-a-crime-family-saga-100-nights-of-hero-and-more/",
+      "sourceName": "AMC Networks Shudder March 2026 film release",
+      "chartEligible": true
+    },
+    {
+      "id": "screambox-deathwoods-2026",
+      "title": "Deathwoods",
+      "filmYear": 2026,
+      "streamDate": "2026-09-01",
+      "platform": "Screambox",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceUrl": "https://home.cineverse.com/articles/coming-soon-september-2026/",
+      "sourceName": "Cineverse September 2026 streaming schedule"
+    },
+    {
+      "id": "screambox-creature-pines",
+      "title": "Creature of the Pines",
+      "filmYear": 2026,
+      "streamDate": "2026-10-13",
+      "platform": "Screambox",
+      "access": "subscription",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceUrl": "https://home.cineverse.com/articles/everything-coming-to-cineverse-in-october-2026/",
+      "sourceName": "Cineverse October 2026 streaming schedule"
+    },
+    {
+      "id": "last-chance-motel-free-gb",
+      "title": "Last Chance Motel",
+      "filmYear": 2026,
+      "streamDate": "2026-10-06",
+      "platform": "BloodStream",
+      "access": "free",
+      "countries": [
+        "GB"
+      ],
+      "premiereKind": "new-to-platform",
+      "sourceUrl": "https://www.justwatch.com/uk/movie/last-chance-motel",
+      "sourceName": "UK availability listing for free BloodStream access"
+    },
+    {
+      "id": "portal-to-hell-rent-us",
+      "title": "Portal to Hell",
+      "filmYear": 2026,
+      "streamDate": "2026-09-08",
+      "platform": "Digital rent/buy",
+      "access": "rent-buy",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "digital-premiere",
+      "sourceUrl": "https://home.cineverse.com/articles/coming-soon-september-2026/",
+      "sourceName": "Cineverse rental and purchase release schedule",
+      "chartEligible": true
+    },
+    {
+      "id": "tomatoes-organic-vod-us",
+      "title": "Attack of the Killer Tomatoes: Organic Intelligence",
+      "filmYear": 2026,
+      "streamDate": "2026-10-06",
+      "platform": "Digital rent/buy",
+      "access": "rent-buy",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "digital-home",
+      "sourceUrl": "https://killertomatoes.com/",
+      "sourceName": "Official film site: digital home release after limited theatrical run"
+    },
+    {
+      "id": "insidious-digital-us",
+      "title": "Insidious: Out of the Further",
+      "filmYear": 2026,
+      "streamDate": "2026-10-06",
+      "platform": "Digital rent/buy",
+      "access": "rent-buy",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "digital-home",
+      "sourceUrl": "https://www.upcominghorrormovies.com/available-now",
+      "sourceName": "UHM October 2026 on-demand calendar after cinema"
+    },
+    {
+      "id": "fall-2-vod-us",
+      "title": "Fall 2: Deadpoint",
+      "filmYear": 2026,
+      "streamDate": "2026-10-06",
+      "platform": "Digital rent/buy",
+      "access": "rent-buy",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "digital-home",
+      "sourceUrl": "https://www.upcominghorrormovies.com/available-now",
+      "sourceName": "UHM October 2026 on-demand listing with theatrical/VOD windows"
+    },
+    {
+      "id": "teenage-vampire-vod",
+      "title": "The Teenage Vampire",
+      "filmYear": 2026,
+      "streamDate": "2026-10-27",
+      "platform": "Digital rent/buy",
+      "access": "rent-buy",
+      "countries": [
+        "US"
+      ],
+      "premiereKind": "digital-premiere",
+      "sourceUrl": "https://www.movieinsider.com/new-on/vod-digital/2026",
+      "sourceName": "Movie Insider upcoming film-specific VOD listing",
+      "chartEligible": true
+    }
+  ]
+}
