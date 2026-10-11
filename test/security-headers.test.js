@@ -36,3 +36,18 @@ test('podcast JSON API is not frameable and does not grant third-party CORS acce
   assert.ok(source.includes(control),'Podcast response is missing '+control);
  assert.doesNotMatch(source,/access-control-allow-origin/i);
 });
+
+test('Cloudflare automatic Web Analytics beacon is allowed by the shared CSP without broadening script access', async () => {
+  const headers = await readFile(new URL('../_headers', import.meta.url), 'utf8');
+  const csp = headers.split('\\n').find(line => line.trim().startsWith('Content-Security-Policy:'));
+  assert.ok(csp, 'Missing shared Content-Security-Policy header');
+  const directives = new Map(csp.replace(/^\\s*Content-Security-Policy:\\s*/, '').split(';').map(part => part.trim()).filter(Boolean).map(part => {
+    const space = part.indexOf(' ');
+    return [space < 0 ? part : part.slice(0, space), space < 0 ? '' : part.slice(space + 1)];
+  }));
+  assert.equal(directives.get('script-src'), "'self' https://static.cloudflareinsights.com/beacon.min.js");
+  assert.equal(directives.get('connect-src'), "'self'", 'Automatic Web Analytics reports to same-origin /cdn-cgi/rum');
+  assert.equal(directives.get('object-src'), "'none'");
+  assert.equal(directives.get('frame-ancestors'), "'none'");
+  assert.doesNotMatch(csp, /'unsafe-inline'|'unsafe-eval'/);
+});
