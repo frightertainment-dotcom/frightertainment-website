@@ -1304,6 +1304,6 @@ test('All streaming links, including pre-2025 library films and future premieres
     await expect(page.locator('#archive-film-detail')).toContainText('ORIGINAL FILM YEAR');
     await expect(page.locator('#archive-film-detail .archive-detail__fact').first()).toContainText(year);
     await expect(page.locator('#archive-film-detail')).toContainText('STREAMING / DIGITAL SERVICE');
-    await expect(page.locator('#archive-film-detail a')).toContainText('PLATFORM RELEASE SOURCE');
+    await expect(page.locator('#archive-film-detail a').filter({hasText:'PLATFORM RELEASE SOURCE'})).toHaveCount(1);
   }
 });
