@@ -222,3 +222,34 @@ test('TMDB region provider discovery separates a Shudder subscription, free Plex
   assert.equal(us.items[0].providerNames[0],'Amazon Video');
  }finally{globalThis.fetch=old;}
 });
+
+
+test('Cinema API excludes old releases and repeated regional theatrical dates in all five countries',async()=>{
+  const previous=globalThis.fetch;
+  const future=new Date(Date.now()+45*86400000).toISOString().slice(0,10);
+  const past=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+  let territory='US';
+  globalThis.fetch=async url=>{
+    const u=new URL(url);
+    if(u.pathname.includes('/discover/movie'))return reply({total_pages:1,total_results:3,results:[
+      {id:1901,title:'Obsession Repeat',release_date:past,poster_path:'/a.jpg',genre_ids:[27]},
+      {id:1902,title:'Unverified Re-release',release_date:future,poster_path:'/b.jpg',genre_ids:[27]},
+      {id:1903,title:'Actual Upcoming Premiere',release_date:future,poster_path:'/c.jpg',genre_ids:[27]}
+    ]});
+    const n=Number(u.pathname.split('/').at(-1));
+    return reply({id:n,title:n===1901?'Obsession Repeat':n===1902?'Unverified Re-release':'Actual Upcoming Premiere',
+      poster_path:'/x.jpg',release_date:n===1901?past:future,genre_ids:[27],
+      release_dates:{results:[{iso_3166_1:territory,release_dates:
+        n===1902?[{type:3,release_date:past+'T00:00:00Z'},{type:3,release_date:future+'T00:00:00Z'}]:
+        [{type:3,release_date:future+'T00:00:00Z'}]}]}} );
+  };
+  try{
+    for(const country of ['GB','US','CA','AU','IE']){
+      territory=country;
+      const data=await fetchCatalogue(env,{type:'movie',mode:'cinema',country,page:1,year:new Date().getUTCFullYear()});
+      assert.deepEqual(data.items.map(x=>x.title),['Actual Upcoming Premiere'],country);
+      assert.equal(data.items[0].releaseCountry,country);
+      assert.equal(data.items[0].cinemaReissue,false);
+    }
+  }finally{globalThis.fetch=previous;}
+});
