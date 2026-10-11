@@ -556,8 +556,10 @@ test('imported horror vault retains thousands of indexed records and every year 
   const count=await counter.evaluate(el=>Number((el.textContent.match(/[0-9,]+/)||['0'])[0].replaceAll(',','')));
   const response=await page.request.get('/data/archive/horror-films.json');
   const raw=await response.json();
+  const streamResponse=await page.request.get('/data/streaming-discovery.json');
+  const stream=await streamResponse.json();
   expect(raw.films).toHaveLength(9772);
-  const expected=await page.evaluate(raw=>{
+  const expected=await page.evaluate(({raw,stream})=>{
     const currentYear=new Date().getUTCFullYear();
     const key=(title,year)=>year+'|'+String(title).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('en-GB');
     const local=(window.FR_MOVIES||[]).filter(movie=>movie.editorialStatus==='approved').map(movie=>({title:movie.title,year:Number(movie.claims?.find(claim=>claim.field==='filmYear')?.value)})).filter(movie=>movie.year>=1896&&movie.year<=currentYear);
@@ -565,8 +567,18 @@ test('imported horror vault retains thousands of indexed records and every year 
     const archived=raw.films.filter(movie=>!movie.excludedFromMovieArchive&&movie.year>=1896&&movie.year<=currentYear&&!keys.has(key(movie.title,movie.year)));
     const manual=(raw.manual||[]).filter(movie=>movie.year>=1896&&movie.year<=currentYear&&!keys.has(key(movie.title,movie.year)));
     const duplicatedOpeningFilm=manual.some(movie=>movie.id==='manual:le-manoir-du-diable-1896')&&archived.some(movie=>movie.qid==='Q153603')?1:0;
-    return archived.length+manual.length+local.length-duplicatedOpeningFilm;
-  },raw);
+    const now=new Date().toISOString().slice(0,10);
+    const known=new Set([...local,...archived,...manual].map(f=>key(f.title,f.year)));
+    let freshStreaming=0;
+    for(const film of stream.entries||[]){
+      if(!Number.isInteger(film.filmYear)||film.filmYear<2025||film.filmYear>currentYear||
+         !/^\d{4}-\d{2}-\d{2}$/.test(film.streamDate)||film.streamDate>now)continue;
+      const identity=key(film.title,film.filmYear);
+      if(known.has(identity))continue;
+      known.add(identity);freshStreaming++;
+    }
+    return archived.length+manual.length+local.length-duplicatedOpeningFilm+freshStreaming;
+  },{raw,stream});
   expect(count).toBe(expected);
   const year=page.locator('#horror-year-2007');
   await year.locator('summary').click();
