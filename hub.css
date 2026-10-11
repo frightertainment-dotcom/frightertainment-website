@@ -1628,3 +1628,9 @@ body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,s
 /* Source-linked streaming-film details keep the original film year distinct from its platform date. */
 .archive-detail__facts:has(.archive-detail__fact:nth-child(4)){grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
 .archive-detail__fact strong{overflow-wrap:break-word}
+
+/* Editorial watchlist fallback when no streaming-film scores qualify. */
+.fr-stream__rank-row--pending .fr-stream__rank-number{color:#879f88}
+.fr-stream__rank-row--pending .fr-stream__rank-score{
+  font-size:11px;color:#b2c0b0;letter-spacing:.04em;
+}

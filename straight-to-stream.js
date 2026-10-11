@@ -130,6 +130,21 @@
     if(revision!==requestNumber)return;
     const charted=rated.filter(Boolean).sort((a,b)=>b.item.voteAverage-a.item.voteAverage||
       b.item.voteCount-a.item.voteCount||a.e.title.localeCompare(b.e.title)).slice(0,5);
+    // A new horror film may not have enough TMDB votes for a meaningful ranking.
+    // Keep useful source-backed titles visible but label them UNRANKED, never #1–#5.
+    if(!charted.length){
+      for(const e of candidates.slice(0,5)){
+        const li=node('li','fr-stream__rank-row fr-stream__rank-row--pending');
+        const number=node('span','fr-stream__rank-number','—');
+        const detail=node('span','fr-stream__rank-info');
+        const title=node('a','',e.title);title.href=filmPage(e);
+        detail.append(title,node('small','',e.platform+' · awaiting TMDB viewer ratings'));
+        li.append(number,detail,node('strong','fr-stream__rank-score','UNRANKED'));
+        chart.append(li);
+      }
+      chartStatus.textContent='These premieres are not yet ranked: no matched film has 20 TMDB votes. Scores will appear when they qualify.';
+      return;
+    }
     for(let i=0;i<charted.length;i++){
       const {item,e}=charted[i];const li=node('li','fr-stream__rank-row');
       const number=node('span','fr-stream__rank-number',String(i+1).padStart(2,'0'));

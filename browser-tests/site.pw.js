@@ -1309,3 +1309,16 @@ test('All streaming links, including pre-2025 library films and future premieres
     await expect(page.locator('#archive-film-detail a').filter({hasText:'PLATFORM RELEASE SOURCE'})).toHaveCount(1);
   }
 });
+
+
+test('streaming chart does not manufacture numbered Top Five places for unrated premieres',async({page})=>{
+  await page.route('**/api/media?**',route=>route.fulfill({json:{item:null,status:'unavailable'}}));
+  await page.goto('/movies.html');
+  const panel=page.locator('#straight-to-stream');
+  const rows=panel.locator('[data-stream-chart] li.fr-stream__rank-row--pending');
+  await expect(rows.first()).toBeVisible();
+  await expect(rows.first().locator('.fr-stream__rank-number')).toHaveText('—');
+  await expect(rows.first()).toContainText('UNRANKED');
+  await expect(panel.locator('[data-stream-chart-status]')).toContainText('not yet ranked');
+  await expect(panel.locator('[data-stream-chart]')).not.toContainText('10/10');
+});
