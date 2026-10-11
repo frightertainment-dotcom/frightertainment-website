@@ -947,7 +947,8 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
 
 test('direct page loads use readable Times New Roman typography', async ({ page }) => {
   for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
-    await page.goto(path);
+    // Embedded media can stall the load event; the document/CSS is ready at DOMContentLoaded.
+    await page.goto(path,{waitUntil:'domcontentloaded'});
     await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Times New Roman');
   }
   await page.goto('/movies.html');
