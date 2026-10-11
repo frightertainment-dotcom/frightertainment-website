@@ -40,7 +40,13 @@
     const updateCinemaLabels=()=>{
       if(!cinemaPicker)return;
       document.querySelectorAll('[data-cinema-country-label]').forEach(element=>element.textContent=cinemaCountryNames[cinemaCountry]);
-
+      const uk=cinemaCountry==='GB';
+      const prefix=root.querySelector('[data-cinema-diary-prefix]');
+      const suffix=root.querySelector('[data-cinema-diary-suffix]');
+      if(prefix)prefix.textContent=uk?'UK CINEMA':'COMING TO';
+      if(suffix)suffix.textContent=uk?'RELEASE DIARY.':'CINEMAS.';
+      const intro=root.querySelector('.fr-cinema-diary__intro');
+      if(intro)intro.hidden=!uk;
     };
     updateCinemaLabels();
     const requestedYear = Number(url.searchParams.get('year'));

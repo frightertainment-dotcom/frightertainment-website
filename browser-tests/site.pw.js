@@ -1349,6 +1349,9 @@ test('UK cinema diary orders months chronologically while ranking studio ahead o
  await expect(listing).toContainText('GENERAL RELEASE');
  await page.locator('#cinema-country').selectOption('US');
  await expect(listing.locator('.fr-cinema-month')).toHaveCount(0);
+ await expect(page.locator('#cinema-heading')).toHaveText('COMING TO CINEMAS.');
+ await page.locator('#cinema-country').selectOption('GB');
+ await expect(page.locator('#cinema-heading')).toHaveText('UK CINEMA RELEASE DIARY.');
 });
 test('older sourced streaming films join their original-year Horror Vault without overwriting historic records',async({page})=>{
  await page.goto('/all-horror-movies.html?year=2023');
