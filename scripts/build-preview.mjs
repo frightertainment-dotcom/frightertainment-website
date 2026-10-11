@@ -20,7 +20,8 @@ for (const directory of ['assets', 'films', 'top-20']) {
 await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
 await cp(new URL('data/editorial-releases.json', root), new URL('data/editorial-releases.json', destination));
-await cp(new URL('data/cinema-screenings.json', 'data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
+await cp(new URL('data/cinema-screenings.json', root), new URL('data/cinema-screenings.json', destination));
+await cp(new URL('data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
 await cp(new URL('data/archive/profiles.json', root), new URL('data/archive/profiles.json', destination));
