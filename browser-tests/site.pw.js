@@ -1204,3 +1204,93 @@ test('Contact form shows a prefilled mailto fallback without losing unsent text'
   expect(decodeURIComponent(url)).toContain('A film to feature');
   await expect(page.locator('#contact-message')).toHaveValue('Here is the film I wanted to suggest.');
 });
+
+
+test('Straight to Stream shows sourced Infirmary and clearly separates subscription, free, and rent/buy',async({page})=>{
+  await page.setViewportSize({width:390,height:820});
+  await page.goto('/movies.html');
+  const stream=page.locator('#straight-to-stream');
+  await expect(stream).toBeVisible();
+  await expect(stream.locator('[data-stream-status]')).toContainText('source-linked films');
+  await expect(stream.locator('[data-stream-country]')).toHaveValue('GB');
+  await expect(stream.locator('[data-stream-year]')).toHaveValue('2026');
+  const infirmary=stream.locator('[data-stream-list] .fr-stream__card').filter({has:page.getByRole('link',{name:'Infirmary',exact:true})});
+  await expect(infirmary).toBeVisible();
+  await expect(infirmary).toContainText('Shudder');
+  await expect(infirmary).toContainText('INCLUDED WITH SUBSCRIPTION');
+  await expect(infirmary.locator('a.fr-stream__source')).toHaveAttribute('href',/letterboxd/);
+  await stream.getByRole('button',{name:'FREE TO WATCH'}).click();
+  await expect(stream.locator('[data-stream-list]')).toContainText('Buzzkill');
+  await expect(stream.locator('[data-stream-list]')).not.toContainText('Shudder');
+  await expect(stream.locator('[data-stream-list]')).toContainText('ADS POSSIBLE');
+  await stream.getByRole('button',{name:'RENT OR BUY'}).click();
+  await expect(stream.locator('[data-stream-list]')).toContainText('Insidious: Out of the Further');
+  await expect(stream.locator('[data-stream-list]')).toContainText('SOURCE AVAILABILITY CHECKED BY');
+  await expect(stream.locator('[data-stream-list]')).not.toContainText('Buzzkill');
+  await page.screenshot({path:'test-results/visual/straight-to-stream-mobile-390.png',fullPage:true});
+});
+test('Straight to Stream respects country, original film-year and future-only viewing information',async({page})=>{
+  await page.goto('/movies.html');
+  const section=page.locator('#straight-to-stream');
+  await expect(section.locator('[data-stream-status]')).toContainText('source-linked');
+  await section.locator('[data-stream-year]').selectOption('2025');
+  await expect(section.locator('[data-stream-list]')).not.toContainText('Infirmary');
+  await expect(section.locator('[data-stream-list]')).toContainText('Mother of Flies');
+  await section.locator('[data-stream-year]').selectOption('2026');
+  await section.locator('[data-stream-country]').selectOption('US');
+  await expect(section.locator('[data-stream-status]')).toContainText('US · 2026 films');
+  await section.getByRole('button',{name:'RENT OR BUY'}).click();
+  await expect(section.locator('[data-stream-list]')).toContainText('Portal to Hell');
+  await expect(section.locator('[data-stream-list]')).not.toContainText('Last Chance Motel');
+});
+test('the new horror-stream mini chart ranks only qualifying TMDB ratings, never invented figures',async({page})=>{
+  await page.route('**/api/media?**',route=>{
+    const args=new URL(route.request().url()).searchParams;
+    const title=args.get('title')||'';
+    const rows={'Infirmary':[8.9,165],'V/H/S/Mixtape':[7.5,230],'Buzzkill':[8.1,82],
+      'The Mortuary Assistant':[9.9,7]};
+    const pair=rows[title];
+    return route.fulfill({json:{status:'ready',item:pair?{
+      tmdbId:1376400,title,type:'movie',mediaType:'movie',posterPath:'/poster.jpg',
+      voteAverage:pair[0],voteCount:pair[1],releaseDate:'2026-10-02'
+    }:null}});
+  });
+  await page.goto('/movies.html');
+  const chart=page.locator('#straight-to-stream [data-stream-chart]');
+  await expect(chart.locator('li')).toHaveCount(3);
+  const titles=await chart.locator('li .fr-stream__rank-info a').allTextContents();
+  expect(titles).toEqual(['Infirmary','Buzzkill','V/H/S/Mixtape']);
+  await expect(chart).not.toContainText('The Mortuary Assistant');
+  await expect(chart.locator('li')).toHaveCount(3);
+  await expect(chart).toContainText('8.9/10');
+});
+test('Infirmary enters the 2026 Horror Vault and its first-party film file keeps streaming dates separate',async({page})=>{
+  await page.goto('/all-horror-movies.html?year=2026');
+  const vault=page.locator('#horror-year-2026');
+  await expect(vault).toBeVisible();
+  await expect(vault).toHaveAttribute('open','');
+  await expect(vault).toContainText('Infirmary');
+  await expect(vault).not.toContainText('The Beast Within');
+  const film=vault.locator('a.horror-year__film-link').filter({hasText:'Infirmary'});
+  await expect(film).toHaveAttribute('href',/archive-film\.html\?id=manual%3Astream-shudder-gb-infirmary-2026/);
+  await film.click();
+  await expect(page).toHaveURL(/archive-film\.html\?id=manual%3Astream-shudder-gb-infirmary-2026/);
+  await expect(page.locator('#archive-film-detail h1')).toHaveText('Infirmary');
+  await expect(page.locator('#archive-film-detail')).toContainText('ORIGINAL FILM YEAR');
+  await expect(page.locator('#archive-film-detail')).toContainText('STREAMING / DIGITAL SERVICE');
+  await expect(page.locator('#archive-film-detail')).toContainText('Shudder');
+  await expect(page.locator('#archive-film-detail')).toContainText('2 October 2026');
+  await expect(page.locator('#archive-film-detail a')).toHaveAttribute('href',/letterboxd/);
+});
+test('All streaming links, including pre-2025 library films and future premieres, open source-backed detail pages',async({page})=>{
+  for(const [term,year] of [['manual:stream-shudder-gb-the-beast-within-2024','2024'],
+     ['manual:stream-shudder-gb-hallowarrior-2026','2026'],
+     ['manual:stream-insidious-digital-gb','2026']]){
+    await page.goto('/archive-film.html?id='+encodeURIComponent(term));
+    await expect(page.locator('#archive-film-detail h1')).not.toContainText('FILM RECORD UNAVAILABLE');
+    await expect(page.locator('#archive-film-detail')).toContainText('ORIGINAL FILM YEAR');
+    await expect(page.locator('#archive-film-detail .archive-detail__fact').first()).toContainText(year);
+    await expect(page.locator('#archive-film-detail')).toContainText('STREAMING / DIGITAL SERVICE');
+    await expect(page.locator('#archive-film-detail a')).toContainText('PLATFORM RELEASE SOURCE');
+  }
+});
