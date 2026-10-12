@@ -32,6 +32,15 @@ for (const entry of pages) {
       });
       expect(typography.navInside).toBe(true);
       expect(typography.wordmarkInside).toBe(true);
+      if(entry.name==='movies' && width<=390) {
+        const rows=await page.evaluate(()=>{
+          const topSet=selector=>[...document.querySelectorAll(selector)].map(a=>Math.round(a.getBoundingClientRect().top));
+          return {subtabs:topSet('.hub-page-intro .hub-subtabs a'),jumps:topSet('.hub-page-intro .hub-section-jumps a')};
+        });
+        expect(new Set(rows.subtabs).size,'Movies subsections should use one compact grid row').toBe(1);
+        expect(new Set(rows.jumps).size,'Movies jump links should use one compact grid row').toBe(1);
+      }
+
       if(entry.editorial) {
         const carousel=page.locator('.hub-page-intro + .editorial-carousel');
         await expect(carousel).toBeVisible();
