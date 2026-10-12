@@ -615,3 +615,22 @@ body.hub-body .editorial-pick__facts .editorial-pick__score{
  body.hub-body .editorial-pick__facts .editorial-pick__meta{margin-top:8px;padding-top:9px}
  body.hub-body .editorial-pick__facts{align-content:start}
 }
+
+/* Compact all six existing Movies sub-navigation links into two phone rows. No hidden menu, no lateral swipe, no new navigation. */
+@media(max-width:720px){
+ body.hub-body[data-theme="movies"] main>.hub-page-intro>.hub-subtabs,
+ body.hub-body[data-theme="movies"] main>.hub-page-intro>.hub-section-jumps{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:stretch;justify-content:stretch;
+  width:100%;min-width:0;max-width:100%;
+  gap:5px;margin:10px 0 0;
+ }
+ body.hub-body[data-theme="movies"] main>.hub-page-intro :is(.hub-subtabs a,.hub-section-jumps a){
+  display:flex;justify-content:center;align-items:center;
+  width:100%;min-width:0;max-width:100%;
+  min-height:49px;padding:6px 4px;
+  font-size:clamp(10px,2.8vw,12px);line-height:1.18;
+  text-align:center;text-wrap:balance;white-space:normal;
+  overflow-wrap:normal;word-break:normal;
+ }
+}
