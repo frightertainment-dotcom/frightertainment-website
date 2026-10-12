@@ -249,7 +249,7 @@ async function handleTMDBMedia(env, request, catalogue = false, executionContext
   }
   const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
   const available = ['current', 'stale'].includes(dataset.status);
-  const headers = { 'cache-control': available ? catalogue ? 'private, max-age=60, stale-while-revalidate=300' : 'private, max-age=60, stale-while-revalidate=300' : 'no-store',
+  const headers = { 'cache-control': available ? 'private, max-age=60, stale-while-revalidate=300' : 'no-store',
     ...(!available ? { 'retry-after': '30' } : {}) };
   if (catalogue) return json({ ...dataset, ...freshness, ...(!available ? { error: { code: 'catalogue_unavailable', message: 'Catalogue data is temporarily unavailable.' } } : {}) }, available ? 200 : 503, headers);
   return json({ item: dataset.items?.[0] || null, ...freshness,
