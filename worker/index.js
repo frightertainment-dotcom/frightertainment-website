@@ -79,26 +79,6 @@ async function logRun(db, task, country, trigger, status, startedAt, error = nul
     .bind(id(), task, country || '', trigger, status, startedAt, finishedAt, count, error?.code || null, error?.message || null).run();
 }
 
-// Request-triggered provider work must never hold a visitor response open. Keep
-// one refresh per dataset in this isolate so bursts do not duplicate TMDB fan-out.
-const requestRefreshes = new Map();
-async function refreshOnRequest(executionContext, key, env, task, country, loader, maxAgeMs, trigger) {
-  let refresh = requestRefreshes.get(key);
-  if (!refresh) {
-    refresh = refreshTask(env, task, country, loader, maxAgeMs, trigger);
-    requestRefreshes.set(key, refresh);
-    refresh.finally(() => {
-      if (requestRefreshes.get(key) === refresh) requestRefreshes.delete(key);
-    }).catch(() => {});
-  }
-  if (typeof executionContext?.waitUntil === 'function') {
-    executionContext.waitUntil(refresh);
-    return false;
-  }
-  await refresh;
-  return true;
-}
-
 async function refreshTask(env, task, country, loader, maxAgeMs, trigger) {
   const startedAt = nowIso();
   try {
@@ -125,7 +105,7 @@ async function recordCandidates(env, candidates, country) {
   return statements.length;
 }
 
-async function handleRanking(env, request, executionContext = null) {
+async function handleRanking(env, request) {
   const yearValue = new URL(request.url).searchParams.get('year') || String(new Date().getUTCFullYear());
   const year = Number(yearValue);
   if (!Number.isInteger(year) || year < 1888 || year > new Date().getUTCFullYear() + 2) return json({ error: 'Invalid ranking year' }, 400);
@@ -133,13 +113,9 @@ async function handleRanking(env, request, executionContext = null) {
     const kind = `tmdb-community-${year}`;
     let dataset = await loadDataset(env.DB, kind, '');
     if (dataset.status !== 'current') {
-      const waited = await refreshOnRequest(executionContext, kind, env, kind, '',
-        () => refreshCommunityChart(env, year, AbortSignal.timeout(20_000)), 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
-      if (waited) dataset = await loadDataset(env.DB, kind, '');
-    }
-    if (!['current', 'stale'].includes(dataset.status)) {
-      return json({ error: { code: 'tmdb_snapshot_unavailable', message: 'The community ranking data is temporarily unavailable.' }, status: dataset.status }, 503,
-        { 'cache-control': 'no-store', 'retry-after': '30' });
+      await refreshTask(env, kind, '', () => refreshCommunityChart(env, year),
+        24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+      dataset = await loadDataset(env.DB, kind, '');
     }
     return json({ year, ratingKind: 'tmdb-community', minimumVotes: 50,
       methodology: 'TMDB community vote average out of 10, ranked among horror films with at least 50 votes and a primary release date in this year up to today. Not a professional critic score or Frightertainment Fright Rating.',
@@ -180,22 +156,20 @@ async function handleRanking(env, request, executionContext = null) {
     { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
 }
 
-async function handleMovieArtwork(env, executionContext = null) {
+async function handleMovieArtwork(env) {
   if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
   let dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
   if (dataset.status !== 'current') {
-    const waited = await refreshOnRequest(executionContext, 'tmdb-movie-artwork', env, 'tmdb-movie-artwork', '',
-      () => refreshMovieArtwork(env, env.DB, AbortSignal.timeout(20_000)), 7 * 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
-    if (waited) dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
+    await refreshTask(env, 'tmdb-movie-artwork', '',
+      () => refreshMovieArtwork(env, env.DB), 7 * 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+    dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
   }
-  const available = ['current', 'stale'].includes(dataset.status);
-  return json({ source: 'TMDB', updatedAt: dataset.updatedAt || null,
-    status: dataset.status, stale: dataset.status === 'stale', items: dataset.items || [],
-    ...(!available ? { error: { code: 'artwork_unavailable', message: 'Movie artwork is temporarily unavailable.' } } : {}) }, available ? 200 : 503,
-    { 'cache-control': available ? 'public, max-age=60, stale-while-revalidate=300' : 'no-store', ...(!available ? { 'retry-after': '30' } : {}) });
+  return json({ source: 'TMDB', updatedAt: dataset.updatedAt,
+    status: dataset.status, items: dataset.items || [] }, 200,
+    { 'cache-control': 'public, max-age=300' });
 }
 
-async function handleTMDBMedia(env, request, catalogue = false, executionContext = null) {
+async function handleTMDBMedia(env, request, catalogue = false) {
   if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
   const params = new URL(request.url).searchParams;
   const type = params.get('type') || 'movie';
@@ -237,44 +211,35 @@ async function handleTMDBMedia(env, request, catalogue = false, executionContext
   const datasetCountry = watchMode ? country : '';
   let dataset = await loadDataset(env.DB, kind, datasetCountry);
   if (dataset.status !== 'current') {
-    const waited = await refreshOnRequest(executionContext, kind, env, kind, datasetCountry, async () => {
-      const boundedOptions = { ...options, signal: AbortSignal.timeout(20_000) };
-      const result = catalogue ? await fetchCatalogue(env, boundedOptions) : { items: [await fetchMedia(env, boundedOptions)].filter(Boolean) };
+    await refreshTask(env, kind, datasetCountry, async () => {
+      const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
       // Provider availability is territory-bound; never store a GB/US provider
       // snapshot as "Global", which the D1 provenance validator must reject.
       return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org',
         territory: watchMode ? country : 'Global', checkedAt: today() };
     }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'tmdb-request-on-demand');
-    if (waited) dataset = await loadDataset(env.DB, kind, datasetCountry);
+    dataset = await loadDataset(env.DB, kind, datasetCountry);
   }
   const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
-  const available = ['current', 'stale'].includes(dataset.status);
-  const headers = { 'cache-control': available ? 'private, max-age=60, stale-while-revalidate=300' : 'no-store',
-    ...(!available ? { 'retry-after': '30' } : {}) };
-  if (catalogue) return json({ ...dataset, ...freshness, ...(!available ? { error: { code: 'catalogue_unavailable', message: 'Catalogue data is temporarily unavailable.' } } : {}) }, available ? 200 : 503, headers);
-  return json({ item: dataset.items?.[0] || null, ...freshness,
-    ...(!available ? { error: { code: 'media_unavailable', message: 'Media data is temporarily unavailable.' } } : {}) }, available ? 200 : 503, headers);
+  if (catalogue) return json({ ...dataset, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=120' });
+  return json({ item: dataset.items?.[0] || null, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=300' });
 }
 
-async function handleDiscovery(env, request, executionContext = null) {
+async function handleDiscovery(env, request) {
   const country = countryOf(request, env);
   // Pages Functions have no cron. When TMDB is configured in the current
   // environment, refresh approved discovery data on demand using D1 snapshots.
   if (tmdbReady(env)) {
     const trending = await loadDataset(env.DB, 'trending-horror', country);
     if (trending.status !== 'current') {
-      await refreshOnRequest(executionContext, `trending-horror:${country}`, env, 'trending-horror', country,
-        () => refreshTrending(env, country), 36 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+      await refreshTask(env, 'trending-horror', country, () => refreshTrending(env, country),
+        36 * 60 * 60 * 1000, 'tmdb-request-on-demand');
     }
   }
   const kinds = ['coming-soon', 'streaming-availability', 'streaming-releases', 'theatrical-releases', 'trending-horror'];
   const datasets = await Promise.all(kinds.map(async kind => [kind, await loadDataset(env.DB, kind, country)]));
-  const payload = { country, updatedAt: datasets.map(([, data]) => data.updatedAt).filter(Boolean).sort().at(-1) || null,
-    datasets: Object.fromEntries(datasets) };
-  const hasSnapshot = datasets.some(([, data]) => ['current', 'stale'].includes(data.status));
-  if (!hasSnapshot) return json({ ...payload, error: { code: 'discovery_unavailable', message: 'Discovery data is temporarily unavailable.' } }, 503,
-    { 'cache-control': 'no-store', 'retry-after': '30' });
-  return json(payload, 200, { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
+  return json({ country, updatedAt: datasets.map(([, data]) => data.updatedAt).filter(Boolean).sort().at(-1) || null,
+    datasets: Object.fromEntries(datasets) }, 200, { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' });
 }
 
 async function handleCinema(env, request) {
@@ -515,15 +480,15 @@ async function handleAdmin(env, request, path) {
   return json({ error: 'Not found' }, 404, { 'cache-control': 'no-store' });
 }
 
-async function fetchHandler(request, env, executionContext = null) {
+async function fetchHandler(request, env) {
   const path = new URL(request.url).pathname;
   if (path === '/api/health') return json({ status: 'ok', apiVersion: 1 });
   try {
-    if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request, executionContext);
-    if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request, executionContext);
-    if (path === '/api/movie-artwork' && request.method === 'GET') return await handleMovieArtwork(env, executionContext);
-    if (path === '/api/media' && request.method === 'GET') return await handleTMDBMedia(env, request, false, executionContext);
-    if (path === '/api/catalogue' && request.method === 'GET') return await handleTMDBMedia(env, request, true, executionContext);
+    if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
+    if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
+    if (path === '/api/movie-artwork' && request.method === 'GET') return await handleMovieArtwork(env);
+    if (path === '/api/media' && request.method === 'GET') return await handleTMDBMedia(env, request);
+    if (path === '/api/catalogue' && request.method === 'GET') return await handleTMDBMedia(env, request, true);
     if (path.startsWith('/api/films/') && request.method === 'GET') {
       let filmId;
       try { filmId = decodeURIComponent(path.slice('/api/films/'.length)); }
