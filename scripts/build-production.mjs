@@ -10,11 +10,12 @@ const publicFiles = [
   'film.html',
   'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
   'hub.js', 'release-calendar.js', 'release-brief.js',
-  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'sitemap.xml'
+  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
   'data/movies.js', 'data/editorial-releases.json',
+  'data/editorial.json', 'data/editorial-spotlight-overrides.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 
