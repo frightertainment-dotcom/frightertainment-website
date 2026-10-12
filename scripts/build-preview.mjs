@@ -9,7 +9,7 @@ await mkdir(destination, { recursive: true });
 const publicFiles = [
   'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
   'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-archive.js', 'archive-film.js',
-  'styles.css', 'hub.css', 'sitemap.xml'
+  'styles.css', 'hub.css', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
   await cp(new URL(file, root), new URL(file, destination));
@@ -20,6 +20,8 @@ for (const directory of ['assets', 'films', 'top-20']) {
 await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
 await cp(new URL('data/editorial-releases.json', root), new URL('data/editorial-releases.json', destination));
+await cp(new URL('data/editorial.json', root), new URL('data/editorial.json', destination));
+await cp(new URL('data/editorial-spotlight-overrides.json', root), new URL('data/editorial-spotlight-overrides.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
 await cp(new URL('data/archive/profiles.json', root), new URL('data/archive/profiles.json', destination));
