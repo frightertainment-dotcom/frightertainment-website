@@ -7,20 +7,20 @@ const day = () => new Date().toISOString().slice(0, 10);
 const normalize = value => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
   .toLocaleLowerCase().replace(/^(?:the)\s+/, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
-async function tmdb(env, path, parameters, operationSignal = null) {
+async function tmdb(env, path, parameters) {
   if (env.TMDB_NONCOMMERCIAL_USE_APPROVED !== 'true' || env.TMDB_ATTRIBUTION_READY !== 'true' ||
       !env.TMDB_READ_ACCESS_TOKEN) throw new Error('Approved TMDB server access is not configured');
   const url = new URL(BASE + path);
   for (const [key, value] of Object.entries(parameters)) url.searchParams.set(key, String(value));
-  const signal = operationSignal ? AbortSignal.any([operationSignal, AbortSignal.timeout(12_000)]) : AbortSignal.timeout(12_000);
   const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${env.TMDB_READ_ACCESS_TOKEN}`, accept: 'application/json' }, signal
+    headers: { Authorization: `Bearer ${env.TMDB_READ_ACCESS_TOKEN}`, accept: 'application/json' },
+    signal: AbortSignal.timeout(12_000)
   });
   if (!response.ok) throw new Error(`TMDB request failed (${response.status})`);
   return response.json();
 }
 
-export async function refreshCommunityChart(env, year, operationSignal = AbortSignal.timeout(20_000)) {
+export async function refreshCommunityChart(env, year) {
   const today = day();
   const end = `${year}-12-31` < today ? `${year}-12-31` : today;
   const kind = `tmdb-community-${year}`;
@@ -34,10 +34,10 @@ export async function refreshCommunityChart(env, year, operationSignal = AbortSi
     'primary_release_date.gte': `${year}-01-01`, 'primary_release_date.lte': end,
     'vote_count.gte': 50, sort_by: 'vote_average.desc'
   };
-  const first = await tmdb(env, '/discover/movie', { ...parameters, page: 1 }, operationSignal);
+  const first = await tmdb(env, '/discover/movie', { ...parameters, page: 1 });
   const pages = Math.min(Math.max(1, Number(first.total_pages) || 1), 3);
   const more = await Promise.all(Array.from({ length: pages - 1 }, (_, i) =>
-    tmdb(env, '/discover/movie', { ...parameters, page: i + 2 }, operationSignal)));
+    tmdb(env, '/discover/movie', { ...parameters, page: i + 2 })));
   const seen = new Set();
   const films = [first, ...more].flatMap(page => page.results || []).filter(film => {
     const valid = Number.isInteger(film.id) && !seen.has(film.id) && film.genre_ids?.includes(27) &&
@@ -62,7 +62,7 @@ export async function refreshCommunityChart(env, year, operationSignal = AbortSi
     minimumVotes: 50, year, items });
 }
 
-export async function refreshMovieArtwork(env, db, operationSignal = AbortSignal.timeout(20_000)) {
+export async function refreshMovieArtwork(env, db) {
   const { results: approvedFilms = [] } = await db.prepare(`SELECT film_id AS id, title, release_year AS year, tmdb_id AS tmdbId
     FROM canonical_films WHERE editorial_status = 'approved' AND horror_verified = 1
     ORDER BY film_id LIMIT 36`).all();
@@ -88,8 +88,8 @@ export async function refreshMovieArtwork(env, db, operationSignal = AbortSignal
       try {
         const pinnedId = film.tmdbId || verifiedIds[film.id];
         const response = pinnedId
-          ? await tmdb(env, `/movie/${pinnedId}`, { language: 'en-US', append_to_response: 'videos,release_dates' }, operationSignal)
-          : await tmdb(env, '/search/movie', { query: film.title, include_adult: false, language: 'en-GB' }, operationSignal);
+          ? await tmdb(env, `/movie/${pinnedId}`, { language: 'en-US', append_to_response: 'videos,release_dates' })
+          : await tmdb(env, '/search/movie', { query: film.title, include_adult: false, language: 'en-GB' });
         const candidates = pinnedId ? [response] : (response.results || []);
         const matches = candidates.filter(item => pinnedId || normalize(item.title) === normalize(film.title) ||
           normalize(item.original_title) === normalize(film.title));
@@ -103,7 +103,7 @@ export async function refreshMovieArtwork(env, db, operationSignal = AbortSignal
           let metadata = sanitizeMedia(match, 'movie', env.DEFAULT_COUNTRY || 'GB');
           if (!pinnedId && enrichmentRequestsRemaining > 0) {
             enrichmentRequestsRemaining--;
-            try { metadata = sanitizeMedia(await tmdbRequest(env, `/movie/${match.id}`, { language: 'en-US', append_to_response: 'videos,release_dates' }, operationSignal), 'movie', env.DEFAULT_COUNTRY || 'GB') || metadata; } catch { /* Retain the matched basic metadata if enrichment is unavailable. */ }
+            try { metadata = sanitizeMedia(await tmdbRequest(env, `/movie/${match.id}`, { language: 'en-US', append_to_response: 'videos,release_dates' }), 'movie', env.DEFAULT_COUNTRY || 'GB') || metadata; } catch { /* Retain the matched basic metadata if enrichment is unavailable. */ }
           }
           results[index] = {
           ...metadata,
