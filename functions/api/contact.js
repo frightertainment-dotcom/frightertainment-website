@@ -40,6 +40,16 @@ async function readLimitedJSON(request) {
 }
 
 export async function onRequestPost({request,env}) {
+  // Make every service-side contact failure diagnosable by its public-safe code
+  // and Cloudflare Ray ID. Never log the sender, message, address or payload.
+  const fail = (status, body) => {
+    const header = request.headers.get('cf-ray') || '';
+    const ray = /^[a-f0-9]{16,32}(?:-[a-z]{2,3})?$/i.test(header) ? header : null;
+    console.error('frightertainment_contact_http_5xx', {
+      status, code: String(body?.code || 'FT-UNCLASSIFIED').slice(0, 80), ray
+    });
+    return reply(status, body);
+  };
   const origin = request.headers.get('origin');
   const fetchSite = request.headers.get('sec-fetch-site');
   if ((origin && origin !== new URL(request.url).origin) ||
@@ -70,7 +80,7 @@ export async function onRequestPost({request,env}) {
     return reply(400,{error:'Enter a valid message of 5 to 5000 characters.',code:'FT-INVALID-FIELDS'});
   }
   if(!env.CONTACT_DELIVERY) {
-    return reply(503,{error:'Message delivery is temporarily unavailable. Use the direct email link.',code:'FT-NO-DELIVERY-BINDING'});
+    return fail(503,{error:'Message delivery is temporarily unavailable. Use the direct email link.',code:'FT-NO-DELIVERY-BINDING'});
   }
   try {
     if (env.CONTACT_DELIVERY) {
@@ -83,7 +93,7 @@ export async function onRequestPost({request,env}) {
         });
       } catch (error) {
         console.error('frightertainment_contact_binding_failed',{type:String(error?.name||'UnknownError').slice(0,60)});
-        return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-MAILER-CONNECTION'});
+        return fail(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-MAILER-CONNECTION'});
       }
       if (!delivery.ok) {
         // Worker failures have fixed, non-sensitive codes; never expose raw upstream errors.
@@ -98,22 +108,22 @@ export async function onRequestPost({request,env}) {
           } catch {}
         }
         console.error('frightertainment_contact_mailer_rejected',{status:delivery.status,code});
-        return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code});
+        return fail(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code});
       }
       if (!(delivery.headers.get('content-type')||'').toLowerCase().includes('application/json')) {
-        return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-NONJSON'});
+        return fail(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-NONJSON'});
       }
       let confirmation;
       try { confirmation=await delivery.json(); }
-      catch { return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-BAD-JSON'}); }
+      catch { return fail(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-BAD-JSON'}); }
       if (confirmation?.ok !== true) {
-        return reply(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-UNCONFIRMED'});
+        return fail(503,{error:'Delivery response unavailable. Use the direct email link.',code:'FT-MAILER-UNCONFIRMED'});
       }
     }
     return reply(200,{ok:true,delivered:true});
   } catch (error) {
     console.error('frightertainment_contact_delivery_failed',{type:String(error?.name||'UnknownError').slice(0,60)});
-    return reply(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-DELIVERY-ERROR'});
+    return fail(503,{error:'Delivery is temporarily unavailable. Use the direct email link.',code:'FT-DELIVERY-ERROR'});
   }
 }
 export function onRequest(){return reply(405,{error:'Method not allowed.'});}
