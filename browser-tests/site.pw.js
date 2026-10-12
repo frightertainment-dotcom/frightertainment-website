@@ -614,6 +614,8 @@ test('verified UK horror release bulletin shows new streaming dates and source l
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('UK release bulletin separates cinema and home-media listings from streaming',async({page})=>{
+  // Date-sensitive Coming Next data is a fixture: freeze clock before page scripts run.
+  await page.clock.install({time: new Date('2026-10-11T12:00:00Z')});
   await page.goto('/movies.html');
   const widget=page.locator('[data-release-brief]');
   await widget.getByRole('button',{name:'IN CINEMAS'}).click();
@@ -658,6 +660,8 @@ test('Movies has a compact secondary tools drawer, deep-linked cinema tools expa
 });
 
 test('optional homepage discovery still shows real UK editorial release notices with provider APIs offline',async({page})=>{
+  // Date-sensitive Coming Next data is a fixture: freeze clock before page scripts run.
+  await page.clock.install({time: new Date('2026-10-11T12:00:00Z')});
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.goto('/');
@@ -671,6 +675,8 @@ test('optional homepage discovery still shows real UK editorial release notices 
   await expect(page.locator('#home-attribution')).toContainText('Shudder UK release calendar');
 });
 test('opened Movies discovery links source-checked current and future horror even if licensed feeds are disabled',async({page})=>{
+  // Date-sensitive Coming Next data is a fixture: freeze clock before page scripts run.
+  await page.clock.install({time: new Date('2026-10-11T12:00:00Z')});
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.goto('/movies.html#discovery');
