@@ -277,7 +277,7 @@ async function start() {
       const dot = make('button', 'editorial-carousel__dot');
       dot.type = 'button';
       dot.setAttribute('aria-label', 'Show editorial pick ' + (index + 1) + ': ' + item.title);
-      dot.addEventListener('click', () => { moveTo(index); stop(); });
+      dot.addEventListener('click', () => { moveTo(index); freezeAutoplay(); });
       dots.append(dot);
       return dot;
     });
@@ -301,6 +301,12 @@ async function start() {
       if (timer !== null) window.clearInterval(timer);
       timer = null;
     }
+    function freezeAutoplay() {
+      manuallyPaused = true;
+      stop();
+      pause.textContent = 'PLAY';
+      pause.setAttribute('aria-label', 'Resume automatic editorial rotation');
+    }
     function startAutoplay() {
       stop();
       // Automatic motion must not interrupt a reader, keyboard user, or owner-pinned title.
@@ -313,13 +319,13 @@ async function start() {
       pause.setAttribute('aria-label', manuallyPaused ? 'Resume automatic editorial rotation' : 'Pause automatic editorial rotation');
       if (manuallyPaused) stop(); else startAutoplay();
     });
-    previous.addEventListener('click', () => { moveTo(slideIndex - 1); stop(); });
-    next.addEventListener('click', () => { moveTo(slideIndex + 1); stop(); });
+    previous.addEventListener('click', () => { moveTo(slideIndex - 1); freezeAutoplay(); });
+    next.addEventListener('click', () => { moveTo(slideIndex + 1); freezeAutoplay(); });
     host.addEventListener('keydown', event => {
       if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
       event.preventDefault();
       moveTo(slideIndex + (event.key === 'ArrowRight' ? 1 : -1));
-      stop();
+      freezeAutoplay();
     });
     host.addEventListener('mouseenter', () => { hovering = true; stop(); });
     host.addEventListener('mouseleave', () => { hovering = false; startAutoplay(); });
@@ -330,7 +336,7 @@ async function start() {
       startAutoplay();
     });
     document.addEventListener('visibilitychange', startAutoplay);
-    reducedMotion.addEventListener('change', startAutoplay);
+    reducedMotion.addEventListener('change', () => { pause.hidden = overridden || reducedMotion.matches; startAutoplay(); });
     render();
     controls.hidden = slides.length <= 1;
     pause.hidden = overridden || reducedMotion.matches;
