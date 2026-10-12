@@ -14,6 +14,10 @@
   };
   const label = {'movies':'MOVIE','tv-shows':'TV SERIES','indie-movies':'INDIE HORROR','podcasts':'PODCAST','games':'HORROR GAME'}[section];
   const seed = Math.floor(Date.now()/86400000);
+  let entries = [];
+  let activeIndex = 0;
+  let autoplayId = null;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const card = document.createElement('section');
   card.className = 'fr-editorial-hero';
   card.setAttribute('aria-label', 'Frightertainment daily editorial spotlight');
@@ -46,23 +50,67 @@
   actions.append(link);
   detail.append(kicker,title,synopsis,evidence,actions);
   contentBox.append(artwork,detail);
-  card.append(ribbon,contentBox);
+  const controls = document.createElement('div');
+  controls.className = 'fr-editorial-hero__controls';
+  controls.setAttribute('aria-label','Editorial picks carousel');
+  const previous = document.createElement('button');
+  previous.type = 'button';
+  previous.className = 'fr-editorial-hero__nav';
+  previous.textContent = '← PREVIOUS';
+  previous.setAttribute('aria-label','Previous editorial pick');
+  const position = document.createElement('span');
+  position.className = 'fr-editorial-hero__position';
+  position.setAttribute('aria-live','polite');
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.className = 'fr-editorial-hero__nav';
+  next.textContent = 'NEXT →';
+  next.setAttribute('aria-label','Next editorial pick');
+  controls.append(previous,position,next);
+  card.append(ribbon,contentBox,controls);
+  const render = () => {
+    const pick = entries[activeIndex];
+    if (!pick) return;
+    artworkText.textContent = pick.title;
+    kicker.textContent = pick.category || label;
+    title.textContent = pick.title;
+    synopsis.textContent = pick.description;
+    evidence.textContent = 'SOURCE: ' + (pick.sourceName || 'Frightertainment') + ' · checked ' + (pick.checkedAt || 'date not available') + ' · no unverified rating';
+    link.href = safeHref(pick.sourceUrl);
+    if (link.href.startsWith('https://') && !link.href.startsWith(location.origin + '/')) {
+      link.target='_blank'; link.rel='noopener noreferrer';
+    } else {
+      link.removeAttribute('target'); link.removeAttribute('rel');
+    }
+    card.dataset.pickId = pick.id || pick.title;
+    card.dataset.rotationDay = new Date(seed * 86400000).toISOString().slice(0,10);
+    position.textContent = (activeIndex + 1) + ' / ' + entries.length;
+  };
+  const move = step => { activeIndex = (activeIndex + step + entries.length) % entries.length; render(); };
+  const stop = () => { if (autoplayId !== null) { clearInterval(autoplayId); autoplayId = null; } };
+  const start = () => {
+    stop();
+    if (!reduceMotion.matches && entries.length > 1 && !document.hidden)
+      autoplayId = setInterval(() => move(1), 9000);
+  };
+  previous.addEventListener('click', () => { move(-1); stop(); });
+  next.addEventListener('click', () => { move(1); stop(); });
+  card.addEventListener('mouseenter',stop);
+  card.addEventListener('mouseleave',start);
+  card.addEventListener('focusin',stop);
+  card.addEventListener('focusout',event => { if (!card.contains(event.relatedTarget)) start(); });
+  document.addEventListener('visibilitychange',() => { if (document.hidden) stop(); else start(); });
+  reduceMotion.addEventListener('change',start);
   intro.insertAdjacentElement('afterend',card);
   fetch('/data/editorial-spotlights.json',{credentials:'same-origin'})
     .then(response => { if(!response.ok) throw new Error('Editorial source unavailable'); return response.json(); })
     .then(data => {
-      const entries = (data.categories?.[section] || []).filter(x => x && x.title && x.description && safeHref(x.sourceUrl));
+      entries = (data.categories?.[section] || []).filter(x => x && x.title && x.description && safeHref(x.sourceUrl));
       if (!entries.length) throw new Error('No source-checked entries');
-      const pick = entries[seed % entries.length];
-      artworkText.textContent = pick.title;
-      kicker.textContent = pick.category || label;
-      title.textContent = pick.title;
-      synopsis.textContent = pick.description;
-      evidence.textContent = 'SOURCE: ' + (pick.sourceName || 'Frightertainment') + ' · checked ' + (pick.checkedAt || 'date not available') + ' · no unverified rating';
-      link.href = safeHref(pick.sourceUrl);
-      if (link.href.startsWith('https://') && !link.href.startsWith(location.origin + '/')) {link.target='_blank';link.rel='noopener noreferrer';}
-      card.dataset.pickId = pick.id || pick.title;
-      card.dataset.rotationDay = new Date(seed * 86400000).toISOString().slice(0,10);
+      activeIndex = seed % entries.length;
+      render();
+      controls.hidden = entries.length < 2;
+      start();
     })
     .catch(() => {
       card.remove();
