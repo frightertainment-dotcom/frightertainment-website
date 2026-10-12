@@ -47,6 +47,12 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Check V5 mobile and desktop concept contracts
         run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
+      - name: Preserve actual first-fold screenshots
+        run: |
+          mkdir -p visual-evidence
+          cp test-results/visual/v5-indie-mobile.png visual-evidence/
+          cp test-results/visual/v5-movies-desktop.png visual-evidence/
+          cp test-results/visual/v5-home-mobile.png visual-evidence/
       - name: Verify poster logic, original catalogues and consent-gated embeds
         run: npx playwright test browser-tests/catalogue.pw.js browser-tests/editorial-poster.pw.js browser-tests/embeds.pw.js --reporter=list
       - name: Export first-fold fixture screenshots for visual inspection
@@ -56,7 +62,7 @@ jobs:
           from pathlib import Path
           import base64
           for name in ('v5-indie-mobile','v5-movies-desktop'):
-              p = Path('test-results/visual') / (name + '.png')
+              p = Path('visual-evidence') / (name + '.png')
               if not p.is_file():
                   continue
               value = base64.b64encode(p.read_bytes()).decode('ascii')
@@ -71,5 +77,6 @@ jobs:
           name: v5-visual-evidence
           path: |
             test-results/
+            visual-evidence/
             playwright-report/
           if-no-files-found: ignore
