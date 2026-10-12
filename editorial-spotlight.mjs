@@ -35,7 +35,8 @@ export function buildEditorialCarousel(items, dayIndex, offset = 0, requestedId 
   if (!selection) return { slides: [], overridden: false };
   const chosen = eligible.findIndex(item => item.id === selection.item.id);
   const arranged = eligible.slice(chosen).concat(eligible.slice(0, chosen));
-  return { slides: arranged, overridden: selection.overridden };
+  // Keep each carousel compact: one daily lead plus four alternatives, from a larger verified pool.
+  return { slides: arranged.slice(0, 5), overridden: selection.overridden };
 }
 
 const categoryMap = {
@@ -244,20 +245,24 @@ async function start() {
     previous.type = 'button';
     previous.setAttribute('aria-label', 'Previous editorial pick');
     const status = make('span', 'editorial-carousel__status');
-    status.setAttribute('aria-live', 'polite');
+    status.setAttribute('aria-live', 'off');
     status.setAttribute('aria-atomic', 'true');
     const dots = make('div', 'editorial-carousel__dots');
     dots.setAttribute('role', 'group');
     dots.setAttribute('aria-label', 'Choose editorial pick');
+    const pause = make('button', 'editorial-carousel__pause', 'PAUSE');
+    pause.type = 'button';
+    pause.setAttribute('aria-label', 'Pause automatic editorial rotation');
     const next = make('button', 'editorial-carousel__nav', 'NEXT →');
     next.type = 'button';
     next.setAttribute('aria-label', 'Next editorial pick');
-    controls.append(previous, dots, status, next);
+    controls.append(previous, dots, status, pause, next);
     host.append(stage, controls);
     let slideIndex = 0;
     let timer = null;
     let hovering = false;
     let focusing = false;
+    let manuallyPaused = false;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     function prepareItem(item) {
       const picked = { ...item };
@@ -288,6 +293,7 @@ async function start() {
       dotButtons.forEach((dot, index) => dot.setAttribute('aria-current', index === slideIndex ? 'true' : 'false'));
     }
     function moveTo(index) {
+      status.setAttribute('aria-live', 'polite');
       slideIndex = (index + slides.length) % slides.length;
       render();
     }
@@ -298,9 +304,15 @@ async function start() {
     function startAutoplay() {
       stop();
       // Automatic motion must not interrupt a reader, keyboard user, or owner-pinned title.
-      if (slides.length <= 1 || overridden || reducedMotion.matches || document.hidden || hovering || focusing) return;
-      timer = window.setInterval(() => moveTo(slideIndex + 1), 12000);
+      if (slides.length <= 1 || overridden || manuallyPaused || reducedMotion.matches || document.hidden || hovering || focusing) return;
+      timer = window.setInterval(() => { status.setAttribute('aria-live', 'off'); slideIndex = (slideIndex + 1) % slides.length; render(); }, 12000);
     }
+    pause.addEventListener('click', () => {
+      manuallyPaused = !manuallyPaused;
+      pause.textContent = manuallyPaused ? 'PLAY' : 'PAUSE';
+      pause.setAttribute('aria-label', manuallyPaused ? 'Resume automatic editorial rotation' : 'Pause automatic editorial rotation');
+      if (manuallyPaused) stop(); else startAutoplay();
+    });
     previous.addEventListener('click', () => { moveTo(slideIndex - 1); stop(); });
     next.addEventListener('click', () => { moveTo(slideIndex + 1); stop(); });
     host.addEventListener('keydown', event => {
@@ -321,6 +333,7 @@ async function start() {
     reducedMotion.addEventListener('change', startAutoplay);
     render();
     controls.hidden = slides.length <= 1;
+    pause.hidden = overridden || reducedMotion.matches;
     // Place directly below each existing section-title logo without replacing any page structure.
     intro.insertAdjacentElement('afterend', host);
     startAutoplay();
