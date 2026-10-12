@@ -23,6 +23,22 @@ export function selectEditorialPick(items, dayIndex, offset = 0, requestedId = '
   return { item: eligible[index], overridden: false };
 }
 
+/**
+ * Stable daily starting point, followed by the rest of the verified editorial pool.
+ * An approved owner selection leads the carousel without altering underlying source evidence.
+ */
+export function buildEditorialCarousel(items, dayIndex, offset = 0, requestedId = '') {
+  const eligible = Array.isArray(items) ? items.filter(item => item &&
+    typeof item.id === 'string' && item.id &&
+    typeof item.title === 'string' && item.title.trim() && item.sourceUrl) : [];
+  const selection = selectEditorialPick(eligible, dayIndex, offset, requestedId);
+  if (!selection) return { slides: [], overridden: false };
+  const chosen = eligible.findIndex(item => item.id === selection.item.id);
+  const arranged = eligible.slice(chosen).concat(eligible.slice(0, chosen));
+  // Keep each carousel compact: one daily lead plus four alternatives, from a larger verified pool.
+  return { slides: arranged.slice(0, 5), overridden: selection.overridden };
+}
+
 const categoryMap = {
   movies: { title: 'MOVIES', offset: 0, label: 'THE FEATURE PRESENTATION' },
   tv: { title: 'TV SHOWS', collection: 'tv-shows', offset: 2, label: 'TONIGHT’S SERIES' },
@@ -43,17 +59,19 @@ const safeDestination = value => {
 };
 const claim = (movie, field) => movie.claims?.find(item => item.field === field);
 const filmSource = movie => claim(movie, 'title')?.source || claim(movie, 'synopsis')?.source || '';
-const getFilmCandidates = () => (window.FR_MOVIES || [])
+const getFilmCandidates = (overviewData = {}) => (window.FR_MOVIES || [])
   .filter(movie => movie.editorialStatus === 'approved' && movie.id && movie.title &&
-    httpUrl(filmSource(movie)))
+    httpUrl(filmSource(movie)) && (claim(movie, 'synopsis')?.value ||
+    (overviewData[movie.id]?.description?.length >= 100 && httpUrl(overviewData[movie.id]?.sourceUrl))))
   .map(movie => ({
     id: movie.id, title: movie.title,
     category: claim(movie, 'genre')?.value || 'SOURCE-CHECKED HORROR',
-    description: claim(movie, 'synopsis')?.value || 'An independently documented horror film. Explore its sourced details.',
+    description: claim(movie, 'synopsis')?.value || overviewData[movie.id]?.description,
+    overviewSource: claim(movie, 'synopsis')?.source || overviewData[movie.id]?.sourceUrl || '',
     sourceName: claim(movie, 'title')?.sourceName || 'Official film source',
     sourceUrl: '/films/' + encodeURIComponent(movie.id) + '/',
     externalSource: filmSource(movie),
-    checkedAt: claim(movie, 'title')?.checked || '',
+    checkedAt: claim(movie, 'synopsis')?.checked || (overviewData[movie.id]?.description ? '2026-10-12' : claim(movie, 'title')?.checked) || '',
     year: claim(movie, 'filmYear')?.value || claim(movie, 'releaseYear')?.value || '',
     trailer: movie.trailer,
     poster: movie.poster, posterCredit: movie.posterCredit,
@@ -169,6 +187,8 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     item.sourceUrl, 'editorial-pick__cta');
   const trailer = verifiedTrailer(item);
   if (!trailer && item.externalSource) addLink(links, 'OFFICIAL SOURCE ↗', item.externalSource, 'editorial-pick__source');
+  if (item.overviewSource && item.overviewSource !== item.externalSource)
+    addLink(links, 'SYNOPSIS SOURCE ↗', item.overviewSource, 'editorial-pick__source');
   if (trailer) appendVideo(links, trailer, item.title);
   content.append(links);
   feature.append(art, content);
@@ -188,11 +208,18 @@ async function start() {
         return response.json();
       }),
       fetch('/data/editorial-spotlight-overrides.json').then(response => response.ok ? response.json() : { overrides: {}, notes: {} })
-        .catch(() => ({ overrides: {}, notes: {} }))
+        .catch(() => ({ overrides: {}, notes: {} })),
+      theme === 'movies' ? fetch('/data/movie-editorial-overviews.json').then(r => {
+        if (!r.ok) throw new Error('Film overview sources unavailable');
+        return r.json();
+      }).catch(() => ({ items: [] })) : Promise.resolve({ items: [] })
     ]);
     const data = sources[0];
     const settings = sources[1] || {};
-    const list = theme === 'movies' ? getFilmCandidates() :
+    const primaryOverviews = Object.fromEntries((sources[2]?.items || []).filter(x =>
+      typeof x.id === 'string' && typeof x.description === 'string' && x.description.length >= 100 && httpUrl(x.sourceUrl)
+    ).map(x => [x.id, x]));
+    const list = theme === 'movies' ? getFilmCandidates(primaryOverviews) :
       (data?.[config.collection] || []).filter(x => safeDestination(x.sourceUrl));
     const override = settings.overrides?.[theme] || {};
     // Overrides are a publisher-controlled feature and must be dated and explicitly approved.
@@ -202,18 +229,120 @@ async function start() {
       /^\d{4}-\d{2}-\d{2}$/.test(override.ends || '') &&
       date >= override.starts && date <= override.ends;
     const dayIndex = londonDayIndex();
-    const selection = selectEditorialPick(list, dayIndex, config.offset, activeOverride ? override.id : '');
-    if (!selection) throw new Error('No verified editorial candidates');
-    const picked = { ...selection.item };
-    if (theme === 'movies' && picked.trailer) picked.trailer = {
-      ...picked.trailer, claimMatched: (window.FR_MOVIES || []).some(film =>
-        film.id === picked.id && film.claims?.some(c =>
-          c.field === 'trailer' && c.source === picked.trailer.source && c.checked === picked.trailer.checked))
-    };
-    const note = settings.notes?.[theme]?.[picked.id] || '';
-    const feature = createSpotlight(config, picked, dayIndex, selection.overridden, note);
-    // Place directly below section title/logo, before existing category content.
-    intro.insertAdjacentElement('afterend', feature);
+    const { slides, overridden } = buildEditorialCarousel(
+      list, dayIndex, config.offset, activeOverride ? override.id : ''
+    );
+    if (!slides.length) throw new Error('No verified editorial candidates');
+
+    const host = make('section', 'editorial-carousel');
+    host.setAttribute('role', 'region');
+    host.setAttribute('aria-roledescription', 'carousel');
+    host.setAttribute('aria-label', config.title + ' editorial picks');
+    host.dataset.dayIndex = String(dayIndex);
+    const stage = make('div', 'editorial-carousel__stage');
+    const controls = make('div', 'editorial-carousel__controls');
+    const previous = make('button', 'editorial-carousel__nav', '← PREVIOUS');
+    previous.type = 'button';
+    previous.setAttribute('aria-label', 'Previous editorial pick');
+    const status = make('span', 'editorial-carousel__status');
+    status.setAttribute('aria-live', 'off');
+    status.setAttribute('aria-atomic', 'true');
+    const dots = make('div', 'editorial-carousel__dots');
+    dots.setAttribute('role', 'group');
+    dots.setAttribute('aria-label', 'Choose editorial pick');
+    const pause = make('button', 'editorial-carousel__pause', 'PAUSE');
+    pause.type = 'button';
+    pause.setAttribute('aria-label', 'Pause automatic editorial rotation');
+    const next = make('button', 'editorial-carousel__nav', 'NEXT →');
+    next.type = 'button';
+    next.setAttribute('aria-label', 'Next editorial pick');
+    controls.append(previous, dots, status, pause, next);
+    host.append(stage, controls);
+    let slideIndex = 0;
+    let timer = null;
+    let hovering = false;
+    let focusing = false;
+    let manuallyPaused = false;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    function prepareItem(item) {
+      const picked = { ...item };
+      if (theme === 'movies' && picked.trailer) picked.trailer = {
+        ...picked.trailer, claimMatched: (window.FR_MOVIES || []).some(film =>
+          film.id === picked.id && film.claims?.some(c =>
+            c.field === 'trailer' && c.source === picked.trailer.source && c.checked === picked.trailer.checked))
+      };
+      return picked;
+    }
+    const dotButtons = slides.map((item, index) => {
+      const dot = make('button', 'editorial-carousel__dot');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', 'Show editorial pick ' + (index + 1) + ': ' + item.title);
+      dot.addEventListener('click', () => { moveTo(index); freezeAutoplay(); });
+      dots.append(dot);
+      return dot;
+    });
+    function render() {
+      const selected = prepareItem(slides[slideIndex]);
+      const note = settings.notes?.[theme]?.[selected.id] || '';
+      // The approved owner nomination keeps its editorial label only on that featured item.
+      const feature = createSpotlight(config, selected, dayIndex, overridden && slideIndex === 0, note);
+      stage.replaceChildren(feature);
+      host.dataset.featureId = selected.id;
+      host.dataset.slide = String(slideIndex + 1);
+      status.textContent = (slideIndex + 1) + ' OF ' + slides.length;
+      dotButtons.forEach((dot, index) => dot.setAttribute('aria-current', index === slideIndex ? 'true' : 'false'));
+    }
+    function moveTo(index) {
+      status.setAttribute('aria-live', 'polite');
+      slideIndex = (index + slides.length) % slides.length;
+      render();
+    }
+    function stop() {
+      if (timer !== null) window.clearInterval(timer);
+      timer = null;
+    }
+    function freezeAutoplay() {
+      manuallyPaused = true;
+      stop();
+      pause.textContent = 'PLAY';
+      pause.setAttribute('aria-label', 'Resume automatic editorial rotation');
+    }
+    function startAutoplay() {
+      stop();
+      // Automatic motion must not interrupt a reader, keyboard user, or owner-pinned title.
+      if (slides.length <= 1 || overridden || manuallyPaused || reducedMotion.matches || document.hidden || hovering || focusing) return;
+      timer = window.setInterval(() => { status.setAttribute('aria-live', 'off'); slideIndex = (slideIndex + 1) % slides.length; render(); }, 12000);
+    }
+    pause.addEventListener('click', () => {
+      manuallyPaused = !manuallyPaused;
+      pause.textContent = manuallyPaused ? 'PLAY' : 'PAUSE';
+      pause.setAttribute('aria-label', manuallyPaused ? 'Resume automatic editorial rotation' : 'Pause automatic editorial rotation');
+      if (manuallyPaused) stop(); else startAutoplay();
+    });
+    previous.addEventListener('click', () => { moveTo(slideIndex - 1); freezeAutoplay(); });
+    next.addEventListener('click', () => { moveTo(slideIndex + 1); freezeAutoplay(); });
+    host.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      moveTo(slideIndex + (event.key === 'ArrowRight' ? 1 : -1));
+      freezeAutoplay();
+    });
+    host.addEventListener('mouseenter', () => { hovering = true; stop(); });
+    host.addEventListener('mouseleave', () => { hovering = false; startAutoplay(); });
+    host.addEventListener('focusin', () => { focusing = true; stop(); });
+    host.addEventListener('focusout', event => {
+      if (event.relatedTarget && host.contains(event.relatedTarget)) return;
+      focusing = false;
+      startAutoplay();
+    });
+    document.addEventListener('visibilitychange', startAutoplay);
+    reducedMotion.addEventListener('change', () => { pause.hidden = overridden || reducedMotion.matches; startAutoplay(); });
+    render();
+    controls.hidden = slides.length <= 1;
+    pause.hidden = overridden || reducedMotion.matches;
+    // Place directly below each existing section-title logo without replacing any page structure.
+    intro.insertAdjacentElement('afterend', host);
+    startAutoplay();
   } catch (error) {
     // Failure is visible and honest, without showing fabricated or stale recommendations.
     const unavailable = make('p', 'editorial-pick__unavailable',

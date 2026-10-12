@@ -151,3 +151,17 @@ body.hub-body .editorial-pick,body.hub-body .editorial-pick *{box-sizing:border-
 @media(prefers-reduced-motion:reduce){
  body.hub-body :is(.editorial-pick,.hub-tabs a,.hub-catalog .hub-tile){animation:none!important;transition:none!important;}
 }
+
+/* Compact page jumps above the featured panel on mobile, without hiding a navigation route. */
+@media(max-width:720px){
+ body.hub-body.hub-section .hub-page-intro .hub-section-jumps{
+  display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:5px 8px;
+  width:100%;min-width:0;margin:12px 0 0;padding:0;
+ }
+ body.hub-body.hub-section .hub-page-intro .hub-section-jumps a{
+  display:inline-flex;flex:0 1 auto;min-width:0;width:auto;max-width:100%;
+  align-items:center;justify-content:center;min-height:38px;
+  padding:8px 10px;font-size:11px;line-height:1.35;
+  white-space:normal;text-align:center;overflow-wrap:anywhere;
+ }
+}

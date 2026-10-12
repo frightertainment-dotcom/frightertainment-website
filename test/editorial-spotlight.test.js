@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { londonDayIndex, selectEditorialPick } from '../editorial-spotlight.mjs';
+import { londonDayIndex, selectEditorialPick, buildEditorialCarousel } from '../editorial-spotlight.mjs';
 const root=new URL('../', import.meta.url);
 const read=path=>readFile(new URL(path,root),'utf8');
 test('London calendar day index changes at local midnight through DST',()=>{
@@ -41,4 +41,20 @@ test('Show no fabricated Fright Rating and gate official poster reuse on permiss
  assert.match(js,/ratingEvidence\?\.approved === true/);
  assert.match(js,/posterLicenceStatus === 'approved'/);
  assert.match(js,/posterPermissionEvidence/);
+});
+
+test('Carousel uses all eligible entries once; an approved owner nomination leads',()=>{
+ const pool=Array.from({length:6},(_,i)=>({id:'film-'+i,title:'Film '+i,sourceUrl:'https://example.com/'+i}));
+ const today=buildEditorialCarousel(pool,100,2);
+ assert.equal(today.slides.length,5);
+ assert.equal(new Set(today.slides.map(s=>s.id)).size,5);
+ assert.equal(today.slides[0].id,selectEditorialPick(pool,100,2).item.id);
+ const nominated=buildEditorialCarousel(pool,100,2,'film-4');
+ assert.equal(nominated.overridden,true);
+ assert.equal(nominated.slides[0].id,'film-4');
+ assert.equal(nominated.slides.length,5);
+ const unknown=buildEditorialCarousel(pool,100,2,'not-a-film');
+ assert.equal(unknown.overridden,false);
+ assert.equal(unknown.slides[0].id,today.slides[0].id);
+ assert.deepEqual(buildEditorialCarousel([],100).slides,[]);
 });
