@@ -11,11 +11,11 @@ const publicFiles = [
   'film.html',
   'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
   'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js', 'streaming-watch.js',
-  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'sitemap.xml'
+  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
-  'data/movies.js', 'data/editorial-releases.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json',
+  'data/movies.js', 'data/editorial-releases.json', 'data/editorial.json', 'data/editorial-spotlight-overrides.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 
