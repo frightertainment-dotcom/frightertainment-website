@@ -43,17 +43,19 @@ const safeDestination = value => {
 };
 const claim = (movie, field) => movie.claims?.find(item => item.field === field);
 const filmSource = movie => claim(movie, 'title')?.source || claim(movie, 'synopsis')?.source || '';
-const getFilmCandidates = () => (window.FR_MOVIES || [])
+const getFilmCandidates = (overviewData = {}) => (window.FR_MOVIES || [])
   .filter(movie => movie.editorialStatus === 'approved' && movie.id && movie.title &&
-    httpUrl(filmSource(movie)))
+    httpUrl(filmSource(movie)) && (claim(movie, 'synopsis')?.value ||
+    (overviewData[movie.id]?.description?.length >= 100 && httpUrl(overviewData[movie.id]?.sourceUrl))))
   .map(movie => ({
     id: movie.id, title: movie.title,
     category: claim(movie, 'genre')?.value || 'SOURCE-CHECKED HORROR',
-    description: claim(movie, 'synopsis')?.value || 'An independently documented horror film. Explore its sourced details.',
+    description: claim(movie, 'synopsis')?.value || overviewData[movie.id]?.description,
+    overviewSource: claim(movie, 'synopsis')?.source || overviewData[movie.id]?.sourceUrl || '',
     sourceName: claim(movie, 'title')?.sourceName || 'Official film source',
     sourceUrl: '/films/' + encodeURIComponent(movie.id) + '/',
     externalSource: filmSource(movie),
-    checkedAt: claim(movie, 'title')?.checked || '',
+    checkedAt: claim(movie, 'synopsis')?.checked || (overviewData[movie.id]?.description ? '2026-10-12' : claim(movie, 'title')?.checked) || '',
     year: claim(movie, 'filmYear')?.value || claim(movie, 'releaseYear')?.value || '',
     trailer: movie.trailer,
     poster: movie.poster, posterCredit: movie.posterCredit,
@@ -169,6 +171,8 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     item.sourceUrl, 'editorial-pick__cta');
   const trailer = verifiedTrailer(item);
   if (!trailer && item.externalSource) addLink(links, 'OFFICIAL SOURCE ↗', item.externalSource, 'editorial-pick__source');
+  if (item.overviewSource && item.overviewSource !== item.externalSource)
+    addLink(links, 'SYNOPSIS SOURCE ↗', item.overviewSource, 'editorial-pick__source');
   if (trailer) appendVideo(links, trailer, item.title);
   content.append(links);
   feature.append(art, content);
@@ -188,11 +192,18 @@ async function start() {
         return response.json();
       }),
       fetch('/data/editorial-spotlight-overrides.json').then(response => response.ok ? response.json() : { overrides: {}, notes: {} })
-        .catch(() => ({ overrides: {}, notes: {} }))
+        .catch(() => ({ overrides: {}, notes: {} })),
+      theme === 'movies' ? fetch('/data/movie-editorial-overviews.json').then(r => {
+        if (!r.ok) throw new Error('Film overview sources unavailable');
+        return r.json();
+      }).catch(() => ({ items: [] })) : Promise.resolve({ items: [] })
     ]);
     const data = sources[0];
     const settings = sources[1] || {};
-    const list = theme === 'movies' ? getFilmCandidates() :
+    const primaryOverviews = Object.fromEntries((sources[2]?.items || []).filter(x =>
+      typeof x.id === 'string' && typeof x.description === 'string' && x.description.length >= 100 && httpUrl(x.sourceUrl)
+    ).map(x => [x.id, x]));
+    const list = theme === 'movies' ? getFilmCandidates(primaryOverviews) :
       (data?.[config.collection] || []).filter(x => safeDestination(x.sourceUrl));
     const override = settings.overrides?.[theme] || {};
     // Overrides are a publisher-controlled feature and must be dated and explicitly approved.
