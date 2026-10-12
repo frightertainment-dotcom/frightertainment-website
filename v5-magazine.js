@@ -3,13 +3,14 @@
    watchlists, ranking values, video links or third-party poster rights. */
 (() => {
  'use strict';
- const theme=document.body?.dataset.theme;
- if (!['movies','indie','tv','podcasts','games','home'].includes(theme)) return;
+ const theme=location.pathname.endsWith('/cinema.html')?'cinema':document.body?.dataset.theme;
+ if (!['movies','indie','tv','podcasts','games','home','cinema'].includes(theme)) return;
  const main=document.querySelector('main');
  const intro=main?.querySelector('.hub-page-intro');
  if (!main) return;
  document.body.classList.add('fr-v5');
  const configs={
+  cinema:{heading:'IN CINEMAS',tagline:'Source-linked theatrical horror releases.',href:'#upcoming-cinema',mode:'cinema',type:'movie',hash:'#upcoming-cinema'},
   movies:{heading:'FEATURED HORROR FILMS',tagline:'Explore films that haunt you.',href:'/all-horror-movies.html',mode:'trending',type:'movie',hash:'#upcoming'},
   indie:{heading:'MORE INDIE PICKS',tagline:'Small budgets. Big nightmares.',href:'#trending',mode:'trending',type:'indie',hash:'#upcoming'},
   tv:{heading:'HORROR SERIES TO WATCH',tagline:'Stories that stay with you.',href:'#trending',mode:'trending',type:'tv',hash:'#upcoming'},
@@ -64,7 +65,8 @@
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
  const fetchList=async(type,mode)=>{
-  const url='/api/catalogue?'+new URLSearchParams({type,mode,page:'1'});
+  const query=new URLSearchParams({type,mode,page:'1'});if(mode==='cinema')query.set('country','GB');
+  const url='/api/catalogue?'+query;
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),10000);
   try {
@@ -223,6 +225,35 @@
     showcase.append(lower);
    }
   }
+
+  if(theme!=='home'&&document.querySelector('.fr-v5-front')){
+   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper'));
+   if(original.length){
+    const details=el('details','fr-v5-deeper');
+    details.id='fr-v5-complete-discovery';
+    const summary=el('summary','fr-v5-deeper__summary');
+    const heading=el('span','fr-v5-deeper__heading','EXPLORE THE COMPLETE '+(theme==='indie'?'INDIE':theme==='tv'?'TV':theme==='cinema'?'CINEMA':theme==='movies'?'HORROR':'EDITORIAL')+' COLLECTION');
+    const explain=el('small','','All original charts, release tools, archive controls and source-linked listings are preserved here.');
+    const arrow=el('span','fr-v5-deeper__arrow','OPEN FULL DISCOVERY  ↓');
+    const wrapper=el('span','fr-v5-deeper__text');wrapper.append(heading,explain);
+    summary.append(wrapper,arrow);details.append(summary);
+    for(const node of original)details.append(node);
+    main.append(details);
+    const reveal=()=>{
+     const hash=location.hash.slice(1);
+     if(hash && details.querySelector('#'+CSS.escape(hash)))details.open=true;
+    };
+    window.addEventListener('hashchange',reveal);
+    document.addEventListener('click',event=>{
+     const anchor=event.target.closest('a[href^="#"]');
+     if(anchor&&details.querySelector(anchor.getAttribute('href'))){
+      details.open=true;
+     }
+    });
+    reveal();
+   }
+  }
+
   await Promise.allSettled(jobs);
  }
  // Keep editorial-spotlight.mjs as the carousel owner: place our page sections
