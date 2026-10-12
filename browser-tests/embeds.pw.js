@@ -1,3 +1,4 @@
+import { navigateLegacy,openCompleteDiscovery } from './helpers/open-full-discovery.mjs';
 import { test, expect } from '@playwright/test';
 
 for (const {path, provider, minimum, host} of [
@@ -8,7 +9,7 @@ for (const {path, provider, minimum, host} of [
     const loaded=[];
     page.on('request',request=>{if(request.url().includes(host))loaded.push(request.url());});
     await page.route('**/'+host+'**',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body>Third-party player fixture</body></html>'}));
-    await page.goto(path,{waitUntil:'domcontentloaded'});
+    await navigateLegacy(page,path,{waitUntil:'domcontentloaded'});
     const gates=page.locator('.fr-player-gate--'+provider);
     expect(await gates.count()).toBeGreaterThanOrEqual(minimum);
     await expect(page.locator('.fr-player-gate iframe')).toHaveCount(0);
@@ -29,7 +30,7 @@ for (const {path, provider, minimum, host} of [
 test('visitor-activated media placeholders remain readable without sideways scrolling',async({browser})=>{
   for (const [path,provider] of [['/podcasts.html','apple'],['/games.html','steam']]) {
     const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
-    await page.goto(path,{waitUntil:'domcontentloaded'});
+    await navigateLegacy(page,path,{waitUntil:'domcontentloaded'});
     const gate=page.locator('.fr-player-gate--'+provider).first();
     for (const width of [320,375,390,768,1440]) {
       await page.setViewportSize({width,height:844});
@@ -43,7 +44,7 @@ test('visitor-activated media placeholders remain readable without sideways scro
 
 test('privacy notice is usable at phone and desktop sizes', async ({browser}) => {
   const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
-  await page.goto('/privacy.html',{waitUntil:'domcontentloaded'});
+  await navigateLegacy(page,'/privacy.html',{waitUntil:'domcontentloaded'});
   await expect(page.locator('h1')).toContainText('PRIVACY');
   await expect(page.locator('a[href="/contact.html"]').first()).toBeVisible();
   for(const width of [320,375,390,768,1440]){
