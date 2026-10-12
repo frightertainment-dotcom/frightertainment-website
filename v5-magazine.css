@@ -775,3 +775,30 @@ body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-deeper{order:3}
  body.fr-v5 .fr-v5-panel__head h2{font-size:15px}
  body.fr-v5 .fr-v5-poster-grid{padding:5px;gap:5px}
 }
+
+
+/* Second actual-image review: bring the first poster rack into the phone's
+   first screen. The masthead must not waste two full rows on jump links. */
+@media(max-width:700px){
+ body.fr-v5.hub-section .hub-page-intro{padding:8px 11px 6px!important}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps){
+  display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+  width:100%;max-width:100%;min-width:0;gap:4px;
+  margin:4px 0 0;padding:0 0 1px;
+  white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+ }
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps)::-webkit-scrollbar{display:none}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps) a{
+  flex:0 0 auto;width:auto;min-width:0;min-height:20px;
+  padding:3px 5px;font-size:8px;
+ }
+ body.fr-v5 .hub-page-intro>p{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden;font-size:11px;line-height:1.3;
+ }
+ body.fr-v5 .editorial-pick__why{-webkit-line-clamp:1}
+ body.fr-v5 .editorial-pick__synopsis{-webkit-line-clamp:2}
+ body.fr-v5 .editorial-pick__facts small{
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ }
+}
