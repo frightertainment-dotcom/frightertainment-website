@@ -80,7 +80,7 @@ test('Original tools remain functional and accessible through the full discovery
  const details=page.locator('.fr-v5-deeper');
  await expect(details).toBeVisible();
  await expect(page.locator('#straight-to-stream')).not.toBeVisible();
- await details.locator('summary').click();
+ await details.locator(':scope > summary').click();
  await expect(page.locator('#straight-to-stream')).toBeVisible();
  await expect(page.locator('#movie-year')).toBeVisible();
  await expect(page.locator('#movie-grid')).toHaveCount(1);
