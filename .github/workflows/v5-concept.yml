@@ -47,6 +47,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Check V5 mobile and desktop concept contracts
         run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
+      - name: Verify poster logic, original catalogues and consent-gated embeds
+        run: npx playwright test browser-tests/catalogue.pw.js browser-tests/editorial-poster.pw.js browser-tests/embeds.pw.js --reporter=list
       - uses: actions/upload-artifact@v4
         if: always()
         with:
