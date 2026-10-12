@@ -44,3 +44,13 @@ test('Editorial card does not invent scores, rights, or a film trailer',async({p
    await expect(hero.locator('.editorial-pick__art-sub')).toContainText('NOT AN OFFICIAL POSTER');
  }
 });
+
+test('Movie editorial picks use a meaningful sourced synopsis, not a filler line',async({page})=>{
+ await page.goto('/movies.html');
+ const feature=page.locator('.editorial-pick');
+ await expect(feature).toBeVisible();
+ const synopsis=(await feature.locator('.editorial-pick__synopsis').innerText()).trim();
+ expect(synopsis.length).toBeGreaterThan(100);
+ expect(synopsis).not.toMatch(/Explore its sourced details|independently documented horror film/i);
+ await expect(feature.getByRole('link',{name:/SYNOPSIS SOURCE|OFFICIAL SOURCE|EXPLORE FILM FILE/}).first()).toBeVisible();
+});

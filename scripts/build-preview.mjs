@@ -22,6 +22,7 @@ await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination)
 await cp(new URL('data/editorial-releases.json', root), new URL('data/editorial-releases.json', destination));
 await cp(new URL('data/editorial.json', root), new URL('data/editorial.json', destination));
 await cp(new URL('data/editorial-spotlight-overrides.json', root), new URL('data/editorial-spotlight-overrides.json', destination));
+await cp(new URL('data/movie-editorial-overviews.json', root), new URL('data/movie-editorial-overviews.json', destination));
 await cp(new URL('data/cinema-screenings.json', root), new URL('data/cinema-screenings.json', destination));
 await cp(new URL('data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
