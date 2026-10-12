@@ -161,6 +161,7 @@ test('navigation works between all main sections and official movie source', asy
   await navigateLegacy(page,'/');
   await page.locator('.hub-tabs a[href="/movies.html"]').click();
   await expect(page).toHaveURL(/movies\.html$/);
+  await openCompleteDiscovery(page);
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
   await page.locator('#movie-more').click();
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(11);
@@ -168,8 +169,10 @@ test('navigation works between all main sections and official movie source', asy
   await expect(official).toHaveAttribute('href', /^https:\/\//);
   await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
   await expect(page).toHaveURL(/podcasts\.html$/);
+  await openCompleteDiscovery(page);
   await expect(page.locator('main .hub-tile')).toHaveCount(12);
   await page.locator('.hub-tabs a[href="/indie-movies.html"]').click();
+  await openCompleteDiscovery(page);
   await expect(page.locator('#chart .fr-media-card')).toHaveCount(3);
   await expect(page.locator('#archive [data-catalogue-search]')).toBeVisible();
   await expect(page.locator('main')).not.toContainText('DETAILS TO BE ANNOUNCED');
@@ -208,30 +211,17 @@ test('all seven section themes and navigation fit the requested viewport widths'
 });
 test('TV, indie, podcast and games landings use distinct desktop compositions', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  for (const route of ['/podcasts.html']) {
-    // Podcast embeds can stall the load event; verify the rendered layout after DOM readiness.
+  // V5 replaces the former uneven 3-tile hero with consistent magazine cards.
+  for (const route of ['/podcasts.html','/games.html']) {
     await navigateLegacy(page,route,{waitUntil:'domcontentloaded'});
-    const cards = page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile');
-    await expect(cards.first()).toBeVisible();
-    const boxes = await cards.evaluateAll(nodes => nodes.map(node => {
-      const { x, y, width, height } = node.getBoundingClientRect();
-      return { x, y, width, height };
-    }));
-    expect(boxes.length).toBe(3);
-    expect(boxes[0].width).toBeGreaterThan(boxes[1].width);
-    expect(boxes[0].height).toBeGreaterThan(boxes[1].height);
-    expect(Math.abs(boxes[1].x - boxes[2].x), `${route} secondary cards should stack in one column`).toBeLessThan(2);
-    expect(boxes[2].y).toBeGreaterThan(boxes[1].y);
+    const cards=page.locator('.fr-v5-front .fr-v5-editorial-tile');
+    await expect(cards).toHaveCount(6);
+    const rows=await cards.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect()));
+    expect(Math.abs(rows[0].top-rows[1].top)).toBeLessThan(3);
+    expect(rows[1].left).toBeGreaterThan(rows[0].right);
+    await expect(page.locator('.fr-v5-deeper')).toHaveAttribute('open','');
+    await expect(page.locator('.fr-v5-deeper .hub-tile').first()).toBeVisible();
   }
-  await navigateLegacy(page,'/games.html');
-  const gameBoxes = await page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile').evaluateAll(nodes => nodes.map(node => {
-    const { x, y, width, height } = node.getBoundingClientRect();
-    return { x, y, width, height };
-  }));
-  expect(gameBoxes).toHaveLength(2);
-  expect(gameBoxes[0].width).toBeGreaterThan(gameBoxes[1].width);
-  expect(gameBoxes[0].height).toBeGreaterThan(gameBoxes[1].height);
-  expect(gameBoxes[1].x).toBeGreaterThan(gameBoxes[0].x);
   for(const route of ['/indie-movies.html','/tv-shows.html']) {
     await navigateLegacy(page,route);
     const cards=page.locator('#chart .fr-media-card');
@@ -1020,7 +1010,7 @@ test('six themed environments and review pages have desktop and mobile browser e
     await page.screenshot({ path: `${out}/${name}-mobile-first.png` });
     await page.screenshot({ path: `${out}/${name}-mobile-full.png`, fullPage: true });
     if (['podcasts', 'games'].includes(name)) {
-      const firstRecommendation = page.locator('main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile').first();
+      const firstRecommendation = page.locator('.fr-v5-deeper .hub-catalog:not(.hub-catalog--expanded)>.hub-tile').first();
       const title = firstRecommendation.locator('h3');
       const action = firstRecommendation.locator('.hub-tile__link');
       await expect(title).toBeVisible();
