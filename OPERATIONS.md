@@ -26,3 +26,14 @@ Automatic refresh is limited to licensed territory-level showtimes, streaming av
 ## Review artifacts
 
 The GitHub Actions `Website quality` workflow runs content validation, unit/provider contract tests, Chromium layout/navigation checks, Wrangler dry-run validation and local D1 migrations. Browser screenshots and traces are attached as `browser-review` workflow artifacts. A green test run covers fixtures and the disabled integration state; it does not prove that a real licensed provider account, production Worker binding, commercial feed, quota or live source coverage is available.
+
+
+## 504 incident monitoring and response
+
+Cloudflare HTTP Analytics is the live request monitor for both production hostnames. Review edge status, origin status, cache status, hostname and path together. A `504` with origin status `0` and a cache miss means Cloudflare returned the error before it received an HTTP response from Pages; it does not, by itself, name the stalled Pages component. Use UK-local midnight-to-midnight windows when comparing daily totals, and compare edge and origin status separately.
+
+Treat two 5xx responses for the same hostname and route within five minutes as an incident at this site's current traffic. Any 504 on the homepage or repeated 504s across static pages and API routes warrants immediate investigation even if the absolute count is low. Include both `frightertainment.com` and `www.frightertainment.com` in every query. Capture available Ray IDs from individual request detail views when investigating a specific request; aggregated Analytics groups do not include per-request Ray IDs.
+
+The `Website quality` GitHub Actions workflow validates the protected preview bundle, API fixtures, content checks and representative browser flows for each pull request. Its browser server is local to the runner; those runs are not live production monitoring and should not be counted as visitor traffic. Cloudflare Analytics remains the production 5xx source. After any release, compare the same route/host error counts and response-time percentiles before and after over matching UK-local windows.
+
+Request-triggered TMDB refreshes run through Pages `waitUntil`. A cold cache returns an explicit 503 while the cache warms; a previously verified stale snapshot is served with its stale state. A genuine provider error remains an error in logs and is never presented as fresh data. Repeated requests for the same dataset share a refresh within one Worker isolate.
