@@ -248,8 +248,12 @@ async function handleTMDBMedia(env, request, catalogue = false, executionContext
     if (waited) dataset = await loadDataset(env.DB, kind, datasetCountry);
   }
   const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
-  if (catalogue) return json({ ...dataset, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=120' });
-  return json({ item: dataset.items?.[0] || null, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=300' });
+  const available = ['current', 'stale'].includes(dataset.status);
+  const headers = { 'cache-control': available ? catalogue ? 'private, max-age=60, stale-while-revalidate=300' : 'private, max-age=60, stale-while-revalidate=300' : 'no-store',
+    ...(!available ? { 'retry-after': '30' } : {}) };
+  if (catalogue) return json({ ...dataset, ...freshness, ...(!available ? { error: { code: 'catalogue_unavailable', message: 'Catalogue data is temporarily unavailable.' } } : {}) }, available ? 200 : 503, headers);
+  return json({ item: dataset.items?.[0] || null, ...freshness,
+    ...(!available ? { error: { code: 'media_unavailable', message: 'Media data is temporarily unavailable.' } } : {}) }, available ? 200 : 503, headers);
 }
 
 async function handleDiscovery(env, request, executionContext = null) {
