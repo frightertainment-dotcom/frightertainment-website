@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-09T13:54:33.725Z",
+  "updatedAt": "2026-10-12T06:40:18.762Z",
   "source": "Wikidata CC0 structured data",
   "sourceUrl": "https://www.wikidata.org/wiki/Wikidata:Licensing",
   "coverage": "Known Wikidata horror-film genre records with published date and English label; not every global cinema, VOD or direct-to-video film",
@@ -9189,6 +9189,13 @@
       "title": "High Plains Drifter",
       "year": 1973,
       "imdbId": "tt0068699",
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+    },
+    {
+      "qid": "Q97376093",
+      "title": "Horror High",
+      "year": 1973,
+      "imdbId": "tt0072331",
       "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
     },
     {
@@ -26788,6 +26795,13 @@
       "title": "Dead Awake",
       "year": 2001,
       "imdbId": "tt0254252",
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+    },
+    {
+      "qid": "Q14755894",
+      "title": "Dead Heat under the Shrubs",
+      "year": 2001,
+      "imdbId": "tt0441876",
       "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
     },
     {
@@ -66359,6 +66373,13 @@
       "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
     },
     {
+      "qid": "Q141693785",
+      "title": "The Mirror of the Valley",
+      "year": 2024,
+      "imdbId": "tt34498604",
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+    },
+    {
       "qid": "Q123856282",
       "title": "The Moogai",
       "year": 2024,
@@ -67578,6 +67599,13 @@
       "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
     },
     {
+      "qid": "Q141237175",
+      "title": "Chronovisor",
+      "year": 2026,
+      "imdbId": "tt39196981",
+      "source": "Wikidata P136=Q200092; P577 original date; P345 IMDb ID"
+    },
+    {
       "qid": "Q139858801",
       "title": "Chum",
       "year": 2026,
@@ -68215,10 +68243,10 @@
   ],
   "lastSync": {
     "windows": 11,
-    "rowsFetched": 15894,
-    "matched": 9772,
-    "added": 0,
+    "rowsFetched": 15933,
+    "matched": 9774,
+    "added": 4,
     "corrected": 0,
-    "total": 9772
+    "total": 9776
   }
 }
