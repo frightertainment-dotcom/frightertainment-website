@@ -49,6 +49,22 @@ jobs:
         run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
       - name: Verify poster logic, original catalogues and consent-gated embeds
         run: npx playwright test browser-tests/catalogue.pw.js browser-tests/editorial-poster.pw.js browser-tests/embeds.pw.js --reporter=list
+      - name: Export first-fold fixture screenshots for visual inspection
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          for name in ('v5-indie-mobile','v5-movies-desktop'):
+              p = Path('test-results/visual') / (name + '.png')
+              if not p.is_file():
+                  continue
+              value = base64.b64encode(p.read_bytes()).decode('ascii')
+              print('V5_IMAGE_BEGIN ' + name)
+              for start in range(0, len(value), 4000):
+                  print('V5_IMAGE_PART ' + value[start:start+4000])
+              print('V5_IMAGE_END ' + name)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
