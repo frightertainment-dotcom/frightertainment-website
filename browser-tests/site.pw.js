@@ -1568,70 +1568,24 @@ test('rotating film feature CTA always agrees with its actual destination', asyn
 });
 
 
-const shopBannerSections = [
+// Owner-approved removal of clothing-shop advertising, 12 Oct 2026.
+// Keep the actual horror website and footer accessible at all viewport sizes.
+const noShopPromoRoutes = [
   '/', '/movies.html', '/tv-shows.html', '/cinema.html',
   '/indie-movies.html', '/podcasts.html', '/games.html'
 ];
-for (const route of shopBannerSections) {
-  test('in-house shop banner is accessible, responsive and directly above footer: ' + route, async ({ browser }) => {
-    test.setTimeout(150_000);
+for (const route of noShopPromoRoutes) {
+  test('clothing advertisement removed without disturbing page layout: ' + route, async ({browser}) => {
     const page = await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
-    const target = 'https://frightertainment-shop.fourthwall.com/en-usd';
-    for (const width of [360,390,430,768,1440,1920]) {
+    for (const width of [360,390,768,1440]) {
       await page.setViewportSize({width,height:844});
       await page.goto(route,{waitUntil:'domcontentloaded'});
-      const promo=page.locator('section.ft-shop-promo');
-      await expect(promo).toHaveCount(1);
-      const banner=promo.locator('a.ft-shop-promo__link');
-      await expect(banner).toHaveAttribute('href',target);
-      await expect(banner).toHaveAttribute('target','_blank');
-      await expect(banner).toHaveAttribute('rel','noopener noreferrer');
-      await expect(banner).toHaveAttribute('aria-label',/clothing collection.*new tab/);
-      const image=banner.locator('picture img');
-      await expect(image).toHaveAttribute('alt',/Frightertainment clothing collection:.*Shop Now/);
-      await expect(image).toHaveAttribute('loading','lazy');
-      await expect(image).toHaveAttribute('decoding','async');
-      await expect(promo.locator('picture source[media="(max-width: 640px)"]')).toHaveCount(1);
-      await promo.scrollIntoViewIfNeeded();
-      await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
-      const metrics=await page.evaluate(() => {
-        const root=document.documentElement;
-        const main=document.querySelector('main');
-        const promo=document.querySelector('section.ft-shop-promo');
-        const footer=document.querySelector('footer');
-        const link=promo.querySelector('a');
-        const img=promo.querySelector('img');
-        const a=main.getBoundingClientRect();
-        const b=promo.getBoundingClientRect();
-        const c=footer.getBoundingClientRect();
-        const l=link.getBoundingClientRect();
-        const im=img.getBoundingClientRect();
-        return {
-          docWidth:root.scrollWidth,clientWidth:root.clientWidth,
-          sectionLeft:b.left,sectionRight:b.right,
-          sectionTop:b.top,sectionBottom:b.bottom,
-          mainBottom:a.bottom,footerTop:c.top,
-          linkWidth:l.width,imageWidth:im.width,
-          imageHeight:im.height,source:new URL(img.currentSrc).pathname,
-          naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,
-          label:promo.getAttribute('aria-label')
-        };
-      });
-      expect(metrics.docWidth,route+' at '+width+'px has horizontal scrolling').toBeLessThanOrEqual(metrics.clientWidth+1);
-      expect(metrics.sectionLeft).toBeGreaterThanOrEqual(-1);
-      expect(metrics.sectionRight).toBeLessThanOrEqual(width+1);
-      expect(metrics.sectionTop,route+' overlaps preceding content').toBeGreaterThanOrEqual(metrics.mainBottom-1);
-      expect(metrics.footerTop,route+' overlaps footer').toBeGreaterThanOrEqual(metrics.sectionBottom-1);
-      expect(metrics.linkWidth).toBeGreaterThan(0);
-      expect(Math.abs(metrics.imageWidth-metrics.linkWidth)).toBeLessThanOrEqual(2);
-      expect(metrics.imageHeight).toBeGreaterThan(80);
-      expect(metrics.source).toBe(width<=640
-        ? '/assets/frightertainment-shop-banner-mobile.webp'
-        : '/assets/frightertainment-shop-banner-wide.webp');
-      expect(metrics.label).toContain('clothing');
-      if (route==='/' && (width===390 || width===1440)) {
-        await promo.screenshot({path:'test-results/visual/ft-shop-banner-home-'+width+'.png'});
-      }
+      await expect(page.locator('section.ft-shop-promo')).toHaveCount(0);
+      await expect(page.locator('a[href*="frightertainment-shop.fourthwall.com"]')).toHaveCount(0);
+      await expect(page.locator('img[src*="frightertainment-shop-banner"]')).toHaveCount(0);
+      await expect(page.locator('.hub-brand img')).toBeVisible();
+      await expect(page.locator('footer.hub-footer')).toBeVisible();
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth+1)).toBe(true);
     }
     await page.close();
   });
