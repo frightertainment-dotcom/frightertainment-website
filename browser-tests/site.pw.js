@@ -10,7 +10,7 @@ test.beforeEach(async ({page}) => {
 });
 
 const pages = [
-  ['/', 'COME CLOSER'],
+  ['/', 'WELCOME TO THE DARK'],
   ['/movies.html','HORROR'],
   ['/all-horror-movies.html','ALL HORROR'],
   ['/archive-film.html?id=Q166385','A Terrible Night'],
@@ -105,7 +105,7 @@ test('dynamic film records escape hostile text and reject credential-bearing sou
   expect(await page.evaluate(() => window.__filmXssRan)).toBe(false);
 });
 
-for (const [path, heading] of [['/', 'COME CLOSER'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
+for (const [path, heading] of [['/', 'WELCOME TO THE DARK'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
   test(`desktop visual layout: ${path}`, async ({ browser }) => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await page.goto(path);
@@ -289,7 +289,7 @@ test('film and Top 20 pages offer main-content skip links', async ({ page }) => 
 test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
   await page.goto('/');
   const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').backgroundImage);
-  expect(artURL).toContain('/assets/worlds/home-threshold.webp');
+  expect(artURL).toContain('/assets/worlds/movies-vault.webp');
   await page.goto('/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
   await expect(page.locator('.movie-card__actions a[target="_blank"]')).toHaveCount(8);
