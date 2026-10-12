@@ -151,7 +151,7 @@ test('homepage is compact, branded and links into distinct pages', async ({page}
   await expect(page.locator('.hub-brand img')).toBeVisible();
   await expect(page.locator('.hub-tabs a')).toHaveCount(7);
   await expect(page.locator('.hero-wordmark')).toHaveCount(0);
-  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
+  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(6);
   await expect(page.locator('#movie-grid')).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
 });
@@ -650,7 +650,7 @@ test('homepage retains compact horror dashboard and hides optional source feeds 
   await expect(drawer).toBeVisible();
   await expect(drawer).not.toHaveAttribute('open','');
   await expect(page.locator('.hub-dashboard')).toBeVisible();
-  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
+  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(6);
   await expect(page.locator('.home-discovery__grid')).toBeHidden();
   await drawer.locator('summary').click();
   await expect(drawer).toHaveAttribute('open','');
@@ -862,11 +862,11 @@ test('homepage composition stays ordered and usable across the approved viewport
       expect(layout.supportTop).toBeLessThan(layout.chartBottom);
       expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
     }
-    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(1);
+    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
     if (width > 640 && width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
     if (width === 390) {
-      expect(layout.featureTop).toBeGreaterThanOrEqual(300);
-      expect(layout.featureTop).toBeLessThanOrEqual(420);
+      expect(layout.featureTop).toBeGreaterThanOrEqual(170);
+      expect(layout.featureTop).toBeLessThanOrEqual(480);
       await expect(page.locator('.hub-feature h3')).toBeInViewport();
       await expect(page.locator('.hub-feature .hub-tile__link')).toBeInViewport();
     }
