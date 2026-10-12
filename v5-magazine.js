@@ -278,7 +278,7 @@
  }
  // Keep editorial-spotlight.mjs as the carousel owner: place our page sections
  // only after its async insertion; preserve the original accessible catalogue.
- if(theme==='home'){build();return;}
+ if(theme==='home'||theme==='cinema'){build();return;}
  if(main.querySelector('.editorial-carousel')){build();return;}
  const observer=new MutationObserver(()=>{
   if(main.querySelector('.editorial-carousel')){
