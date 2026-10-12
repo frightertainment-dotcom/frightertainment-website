@@ -114,3 +114,9 @@ body.hub-body .editorial-carousel .editorial-pick{width:100%;max-width:100%;marg
  .editorial-carousel__dots{order:1;width:100%;flex:1 0 100%;padding-top:8px}
 }
 @media(max-width:360px){.editorial-carousel__nav{font-size:11px;letter-spacing:0;padding:8px 10px}}
+
+.editorial-carousel__pause{min-height:44px;border:1px solid #78434e;background:transparent;color:#f6d9db;padding:10px 14px;font:800 11px/1.3 var(--font-display,Arial,sans-serif);letter-spacing:.08em;cursor:pointer}
+.editorial-carousel__pause:hover{background:#6d2937}
+.editorial-carousel__pause:focus-visible{outline:3px solid #ffe1e4;outline-offset:3px}
+.editorial-carousel__pause[hidden]{display:none}
+@media(max-width:700px){.editorial-carousel__pause{order:2;width:100%;padding:6px;min-height:36px}}
