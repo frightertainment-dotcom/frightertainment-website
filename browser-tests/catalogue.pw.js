@@ -1,9 +1,10 @@
+import { navigateLegacy,openCompleteDiscovery } from './helpers/open-full-discovery.mjs';
 import {test,expect} from '@playwright/test';
 const film = {tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,trailer:{key:'abcdefghijk',name:'Official trailer'}};
 const series = {...film,tmdbId:456,mediaType:'tv',title:'Haunted Series'};
 test('indie charts and paged archive use TMDB metadata and year changes',async({page})=>{
  await page.route('**/api/catalogue?**',route=>{const query=new URL(route.request().url()).searchParams;route.fulfill({json:{items:[film],page:Number(query.get('page')),totalPages:query.get('mode')==='archive'?2:1,totalResults:2,status:'ready'}});});
- await page.goto('/indie-movies.html');
+ await navigateLegacy(page,'/indie-movies.html');
  await expect(page.locator('#chart .fr-media-card')).toHaveCount(1);
  await expect(page.locator('#chart')).toContainText('7.8');
  await expect(page.locator('#chart img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
@@ -17,7 +18,7 @@ test('indie charts and paged archive use TMDB metadata and year changes',async({
 test('TV sections and internal detail render series metadata without Fright Rating',async({page})=>{
  await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[series],page:1,totalPages:1,status:'ready'}}));
  await page.route('**/api/media?**',route=>route.fulfill({json:{item:series,status:'ready'}}));
- await page.goto('/tv-shows.html');
+ await navigateLegacy(page,'/tv-shows.html');
  for(const section of ['chart','trending','upcoming','archive'])await expect(page.locator('#'+section+' .fr-media-card')).toHaveCount(1);
  await page.locator('#chart h3 a').click();
  await expect(page.locator('#media-detail h1')).toHaveText('Haunted Series');
@@ -30,7 +31,7 @@ test('archive film hydrates poster, viewer score, release date and trailer dialo
  const tinyPng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Yk4zh8AAAAASUVORK5CYII=','base64');
  await page.route('**/image.tmdb.org/**',route=>route.fulfill({contentType:'image/png',body:tinyPng}));
  await page.route('**/api/media?**',route=>route.fulfill({json:{item:{...film,tmdbId:3021,title:'1408',releaseDate:'2007-06-22',releaseCountry:'GB'},status:'ready'}}));
- await page.goto('/archive-film.html?id=Q203560');
+ await navigateLegacy(page,'/archive-film.html?id=Q203560');
  await expect(page.locator('.archive-detail__title')).toHaveText('1408');
  await expect(page.locator('.archive-detail__poster')).toBeVisible();
  await expect(page.locator('.archive-detail__poster')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
@@ -55,7 +56,7 @@ test('375px catalogue layouts keep posters, readable long titles and all feature
  await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[long,{...film,tmdbId:124}],page:1,totalPages:2,status:'ready'}}));
  await page.route('**/api/media?**',route=>route.fulfill({json:{item:long,status:'ready'}}));
  for(const route of ['/indie-movies.html','/tv-shows.html']){
-  await page.goto(route);
+  await navigateLegacy(page,route);
   await expect(page.locator('#chart .fr-media-card')).toHaveCount(2);
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   for(const section of ['chart','trending','upcoming','archive'])await expect(page.locator('#'+section+' h2')).toBeVisible();
@@ -81,7 +82,7 @@ test('indie chart continues past studio-heavy pages, deduplicates and stops at 2
   if(chart)requested.push(number);
   return route.fulfill({json:{items:chart?(number===1?candidates.slice(0,4):[candidates[0],...candidates.slice(4)]):[],page:number,nextPage:chart?(number===1?3:5):null,totalPages:5,status:'ready'}});
  });
- await page.goto('/indie-movies.html');
+ await navigateLegacy(page,'/indie-movies.html');
  await expect(page.locator('#chart .fr-media-card')).toHaveCount(20);
  expect(requested).toEqual([1,3]);
  await expect(page.locator('#chart h3').first()).toHaveText('Independent Film 1');
