@@ -1,0 +1,34 @@
+/* Cinematic Frightertainment visual layer — preserves all original logos and navigation. */
+body.hub-body {--fr-crimson:#d52a37;--fr-ink:#080708;--fr-fog:#d6c8c6;--fr-blood:#781923;background-color:#080708;background-image:radial-gradient(ellipse at 82% 8%,#6b0e1b44,transparent 37%),radial-gradient(ellipse at 0% 52%,#4a141b33,transparent 43%),linear-gradient(180deg,#0c080b,#060607 55%,#10080b);color:#f0e7e4}
+body.hub-body::before {background:radial-gradient(ellipse at 85% 8%,#a524312d,transparent 48%),repeating-linear-gradient(108deg,transparent 0 49px,#a66c6c08 50px 51px);opacity:.8}
+body.hub-body .hub-header{background:linear-gradient(180deg,#050506,#13090c);border-bottom:1px solid #73212b;box-shadow:0 10px 35px #0009}
+body.hub-body .hub-tabs a{border:0;border-bottom:1px solid #492329;background:transparent;color:#e8dcdb;font-family:'Cormorant Garamond',Georgia,serif;font-weight:700;font-size:clamp(12px,1.25vw,17px);letter-spacing:.035em}
+body.hub-body .hub-tabs a.active,body.hub-body .hub-tabs a[aria-current=page]{background:linear-gradient(0deg,#8b182535,transparent);color:#fff}
+body.hub-body .hub-tabs a.active::after,body.hub-body .hub-tabs a[aria-current=page]::after{background:#ed3948;box-shadow:0 0 14px #e52035}
+body.hub-body .hub-page-intro{position:relative;padding-block:clamp(24px,4vw,56px) 22px;background:radial-gradient(ellipse at 94% 25%,#74162535,transparent 48%);border-bottom:1px solid #6a2632}
+body.hub-body .hub-page-intro h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(39px,6vw,78px);font-weight:700;letter-spacing:.035em;line-height:1.02;text-shadow:0 3px 18px #000}
+body.hub-body .hub-page-intro p{max-width:750px;line-height:1.65;color:#e1d3d1}
+body.hub-body .hub-eyebrow,body.hub-body .hub-kicker{color:#dca6a7}
+body.hub-body .hub-tile,body.hub-body .hub-charts,body.hub-body .discovery-panel{border-color:#652630;border-radius:5px;box-shadow:inset 0 1px #f9b9b914,0 12px 32px #0007}
+body.hub-body .hub-tile:hover{border-color:#d44857}
+body.hub-body .hub-tile__wash{background:linear-gradient(90deg,#080507f2,#10070ad1 48%,#1a0b0d4a)}
+body.hub-body .hub-tile__content h3,body.hub-body .section-head h2{font-family:'Cormorant Garamond',Georgia,serif}
+body.hub-body .hub-page-intro em,body.hub-body .section-head em{color:#e05a63}
+.fr-editorial-hero{position:relative;isolation:isolate;overflow:hidden;margin:18px auto 30px;width:min(calc(100% - 32px),1260px);border:1px solid #9f2836;border-radius:8px;background:radial-gradient(ellipse at 85% 0%,#77202965,transparent 50%),linear-gradient(120deg,#1a090e,#080809 62%,#18090e);box-shadow:0 0 0 3px #4b11191c,inset 0 0 45px #000,0 25px 65px #000a}
+.fr-editorial-hero::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.3;background-image:url('/assets/hub-haunted.svg');background-repeat:no-repeat;background-position:95% center;background-size:55% auto;filter:grayscale(1)}
+.fr-editorial-hero::after{content:'';position:absolute;inset:5px;pointer-events:none;border:1px solid #b73a422e;border-radius:4px}
+.fr-editorial-hero__ribbon{position:relative;padding:12px 22px;border-bottom:1px solid #8e2630;background:linear-gradient(90deg,#7e1524,#300c12 70%,transparent);font:800 13px/1.35 'Barlow Condensed',Arial,sans-serif;letter-spacing:.13em;color:#fff}
+.fr-editorial-hero__content{display:grid;grid-template-columns:minmax(175px,27%) minmax(0,1fr);gap:clamp(18px,3vw,42px);padding:clamp(18px,3vw,34px);align-items:center}
+.fr-editorial-hero__art{position:relative;display:grid;place-items:center;aspect-ratio:3/4;min-width:0;overflow:hidden;padding:18px;background:radial-gradient(circle at 60% 35%,#9e27395a,transparent 42%),linear-gradient(145deg,#12090b,#280e16 50%,#080708);border:1px solid #aa3843;box-shadow:0 14px 35px #000a,inset 0 0 45px #000a}
+.fr-editorial-hero__art::before{content:'';position:absolute;inset:0;background:url('/assets/hub-haunted.svg') center / cover no-repeat;opacity:.36;filter:grayscale(1) contrast(1.4)}
+.fr-editorial-hero__art-title{position:relative;font:700 clamp(27px,3.8vw,53px)/.95 'Cormorant Garamond',Georgia,serif;color:#f6ece8;text-shadow:0 2px 18px #000;letter-spacing:.04em;text-align:center;overflow-wrap:anywhere}
+.fr-editorial-hero__detail{min-width:0}
+.fr-editorial-hero__kicker{font:800 12px/1.4 'Barlow Condensed',Arial,sans-serif;letter-spacing:.17em;color:#f08b91}
+.fr-editorial-hero__detail h2{margin:9px 0 16px;font:700 clamp(32px,4vw,60px)/.97 'Cormorant Garamond',Georgia,serif;color:#f3e4e1;letter-spacing:.01em;overflow-wrap:anywhere}
+.fr-editorial-hero__synopsis{max-width:62ch;color:#e7d9d7;font:400 clamp(15px,1.45vw,18px)/1.65 'DM Sans',Arial,sans-serif}
+.fr-editorial-hero__evidence{margin-top:18px;color:#bda9aa;font:600 12px/1.5 'DM Sans',Arial,sans-serif}
+.fr-editorial-hero__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:23px}
+.fr-editorial-hero__link{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 24px;background:linear-gradient(110deg,#a51d2b,#dc3a48);border:1px solid #ed5360;border-radius:3px;box-shadow:0 8px 22px #0008;color:#fff;font:800 14px/1.2 'Barlow Condensed',Arial,sans-serif;letter-spacing:.12em;text-decoration:none}
+.fr-editorial-hero__link:hover,.fr-editorial-hero__link:focus-visible{background:#e34350;outline:2px solid #f8b1b6;outline-offset:3px}
+@media(max-width:700px){body.hub-body .hub-header__inside{min-width:0}body.hub-body .hub-page-intro{padding-block:20px 14px}body.hub-body .hub-page-intro h1{font-size:clamp(34px,10vw,50px)}.fr-editorial-hero{width:calc(100% - 24px);margin:14px auto 24px}.fr-editorial-hero__ribbon{padding:10px 13px;font-size:11px;letter-spacing:.07em}.fr-editorial-hero__content{grid-template-columns:minmax(0,1fr);gap:18px;padding:16px}.fr-editorial-hero__art{width:min(100%,260px);aspect-ratio:4/3;justify-self:center}.fr-editorial-hero__art-title{font-size:clamp(30px,8vw,45px)}.fr-editorial-hero__detail h2{font-size:clamp(31px,9vw,45px)}.fr-editorial-hero__synopsis{font-size:15px;line-height:1.6}.fr-editorial-hero__link{width:100%}}
+@media(prefers-reduced-motion:reduce){.fr-editorial-hero *{animation:none!important;transition:none!important}}
