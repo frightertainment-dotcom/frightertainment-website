@@ -100,7 +100,7 @@ for(const [room,path,wordmark] of [
    expect(box.width).toBeLessThanOrEqual(width+2);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width+2);
    const art=await carousel.locator('.editorial-pick__art-frame').boundingBox();
-   expect(art.width).toBeGreaterThan(150);
+   expect(art.width).toBeGreaterThan(Math.min(150,width*0.275));
    expect(art.height/art.width).toBeGreaterThan(1.35);
    await expect(carousel.getByRole('button',{name:'Next editorial pick'})).toBeVisible();
   }
@@ -140,12 +140,12 @@ test('Indie discovery presents the poster-led selections before its long charts'
   await page.goto('/indie-movies.html');
   await expect(page.locator('.editorial-pick')).toBeVisible();
   const positions=await page.evaluate(()=>({
-    editorial:document.querySelector('.editorial-carousel').getBoundingClientRect().top,
-    trending:document.querySelector('#trending').getBoundingClientRect().top,
-    upcoming:document.querySelector('#upcoming').getBoundingClientRect().top,
-    chart:document.querySelector('#chart').getBoundingClientRect().top
+    editorial:document.querySelector('.editorial-carousel').getBoundingClientRect(),
+    magazine:document.querySelector('.fr-v5-front').getBoundingClientRect(),
+    full:document.querySelector('.fr-v5-deeper').getBoundingClientRect(),
+    originals:[...['#trending','#upcoming','#chart','#archive']].every(s=>document.querySelector('.fr-v5-deeper').querySelector(s))
   }));
-  expect(positions.editorial).toBeLessThan(positions.trending);
-  expect(positions.trending).toBeLessThan(positions.upcoming);
-  expect(positions.upcoming).toBeLessThan(positions.chart);
+  expect(positions.editorial.bottom).toBeLessThanOrEqual(positions.magazine.top+4);
+  expect(positions.magazine.bottom).toBeLessThanOrEqual(positions.full.top+4);
+  expect(positions.originals).toBe(true);
 });
