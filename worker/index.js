@@ -134,7 +134,7 @@ async function handleRanking(env, request, executionContext = null) {
     let dataset = await loadDataset(env.DB, kind, '');
     if (dataset.status !== 'current') {
       const waited = await refreshOnRequest(executionContext, kind, env, kind, '',
-        () => refreshCommunityChart(env, year), 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+        () => refreshCommunityChart(env, year, AbortSignal.timeout(20_000)), 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
       if (waited) dataset = await loadDataset(env.DB, kind, '');
     }
     if (!['current', 'stale'].includes(dataset.status)) {
@@ -185,7 +185,7 @@ async function handleMovieArtwork(env, executionContext = null) {
   let dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
   if (dataset.status !== 'current') {
     const waited = await refreshOnRequest(executionContext, 'tmdb-movie-artwork', env, 'tmdb-movie-artwork', '',
-      () => refreshMovieArtwork(env, env.DB), 7 * 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
+      () => refreshMovieArtwork(env, env.DB, AbortSignal.timeout(20_000)), 7 * 24 * 60 * 60 * 1000, 'tmdb-request-on-demand');
     if (waited) dataset = await loadDataset(env.DB, 'tmdb-movie-artwork', '');
   }
   const available = ['current', 'stale'].includes(dataset.status);
@@ -238,7 +238,8 @@ async function handleTMDBMedia(env, request, catalogue = false, executionContext
   let dataset = await loadDataset(env.DB, kind, datasetCountry);
   if (dataset.status !== 'current') {
     const waited = await refreshOnRequest(executionContext, kind, env, kind, datasetCountry, async () => {
-      const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
+      const boundedOptions = { ...options, signal: AbortSignal.timeout(20_000) };
+      const result = catalogue ? await fetchCatalogue(env, boundedOptions) : { items: [await fetchMedia(env, boundedOptions)].filter(Boolean) };
       // Provider availability is territory-bound; never store a GB/US provider
       // snapshot as "Global", which the D1 provenance validator must reject.
       return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org',
