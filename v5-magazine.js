@@ -98,6 +98,25 @@
    grid.replaceChildren(...data.slice(0,config.type==='indie'?3:8).map(x=>poster(x,config.type)));
   }catch{mockFreeState(grid,'The live catalogue is unavailable right now. The full catalogue and archive remain below.');}
  };
+ const addNotices=async(parent)=>{
+  const p=panel('fr-v5-notices','LATEST HORROR DROPS','Source-checked UK release notices.','#straight-to-stream');
+  const list=el('div','fr-v5-notices__list','Loading verified notices…');p.append(list);parent.append(p);
+  try{
+   const response=await fetch('/data/editorial-releases.json');
+   if(!response.ok)throw Error('Notices unavailable');
+   const data=await response.json();
+   const entries=(Array.isArray(data.items)?data.items:[]).filter(x=>x&&typeof x.title==='string'&&/^https:\/\//.test(x.sourceUrl||'')&&['streaming','cinema','vod'].includes(x.category)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,5);
+   if(!entries.length)return mockFreeState(list,'No recent source-checked notices are available.');
+   list.replaceChildren(...entries.map(x=>{
+    const a=link('',x.sourceUrl,'fr-v5-notices__row');a.target='_blank';a.rel='noopener noreferrer';
+    const copy=el('span','fr-v5-notices__copy');
+    copy.append(el('strong','',x.title),el('small','',x.service+' · '+x.date));
+    a.append(copy,el('span','fr-v5-notices__arrow','↗'));
+    return a;
+   }));
+   list.append(el('p','fr-v5-notices__warning','Announcements are not live availability guarantees.'));
+  }catch{mockFreeState(list,'Release notices are temporarily unavailable. Use the complete discovery tools below.');}
+ };
  const addRanking=async(parent)=>{
   const p=panel('fr-v5-ranking','TOP 20 HORROR','TMDB community rankings, where available.','/top-20/'+new Date().getFullYear()+'/');
   const list=el('ol','fr-v5-ranking__list');p.append(list);parent.append(p);
@@ -213,6 +232,7 @@
   }else{
    const upper=el('div','fr-v5-feature-panels');
    if(theme==='movies'){
+    jobs.push(addNotices(upper));
     jobs.push(addRanking(upper));
     jobs.push(addTrailer(upper,'movie'));
     showcase.append(upper);
@@ -241,12 +261,12 @@
     main.append(details);
     const reveal=()=>{
      const hash=location.hash.slice(1);
-     if(hash && details.querySelector('#'+CSS.escape(hash)))details.open=true;
+     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){details.open=true;}
     };
     window.addEventListener('hashchange',reveal);
     document.addEventListener('click',event=>{
      const anchor=event.target.closest('a[href^="#"]');
-     if(anchor&&details.querySelector(anchor.getAttribute('href'))){
+     if(anchor&&/^#[a-zA-Z][a-zA-Z0-9_-]*$/.test(anchor.getAttribute('href')||'')&&details.querySelector(anchor.getAttribute('href'))){
       details.open=true;
      }
     });
