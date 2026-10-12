@@ -634,3 +634,12 @@ body.hub-body .editorial-pick__facts .editorial-pick__score{
   overflow-wrap:normal;word-break:normal;
  }
 }
+
+/* Correct an inherited @max640 grid-column span that pushed In Cinemas onto its own mobile row. Existing six links are preserved and visible. */
+@media(max-width:720px){
+ body.hub-body[data-theme="movies"] main>.hub-page-intro>.hub-section-jumps a,
+ body.hub-body[data-theme="movies"] main>.hub-page-intro>.hub-section-jumps a:last-child{
+  grid-column:auto;
+  grid-row:auto;
+ }
+}
