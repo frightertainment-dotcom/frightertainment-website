@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { londonDayIndex, selectEditorialPick, buildEditorialCarousel } from '../editorial-spotlight.mjs';
+import { londonDayIndex, selectEditorialPick, buildEditorialCarousel, matchedMedia, artHasRights, filmMediaIdentities } from '../editorial-spotlight.mjs';
 const root=new URL('../', import.meta.url);
 const read=path=>readFile(new URL(path,root),'utf8');
 test('London calendar day index changes at local midnight through DST',()=>{
@@ -57,4 +57,23 @@ test('Carousel uses all eligible entries once; an approved owner nomination lead
  assert.equal(unknown.overridden,false);
  assert.equal(unknown.slides[0].id,today.slides[0].id);
  assert.deepEqual(buildEditorialCarousel([],100).slides,[]);
+});
+test('Pinned poster identity rejects a remake, a title collision and a different TMDB film',()=>{
+ const item={title:'Heretic',year:2024,mediaIdentity:filmMediaIdentities.heretic};
+ const exact={type:'movie',tmdbId:1138194,title:'Heretic',firstReleaseDate:'2024-11-08',
+   sourceUrl:'https://www.themoviedb.org/movie/1138194',posterPath:'/official.jpg'};
+ assert.equal(matchedMedia(item,exact),true);
+ assert.equal(matchedMedia(item,{...exact,firstReleaseDate:'2018-01-01'}),false);
+ assert.equal(matchedMedia(item,{...exact,title:'The Heretic'}),false);
+ assert.equal(matchedMedia(item,{...exact,tmdbId:502716,sourceUrl:'https://www.themoviedb.org/movie/502716'}),false);
+ assert.equal(matchedMedia(item,{...exact,posterPath:'https://unapproved.example/poster.jpg'}),false);
+});
+test('A direct promotional poster requires documented rights, source and scope',()=>{
+ const good={poster:'https://studio.example/poster.jpg',posterLicenceStatus:'approved',
+  posterCredit:'Studio',posterPermission:'Written promotional use',posterUsageScope:'website spotlight',
+  posterSourcePage:'https://studio.example/film',posterPermissionEvidence:'https://studio.example/permission'};
+ assert.equal(artHasRights(good),true);
+ assert.equal(artHasRights({...good,posterPermissionEvidence:''}),false);
+ assert.equal(artHasRights({...good,posterUsageScope:''}),false);
+ assert.equal(artHasRights({...good,posterLicenceStatus:'pending'}),false);
 });
