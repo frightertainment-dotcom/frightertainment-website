@@ -141,7 +141,7 @@ body.hub-home :is(.fr-home-updates>summary,.hub-feature .hub-tile__link,.hub-sho
   grid-template-areas:'feature' 'ranking' 'support';gap:10px}
  body.hub-home .hub-dashboard.hub-showcase>.hub-charts{position:relative;width:100%;inset:auto}
  body.hub-home .hub-feature{min-height:290px}
- body.hub-home .hub-showcase__bottom{grid-template-columns:repeat(3,minmax(0,1fr))}
+ body.hub-home .hub-showcase__bottom{grid-template-columns:repeat(2,minmax(0,1fr))}
  body.hub-home .hub-showcase__bottom .hub-tile{min-height:175px}
 }
 @media(max-width:640px){
