@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="430" viewBox="0 0 1440 430" role="img" aria-label="An original Frightertainment haunted manor beneath a red moon">
+<defs>
+ <linearGradient id="night" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#020405"/><stop offset=".66" stop-color="#0b1013"/><stop offset="1" stop-color="#11080c"/></linearGradient>
+ <radialGradient id="moon"><stop stop-color="#d4414a"/><stop offset=".58" stop-color="#9c1628"/><stop offset=".96" stop-color="#43101c"/><stop offset="1" stop-color="#43101c" stop-opacity="0"/></radialGradient>
+ <radialGradient id="glow"><stop stop-color="#e9464e" stop-opacity=".6"/><stop offset="1" stop-color="#be132c" stop-opacity="0"/></radialGradient>
+ <linearGradient id="fog" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#401c24" stop-opacity=".44"/><stop offset="1" stop-color="#172329" stop-opacity="0"/></linearGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="17"/></filter>
+ <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".48" numOctaves="3" seed="9"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".1"/></feComponentTransfer></filter>
+ <symbol id="pine" viewBox="0 0 80 210"><path fill="#030607" d="M37 205H44L43 151 78 159 56 125 70 128 49 99 64 102 48 75 59 77 41 20 23 77 35 75 19 102 34 99 11 128 26 125 2 159 39 151Z"/></symbol>
+</defs>
+<path fill="url(#night)" d="M0 0H1440V430H0Z"/>
+<circle cx="1130" cy="125" r="169" fill="url(#glow)"/>
+<circle cx="1130" cy="125" r="71" fill="url(#moon)"/>
+<path d="M1078 86c31 11 61-12 100 16-17-3-38-5-45 9-20-13-42-15-55-25ZM1100 150c36-1 49-26 72-23-13 13-27 23-40 22-11 0-22 2-32 1Z" fill="#5f101c" opacity=".35"/>
+<path d="M0 335Q210 285 400 320T840 301Q990 263 1172 295T1440 293V430H0Z" fill="#0a0c0c"/>
+<g opacity=".81">
+ <use href="#pine" x="785" y="43" width="170" height="365"/><use href="#pine" x="883" y="13" width="130" height="402"/><use href="#pine" x="1336" y="22" width="170" height="405"/>
+ <use href="#pine" x="708" y="93" width="112" height="300"/><use href="#pine" x="1258" y="66" width="145" height="347"/>
+</g>
+<g transform="translate(890 120)">
+ <path d="M24 239V94L144 22 260 93V237Z" fill="#080a0c" stroke="#1c2425" stroke-width="4"/>
+ <path d="M9 103 144 1 278 106 246 94 143 24 37 98Z" fill="#030506" stroke="#303337" stroke-width="3"/>
+ <path d="M109 44V0L142-28 178 0V46L143 25Z" fill="#0a0b0c" stroke="#232425" stroke-width="3"/>
+ <path d="M118 4 143-15 169 4Z" fill="#030405"/>
+ <path d="M53 235V136L110 136V235M178 235V136L235 136V235" fill="#050507" stroke="#161b1c" stroke-width="8"/>
+ <path d="M126 238V151H160V238Z" fill="#030608" stroke="#2c2d2a" stroke-width="4"/>
+ <path d="M122 172H164V175H122Z" fill="#4b0d14"/><circle cx="152" cy="203" r="2" fill="#d03c35"/>
+ <g fill="#ac3038"><path d="M52 101H98V136H52Z"/><path d="M192 101H237V136H192Z"/><path d="M133 50H159V84H133Z"/></g>
+ <g stroke="#5c181c" stroke-width="3"><path d="M75 100V137M52 118H98M214 100V137M192 118H237M147 50V84M133 67H159"/></g>
+ <path d="M11 239H283V253H11Z" fill="#060608"/>
+ <path d="M-2 246 145 255 290 247" fill="none" stroke="#162023" stroke-width="4"/>
+</g>
+<g opacity=".72">
+ <use href="#pine" x="792" y="190" width="115" height="236"/><use href="#pine" x="1198" y="152" width="133" height="282"/><use href="#pine" x="1311" y="135" width="146" height="286"/>
+</g>
+<path fill="url(#fog)" d="M0 270H1440V430H0Z"/>
+<path fill="#871d2c" opacity=".11" filter="url(#blur)" d="M750 343Q945 260 1090 314T1435 335V429H750Z"/>
+<path fill="#fff" filter="url(#noise)" d="M0 0H1440V430H0Z" opacity=".2"/>
+<path fill="#020204" opacity=".15" d="M0 0H1440V430H0Z"/>
+</svg>
