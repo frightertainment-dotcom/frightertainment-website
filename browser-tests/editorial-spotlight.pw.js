@@ -25,11 +25,15 @@ for(const [room,path,wordmark] of routes){
    await expect(carousel).toHaveAttribute('aria-roledescription','carousel');
    await expect(carousel.getByRole('button',{name:'Next editorial pick'})).toBeVisible();
    await expect(carousel.getByRole('button',{name:'Previous editorial pick'})).toBeVisible();
+   await expect(carousel.locator('.editorial-carousel__dot')).toHaveCount(5);
    const before=await carousel.getAttribute('data-feature-id');
    await carousel.getByRole('button',{name:'Next editorial pick'}).click();
    await expect.poll(()=>carousel.getAttribute('data-feature-id')).not.toBe(before);
    await expect(page.locator('.editorial-carousel__status')).toContainText('OF');
    await expect(page.locator('.hub-page-intro + .editorial-carousel')).toBeVisible();
+   await expect(carousel.getByRole('button',{name:'Resume automatic editorial rotation'})).toBeVisible();
+   await carousel.getByRole('button',{name:'Resume automatic editorial rotation'}).click();
+   await expect(carousel.getByRole('button',{name:'Pause automatic editorial rotation'})).toBeVisible();
    await expect(hero.locator('.editorial-pick__synopsis')).not.toBeEmpty();
    await expect(hero.locator('.editorial-pick__score')).toContainText('FRIGHT RATING');
    const filmID=await hero.getAttribute('data-feature-id');
@@ -37,6 +41,7 @@ for(const [room,path,wordmark] of routes){
    expect(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth+3))
      .toBeTruthy();
    expect(missingAssets).toEqual([]);
+   await page.evaluate(() => window.scrollTo(0,0));
    await page.screenshot({path:'test-results/cinematic-'+room+'-'+name+'.png',fullPage:false});
   });
  }
