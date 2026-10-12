@@ -107,3 +107,45 @@ for(const [room,path,wordmark] of [
   expect(errors).toEqual([]);
  });
 }
+
+
+test('Concept parity keeps the seven desktop tabs and a two-column phone editorial', async ({page}) => {
+  await pin(page,'longlegs');
+  await page.route('**/api/media?**',route=>route.fulfill({status:503}));
+  for(const width of [390,1440]) {
+    await page.setViewportSize({width,height:900});
+    await page.goto('/movies.html');
+    await expect(page.locator('.editorial-pick')).toBeVisible();
+    const result=await page.evaluate(()=>{
+      const tabs=[...document.querySelectorAll('.hub-tabs a')];
+      const poster=document.querySelector('.editorial-pick__art').getBoundingClientRect();
+      const copy=document.querySelector('.editorial-pick__content').getBoundingClientRect();
+      return {
+        tabs:tabs.length,
+        navRows:new Set(tabs.map(a=>Math.round(a.getBoundingClientRect().top))).size,
+        sideBySide:poster.right<=copy.left+2 && Math.abs(poster.top-copy.top)<16,
+        width:document.documentElement.scrollWidth,
+        viewport:innerWidth
+      };
+    });
+    expect(result.tabs).toBe(7);
+    if(width===1440) expect(result.navRows).toBe(1);
+    if(width===390) expect(result.sideBySide).toBe(true);
+    expect(result.width).toBeLessThanOrEqual(result.viewport+2);
+  }
+});
+
+test('Indie discovery presents the poster-led selections before its long charts',async({page})=>{
+  await page.setViewportSize({width:390,height:900});
+  await page.goto('/indie-movies.html');
+  await expect(page.locator('.editorial-pick')).toBeVisible();
+  const positions=await page.evaluate(()=>({
+    editorial:document.querySelector('.editorial-carousel').getBoundingClientRect().top,
+    trending:document.querySelector('#trending').getBoundingClientRect().top,
+    upcoming:document.querySelector('#upcoming').getBoundingClientRect().top,
+    chart:document.querySelector('#chart').getBoundingClientRect().top
+  }));
+  expect(positions.editorial).toBeLessThan(positions.trending);
+  expect(positions.trending).toBeLessThan(positions.upcoming);
+  expect(positions.upcoming).toBeLessThan(positions.chart);
+});
