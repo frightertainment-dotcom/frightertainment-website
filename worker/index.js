@@ -169,7 +169,7 @@ async function handleMovieArtwork(env) {
     { 'cache-control': 'public, max-age=300' });
 }
 
-async function handleTMDBMedia(env, request, catalogue = false) {
+async function handleTMDBMedia(env, request, catalogue = false, executionContext = null) {
   if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
   const params = new URL(request.url).searchParams;
   const type = params.get('type') || 'movie';
@@ -211,14 +211,22 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   const datasetCountry = watchMode ? country : '';
   let dataset = await loadDataset(env.DB, kind, datasetCountry);
   if (dataset.status !== 'current') {
-    await refreshTask(env, kind, datasetCountry, async () => {
+    // A first-time catalogue or media refresh can require dozens of provider
+    // calls. Never keep a visitor's HTTP request open until that work finishes:
+    // return the last validated snapshot (marked stale), or an explicit 503
+    // while an empty cache warms. Cloudflare retains the refresh via waitUntil.
+    // Do not claim a newly acquired dataset or an updated freshness timestamp.
+    const refresh = refreshTask(env, kind, datasetCountry, async () => {
       const result = catalogue ? await fetchCatalogue(env, options) : { items: [await fetchMedia(env, options)].filter(Boolean) };
-      // Provider availability is territory-bound; never store a GB/US provider
-      // snapshot as "Global", which the D1 provenance validator must reject.
       return { ...result, kind, sourceName: 'TMDB', sourceUrl: 'https://www.themoviedb.org',
         territory: watchMode ? country : 'Global', checkedAt: today() };
     }, (catalogue ? 24 : 48) * 60 * 60 * 1000, 'tmdb-request-on-demand');
-    dataset = await loadDataset(env.DB, kind, datasetCountry);
+    if (executionContext?.waitUntil) {
+      executionContext.waitUntil(refresh);
+    } else {
+      await refresh;
+      dataset = await loadDataset(env.DB, kind, datasetCountry);
+    }
   }
   const freshness = { status: dataset.status, stale: dataset.status === 'stale', updatedAt: dataset.updatedAt || null };
   if (catalogue) return json({ ...dataset, ...freshness }, dataset.status === 'unavailable' ? 503 : 200, { 'cache-control': 'private, max-age=120' });
@@ -480,15 +488,15 @@ async function handleAdmin(env, request, path) {
   return json({ error: 'Not found' }, 404, { 'cache-control': 'no-store' });
 }
 
-async function fetchHandler(request, env) {
+async function fetchHandler(request, env, executionContext = null) {
   const path = new URL(request.url).pathname;
   if (path === '/api/health') return json({ status: 'ok', apiVersion: 1 });
   try {
     if (path === '/api/discovery' && request.method === 'GET') return await handleDiscovery(env, request);
     if (path === '/api/rankings' && request.method === 'GET') return await handleRanking(env, request);
     if (path === '/api/movie-artwork' && request.method === 'GET') return await handleMovieArtwork(env);
-    if (path === '/api/media' && request.method === 'GET') return await handleTMDBMedia(env, request);
-    if (path === '/api/catalogue' && request.method === 'GET') return await handleTMDBMedia(env, request, true);
+    if (path === '/api/media' && request.method === 'GET') return await handleTMDBMedia(env, request, false, executionContext);
+    if (path === '/api/catalogue' && request.method === 'GET') return await handleTMDBMedia(env, request, true, executionContext);
     if (path.startsWith('/api/films/') && request.method === 'GET') {
       let filmId;
       try { filmId = decodeURIComponent(path.slice('/api/films/'.length)); }
