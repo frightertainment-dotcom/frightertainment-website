@@ -1122,7 +1122,7 @@ test('editorial movie cards remain readable with one card per row on phones',asy
   expect(metrics.readableTitle).toBe(true);
   expect(metrics.viewportOverflow).toBe(false);
 });
-test('all seven main tabs fit narrow and wide viewports, with centred second-row links',async({browser})=>{
+test('all seven main tabs remain reachable in concept-style single-row navigation',async({browser})=>{
   test.setTimeout(150000);
   for(const width of [320,375,390,768,1440]){
     const page=await browser.newPage({viewport:{width,height:820},reducedMotion:'reduce'});
@@ -1133,18 +1133,19 @@ test('all seven main tabs fit narrow and wide viewports, with centred second-row
       await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       if(width<=640){
         const values=await page.locator('.hub-tabs').evaluate(nav=>{
-          const box=nav.getBoundingClientRect();
           const links=[...nav.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
-          return {diff:Math.abs((links[4].left+links[6].right)/2 - (box.left+box.right)/2),
-            row2:links[4].top,firstRow:links[0].top,lastRow:links[6].top,
-            fourFirstRow:links.slice(0,4).every(r=>Math.abs(r.top-links[0].top)<1),
-            threeSecondRow:links.slice(4).every(r=>Math.abs(r.top-links[4].top)<1)};
+          return {allSameRow:links.every(x=>Math.abs(x.top-links[0].top)<2),
+            allHaveWidth:links.every(x=>x.width>=36),
+            navigable:nav.scrollWidth>=nav.clientWidth,
+            pageWidth:document.documentElement.scrollWidth,viewport:innerWidth};
         });
-        expect(values.row2).toBeGreaterThan(values.firstRow);
-        expect(values.row2).toBe(values.lastRow);
-        expect(values.diff).toBeLessThanOrEqual(4);
-        expect(values.fourFirstRow).toBe(true);
-        expect(values.threeSecondRow).toBe(true);
+        expect(values.allSameRow).toBe(true);
+        expect(values.allHaveWidth).toBe(true);
+        expect(values.navigable).toBe(true);
+        expect(values.pageWidth).toBeLessThanOrEqual(values.viewport+2);
+        await page.locator('.hub-tabs a[href="/games.html"]').scrollIntoViewIfNeeded();
+        await expect(page.locator('.hub-tabs a[href="/games.html"]')).toBeVisible();
+
       }
     }
     if(width===375){await navigateLegacy(page,'/movies.html');await page.screenshot({path:'test-results/visual/frightertainment-movies-375px.png',fullPage:true});}
