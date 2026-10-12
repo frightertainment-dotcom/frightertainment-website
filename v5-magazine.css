@@ -656,3 +656,30 @@ body.fr-v5 .fr-v5-notices__warning{
  body.fr-v5 .fr-v5-deeper>section.shell{width:calc(100% - 12px)}
  body.fr-v5 .fr-v5-deeper>.fr-catalogue-section{max-width:calc(100% - 12px)}
 }
+
+
+/* Owner concept: haunted manor silhouette and blood moon behind title logos.
+   Original first-party illustration; never replace the approved wordmark images. */
+body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro,
+body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro{
+ background:linear-gradient(90deg,#050506fc 0%,#080608eb 40%,#09050798 67%,#08060843 100%),
+ url('/assets/v5-haunted-moon.svg') 88% center/cover no-repeat!important;
+}
+body.fr-v5.hub-section .hub-page-intro::before{
+ content:none!important;
+}
+body.fr-v5 .editorial-pick{
+ background-image:linear-gradient(95deg,#070507f9 0%,#0c070adf 38%,#070507a5 74%,#080506eb),
+ var(--pick-scene);
+}
+body.fr-v5 .editorial-pick::after{
+ pointer-events:none;border:1px solid #b43f4a85;
+ box-shadow:inset 0 0 18px #ce273a1b;
+}
+@media(max-width:700px){
+ body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro,
+ body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro{
+  background:linear-gradient(90deg,#080609f7 0%,#080609e8 46%,#0806097d 100%),
+  url('/assets/v5-haunted-moon.svg') 77% center/cover no-repeat!important;
+ }
+}
