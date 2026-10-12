@@ -49,7 +49,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  expect(visual.artRight).toBeLessThanOrEqual(visual.textLeft+4);
  expect(visual.pageWidth).toBeLessThanOrEqual(visual.viewport+2);
  expect(visual.legacyOpen).toBe(false);
- await page.screenshot({path:'test-results/visual/v5-indie-mobile.png',fullPage:true});
+ await page.screenshot({path:'test-results/visual/v5-indie-mobile.png',fullPage:false});
 });
 
 test('V5 desktop Movies matches three-panels-above-eight-posters layout',async({page})=>{
@@ -71,7 +71,7 @@ test('V5 desktop Movies matches three-panels-above-eight-posters layout',async({
  expect(layout.panelsOneRow).toBe(true);
  expect(layout.rackAfter).toBe(true);
  expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewport+2);
- await page.screenshot({path:'test-results/visual/v5-movies-desktop.png',fullPage:true});
+ await page.screenshot({path:'test-results/visual/v5-movies-desktop.png',fullPage:false});
 });
 
 test('Original tools remain functional and accessible through the full discovery disclosure',async({page})=>{
@@ -114,5 +114,5 @@ test('Home keeps authentic site logo and working chart with condensed presentati
  await expect(page.locator('#hub-ranking')).toBeVisible();
  await expect(page.locator('.hub-feature')).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
- await page.screenshot({path:'test-results/visual/v5-home-mobile.png',fullPage:true});
+ await page.screenshot({path:'test-results/visual/v5-home-mobile.png',fullPage:false});
 });
