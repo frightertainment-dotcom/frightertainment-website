@@ -182,6 +182,7 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   feature.setAttribute('aria-label', config.title + ' daily editorial pick');
   feature.dataset.dayIndex = String(dayIndex);
   feature.dataset.featureId = item.id;
+  feature.dataset.ownerSelected = overridden ? 'true' : 'false';
 
   const art = make('div', 'editorial-pick__art');
   const card = make('div', 'editorial-pick__art-frame');
@@ -227,7 +228,7 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     'FRIGHT RATING ' + item.frightRating.toFixed(1) + '/10' : 'FRIGHT RATING · AWAITING VERIFIED SCORES'));
   const checked = dateLabel(item.checkedAt);
   if (checked) meta.append(make('span', '', 'SOURCE CHECKED ' + checked));
-  content.append(meta);
+  // Rating and verified-source facts belong in the dedicated facts rail, not duplicated under the synopsis.
   const links = make('div', 'editorial-pick__links');
   addLink(links, item.sourceUrl.startsWith('/films/') ? 'EXPLORE FILM FILE →' : 'EXPLORE OFFICIAL PAGE →',
     item.sourceUrl, 'editorial-pick__cta');
@@ -242,6 +243,7 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   if (item.year) facts.append(make('strong', '', String(item.year)));
   facts.append(make('span', '', item.category));
   facts.append(make('small', '', 'SOURCE · ' + (item.sourceName || 'Official source')));
+  facts.append(meta);
   feature.append(art, content, facts);
   return feature;
 }
