@@ -359,3 +359,27 @@ body.hub-body main[data-catalogue-type="indie"]>.editorial-pick__unavailable{ord
 @media(prefers-reduced-motion:reduce){
  body.hub-body .fr-media-card__poster img{transition:none!important}
 }
+
+/* Regression corrections after measured browser failures:
+   keep full film titles intact and preserve accessible colour contrast. */
+body.hub-body .hub-tabs a:is(.active,[aria-current="page"]){
+ color:#fff4f1;background:#39121b;border-bottom-color:#f25262;
+}
+body.hub-body .editorial-pick__art-title{
+ overflow-wrap:normal;word-break:normal;hyphens:none;
+}
+@media(max-width:700px){
+ body.hub-body .editorial-pick{
+  grid-template-columns:minmax(155px,43%) minmax(0,1fr);
+ }
+ body.hub-body .editorial-pick__art-frame{min-width:155px}
+}
+@media(max-width:365px){
+ body.hub-body .editorial-pick{
+  grid-template-columns:minmax(0,1fr);
+ }
+ body.hub-body .editorial-pick__art{grid-column:1;width:min(70vw,245px);justify-self:center}
+ body.hub-body .editorial-pick__content{grid-column:1;min-width:0}
+ body.hub-body .editorial-pick__facts{grid-column:1}
+ body.hub-body .editorial-pick__art-frame{width:100%;min-width:155px}
+}
