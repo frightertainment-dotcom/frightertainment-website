@@ -32,3 +32,12 @@ body.hub-body .hub-page-intro em,body.hub-body .section-head em{color:#e05a63}
 .fr-editorial-hero__link:hover,.fr-editorial-hero__link:focus-visible{background:#e34350;outline:2px solid #f8b1b6;outline-offset:3px}
 @media(max-width:700px){body.hub-body .hub-header__inside{min-width:0}body.hub-body .hub-page-intro{padding-block:20px 14px}body.hub-body .hub-page-intro h1{font-size:clamp(34px,10vw,50px)}.fr-editorial-hero{width:calc(100% - 24px);margin:14px auto 24px}.fr-editorial-hero__ribbon{padding:10px 13px;font-size:11px;letter-spacing:.07em}.fr-editorial-hero__content{grid-template-columns:minmax(0,1fr);gap:18px;padding:16px}.fr-editorial-hero__art{width:min(100%,260px);aspect-ratio:4/3;justify-self:center}.fr-editorial-hero__art-title{font-size:clamp(30px,8vw,45px)}.fr-editorial-hero__detail h2{font-size:clamp(31px,9vw,45px)}.fr-editorial-hero__synopsis{font-size:15px;line-height:1.6}.fr-editorial-hero__link{width:100%}}
 @media(prefers-reduced-motion:reduce){.fr-editorial-hero *{animation:none!important;transition:none!important}}
+
+/* Accessible compact editorial carousel controls. */
+.fr-editorial-hero__controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 clamp(18px,3vw,34px) 18px}
+.fr-editorial-hero__controls[hidden]{display:none}
+.fr-editorial-hero__nav{appearance:none;min-height:44px;padding:10px 18px;border:1px solid #8d3943;border-radius:3px;background:#1e0d13;color:#f4e7e6;font:800 13px 'Barlow Condensed',Arial,sans-serif;letter-spacing:.1em;cursor:pointer}
+.fr-editorial-hero__nav:hover{background:#69202c}
+.fr-editorial-hero__nav:focus-visible{outline:2px solid #ffc5c9;outline-offset:3px}
+.fr-editorial-hero__position{font:700 13px 'DM Sans',Arial,sans-serif;color:#efc0c2;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.fr-editorial-hero__controls{padding:0 16px 16px}.fr-editorial-hero__nav{padding:10px 12px}}
