@@ -59,6 +59,38 @@ const safeDestination = value => {
 };
 const claim = (movie, field) => movie.claims?.find(item => item.field === field);
 const filmSource = movie => claim(movie, 'title')?.source || claim(movie, 'synopsis')?.source || '';
+// Exact identities reviewed against the named film, original year and the archive's
+// IMDb identifiers (or the corresponding TMDB title page). Never search artwork by title.
+export const filmMediaIdentities = Object.freeze({
+  'longlegs': { id: 1226578, year: 2024 },
+  'heart-eyes': { id: 1302916, year: 2025 },
+  'heretic': { id: 1138194, year: 2024 },
+  'nosferatu': { id: 426063, year: 2024 },
+  'the-monkey': { id: 1124620, year: 2025 },
+  '28-years-later': { imdb: 'tt10548174', year: 2025 },
+  '28-years-later-bone-temple': { imdb: 'tt32141377', year: 2026 },
+  'five-nights-at-freddys-2': { imdb: 'tt30274401', year: 2025 },
+  'together': { imdb: 'tt31184028', year: 2025 },
+  'bring-her-back': { imdb: 'tt32246771', year: 2025 },
+  'scream-7': { imdb: 'tt27047903', year: 2026 },
+  '28-weeks-later': { imdb: 'tt0463854', year: 2007 },
+  '28-days-later': { imdb: 'tt0289043', year: 2002 }
+});
+const indieFilmIds = Object.freeze({
+  'indie-movies-0':'longlegs', 'indie-movies-1':'the-monkey',
+  'indie-movies-2':'together', 'indie-movies-3':'heretic',
+  'indie-movies-4':'bring-her-back', 'indie-movies-5':'nosferatu'
+});
+export function matchedMedia(item, media) {
+  const identity = item.mediaIdentity;
+  if (!identity || !media || media.type !== 'movie' || (identity.id && media.tmdbId !== identity.id) ||
+      !Number.isInteger(media.tmdbId) || !/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(media.posterPath || '')) return false;
+  const normal = value => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  return normal(media.title) === normal(item.title) &&
+    Number(String(media.firstReleaseDate || media.releaseDate || '').slice(0,4)) === identity.year &&
+    Number(item.year) === identity.year &&
+    media.sourceUrl === 'https://www.themoviedb.org/movie/' + media.tmdbId;
+}
 const getFilmCandidates = (overviewData = {}) => (window.FR_MOVIES || [])
   .filter(movie => movie.editorialStatus === 'approved' && movie.id && movie.title &&
     httpUrl(filmSource(movie)) && (claim(movie, 'synopsis')?.value ||
@@ -66,7 +98,8 @@ const getFilmCandidates = (overviewData = {}) => (window.FR_MOVIES || [])
   .map(movie => ({
     id: movie.id, title: movie.title,
     category: claim(movie, 'genre')?.value || 'SOURCE-CHECKED HORROR',
-    description: claim(movie, 'synopsis')?.value || overviewData[movie.id]?.description,
+    description: (claim(movie, 'synopsis')?.value || '').length >= 100 ?
+      claim(movie, 'synopsis').value : overviewData[movie.id]?.description,
     overviewSource: claim(movie, 'synopsis')?.source || overviewData[movie.id]?.sourceUrl || '',
     sourceName: claim(movie, 'title')?.sourceName || 'Official film source',
     sourceUrl: '/films/' + encodeURIComponent(movie.id) + '/',
@@ -80,9 +113,12 @@ const getFilmCandidates = (overviewData = {}) => (window.FR_MOVIES || [])
     posterSourcePage: movie.posterSourcePage,
     posterPermissionEvidence: movie.posterPermissionEvidence,
     posterUsageScope: movie.posterUsageScope,
+    mediaIdentity: filmMediaIdentities[movie.id],
     // Do not borrow ratings from unrelated publishers or fabricate an audience review.
     frightRating: null
   }))
+  .filter(item => item.mediaIdentity && Number(item.year) === item.mediaIdentity.year &&
+    item.description?.length >= 100)
   .sort((a, b) => a.id.localeCompare(b.id, 'en'));
 
 function make(tag, className, value) {
@@ -109,10 +145,10 @@ function verifiedTrailer(item) {
   if (item.externalSource && !trailer.claimMatched) return null;
   return trailer;
 }
-function artHasRights(item) {
-  return httpUrl(item.poster) && item.posterLicenceStatus === 'approved' &&
+export function artHasRights(item) {
+  return Boolean(httpUrl(item.poster) && item.posterLicenceStatus === 'approved' &&
     item.posterCredit && item.posterPermission && item.posterUsageScope &&
-    httpUrl(item.posterSourcePage) && httpUrl(item.posterPermissionEvidence);
+    httpUrl(item.posterSourcePage) && httpUrl(item.posterPermissionEvidence));
 }
 function dateLabel(date) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return '';
@@ -146,15 +182,26 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   feature.setAttribute('aria-label', config.title + ' daily editorial pick');
   feature.dataset.dayIndex = String(dayIndex);
   feature.dataset.featureId = item.id;
+  feature.dataset.ownerSelected = overridden ? 'true' : 'false';
 
   const art = make('div', 'editorial-pick__art');
   const card = make('div', 'editorial-pick__art-frame');
+  card.dataset.artIdentity = item.id;
   if (artHasRights(item)) {
     const img = make('img', 'editorial-pick__poster');
     img.src = httpUrl(item.poster);
     img.alt = 'Licensed promotional poster for ' + item.title;
     img.loading = 'eager';
     img.decoding = 'async';
+    img.addEventListener('error', () => {
+      if (!card.isConnected) return;
+      card.replaceChildren(
+        make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'),
+        make('strong', 'editorial-pick__art-title', item.title),
+        make('span', 'editorial-pick__art-sub', 'FRIGHTERTAINMENT ORIGINAL DISPLAY ART · NOT AN OFFICIAL POSTER')
+      );
+      card.classList.remove('editorial-pick__art-frame--poster');
+    }, {once:true});
     card.append(img);
     card.append(make('small', 'editorial-pick__art-credit', 'Artwork © ' + item.posterCredit));
   } else {
@@ -181,7 +228,7 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     'FRIGHT RATING ' + item.frightRating.toFixed(1) + '/10' : 'FRIGHT RATING · AWAITING VERIFIED SCORES'));
   const checked = dateLabel(item.checkedAt);
   if (checked) meta.append(make('span', '', 'SOURCE CHECKED ' + checked));
-  content.append(meta);
+  // Rating and verified-source facts belong in the dedicated facts rail, not duplicated under the synopsis.
   const links = make('div', 'editorial-pick__links');
   addLink(links, item.sourceUrl.startsWith('/films/') ? 'EXPLORE FILM FILE →' : 'EXPLORE OFFICIAL PAGE →',
     item.sourceUrl, 'editorial-pick__cta');
@@ -191,8 +238,52 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     addLink(links, 'SYNOPSIS SOURCE ↗', item.overviewSource, 'editorial-pick__source');
   if (trailer) appendVideo(links, trailer, item.title);
   content.append(links);
-  feature.append(art, content);
+  const facts = make('aside', 'editorial-pick__facts');
+  facts.append(make('span', 'editorial-pick__facts-label', 'THE FILE'));
+  if (item.year) facts.append(make('strong', '', String(item.year)));
+  facts.append(make('span', '', item.category));
+  facts.append(make('small', '', 'SOURCE · ' + (item.sourceName || 'Official source')));
+  facts.append(meta);
+  feature.append(art, content, facts);
   return feature;
+}
+async function loadPoster(feature, item, isCurrent) {
+  const card = feature.querySelector('.editorial-pick__art-frame');
+  if (!item.mediaIdentity || artHasRights(item)) return;
+  const params = new URLSearchParams({type:'movie'});
+  if (item.mediaIdentity.id) params.set('id', item.mediaIdentity.id);
+  else if (item.mediaIdentity.imdb) params.set('imdb', item.mediaIdentity.imdb);
+  else return;
+  try {
+    const response = await fetch('/api/media?' + params, {headers:{accept:'application/json'}});
+    if (!response.ok) return;
+    const media = (await response.json())?.item;
+    if (!isCurrent() || !matchedMedia(item, media)) return;
+    const image = new Image();
+    image.alt = 'Poster for ' + item.title + ' (' + item.year + '), via TMDB';
+    image.className = 'editorial-pick__poster';
+    image.loading = 'eager';
+    image.decoding = 'async';
+    image.src = 'https://image.tmdb.org/t/p/w500' + media.posterPath;
+    await image.decode();
+    if (!isCurrent() || !card.isConnected) return;
+    card.replaceChildren(image);
+    card.classList.add('editorial-pick__art-frame--poster');
+    card.append(make('small', 'editorial-pick__art-credit', 'Poster via TMDB · ' + item.title + ' (' + item.year + ')'));
+    feature.querySelector('.editorial-pick__facts').append(make('small', 'editorial-pick__tmdb-credit',
+      'Poster and optional audience score: TMDB. TMDB does not endorse this site. See Credits for attribution.'));
+    const score = feature.querySelector('.editorial-pick__score');
+    if (Number.isFinite(media.voteAverage) && media.voteAverage > 0 && media.voteCount > 0)
+      score.textContent = 'TMDB AUDIENCE · ' + media.voteAverage.toFixed(1) + '/10 · ' + media.voteCount + ' votes';
+    if (media.trailer?.source === 'TMDB official video listing' &&
+        /^https:\/\/www\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}$/.test(media.trailer.url || '')) {
+      const links = feature.querySelector('.editorial-pick__links');
+      if (!links.querySelector('.editorial-pick__media-trailer'))
+        addLink(links, 'WATCH OFFICIAL TRAILER ↗', media.trailer.url, 'editorial-pick__source editorial-pick__media-trailer');
+    }
+  } catch {
+    // Network and image failures retain the labelled original display art.
+  }
 }
 
 async function start() {
@@ -209,7 +300,7 @@ async function start() {
       }),
       fetch('/data/editorial-spotlight-overrides.json').then(response => response.ok ? response.json() : { overrides: {}, notes: {} })
         .catch(() => ({ overrides: {}, notes: {} })),
-      theme === 'movies' ? fetch('/data/movie-editorial-overviews.json').then(r => {
+      ['movies','indie'].includes(theme) ? fetch('/data/movie-editorial-overviews.json').then(r => {
         if (!r.ok) throw new Error('Film overview sources unavailable');
         return r.json();
       }).catch(() => ({ items: [] })) : Promise.resolve({ items: [] })
@@ -220,7 +311,14 @@ async function start() {
       typeof x.id === 'string' && typeof x.description === 'string' && x.description.length >= 100 && httpUrl(x.sourceUrl)
     ).map(x => [x.id, x]));
     const list = theme === 'movies' ? getFilmCandidates(primaryOverviews) :
-      (data?.[config.collection] || []).filter(x => safeDestination(x.sourceUrl));
+      (data?.[config.collection] || []).filter(x => safeDestination(x.sourceUrl)).map(x => {
+        const filmId = theme === 'indie' ? indieFilmIds[x.id] : '';
+        const identity = filmMediaIdentities[filmId];
+        const overview = primaryOverviews[filmId];
+        return identity ? {...x, year: identity.year, mediaIdentity: identity,
+          description: overview?.description || x.description,
+          overviewSource: overview?.sourceUrl || ''} : x;
+      }).filter(x => theme !== 'indie' || x.mediaIdentity);
     const override = settings.overrides?.[theme] || {};
     // Overrides are a publisher-controlled feature and must be dated and explicitly approved.
     const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
@@ -287,6 +385,7 @@ async function start() {
       // The approved owner nomination keeps its editorial label only on that featured item.
       const feature = createSpotlight(config, selected, dayIndex, overridden && slideIndex === 0, note);
       stage.replaceChildren(feature);
+      void loadPoster(feature, selected, () => stage.firstElementChild === feature && host.dataset.featureId === selected.id);
       host.dataset.featureId = selected.id;
       host.dataset.slide = String(slideIndex + 1);
       status.textContent = (slideIndex + 1) + ' OF ' + slides.length;
