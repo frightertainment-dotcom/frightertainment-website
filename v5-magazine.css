@@ -802,3 +802,23 @@ body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-deeper{order:3}
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
  }
 }
+
+
+/* Specificity fix: the legacy hub-section rule was still forcing the four
+   Indie jump links onto two rows, despite the V5 no-wrap declaration. */
+@media(max-width:700px){
+ body.hub-body.fr-v5.hub-section .hub-page-intro .hub-section-jumps,
+ body.hub-body.fr-v5.hub-section .hub-page-intro .hub-subtabs{
+  display:flex!important;flex-wrap:nowrap!important;
+  width:100%!important;max-width:100%;min-width:0;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  justify-content:flex-start!important;align-items:center!important;
+  gap:4px!important;margin:4px 0 0!important;padding:0 0 2px!important;
+  scrollbar-width:none;
+ }
+ body.hub-body.fr-v5.hub-section .hub-page-intro :is(.hub-section-jumps,.hub-subtabs) a{
+  flex:0 0 auto!important;white-space:nowrap!important;
+  width:auto!important;max-width:none!important;min-height:23px!important;
+  padding:4px 8px!important;font-size:9px!important;
+ }
+}
