@@ -4,12 +4,11 @@ const date = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') ? value : null;
 const text = (value, max = 4000) => typeof value === 'string' ? value.slice(0, max) : '';
 export const normalizeTitle = value => text(value).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/^the\s+/, '').replace(/[^a-z0-9]+/g, ' ').trim();
 export const safePoster = value => /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(value || '') ? value : null;
-export async function tmdbRequest(env, path, parameters = {}, operationSignal = null) {
+export async function tmdbRequest(env, path, parameters = {}) {
   if (env.TMDB_NONCOMMERCIAL_USE_APPROVED !== 'true' || env.TMDB_ATTRIBUTION_READY !== 'true' || !env.TMDB_READ_ACCESS_TOKEN) throw new Error('TMDB access is not configured');
   const url = new URL(BASE + path);
   for (const [key, value] of Object.entries(parameters)) if (value !== undefined && value !== null) url.searchParams.set(key, String(value));
-  const signal = operationSignal ? AbortSignal.any([operationSignal, AbortSignal.timeout(12_000)]) : AbortSignal.timeout(12_000);
-  const response = await fetch(url, { headers: { Authorization: `Bearer ${env.TMDB_READ_ACCESS_TOKEN}`, accept: 'application/json' }, signal });
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${env.TMDB_READ_ACCESS_TOKEN}`, accept: 'application/json' }, signal: AbortSignal.timeout(12000) });
   if (!response.ok) throw new Error(`TMDB request failed (${response.status})`);
   return response.json();
 }
@@ -42,13 +41,13 @@ export async function fetchMedia(env, options) {
   const type = options.type === 'tv' ? 'tv' : 'movie';
   let mediaId = Number(options.id) || null;
   if (!mediaId && options.imdb) {
-    const result = await tmdbRequest(env, `/find/${options.imdb}`, { external_source: 'imdb_id', language: 'en-GB' }, options.signal);
+    const result = await tmdbRequest(env, `/find/${options.imdb}`, { external_source: 'imdb_id', language: 'en-GB' });
     const matches = result[type === 'tv' ? 'tv_results' : 'movie_results'] || [];
     if (matches.length !== 1) return null;
     mediaId = matches[0].id;
   }
   if (!mediaId) {
-    const result = await tmdbRequest(env, `/search/${type}`, { query: options.title, include_adult: false, language: 'en-GB' }, options.signal);
+    const result = await tmdbRequest(env, `/search/${type}`, { query: options.title, include_adult: false, language: 'en-GB' });
     const matches = (result.results || []).filter(item => {
       const titleMatches = [item.title, item.original_title, item.name, item.original_name].some(t => normalizeTitle(t) === normalizeTitle(options.title));
       const year = Number(String(type === 'tv' ? item.first_air_date : item.release_date).slice(0, 4));
@@ -58,7 +57,7 @@ export async function fetchMedia(env, options) {
     if (matches.length !== 1) return null;
     mediaId = matches[0].id;
   }
-  const raw = await tmdbRequest(env, `/${type}/${mediaId}`, { language: 'en-US', append_to_response: type === 'tv' ? 'videos,keywords' : 'videos,release_dates,keywords' }, options.signal);
+  const raw = await tmdbRequest(env, `/${type}/${mediaId}`, { language: 'en-US', append_to_response: type === 'tv' ? 'videos,keywords' : 'videos,release_dates,keywords' });
   return sanitizeMedia(raw, type, options.country || 'GB');
 }
 const MAJOR_PRODUCERS = /\b(warner bros|walt disney|disney pictures|marvel studios|lucasfilm|universal pictures|paramount pictures|columbia pictures|20th century|twentieth century|new line cinema|sony pictures|screen gems|tristar pictures|tri star pictures|lionsgate|summit entertainment|netflix studios|amazon studios|amazon mgm studios|dreamworks|metro goldwyn mayer|mgm pictures)\b/i;
@@ -71,8 +70,8 @@ export function independentAssessment(raw) {
 }
 export const INDIE_POLICY = 'Independent production candidates: TMDB horror films with named production companies, no listed major studio producer, and no reported budget of US$30 million or more. Major distribution alone does not exclude a film. Unknown budgets and marketing spend are not treated as verified; TMDB does not certify independent status.';
 const TV_POLICY = 'Horror television tagged with the exact horror or horror anthology keyword in TMDB. Popularity indicates trending within this catalogue, not a platform viewing chart. Archive years refer to first broadcast, not every season.';
-async function horrorKeywords(env, signal) {
-  const replies = await Promise.all(['horror', 'horror anthology'].map(query => tmdbRequest(env, '/search/keyword', { query }, signal)));
+async function horrorKeywords(env) {
+  const replies = await Promise.all(['horror', 'horror anthology'].map(query => tmdbRequest(env, '/search/keyword', { query })));
   const ids = replies.flatMap((reply, index) => (reply.results || []).filter(k => k.name?.toLowerCase() === ['horror', 'horror anthology'][index]).map(k => k.id)).filter(Number.isInteger);
   if (!ids.length) throw new Error('Horror television classification is unavailable');
   return [...new Set(ids)];
@@ -106,11 +105,11 @@ export async function fetchStreamingAvailability(env,options) {
     query['primary_release_date.gte']=year+'-01-01';
     query['primary_release_date.lte']=year+'-12-31'<today()?year+'-12-31':today();
   }
-  const discovered=await tmdbRequest(env,'/discover/movie',query,options.signal);
+  const discovered=await tmdbRequest(env,'/discover/movie',query);
   const candidates=(discovered.results||[]).filter(x=>x.adult!==true&&
     Number.isInteger(x.id)&&Array.isArray(x.genre_ids)&&x.genre_ids.includes(27));
   const verified=await mapBounded(candidates.slice(0,20),async raw=>{
-    const data=await tmdbRequest(env,'/movie/'+raw.id+'/watch/providers',{},options.signal);
+    const data=await tmdbRequest(env,'/movie/'+raw.id+'/watch/providers');
     const local=data.results?.[region];
     if(!local)return null;
     const groups={
@@ -158,7 +157,7 @@ export async function fetchCatalogue(env, options) {
   const chart = mode === 'top'; const cinema = ['cinema','cinema-recent'].includes(mode); const recentCinema = mode === 'cinema-recent';
   const recentFrom = new Date(Date.now() - 90 * 86400000).toISOString().slice(0,10);
   const end = `${year}-12-31` < today() ? `${year}-12-31` : today();
-  const keywordIds = type === 'tv' ? await horrorKeywords(env,options.signal) : [];
+  const keywordIds = type === 'tv' ? await horrorKeywords(env) : [];
   const parameters = { language: 'en-GB', include_adult: false, include_video: false, page,
     sort_by: chart ? 'vote_average.desc' : recentCinema ? 'release_date.desc' : mode === 'cinema' ? 'release_date.asc' : mode === 'upcoming' ? type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc' : 'popularity.desc',
     ...(type === 'tv' ? { with_keywords: keywordIds.join('|'), include_null_first_air_dates: false } : { with_genres: 27 }) };
@@ -173,18 +172,18 @@ export async function fetchCatalogue(env, options) {
   const search = !!options.query;
   if (search) { parameters.query = options.query; delete parameters.with_genres; delete parameters.with_keywords; }
   const path = search ? `/search/${type}` : `/discover/${type}`;
-  const first = await tmdbRequest(env, path, parameters, options.signal);
+  const first = await tmdbRequest(env, path, parameters);
   const totalPages = Math.min(500, Number(first.total_pages) || 1);
   // Both independent status and regional theatrical dates need detail verification.
   // Screen a bounded two-page pool so a page of false candidates is not shown as empty.
-  const extra = (kind === 'indie' || cinema) && !search && page < totalPages ? await tmdbRequest(env, path, { ...parameters, page: page + 1 }, options.signal) : null;
+  const extra = (kind === 'indie' || cinema) && !search && page < totalPages ? await tmdbRequest(env, path, { ...parameters, page: page + 1 }) : null;
   let candidates = [...(first.results || []), ...(extra?.results || [])].filter(raw => raw.adult !== true && safePoster(raw.poster_path) && Number.isInteger(raw.id));
   if (type === 'movie') candidates = candidates.filter(raw => raw.genre_ids?.includes(27));
   if (search && ['archive', 'top'].includes(mode)) candidates = candidates.filter(raw => Number(String(type === 'tv' ? raw.first_air_date : raw.release_date).slice(0, 4)) === year);
   let items;
   if (kind === 'indie' || (type === 'tv' && search) || cinema) {
     items = await mapBounded(candidates.slice(0, 40), async candidate => {
-      const raw = await tmdbRequest(env, `/${type}/${candidate.id}`, { language: 'en-US', append_to_response: type === 'tv' ? 'videos,keywords' : 'videos,release_dates' }, options.signal);
+      const raw = await tmdbRequest(env, `/${type}/${candidate.id}`, { language: 'en-US', append_to_response: type === 'tv' ? 'videos,keywords' : 'videos,release_dates' });
       if (cinema) {
         const region = options.country || 'GB';
         const dates = raw.release_dates?.results?.find(entry => entry.iso_3166_1 === region);
