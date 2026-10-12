@@ -770,7 +770,7 @@ test('UK release bulletin separates cinema and home-media listings from streamin
   await expect(widget).toContainText('28 Years Later: The Bone Temple');
   await expect(widget).toContainText('Insidious: Out of the Further');
   await widget.getByRole('button',{name:'COMING NEXT'}).click();
-  await expect(widget).toContainText('Jitters');
+  await expect(widget).toContainText('The Mill Killers');
   await expect(widget.locator('.release-brief__item')).toHaveCount(4);
 });
 test('release bulletin never invents current streaming entries after data becomes stale',async({page})=>{
@@ -811,7 +811,7 @@ test('optional homepage discovery still shows real UK editorial release notices 
   await expect(page.locator('[data-home-list="streaming-releases"] article')).toHaveCount(4);
   await expect(page.locator('[data-home-list="streaming-releases"]')).toContainText('Shudder');
   await expect(page.locator('[data-home-list="theatrical-releases"]')).toContainText('Other Mommy');
-  await expect(page.locator('[data-home-list="coming-soon"]')).toContainText('Jitters');
+  await expect(page.locator('[data-home-list="coming-soon"]')).toContainText('The Mill Killers');
   await expect(page.locator('[data-home-list="trending-horror"]')).toContainText('Shudder');
   await expect(page.locator('[data-home-state="trending-horror"]')).toContainText('UK release announcements');
   await expect(page.locator('#home-attribution')).toContainText('Shudder UK release calendar');
@@ -823,7 +823,7 @@ test('opened Movies discovery links source-checked current and future horror eve
   await expect(page.locator('.movie-advanced')).toHaveAttribute('open','');
   await expect(page.locator('[data-list="streaming-releases"]')).toContainText('Shudder');
   await expect(page.locator('[data-list="theatrical-releases"]')).toContainText('Other Mommy');
-  await expect(page.locator('[data-list="coming-soon"]')).toContainText('Jitters');
+  await expect(page.locator('[data-list="coming-soon"]')).toContainText('The Mill Killers');
   await expect(page.locator('[data-list="trending-horror"]')).toContainText('Shudder');
   await expect(page.locator('[data-state="rankings"]')).toContainText('Critic ranking pending');
 });
