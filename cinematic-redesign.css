@@ -10,7 +10,7 @@ body.hub-body {
  color:var(--cinema-pale);
 }
 body.hub-body[data-theme] {
- --red:#d33345; --red-dark:#8a1d2d; --hair:#55262f;
+ --red:#e9596a; --red-dark:#8a1d2d; --hair:#55262f;
  --world:#0b080c; --surface-world:#110b0f; --surface-raised:#190e13;
  --edge:#80323d; --world-glow:#9a2434; --font-room:'Grenze Gotisch',Georgia,serif;
 }
