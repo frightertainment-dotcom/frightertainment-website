@@ -698,3 +698,80 @@ body.fr-v5 main[data-catalogue-type="indie"]>.fr-v5-deeper,
 body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-deeper{order:3}
 
 @media(max-width:700px){body.fr-v5 .editorial-pick__art-title{overflow-wrap:normal;word-break:normal;hyphens:none}}
+
+/* V5 screenshot review — corrected against actual Chromium first-fold screenshots.
+   Keep editorial full synopsis in linked film detail, not a 600px mobile feature. */
+@media(min-width:1000px){
+ body.fr-v5.hub-section .hub-page-intro{min-height:0!important;padding-top:14px!important;padding-bottom:10px!important}
+ body.fr-v5 .hub-page-wordmark{max-height:57px}
+ body.fr-v5 .hub-page-intro>p{font-size:14px;line-height:1.36}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps){margin:4px 0 0}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps) a{min-height:23px;padding:4px 6px;font-size:10px}
+ body.fr-v5 .editorial-pick{
+  grid-template-columns:minmax(145px,18%) minmax(0,1fr) minmax(135px,17%);
+  padding:39px 21px 15px;gap:clamp(16px,1.8vw,26px);
+ }
+ body.fr-v5 .editorial-pick::before{height:29px;padding:7px 15px;font-size:11px}
+ body.fr-v5 .editorial-pick__art-frame{max-width:188px;aspect-ratio:2/3}
+ body.fr-v5 .editorial-pick__title{font-size:clamp(27px,2.6vw,39px);line-height:1.06}
+ body.fr-v5 .editorial-pick__synopsis{font-size:14px;line-height:1.48;margin:9px 0 0}
+ body.fr-v5 .editorial-pick__why{font-size:12px;line-height:1.4;margin:7px 0 0}
+ body.fr-v5 .editorial-pick__links{margin:8px 0 0}
+ body.fr-v5 .editorial-pick__facts{gap:6px;padding:9px}
+ body.fr-v5 .editorial-carousel{margin-bottom:5px}
+ body.fr-v5 .editorial-carousel__controls{padding:3px}
+ body.fr-v5 .fr-v5-panel__head{padding:9px 12px 7px}
+ body.fr-v5 .fr-v5-panel__head h2{font-size:17px}
+}
+@media(max-width:700px){
+ body.fr-v5.hub-section .hub-page-intro{
+  padding:9px 11px 7px!important;min-height:0!important;margin-bottom:1px;
+ }
+ body.fr-v5 .hub-page-wordmark{max-height:44px;max-width:75%}
+ body.fr-v5 .hub-page-intro>p{font-size:11px;line-height:1.31;margin:4px 0}
+ body.fr-v5 .hub-page-intro .hub-eyebrow{font-size:8px}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps){gap:1px 5px;margin:3px 0 0}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps) a{
+  min-height:22px;padding:3px 3px;font-size:8px;
+ }
+ body.fr-v5 .editorial-carousel{margin:4px auto 4px}
+ body.fr-v5 .editorial-pick{
+  grid-template-columns:minmax(0,35%) minmax(0,1fr);
+  gap:8px;padding:30px 9px 8px;
+ }
+ body.fr-v5 .editorial-pick::before{height:24px;font-size:9px;padding:6px 9px}
+ body.fr-v5 .editorial-pick__art-frame{aspect-ratio:2/3}
+ body.fr-v5 .editorial-pick__art-eyebrow,
+ body.fr-v5 .editorial-pick__art-sub{font-size:7px;line-height:1.15;letter-spacing:0}
+ body.fr-v5 .editorial-pick__art-title{font-size:clamp(12px,3vw,19px)}
+ body.fr-v5 .editorial-pick__series{font-size:8px;margin:0 0 2px}
+ body.fr-v5 .editorial-pick__title{font-size:clamp(18px,5vw,23px);line-height:1.06;margin:0 0 4px}
+ body.fr-v5 .editorial-pick__genre{font-size:8px}
+ body.fr-v5 .editorial-pick__synopsis{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden;font-size:11px;line-height:1.3;margin:6px 0 0;
+ }
+ body.fr-v5 .editorial-pick__why{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden;font:italic 10px/1.26 Georgia,serif;margin:5px 0 0;padding-left:5px;
+ }
+ body.fr-v5 .editorial-pick__meta{
+  font-size:8px;gap:3px 7px;padding-top:4px;margin-top:5px;
+ }
+ body.fr-v5 .editorial-pick__links{gap:3px;margin:5px 0 0}
+ body.fr-v5 .editorial-pick__cta,
+ body.fr-v5 .editorial-pick__source,body.fr-v5 .editorial-pick__trailer summary{
+  font-size:8px;line-height:1.2;min-height:28px;padding:5px 6px;max-width:100%;
+ }
+ body.fr-v5 .editorial-pick__facts{gap:3px 9px;padding:4px 6px}
+ body.fr-v5 .editorial-pick__facts-label{font-size:8px}
+ body.fr-v5 .editorial-pick__facts strong{font-size:12px}
+ body.fr-v5 .editorial-pick__facts small{font-size:8px}
+ body.fr-v5 .editorial-carousel__controls{padding:2px 0;gap:0 2px}
+ body.fr-v5 .editorial-carousel__nav,
+ body.fr-v5 .editorial-carousel__pause{font-size:8px;min-height:23px;padding:3px}
+ body.fr-v5 .fr-v5-front{margin:5px auto 10px;gap:7px}
+ body.fr-v5 .fr-v5-panel__head{padding:7px 8px 6px}
+ body.fr-v5 .fr-v5-panel__head h2{font-size:15px}
+ body.fr-v5 .fr-v5-poster-grid{padding:5px;gap:5px}
+}
