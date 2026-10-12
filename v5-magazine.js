@@ -64,18 +64,23 @@
   return a;
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
- const fetchList=async(type,mode)=>{
+ const catalogueRequests=new Map();
+ const fetchList=(type,mode)=>{
+  const key=type+':'+mode;
+  if(catalogueRequests.has(key))return catalogueRequests.get(key);
   const query=new URLSearchParams({type,mode,page:'1'});if(mode==='cinema')query.set('country','GB');
   const url='/api/catalogue?'+query;
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),10000);
-  try {
+  const promise=(async()=>{try {
    const response=await fetch(url,{headers:{accept:'application/json'},signal:controller.signal});
    if(!response.ok)throw new Error('Catalogue unavailable');
    const data=await response.json();
    if(!Array.isArray(data.items))throw new Error('Catalogue response invalid');
    return data.items.filter(valid);
-  } finally {clearTimeout(timeout);}
+  } finally {clearTimeout(timeout);}})();
+  catalogueRequests.set(key,promise);
+  return promise;
  };
  const mockFreeState=(node,copy)=>{
   node.replaceChildren(el('p','fr-v5-empty',copy));
