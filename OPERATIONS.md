@@ -35,4 +35,35 @@ For visitor-impact monitoring, filter those probes out and review edge status, o
 
 Use UK-local midnight-to-midnight windows when comparing daily totals. The GitHub Actions `Website quality` workflow runs browser checks against a local server and is not production traffic or live monitoring. Cloudflare HTTP Analytics remains the production request source. After changes, compare matching host/path/request-source windows and response-time percentiles.
 
-The incident query for 11 October 2026 (UK-local midnight-to-midnight) returned 300 504s, all with `requestSource=earlyHintsCache`, a cache miss and no origin HTTP status. The corresponding 12 October query through 08:45 UTC returned 121 with the same classification. Excluding `earlyHintsCache` left zero 504s in both windows. Keep the separately observed visitor-source 503 on `/api/contact` tracked as its own issue.
+## Closed 504 incident record — 12 October 2026
+
+**Status: CLOSED — BENIGN CLOUDFLARE EARLY HINTS CACHE PROBES**
+
+The 11 October 2026 UK-local day (10 October 23:00 UTC to 11 October 23:00 UTC) contained 300 edge 504 responses across `frightertainment.com` and `www.frightertainment.com`. Every response was `requestSource=earlyHintsCache`, a cache miss, and had no origin HTTP status. The request paths included both HTML routes and API paths; Cloudflare's Pages Early Hints probes do not execute the Pages project.
+
+For 12 October, 121 probes were counted through 08:45 UTC (09:45 BST) in the earlier query. At the actual 08:45 BST boundary (07:45 UTC), the total was 119. Follow-up queries through 09:04:32 UTC found 12 additional probes. Across the examined windows, filtering out `earlyHintsCache` left zero visitor-source 504s. The requests affected both hostnames; the source and origin-status evidence was consistent across each.
+
+This closure applies only to those queried historical windows. It does not classify future 504s as harmless. Investigate every future 504 whose request source is not `earlyHintsCache`. Grouped Analytics results do not contain Ray IDs; retrieve individual request details when a Ray ID is needed. Cloudflare Analytics is aggregated/retention-limited and does not establish who initiated a request.
+
+## Contact-form 503 follow-up — 12 October 2026
+
+One separate request to `/api/contact` returned a visitor-source 503 on 11 October at 04:07:16 UTC (Ray ID `a48aff36eb9beb19`). Cloudflare recorded `requestSource=eyeball`, origin status 503 and 49 ms origin response time. `eyeball` does not prove that the request came from a person.
+
+The Pages handler returns 503 for missing delivery binding, failed mailer connection, non-2xx mailer response, or a malformed/unconfirmed success response. The private mailer can return 503 for a missing email binding, an email-service rejection, or no acceptance identifier. Production configuration has the Pages-to-mailer service binding and the mailer `send_email` binding. Cloudflare's invocation aggregate recorded one successful Worker execution with no runtime exception. That metric does not reveal which HTTP response was returned or whether the email service accepted the message.
+
+A separate owner-labelled contact delivery test reached Gmail at 03:59 UTC, eight minutes before the 503. Gmail has no matching message at 04:07 UTC. This does not prove the failing request never submitted email: the historical Worker event logs contain no event for that invocation, and no message identifier is available to query Cloudflare Email Service. The 04:07 delivery outcome and the exact 503 branch therefore remain unverified. No production form message was sent during this investigation. No further visitor-source `/api/contact` 5xx was found from the incident through the 12 October Analytics query time. The 503 remains a separate unresolved diagnostic item; do not infer a delivery failure or success from the Worker invocation status alone.
+
+## Request classification and monitoring procedure
+
+For each report, keep these categories separate:
+
+- **Early Hints probes:** keep a separate diagnostic count for `requestSource=earlyHintsCache`; exclude it from visitor-facing 5xx counts and rates.
+- **Visitor-source HTTP requests:** report `requestSource` exactly as Cloudflare provides it. A value such as `eyeball` is not evidence of a human visitor. Use Cloudflare bot classification when it is available; otherwise label the source unclassified.
+- **Page requests and APIs:** group by hostname, path, edge status, origin status, request source and timestamp. A browser page load may create multiple HTML, asset and API requests; do not treat request counts as visits.
+- **Visits and browser tests:** report Cloudflare-defined visits/page views separately from HTTP request totals. Correlate owner/QA checks with GitHub Actions, preview deployment and test timestamps. The existing Playwright workflow tests a local server; it does not create production traffic.
+- **Cloudflare Access:** report expected authentication/denial statuses such as 401/403 separately from application 5xx. Confirm the host and policy context before calling a denial an outage.
+- **Application failures:** for genuine 500/502/503/504 responses, compare edge and origin status, request source, hostname/path, cache status and response duration. Capture Ray IDs from individual request details where available.
+
+Report both the absolute non-probe 5xx count and its rate over non-probe HTTP requests for the same host, path and interval. Keep the numerator and denominator definitions identical between comparisons. At this site's current scale, investigate any visitor-source 504 immediately and treat two visitor-source 5xx responses on the same hostname and route within five minutes as an incident. Compare matching time windows before and after deployments; do not call an unverified request human traffic.
+
+**Alerting status:** the Cloudflare account currently has no alert policies. This runbook and HTTP Analytics provide manual monitoring; automated notifications are not configured. Do not add a broad 5xx alert that counts Early Hints probes. A future automated alert needs a verified `requestSource` exclusion, an appropriate request-rate denominator, a tested route/host grouping and an authorized notification destination. A GitHub Actions monitor would also require a least-privilege Cloudflare Analytics credential stored as a repository secret; neither that secret nor an external notification destination was added here.
