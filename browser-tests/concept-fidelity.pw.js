@@ -38,6 +38,8 @@ for (const entry of pages) {
         const hero=carousel.locator('.editorial-pick');
         await expect(hero.locator('.editorial-pick__art-frame')).toBeVisible();
         await expect(hero.locator('.editorial-pick__title')).toBeVisible();
+        await expect(hero.locator('.editorial-pick__facts .editorial-pick__meta .editorial-pick__score')).toBeVisible();
+        await expect(hero.locator('.editorial-pick__content .editorial-pick__meta')).toHaveCount(0);
         await expect(carousel.locator('.editorial-carousel__dot')).toHaveCount(5);
         const dims=await hero.evaluate(el=>{
           const cover=el.querySelector('.editorial-pick__art-frame').getBoundingClientRect();
