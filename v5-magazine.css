@@ -696,3 +696,5 @@ body.fr-v5 main[data-catalogue-type="indie"]>.fr-v5-front,
 body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-front{order:2}
 body.fr-v5 main[data-catalogue-type="indie"]>.fr-v5-deeper,
 body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-deeper{order:3}
+
+@media(max-width:700px){body.fr-v5 .editorial-pick__art-title{overflow-wrap:normal;word-break:normal;hyphens:none}}
