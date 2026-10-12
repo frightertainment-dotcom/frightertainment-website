@@ -1,0 +1,57 @@
+name: V5 concept visual gate
+
+on:
+  pull_request:
+    paths:
+      - 'v5-magazine.*'
+      - 'browser-tests/v5-concept.pw.js'
+      - 'cinematic-redesign.css'
+      - 'homepage-concept.css'
+      - 'index.html'
+      - 'movies.html'
+      - 'tv-shows.html'
+      - 'indie-movies.html'
+      - 'cinema.html'
+      - 'games.html'
+      - 'podcasts.html'
+      - 'styles.css'
+      - 'assets/v5-haunted-moon.svg'
+      - 'scripts/build-preview.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:preview
+      - name: Check original branding and concept assets are in preview bundle
+        run: |
+          test -f dist/v5-magazine.css
+          test -f dist/v5-magazine.js
+          test -f dist/assets/v5-haunted-moon.svg
+          test -f dist/assets/frightertainment-brand.png
+          test -f dist/assets/page-title-movies.png
+          test -f dist/assets/page-title-indie-movies.png
+          grep -q 'v5-magazine.css' dist/movies.html
+          grep -q 'v5-magazine.js' dist/indie-movies.html
+      - run: npx playwright install --with-deps chromium
+      - name: Check V5 mobile and desktop concept contracts
+        run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-visual-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
