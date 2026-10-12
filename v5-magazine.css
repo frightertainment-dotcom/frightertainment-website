@@ -683,3 +683,16 @@ body.fr-v5 .editorial-pick::after{
   url('/assets/v5-haunted-moon.svg') 77% center/cover no-repeat!important;
  }
 }
+
+
+/* Visual-gate finding 2026-10-12:
+   legacy Indie main is a flex-column with explicit order for old sections.
+   Give the V5 content a deliberate order instead of letting order:0 show first. */
+body.fr-v5 main[data-catalogue-type="indie"]>.hub-page-intro,
+body.fr-v5 main[data-catalogue-type="tv"]>.hub-page-intro{order:0}
+body.fr-v5 main[data-catalogue-type="indie"]>.editorial-carousel,
+body.fr-v5 main[data-catalogue-type="tv"]>.editorial-carousel{order:1}
+body.fr-v5 main[data-catalogue-type="indie"]>.fr-v5-front,
+body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-front{order:2}
+body.fr-v5 main[data-catalogue-type="indie"]>.fr-v5-deeper,
+body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-deeper{order:3}
