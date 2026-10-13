@@ -83,20 +83,28 @@ test('Five TMDB fixture rankings form one readable Home group without an inner s
 });
 
 test('Game fallback artwork keeps its title clear of the credit at mobile and desktop widths', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const width of [320, 390, 768, 980, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/games.html');
-    await expect(page.locator('.editorial-pick__art-title').first()).toHaveText('Outlast');
-    const state = await page.locator('.editorial-pick__art-frame').first().evaluate(frame => {
-      const title = frame.querySelector('.editorial-pick__art-title');
-      const credit = frame.querySelector('.editorial-pick__art-sub');
-      return { frame: frame.getBoundingClientRect(), title: title.getBoundingClientRect(),
-        credit: credit.getBoundingClientRect(), lineHeight: parseFloat(getComputedStyle(title).lineHeight) };
-    });
-    expect(state.title.height).toBeGreaterThanOrEqual(state.lineHeight - 1);
-    expect(state.title.top).toBeGreaterThanOrEqual(state.frame.top);
-    expect(state.title.bottom).toBeLessThanOrEqual(state.credit.top);
-    expect(state.credit.bottom).toBeLessThanOrEqual(state.frame.bottom);
+    const dots = page.locator('.editorial-carousel__dot');
+    await expect(dots).toHaveCount(5);
+    for (let index = 0; index < 5; index++) {
+      const dot = dots.nth(index);
+      await dot.click();
+      const title = await page.locator('.editorial-pick__art-title').first().textContent();
+      expect(await dot.getAttribute('aria-label')).toContain(title);
+      const state = await page.locator('.editorial-pick__art-frame').first().evaluate(frame => {
+        const artTitle = frame.querySelector('.editorial-pick__art-title');
+        const credit = frame.querySelector('.editorial-pick__art-sub');
+        return { frame: frame.getBoundingClientRect(), title: artTitle.getBoundingClientRect(),
+          credit: credit.getBoundingClientRect(), lineHeight: parseFloat(getComputedStyle(artTitle).lineHeight) };
+      });
+      expect(state.title.height).toBeGreaterThanOrEqual(state.lineHeight - 1);
+      expect(state.title.top).toBeGreaterThanOrEqual(state.frame.top);
+      expect(state.title.bottom).toBeLessThanOrEqual(state.credit.top);
+      expect(state.credit.bottom).toBeLessThanOrEqual(state.frame.bottom);
+    }
   }
 });
 

@@ -47,39 +47,40 @@ body.fr-v5[data-theme='games'] {
 }
 
 /* A carousel page reserves the normal-state space needed by its longest
-   editorial item. The content, poster and controls remain distinct tracks;
-   opening a player can still expand the card. */
+   editorial item, with one line of room for browser font-metric differences.
+   The content, poster and controls remain distinct tracks; opening a player
+   can still expand the card. */
 @media (min-width:1101px) {
-  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:clamp(525px,calc(8vw + 424px),580px); }
-  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:clamp(550px,calc(5vw + 500px),600px); }
-  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:clamp(580px,calc(6vw + 520px),640px); }
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:clamp(541px,calc(8vw + 440px),596px); }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:clamp(566px,calc(5vw + 516px),616px); }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:clamp(596px,calc(6vw + 536px),656px); }
 }
 @media (min-width:1001px) and (max-width:1100px) {
-  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:530px; }
-  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:560px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:546px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:576px; }
 }
 @media (min-width:701px) and (max-width:800px) {
-  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:430px; }
-  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:470px; }
-  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:510px; }
-  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:430px; }
-  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:415px; }
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:446px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:486px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:526px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:446px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:431px; }
 }
 @media (max-width:700px) {
-  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:670px; }
-  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:720px; }
-  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:750px; }
-  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:620px; }
-  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:620px; }
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:686px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:736px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:766px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:636px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:636px; }
 }
 @media (max-width:380px) {
-  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:800px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:816px; }
 }
 @media (max-width:359px) {
-  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:740px; }
-  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:735px; }
-  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:640px; }
-  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:635px; }
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:756px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:751px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:656px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:651px; }
 }
 
 body.fr-v5 .hub-catalog .hub-tile:first-child::before { background-image:var(--fr-scene-current); }
