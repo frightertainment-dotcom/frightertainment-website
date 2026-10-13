@@ -237,3 +237,40 @@ body.fr-v5 .fr-v5-panel :is(a,button):focus-visible,body.fr-v5 .editorial-carous
 @media(max-width:359px){
  body.fr-v5.hub-home .hub-intro.fr-home-intro{height:195px;min-height:195px;max-height:195px}
 }
+
+/* Later legacy V5 rules have greater specificity than the shared concept
+   masthead. Give all seven pages the approved scenic art at both sizes. */
+body.hub-body.fr-v5.hub-section .hub-page-intro,
+body.hub-body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro,
+body.hub-body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro{
+ min-height:226px!important;max-height:226px!important;
+ margin:0 auto 8px!important;padding:19px 34px!important;
+ background:linear-gradient(90deg,#030508e8 0%,#030508a8 38%,transparent 75%),url('/assets/concept-haunted-house.png') center 45%/cover no-repeat #050708!important;
+}
+body.hub-body.fr-v5.hub-section .hub-page-wordmark{max-height:108px;max-width:min(510px,65%)}
+body.hub-body.fr-v5.hub-section .hub-page-intro>p{font:400 14px/1.4 Arial,Helvetica,sans-serif!important;max-width:465px;margin:5px 0 9px!important}
+@media(max-width:700px){
+ body.fr-v5 .hub-header__inside{
+  display:grid!important;grid-template-columns:minmax(44px,1fr) auto minmax(78px,1fr)!important;
+  grid-template-rows:54px 40px!important;gap:0 4px!important;
+  width:100%!important;padding:4px 9px 2px!important;
+ }
+ body.fr-v5 .hub-brand{grid-column:2;grid-row:1;width:min(56vw,225px);justify-self:center}
+ body.fr-v5 .fr-v5-header-tools{display:contents;grid-column:auto;grid-row:auto}
+ body.fr-v5 .hub-tabs{grid-column:1/-1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));flex-wrap:nowrap;overflow:visible!important}
+ body.fr-v5 .hub-tabs a{flex:none;min-height:36px;padding:4px 1px!important}
+ body.hub-body.fr-v5.hub-section .hub-page-intro,
+ body.hub-body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro,
+ body.hub-body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro{
+  display:block!important;height:202px!important;min-height:202px!important;max-height:202px!important;
+  padding:17px 13px 8px!important;margin:0 auto 5px!important;
+  background:linear-gradient(180deg,#03050730 0%,#03050793 42%,#030507da 100%),url('/assets/concept-haunted-house.png') 72% center/auto 100% no-repeat #050708!important;
+ }
+ body.hub-body.fr-v5.hub-section .hub-page-wordmark{max-height:66px;max-width:86%}
+ body.hub-body.fr-v5.hub-section .hub-page-intro>p{font:400 11px/1.3 Arial,Helvetica,sans-serif!important;max-width:310px;margin:4px 0!important}
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{height:202px;min-height:202px;max-height:202px}
+}
+@media(max-width:359px){
+ body.hub-body.fr-v5.hub-section .hub-page-intro{height:190px!important;min-height:190px!important;max-height:190px!important}
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{height:190px;min-height:190px;max-height:190px}
+}
