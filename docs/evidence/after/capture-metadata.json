@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-13T23:42:43.246Z",
+  "capturedAt": "2026-10-13T23:56:31.774Z",
   "origin": "http://127.0.0.1:4173",
   "captures": [
     {
@@ -155,47 +155,47 @@
           "status": 404
         },
         {
-          "path": "/api/rankings",
-          "status": 404
-        },
-        {
           "path": "/api/discovery",
           "status": 404
         },
         {
-          "path": "/api/movie-artwork",
-          "status": 404
-        },
-        {
-          "path": "/api/movie-artwork",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
           "path": "/api/rankings",
           "status": 404
         },
         {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
           "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
           "status": 404
         },
         {
@@ -319,11 +319,11 @@
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/rankings",
           "status": 404
         },
         {
-          "path": "/api/rankings",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
@@ -396,7 +396,7 @@
         },
         "synopsis": {
           "x": 28,
-          "y": 820.421875,
+          "y": 811.40625,
           "width": 334,
           "height": 43.5,
           "clientHeight": 44,
@@ -713,11 +713,11 @@
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/media",
           "status": 404
         },
         {
-          "path": "/api/media",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
@@ -1107,7 +1107,7 @@
           "status": 404
         },
         {
-          "path": "/api/movie-artwork",
+          "path": "/api/rankings",
           "status": 404
         },
         {
@@ -1115,7 +1115,7 @@
           "status": 404
         },
         {
-          "path": "/api/rankings",
+          "path": "/api/movie-artwork",
           "status": 404
         },
         {
@@ -1270,23 +1270,23 @@
           "status": 404
         },
         {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
           "path": "/api/rankings",
           "status": 404
         },
         {
           "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
           "status": 404
         },
         {
