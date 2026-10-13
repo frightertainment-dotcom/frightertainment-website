@@ -1139,7 +1139,7 @@ body.fr-v5 .fr-v5-trailer__play{
    side by side. That geometry is viable at normal modern phone widths. */
 @media(min-width:380px) and (max-width:700px){
  body.hub-body.fr-v5 .editorial-pick{
-  display:grid;grid-template-columns:minmax(0,30%) minmax(0,1fr) minmax(65px,21%);
+  display:grid;grid-template-columns:minmax(0,28%) minmax(0,1fr) minmax(61px,18%);
   column-gap:6px;row-gap:4px;align-items:start;
   padding:30px 7px 8px;min-height:0;
  }
