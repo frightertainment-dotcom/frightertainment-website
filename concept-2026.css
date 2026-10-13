@@ -700,7 +700,7 @@ body.fr-v5.hub-home .hub-feature>.hub-tile__content{
  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
  grid-template-rows:repeat(4,min-content) 42px;
  grid-template-areas:"kicker kicker" "title title" "score score" "synopsis synopsis" "details trailer";
- align-content:end;align-items:center;column-gap:9px;row-gap:8px;
+ align-content:center;align-items:center;column-gap:9px;row-gap:8px;
  overflow:hidden;padding:22px 22px 20px;
 }
 body.fr-v5.hub-home .hub-feature .hub-kicker{
