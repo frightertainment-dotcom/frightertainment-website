@@ -32,7 +32,7 @@ body.fr-v5 .hub-page-intro,body.fr-v5 .hub-intro.fr-home-intro{
  box-shadow:inset 0 -32px 34px #050608cf;
 }
 body.fr-v5.hub-home .hub-main{padding-top:0}
-body.fr-v5.hub-home .fr-home-intro{display:flex;align-items:center;height:235px;min-height:235px}
+body.fr-v5.hub-home .fr-home-intro{display:flex;align-items:center;height:260px;min-height:260px}
 body.fr-v5.hub-home .fr-home-intro__copy{width:min(530px,65%);min-width:0}
 body.fr-v5.hub-home .fr-home-intro h1 img{display:block;width:min(100%,420px);max-height:82px;object-fit:contain;object-position:left center;filter:drop-shadow(0 2px 3px #000)}
 body.fr-v5.hub-home .fr-home-intro__motto{font:700 11px/1.2 Arial,Helvetica,sans-serif!important;letter-spacing:.47em;color:#e8e0df;margin:0 0 8px!important}
@@ -88,7 +88,7 @@ body.fr-v5 .editorial-pick::before{
 body.fr-v5 .editorial-pick__art{height:100%;overflow:hidden;align-items:center}
 body.fr-v5 .editorial-pick__art-frame{height:100%;width:auto;max-width:100%;aspect-ratio:2/3;max-height:252px;overflow:hidden}
 body.fr-v5 .editorial-pick__content{display:flex;flex-direction:column;justify-content:center;align-self:stretch;min-height:0;overflow:hidden}
-body.fr-v5 .editorial-pick__title{font:700 clamp(22px,2.6vw,38px)/1.05 Georgia,'Times New Roman',serif;max-height:2.15em;overflow:hidden}
+body.fr-v5 .editorial-pick__title{flex-shrink:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;font:700 clamp(22px,2.3vw,34px)/1.08 Georgia,'Times New Roman',serif;max-height:2.2em;overflow:hidden}
 body.fr-v5 .editorial-pick__synopsis{font:400 13px/1.4 Arial,Helvetica,sans-serif;margin:5px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 body.fr-v5 .editorial-pick__why{font-size:11px;margin:5px 0;max-height:2.9em;overflow:hidden}
 body.fr-v5 .editorial-pick__meta{margin:5px 0;padding-top:4px}
@@ -135,6 +135,9 @@ body.fr-v5 .fr-cinema-concept a:hover{text-decoration:underline}
 body.fr-v5 .fr-cinema-concept__cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;min-height:210px}
 body.fr-v5 .fr-cinema-concept__card{min-width:0;display:flex;flex-direction:column;border:1px solid #69232c;background:#0b1011}
 body.fr-v5 .fr-cinema-concept__art{height:125px;background:linear-gradient(180deg,#03040420,#030404c2),url('/assets/concept-haunted-house.png') 73% center/auto 100% no-repeat #13181a;overflow:hidden}
+body.fr-v5 .fr-cinema-concept__card:nth-child(2) .fr-cinema-concept__art{background-image:linear-gradient(180deg,#03040420,#030404c2),url('/assets/worlds/movies-vault.webp');background-size:cover}
+body.fr-v5 .fr-cinema-concept__card:nth-child(3) .fr-cinema-concept__art{background-image:linear-gradient(180deg,#03040420,#030404c2),url('/assets/worlds/indie-projection.webp');background-size:cover}
+body.fr-v5 .fr-cinema-concept__card:nth-child(4) .fr-cinema-concept__art{background-image:linear-gradient(180deg,#03040420,#030404c2),url('/assets/worlds/home-threshold.webp');background-size:cover}
 body.fr-v5 .fr-cinema-concept__art img{width:100%;height:100%;object-fit:cover}
 body.fr-v5 .fr-cinema-concept__copy{display:flex;flex-direction:column;gap:3px;padding:6px;flex:1}
 body.fr-v5 .fr-cinema-concept__copy strong{font:700 12px/1.1 Arial,Helvetica,sans-serif;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
@@ -173,6 +176,11 @@ body.fr-v5 .hub-tile__wash{pointer-events:none}
 body.fr-v5 .fr-v5-panel :is(a,button):focus-visible,body.fr-v5 .editorial-carousel :is(a,button):focus-visible{outline:2px solid #ffe2e3;outline-offset:2px}
 @media(min-width:1000px){
  body.fr-v5.hub-home .hub-dashboard.hub-showcase{grid-template-rows:350px auto}
+ body.fr-v5 .fr-cinema-concept__features,body.fr-v5 .fr-cinema-concept__region{height:290px;max-height:290px;overflow:hidden}
+ body.fr-v5 .fr-cinema-concept__region{justify-content:flex-start;padding:12px}
+ body.fr-v5 .fr-cinema-concept__region p{font-size:12px;line-height:1.25;margin:4px 0}
+ body.fr-v5 .fr-cinema-concept__region .fr-cinema-region{margin:5px 0 2px}
+ body.fr-v5 .fr-cinema-concept__region a{margin-top:5px}
  body.fr-v5 .fr-v5-front{gap:10px}
  body.fr-v5 .fr-v5-feature-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
  body.fr-v5 .fr-v5-secondary-panels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -271,6 +279,7 @@ body.fr-v5 .fr-v5-panel :is(a,button):focus-visible,body.fr-v5 .editorial-carous
  body.fr-v5 .fr-v5-feature-panels,body.fr-v5 .fr-v5-secondary-panels{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
  body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
  body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile{height:105px;min-height:105px;max-height:105px;padding:6px}
+ body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile:nth-child(n+4){display:none}
  body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile strong{font-size:11px;line-height:1.05}
  body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile :is(.fr-v5-editorial-tile__eyebrow,small,.fr-v5-editorial-tile__go){display:none}
  body.fr-v5[data-theme="games"] .fr-v5-editorial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
