@@ -166,6 +166,9 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-diary__media img { width:100%; height
   body.fr-v5[data-theme='games'] .editorial-pick__art-title { font-size:21px; }
 }
 @media (max-width:700px) {
+  /* A single long TV title such as Yellowjackets must remain a whole word. */
+  body.fr-v5[data-theme='tv'] .editorial-pick__art-frame { width:min(100%,150px); }
+  body.fr-v5[data-theme='tv'] .editorial-pick__art-title { font-size:18px; }
   body.fr-v5[data-theme='podcasts'] .editorial-pick__art-frame { width:min(100%,180px); }
   body.fr-v5[data-theme='games'] .editorial-pick__art-frame { width:100%; max-width:240px; }
   body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover { grid-template-columns:1fr; }

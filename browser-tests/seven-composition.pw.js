@@ -112,6 +112,36 @@ test('Game fallback artwork keeps its title clear of the credit at mobile, table
   }
 });
 
+test('Yellowjackets remains a whole word in TV original-art fallback on phones', async ({ page }) => {
+  await page.route('**/data/editorial-spotlight-overrides.json', route => route.fulfill({ json: {
+    schemaVersion: 1, overrides: { tv: { id: 'tv-shows-expanded-6', approved: true,
+      starts: '2026-01-01', ends: '2027-01-01' } }, notes: {}
+  } }));
+  await page.route('**/api/media?**', route => route.fulfill({ status: 503 }));
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/tv-shows.html');
+    await expect(page.locator('.editorial-pick')).toHaveAttribute('data-feature-id', 'tv-shows-expanded-6');
+    const state = await page.locator('.editorial-pick__art-title').evaluate(title => {
+      const text = title.firstChild;
+      const tops = new Set();
+      for (let index = 0; index < text.length; index++) {
+        const range = document.createRange();
+        range.setStart(text, index);
+        range.setEnd(text, index + 1);
+        tops.add(Math.round(range.getBoundingClientRect().top));
+      }
+      const frame = title.closest('.editorial-pick__art-frame').getBoundingClientRect();
+      return { text: title.textContent, lines: tops.size,
+        titleRect: title.getBoundingClientRect(), frame };
+    });
+    expect(state.text).toBe('Yellowjackets');
+    expect(state.lines, `${width}px`).toBe(1);
+    expect(state.titleRect.left, `${width}px`).toBeGreaterThanOrEqual(state.frame.left);
+    expect(state.titleRect.right, `${width}px`).toBeLessThanOrEqual(state.frame.right);
+  }
+});
+
 test('Unavailable film and series shelves use compact full-width messages', async ({ page }) => {
   await page.route('**/api/catalogue?**', route => route.fulfill({ status: 503, body: 'Unavailable' }));
   for (const route of ['/movies.html', '/tv-shows.html', '/indie-movies.html']) {
