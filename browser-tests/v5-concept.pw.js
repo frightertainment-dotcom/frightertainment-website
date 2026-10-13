@@ -366,6 +366,74 @@ test('Movies mobile discovery has five illustrated links on a centred 3+2 grid',
  expect(layout.overflow).toBeLessThanOrEqual(2);
 });
 
+test('Cinema has stable first-paint sections and does not relocate the country picker on a nudge',async({page})=>{
+ // A static HTML test catches the original problem even before deferred JS runs.
+ const response=await page.request.get('/cinema.html');
+ expect(response.ok()).toBe(true);
+ const html=await response.text();
+ expect(html).toContain('class="fr-cinema-concept"');
+ expect(html).toContain('data-cinema-concept-cards');
+ expect(html).toContain('class="fr-cinema-concept__region"');
+ expect(html).toContain('data-cinema-country');
+
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/cinema.html');
+ const region=page.locator('.fr-cinema-concept__region');
+ const selector=page.locator('#cinema-country');
+ await expect(selector).toBeVisible();
+ await expect(region.locator('#cinema-country')).toHaveCount(1);
+ await expect(page.locator('.fr-cinema-concept')).toHaveCount(1);
+ const before=await page.evaluate(()=>{
+  const feature=document.querySelector('.fr-cinema-concept');
+  const diary=document.querySelector('#upcoming-cinema');
+  const picker=document.querySelector('#cinema-country');
+  return {feature:feature.getBoundingClientRect().height,diaryY:diary.getBoundingClientRect().y+scrollY,
+   pickerParent:picker.closest('.fr-cinema-concept__region')!==null};
+ });
+ await page.evaluate(()=>window.scrollTo({top:3,behavior:'instant'}));
+ await page.waitForTimeout(80);
+ await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+ const after=await page.evaluate(()=>({
+  feature:document.querySelector('.fr-cinema-concept').getBoundingClientRect().height,
+  diaryY:document.querySelector('#upcoming-cinema').getBoundingClientRect().y+scrollY,
+  pickerParent:document.querySelector('#cinema-country').closest('.fr-cinema-concept__region')!==null,
+  overflow:document.documentElement.scrollWidth-innerWidth
+ }));
+ expect(after.pickerParent).toBe(true);
+ expect(before.pickerParent).toBe(true);
+ expect(Math.abs(after.diaryY-before.diaryY)).toBeLessThanOrEqual(2);
+ expect(Math.abs(after.feature-before.feature)).toBeLessThanOrEqual(2);
+ expect(after.overflow).toBeLessThanOrEqual(2);
+});
+
+test('Saving a movie shows a discoverable watchlist on the homepage with a working details link',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ const shelf=page.locator('#my-watchlist');
+ await expect(shelf).toBeVisible();
+ await expect(shelf.locator('[data-home-watch-count]')).toHaveText('0');
+ await expect(shelf.locator('[data-home-watch-items]')).toBeHidden();
+ await page.goto('/movies.html');
+ const first=page.locator('.fr-v5-rack .fr-v5-poster-card').first();
+ await expect(first).toBeVisible();
+ await first.locator('.fr-v5-watch-toggle').click();
+ await expect(first.locator('.fr-v5-watch-toggle')).toHaveAttribute('aria-pressed','true');
+ const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('frightertainment-v5-watchlist')||'[]'));
+ expect(stored.length).toBe(1);
+ await page.goto('/');
+ await expect(shelf.locator('[data-home-watch-count]')).toHaveText('1');
+ const a=shelf.locator('.fr-home-watch-shelf__movie').first();
+ await expect(a).toBeVisible();
+ await expect(a).toHaveAttribute('href',new RegExp('^/media\\.html\\?type=movie&id='+stored[0].tmdbId));
+ await expect(shelf).toContainText(stored[0].title);
+ await a.click();
+ await expect(page).toHaveURL(new RegExp('/media\\.html\\?type=movie&id='+stored[0].tmdbId));
+ await page.goto('/');
+ await shelf.locator('.fr-home-watch-shelf__remove').click();
+ await expect(shelf.locator('[data-home-watch-count]')).toHaveText('0');
+ await expect(shelf.locator('[data-home-watch-items]')).toBeHidden();
+});
+
 test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/cinema.html');
