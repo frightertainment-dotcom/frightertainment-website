@@ -1340,3 +1340,46 @@ body.fr-v5 .editorial-carousel__pause[hidden]{display:none!important}
   font-size:9px;
  }
 }
+
+
+/* DESKTOP REFERENCE LAST ROW ALIGNMENT:
+   keep the three dashboard panels concise so the full poster gallery
+   starts within the reference's first desktop fold. */
+@media(min-width:1000px){
+ body.fr-v5 .fr-v5-feature-panels .fr-v5-panel__head{
+  padding:6px 10px 5px;
+  min-height:46px;
+ }
+ body.fr-v5 .fr-v5-feature-panels .fr-v5-panel__head h2{
+  font-size:15px;line-height:1.06;
+ }
+ body.fr-v5 .fr-v5-feature-panels .fr-v5-panel__head p{
+  font:400 10px/1.15 system-ui,sans-serif;margin:2px 0 0;
+ }
+ body.fr-v5 .fr-v5-ranking__list{
+  padding:3px 8px;margin:0;gap:1px 7px;
+  grid-template-rows:repeat(5,minmax(20px,auto));
+ }
+ body.fr-v5 .fr-v5-ranking__entry{
+  min-height:0;padding:3px 1px;gap:3px;line-height:1.08;
+ }
+ body.fr-v5 .fr-v5-ranking__position,
+ body.fr-v5 .fr-v5-ranking__score,
+ body.fr-v5 .fr-v5-ranking__movie{font-size:10px;line-height:1.12}
+ body.fr-v5 .fr-v5-ranking__source{padding:4px 8px 0;font-size:8px}
+ body.fr-v5 .fr-v5-trailer__film{
+  aspect-ratio:16/6.4;min-height:0;
+ }
+ body.fr-v5 .fr-v5-trailer__content{padding:6px}
+ body.fr-v5 .fr-v5-watchlist__grid{
+  padding:7px;min-height:88px;
+ }
+ body.fr-v5 .fr-v5-watchlist__grid>.fr-v5-empty{
+  min-height:82px;font-size:11px;
+ }
+ body.fr-v5 .fr-v5-front{margin-top:2px;gap:7px}
+}
+body.fr-v5[data-theme="indie"] .fr-v5-poster__art{
+ background:linear-gradient(180deg,#35101965 0%,#0b080c72 70%),
+ url('/assets/worlds/indie-projection.webp') center/cover no-repeat #090809;
+}
