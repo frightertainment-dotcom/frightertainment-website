@@ -1080,3 +1080,119 @@ body.fr-v5 .fr-v5-trailer__play{
   flex:none!important;padding:4px 1px!important;
  }
 }
+
+
+/* OWNER ART GEOMETRY — measured against 390px Indie and 1440px Movies
+   Chromium screenshots. Remove inherited introductory over-height and let
+   the editorial cinema lead. The lower legacy navigation is still reachable
+   from the complete-discovery disclosure and permanent site links. */
+@media(min-width:1000px){
+ body.hub-body.fr-v5.hub-section .hub-page-intro{
+  padding:10px 22px 7px!important;
+  min-height:0!important;margin:0 auto 5px!important;
+ }
+ body.fr-v5 .hub-page-intro h1{margin:2px 0!important}
+ body.fr-v5 .hub-page-intro>p{margin:3px 0!important;font-size:13px}
+ body.fr-v5 .hub-page-intro .hub-section-jumps{display:none!important}
+ body.fr-v5 .hub-page-intro .hub-subtabs{margin:4px 0 0}
+ body.fr-v5 .editorial-pick{
+  padding:37px 19px 11px;gap:clamp(12px,1.75vw,23px);
+  min-height:0;
+ }
+ body.fr-v5 .editorial-pick__art-frame{max-width:177px}
+ body.fr-v5 .editorial-pick__synopsis{
+  display:-webkit-box;-webkit-box-orient:vertical;
+  -webkit-line-clamp:3;overflow:hidden;line-height:1.43;
+ }
+ body.fr-v5 .editorial-carousel{margin-top:5px;margin-bottom:2px}
+ body.fr-v5 .fr-v5-feature-panels{gap:9px}
+ body.fr-v5 .fr-v5-panel__head{padding:8px 11px 6px}
+ body.fr-v5 .fr-v5-panel__head p{font-size:10px;line-height:1.25}
+ body.fr-v5 .fr-v5-watchlist__grid{min-height:110px}
+ body.fr-v5 .fr-v5-trailer__film{min-height:113px}
+ body.fr-v5 .fr-v5-front{gap:8px;margin-top:5px}
+}
+@media(max-width:700px){
+ body.hub-body.fr-v5.hub-section .hub-page-intro{
+  display:block!important;
+  padding:6px 11px 5px!important;
+  margin:0 auto 4px!important;
+  min-height:0!important;max-height:none;
+ }
+ body.fr-v5 .hub-page-intro h1{margin:2px 0!important}
+ body.fr-v5 .hub-page-wordmark{max-height:43px;max-width:80%}
+ body.fr-v5 .hub-page-intro .hub-eyebrow{font-size:8px;line-height:1.15}
+ body.fr-v5 .hub-page-intro>p{
+  font:400 11px/1.3 Georgia,serif;
+  margin:3px 0!important;-webkit-line-clamp:2;
+ }
+ body.hub-body.fr-v5.hub-section .hub-page-intro .hub-section-jumps{
+  display:none!important;
+ }
+ body.hub-body.fr-v5.hub-section .hub-page-intro .hub-subtabs{
+  margin-top:2px!important;
+ }
+ body.fr-v5 .editorial-carousel{margin:3px auto 4px}
+ body.fr-v5 .fr-v5-front{margin-top:4px;gap:6px}
+}
+/* The mobile concept has poster, description AND compact release/source facts
+   side by side. That geometry is viable at normal modern phone widths. */
+@media(min-width:380px) and (max-width:700px){
+ body.hub-body.fr-v5 .editorial-pick{
+  display:grid;grid-template-columns:minmax(0,30%) minmax(0,1fr) minmax(65px,21%);
+  column-gap:6px;row-gap:4px;align-items:start;
+  padding:30px 7px 8px;min-height:0;
+ }
+ body.fr-v5 .editorial-pick__art{
+  grid-column:1;grid-row:1;align-self:start;width:100%;
+ }
+ body.fr-v5 .editorial-pick__art-frame{
+  width:100%;aspect-ratio:2/3;max-width:100%;min-width:0;
+ }
+ body.fr-v5 .editorial-pick__content{
+  grid-column:2;grid-row:1;align-self:start;min-width:0;
+ }
+ body.fr-v5 .editorial-pick__facts{
+  grid-column:3;grid-row:1;align-self:stretch;
+  display:flex;flex-direction:column;align-items:flex-start;
+  justify-content:center;gap:5px;min-width:0;
+  border:1px solid #5f303a;padding:6px 4px;
+  overflow:hidden;word-break:normal;
+ }
+ body.fr-v5 .editorial-pick__facts strong{font-size:16px;line-height:1.15}
+ body.fr-v5 .editorial-pick__facts small{
+  font-size:7px;line-height:1.2;white-space:normal;overflow-wrap:break-word;
+  max-width:100%;text-overflow:clip;
+ }
+ body.fr-v5 .editorial-pick__facts .editorial-pick__tmdb-credit{
+  display:none;
+ }
+ body.fr-v5 .editorial-pick__art-credit{font-size:7px;line-height:1.1}
+ body.fr-v5 .editorial-pick__series{font-size:8px}
+ body.fr-v5 .editorial-pick__title{font-size:clamp(17px,4.7vw,23px);line-height:1.03}
+ body.fr-v5 .editorial-pick__genre{font-size:8px;line-height:1.15}
+ body.fr-v5 .editorial-pick__synopsis{
+  display:-webkit-box;-webkit-box-orient:vertical;
+  -webkit-line-clamp:3;overflow:hidden;
+  font-size:10px;line-height:1.24;margin-top:4px;
+ }
+ body.fr-v5 .editorial-pick__why{
+  font-size:10px;line-height:1.22;margin:4px 0 0;
+ }
+ body.fr-v5 .editorial-pick__meta{
+  font-size:8px;line-height:1.2;margin-top:4px;padding-top:3px;
+ }
+ body.fr-v5 .editorial-pick__links{gap:3px;margin-top:4px}
+ body.fr-v5 .editorial-pick__cta,
+ body.fr-v5 .editorial-pick__source,
+ body.fr-v5 .editorial-pick__trailer summary{
+  min-height:26px;padding:4px 5px;font-size:8px;line-height:1.13;
+ }
+ body.fr-v5 .editorial-carousel__controls{margin-top:0}
+}
+/* At 320-379px the two-column form protects legibility and touch targets. */
+@media(max-width:379px){
+ body.fr-v5 .editorial-pick__synopsis{-webkit-line-clamp:2}
+ body.fr-v5 .editorial-pick__why{-webkit-line-clamp:1}
+ body.fr-v5 .editorial-pick__facts{padding:4px}
+}
