@@ -1383,3 +1383,30 @@ body.fr-v5[data-theme="indie"] .fr-v5-poster__art{
  background:linear-gradient(180deg,#35101965 0%,#0b080c72 70%),
  url('/assets/worlds/indie-projection.webp') center/cover no-repeat #090809;
 }
+
+
+/* Preserve original Cinema recent/upcoming anchor controls:
+   they are functional venue-country switching destinations, not decorative
+   intro links. No section is allowed to become unreachable in V5. */
+body.fr-v5:has(.fr-cinema-context) .hub-page-intro .hub-section-jumps{
+ display:flex!important;flex-wrap:wrap!important;
+ gap:5px 9px!important;align-items:center!important;
+ overflow:visible!important;white-space:normal!important;
+ margin:5px 0 0!important;
+}
+body.fr-v5:has(.fr-cinema-context) .hub-page-intro .hub-section-jumps a{
+ display:inline-flex!important;align-items:center;min-height:26px!important;
+ padding:4px 8px!important;color:#f3d9dc!important;
+ border-bottom:1px solid #91505b!important;
+ background:transparent!important;white-space:nowrap!important;
+}
+@media(max-width:700px){
+ body.fr-v5:has(.fr-cinema-context) .hub-page-intro .hub-section-jumps{
+  display:flex!important;flex-wrap:wrap!important;
+  max-width:100%!important;overflow:visible!important;
+ }
+}
+body.fr-v5 .editorial-pick__score{
+ display:block;max-width:100%;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
