@@ -172,6 +172,7 @@ body.fr-v5 .hub-tile p{-webkit-line-clamp:3}
 body.fr-v5 .hub-tile__wash{pointer-events:none}
 body.fr-v5 .fr-v5-panel :is(a,button):focus-visible,body.fr-v5 .editorial-carousel :is(a,button):focus-visible{outline:2px solid #ffe2e3;outline-offset:2px}
 @media(min-width:1000px){
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase{grid-template-rows:350px auto}
  body.fr-v5 .fr-v5-front{gap:10px}
  body.fr-v5 .fr-v5-feature-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
  body.fr-v5 .fr-v5-secondary-panels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
