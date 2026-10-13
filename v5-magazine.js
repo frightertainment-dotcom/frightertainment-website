@@ -61,6 +61,12 @@
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
   a.append(art,foot);
   a.setAttribute('aria-label','Explore '+x.title+' details');
+  if(type==='movie' || type==='indie'){
+   const box=el('article','fr-v5-poster-card');
+   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+   box.append(a,watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
+   return box;
+  }
   return a;
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
@@ -91,6 +97,101 @@
   linkElement.rel='noopener noreferrer';linkElement.target='_blank';return true;
  };
  const mediaKey=x=>x.trailer?.key||x.trailerVideoId||'';
+
+ const watchKey='frightertainment-v5-watchlist';
+ const cleanWatch=x=> x && Number.isInteger(Number(x.tmdbId)) && Number(x.tmdbId)>0 &&
+   typeof x.title==='string' && x.title.trim().length>0 && x.title.length<=160 &&
+   ['movie','tv','indie'].includes(x.type) ?
+   {tmdbId:Number(x.tmdbId),title:x.title.trim(),type:x.type,
+    posterPath:posterPath(x.posterPath),year:Number(x.year)||null}:null;
+ const savedWatch=()=>{
+  try{const parsed=JSON.parse(localStorage.getItem(watchKey)||'[]');
+   return (Array.isArray(parsed)?parsed:[]).map(cleanWatch).filter(Boolean).slice(0,80);
+  }catch{return [];}
+ };
+ const writeWatch=arr=>{
+  try{localStorage.setItem(watchKey,JSON.stringify(arr.slice(0,80)));}
+  catch{return false;}
+  document.dispatchEvent(new Event('fr-v5-watchlist-updated'));
+  return true;
+ };
+ const watchIdentity=x=>x.type+':'+x.tmdbId;
+ const toggleWatch=x=>{
+  const record=cleanWatch(x);if(!record)return;
+  const list=savedWatch(),where=list.findIndex(item=>watchIdentity(item)===watchIdentity(record));
+  if(where>=0)list.splice(where,1);else list.unshift(record);
+  writeWatch(list);
+ };
+ const watchButton=x=>{
+  const button=el('button','fr-v5-watch-toggle');button.type='button';
+  const update=()=>{
+   const selected=savedWatch().some(item=>watchIdentity(item)===watchIdentity(x));
+   button.textContent=selected?'✓':'＋';
+   button.setAttribute('aria-label',(selected?'Remove from':'Add to')+' my watchlist: '+x.title);
+   button.title=(selected?'Remove from':'Add to')+' my watchlist';
+   button.setAttribute('aria-pressed',String(selected));
+  };
+  update();button.addEventListener('click',()=>toggleWatch(x));
+  document.addEventListener('fr-v5-watchlist-updated',update);
+  return button;
+ };
+ const addWatchlist=parent=>{
+  const p=panel('fr-v5-watchlist','MY WATCHLIST','Saved on this device. Add films using + on the posters below.','/all-horror-movies.html');
+  const grid=el('div','fr-v5-watchlist__grid');p.append(grid);parent.append(p);
+  const render=()=>{
+   const items=savedWatch();
+   if(!items.length){
+    mockFreeState(grid,'Nothing saved yet. Press + on a film poster below to make your list.');
+    return;
+   }
+   grid.replaceChildren(...items.slice(0,5).map(item=>{
+    const a=link('',filmHref(item,item.type),'fr-v5-watchlist__item');
+    a.setAttribute('aria-label','Open '+item.title);
+    a.append(image(item,item.type),el('span','fr-v5-watchlist__title',item.title));
+    const box=el('div','fr-v5-watchlist__saved');box.append(a,watchButton(item));
+    return box;
+   }));
+  };
+  document.addEventListener('fr-v5-watchlist-updated',render);
+  render();
+ };
+ const installHeader=()=>{
+  const head=document.querySelector('.hub-header__inside');
+  if(!head || head.querySelector('.fr-v5-header-tools'))return;
+  const actions=el('div','fr-v5-header-tools');
+  const menu=el('details','fr-v5-header-menu');
+  const menuButton=el('summary','fr-v5-icon-control','☰');
+  menuButton.setAttribute('aria-label','Open horror section menu');
+  const menuList=el('nav','fr-v5-menu-list');
+  menuList.setAttribute('aria-label','All Frightertainment sections');
+  for(const [name,url] of [
+   ['HOME','/'],['MOVIES','/movies.html'],['TV SHOWS','/tv-shows.html'],
+   ['CINEMA','/cinema.html'],['INDIE MOVIES','/indie-movies.html'],
+   ['PODCASTS','/podcasts.html'],['GAMES','/games.html']
+  ])menuList.append(link(name,url));
+  menu.append(menuButton,menuList);
+  const search=el('details','fr-v5-header-search');
+  const searchButton=el('summary','fr-v5-icon-control','⌕');
+  searchButton.setAttribute('aria-label','Search horror films');
+  const form=el('form','fr-v5-search-form');
+  form.action='/all-horror-movies.html';form.method='get';
+  const label=el('label','','Search the Horror Vault');label.htmlFor='fr-v5-global-search';
+  const input=el('input','');input.id='fr-v5-global-search';input.type='search';
+  input.name='q';input.required=true;input.minLength=2;input.maxLength=100;
+  input.placeholder='Search horror titles…';
+  const submit=el('button','','SEARCH');submit.type='submit';
+  form.append(label,input,submit);search.append(searchButton,form);
+  search.addEventListener('toggle',()=>{if(search.open){menu.open=false;input.focus();}});
+  menu.addEventListener('toggle',()=>{if(menu.open)search.open=false;});
+  const contact=link('☠','/contact.html','fr-v5-contact-icon');
+  contact.setAttribute('aria-label','Contact Frightertainment');
+  actions.append(menu,search,contact);
+  head.append(actions);
+  document.addEventListener('keydown',event=>{
+   if(event.key==='Escape'){menu.open=false;search.open=false;}
+  });
+ };
+
  const showPosterRack=async(config,host)=>{
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-poster-grid');
@@ -221,6 +322,7 @@
  }
  async function build(){
   if(main.dataset.frV5Ready)return;
+  installHeader();
   main.dataset.frV5Ready='true';
   mobileDock();
   if(theme==='home')return;
@@ -237,7 +339,7 @@
   }else{
    const upper=el('div','fr-v5-feature-panels');
    if(theme==='movies'){
-    jobs.push(addNotices(upper));
+    addWatchlist(upper);
     jobs.push(addRanking(upper));
     jobs.push(addTrailer(upper,'movie'));
     showcase.append(upper);
