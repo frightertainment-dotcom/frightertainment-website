@@ -291,10 +291,35 @@
    grid.replaceChildren(...entries.map(x=>{
     const a=link('',x.sourceUrl,'fr-v5-editorial-tile');
     a.target='_blank';a.rel='noopener noreferrer';
+    a.dataset.editorialTitle=x.title;
     a.style.setProperty('--fr-v5-tile-image','url("'+backdrop+'")');
     a.append(el('span','fr-v5-editorial-tile__eyebrow',x.category||config.editorial),el('strong','',x.title),el('small','',x.sourceName||'Publisher source'),el('span','fr-v5-editorial-tile__go','EXPLORE  ›'));
     return a;
    }));
+   if(config.editorial==='podcasts'){
+    // This route already supplies creator artwork. Match by exact title and
+    // retain the house scene whenever an image is absent or fails to load.
+    try{
+     const response=await fetch('/api/podcasts',{headers:{accept:'application/json'}});
+     if(response.ok){
+      const shows=await response.json();
+      const covers=new Map((Array.isArray(shows.items)?shows.items:[])
+       .filter(x=>x&&typeof x.title==='string'&&typeof x.artworkUrl==='string')
+       .map(x=>[x.title.trim().toLocaleLowerCase('en-GB'),x.artworkUrl]));
+      for(const tile of grid.querySelectorAll('[data-editorial-title]')){
+       const url=covers.get(tile.dataset.editorialTitle.trim().toLocaleLowerCase('en-GB'));
+       if(!url)continue;
+       try{
+        const parsed=new URL(url);
+        if(parsed.protocol!=='https:')continue;
+        const art=new Image();
+        art.onload=()=>tile.style.setProperty('--fr-v5-tile-image','url("'+parsed.href.replace(/"/g,'%22')+'")');
+        art.src=parsed.href;
+       }catch{}
+      }
+     }
+    }catch{}
+   }
   }catch{mockFreeState(grid,'Recommendations are unavailable. Explore the editorial selections below.');}
  };
  function mobileDock(){
@@ -338,6 +363,12 @@
   const jobs=[];
   if(config.editorial){
    jobs.push(addEditorialList(config,showcase));
+   // Keep the working chart accessible in the visible page composition.
+   // Its order is editorial; it is not an invented audience rating.
+   if(theme==='podcasts'){
+    const chart=main.querySelector('.podcast-chart');
+    if(chart){chart.classList.add('fr-v5-pinned');showcase.append(chart);}
+   }
   }else{
    const upper=el('div','fr-v5-feature-panels');
    if(theme==='movies'){
@@ -356,7 +387,7 @@
   }
 
   if(theme!=='home'&&document.querySelector('.fr-v5-front')){
-   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper'));
+   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
    if(original.length){
     const details=el('details','fr-v5-deeper');
     details.id='fr-v5-complete-discovery';
