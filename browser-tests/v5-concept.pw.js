@@ -51,7 +51,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  expect(visual.legacyOpen).toBe(false);
 
  // First-fold parity: the hero cannot consume the entire phone screen.
- expect(visual.rack).toBeLessThan(535);
+ expect(visual.rack).toBeLessThan(585); // Small extra height makes the title and trailer controls readable.
  const posterDimensions=await page.locator('.fr-v5-rack .fr-v5-poster__art').first().boundingBox();
  expect(posterDimensions.height/posterDimensions.width).toBeLessThan(1.8);
 
@@ -199,7 +199,7 @@ test('Editorial Picks geometry stays fixed for every rotating film title and pos
  await page.goto('/movies.html');
  const card=page.locator('.editorial-pick');
  await expect(card).toBeVisible();
- await expect(card).toHaveCSS('height','180px');
+ await expect(card).toHaveCSS('height','210px');
  const stage=page.locator('.editorial-carousel__stage');
  const first=await stage.boundingBox();
  const next=page.locator('.editorial-carousel__nav[aria-label="Next editorial pick"]');
@@ -219,7 +219,39 @@ test('Editorial Picks geometry stays fixed for every rotating film title and pos
   expect(contained.title).toBe(true);
   expect(contained.links).toBe(true);
  }
- await expect(page.locator('.editorial-pick')).toHaveCSS('height','180px');
+ await expect(page.locator('.editorial-pick')).toHaveCSS('height','210px');
+ const legible=await page.evaluate(()=>{
+  const title=document.querySelector('.editorial-pick__title');
+  const synopsis=document.querySelector('.editorial-pick__synopsis');
+  const action=document.querySelector('.editorial-pick__links a,.editorial-pick__links summary');
+  return {title:parseFloat(getComputedStyle(title).fontSize),
+    synopsis:parseFloat(getComputedStyle(synopsis).fontSize),
+    action:action?parseFloat(getComputedStyle(action).fontSize):0,
+    actionHeight:action?parseFloat(getComputedStyle(action).minHeight):0};
+ });
+ expect(legible.title).toBeGreaterThanOrEqual(17);
+ expect(legible.synopsis).toBeGreaterThanOrEqual(12);
+ expect(legible.action).toBeGreaterThanOrEqual(11);
+ expect(legible.actionHeight).toBeGreaterThanOrEqual(34);
+});
+
+test('All seven editorial pages protect mobile dock clearance and real copy at 390px',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ for(const route of ['/','/movies.html','/tv-shows.html','/cinema.html','/indie-movies.html','/podcasts.html','/games.html']){
+  await page.goto(route);
+  await expect(page.locator('.fr-v5-mobile-dock')).toBeVisible();
+  const metrics=await page.evaluate(()=>{
+    const dock=document.querySelector('.fr-v5-mobile-dock');
+    return {dock:Math.ceil(dock.getBoundingClientRect().height),
+      bodyPadding:parseFloat(getComputedStyle(document.body).paddingBottom),
+      overflow:document.documentElement.scrollWidth-innerWidth,
+      tabs:[...document.querySelectorAll('.hub-tabs a')].map(x=>Math.round(x.getBoundingClientRect().height))};
+  });
+  expect(metrics.bodyPadding).toBeGreaterThanOrEqual(metrics.dock+10);
+  expect(metrics.overflow).toBeLessThanOrEqual(2);
+  expect(metrics.tabs.length).toBe(7);
+  expect(Math.min(...metrics.tabs)).toBeGreaterThanOrEqual(38);
+ }
 });
 
 test('All seven concept pages bundle their supplied wordmarks and fit a narrow phone',async({page})=>{
