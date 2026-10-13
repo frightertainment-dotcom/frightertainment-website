@@ -1,0 +1,54 @@
+/* The source letter is isolated, losslessly, from assets/frightertainment-brand.png. */
+.fr-rating-badge {
+  --fr-rating-seal: 2.05rem;
+  --fr-rating-value: 1.45rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .48rem;
+  max-width: 100%;
+  vertical-align: middle;
+  white-space: nowrap;
+  color: #f5f4f0;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fr-rating-badge--compact { --fr-rating-seal: 1.58rem; --fr-rating-value: 1.13rem; gap: .35rem; }
+.fr-rating-badge--feature { --fr-rating-seal: 2.65rem; --fr-rating-value: 1.9rem; gap: .65rem; }
+
+.fr-rating-badge__seal {
+  box-sizing: border-box;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--fr-rating-seal);
+  height: var(--fr-rating-seal);
+  border-radius: 50%;
+  background: #070909;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 11px rgba(126,255,71,.08);
+}
+
+.fr-rating-badge__seal img {
+  display: block;
+  width: auto;
+  height: 74%;
+  max-width: 48%;
+  object-fit: contain;
+}
+
+.fr-rating-badge__content { display: inline-flex; flex-direction: column; align-items: flex-start; gap: .1rem; min-width: 0; }
+.fr-rating-badge__value { color: #a6ff59; font-size: var(--fr-rating-value); font-weight: 800; letter-spacing: -.045em; line-height: 1; text-shadow: 0 0 8px rgba(126,255,71,.2); }
+.fr-rating-badge__value small { margin-inline-start: .08em; color: #b6d9a1; font-size: .43em; font-weight: 700; letter-spacing: 0; }
+.fr-rating-badge__attribution { display: inline-flex; align-items: baseline; gap: .23rem; white-space: nowrap; }
+.fr-rating-badge__source { color: #d2d8cd; font-size: .68rem; font-weight: 700; line-height: 1.1; letter-spacing: .035em; text-decoration-thickness: 1px; text-underline-offset: .14em; }
+.fr-rating-badge__votes { color: #b9c3b5; font-size: .66rem; line-height: 1.1; }
+.fr-rating-badge--compact .fr-rating-badge__votes { display: none; }
+.fr-rating-badge--compact .fr-rating-badge__source { font-size: .62rem; }
+.fr-rating-badge--feature .fr-rating-badge__source { font-size: .75rem; }
+.fr-rating-badge__source[href]:hover { color: #a6ff59; }
+.fr-rating-badge__source[href]:focus-visible { outline: 2px solid #a6ff59; outline-offset: 3px; border-radius: 2px; }
+.fr-rating-badge--unrated .fr-rating-badge__value,
+.fr-rating-badge--unavailable .fr-rating-badge__value,
+.fr-rating-badge--loading .fr-rating-badge__value { color: #d5ded0; font-size: .83rem; font-weight: 600; letter-spacing: 0; text-shadow: none; }
+.fr-rating-badge--compact:is(.fr-rating-badge--unrated,.fr-rating-badge--unavailable,.fr-rating-badge--loading) .fr-rating-badge__value { font-size: .73rem; }
