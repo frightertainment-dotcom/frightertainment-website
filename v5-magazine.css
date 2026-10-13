@@ -1410,3 +1410,179 @@ body.fr-v5 .editorial-pick__score{
  display:block;max-width:100%;
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+
+
+/* 13 Oct owner QA: all editorial slides share one locked module footprint.
+   A longer title, text-only fallback or fetched TMDB poster may change contents,
+   but MUST NOT reflow the panel, carousel controls or sections beneath it. */
+body.fr-v5 .editorial-pick::before{
+ content:'★  EDITORIAL PICKS';
+}
+body.fr-v5 .editorial-pick{
+ box-sizing:border-box;
+ block-size:326px;min-block-size:326px;max-block-size:326px;
+ overflow:hidden;
+}
+body.fr-v5 .editorial-pick__art{
+ align-self:center;min-height:0;max-height:100%;height:100%;align-items:center;
+}
+body.fr-v5 .editorial-pick__art-frame{
+ box-sizing:border-box;width:min(100%,170px);max-width:100%;
+ height:auto;max-height:none;aspect-ratio:2/3;flex:0 0 auto;
+ flex:0 1 auto;
+}
+body.fr-v5 .editorial-pick__poster{
+ display:block;width:100%;height:100%;object-fit:cover;
+}
+body.fr-v5 .editorial-pick__art-title{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;
+ overflow:hidden;overflow-wrap:normal;word-break:normal;hyphens:none;max-width:100%;
+}
+body.fr-v5 .editorial-pick__content{
+ display:flex;flex-direction:column;justify-content:center;
+ align-self:stretch;min-height:0;height:100%;max-height:100%;
+ overflow:hidden;
+}
+body.fr-v5 .editorial-pick__title{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden;overflow-wrap:break-word;hyphens:auto;
+ font-size:clamp(23px,2.5vw,40px);line-height:1.08;
+}
+body.fr-v5 .editorial-pick__synopsis{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+ overflow:hidden;line-height:1.38;
+}
+body.fr-v5 .editorial-pick__why{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden;
+}
+body.fr-v5 .editorial-pick__facts{
+ min-height:0;max-height:100%;overflow:hidden;
+}
+body.fr-v5 .editorial-pick__facts small{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+ overflow:hidden;
+}
+body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){
+ block-size:auto;min-block-size:326px;max-block-size:none;overflow:visible;
+}
+body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]) .editorial-pick__content{
+ overflow:visible;height:auto;max-height:none;
+}
+@media(min-width:701px) and (max-width:999px){
+ body.fr-v5 .editorial-pick{block-size:348px;min-block-size:348px;max-block-size:348px}
+ body.fr-v5 .editorial-pick__art-frame{width:min(100%,170px);height:auto;max-height:none}
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-block-size:348px;max-block-size:none}
+}
+@media(max-width:700px){
+ body.fr-v5 .editorial-pick{
+  block-size:235px;min-block-size:235px;max-block-size:235px;
+  padding-block:32px 8px;
+ }
+ body.fr-v5 .editorial-pick__art-frame{
+  width:100%;height:auto;max-height:100%;aspect-ratio:2/3;
+ }
+ body.fr-v5 .editorial-pick__art-title{
+  font-size:clamp(13px,3.3vw,21px);-webkit-line-clamp:4;
+ }
+ body.fr-v5 .editorial-pick__content{
+  justify-content:center;max-height:100%;
+ }
+ body.fr-v5 .editorial-pick__title{
+  font-size:clamp(16px,4.65vw,23px);line-height:1.05;
+  -webkit-line-clamp:3;max-height:3.15em;margin-bottom:3px;
+ }
+ body.fr-v5 .editorial-pick__synopsis{
+  font-size:10px;line-height:1.26;-webkit-line-clamp:2;
+  margin-top:4px;
+ }
+ body.fr-v5 .editorial-pick__why{
+  font-size:9px;line-height:1.2;-webkit-line-clamp:1;
+ }
+ body.fr-v5 .editorial-pick__meta{
+  font-size:8px;line-height:1.2;margin-top:3px;padding-top:3px;
+ }
+ body.fr-v5 .editorial-pick__links{margin-top:4px}
+ body.fr-v5 .editorial-pick__cta{
+  min-height:27px;padding:5px 7px;font-size:8px;line-height:1.15;
+ }
+ body.fr-v5 .editorial-pick__facts{
+  max-height:100%;align-self:stretch;
+ }
+ body.fr-v5 .editorial-pick__facts small{
+  -webkit-line-clamp:3;overflow-wrap:anywhere;
+ }
+ body.fr-v5 .editorial-pick__art-credit{
+  font-size:7px;line-height:1.15;max-height:35px;overflow:hidden;
+ }
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){
+  block-size:auto;min-block-size:235px;max-block-size:none;
+ }
+}
+@media(max-width:379px){
+ body.fr-v5 .editorial-pick{
+  block-size:282px;min-block-size:282px;max-block-size:282px;
+ }
+ body.fr-v5 .editorial-pick__title{font-size:17px}
+ body.fr-v5 .editorial-pick__facts{max-height:50px}
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){
+  block-size:auto;min-block-size:282px;max-block-size:none;
+ }
+}
+/* The Cinema diary must look like part of the same magazine on first paint,
+   rather than an oversized greenish second site after the page begins to load. */
+body.fr-v5:has([data-cinema-country]) .fr-catalogue-section{
+ background:linear-gradient(145deg,#101013fa,#08090afb);
+ border:1px solid #483039;border-top:2px solid #a52b41;
+ box-shadow:0 12px 30px #000a;
+}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__item{
+ background:linear-gradient(115deg,#140e12,#080b0e);
+ border-color:#54333d;
+}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__media{
+ background:linear-gradient(155deg,#211018,#09080b 76%);
+ aspect-ratio:2/3;min-height:0;
+}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-pill--reach{
+ background:#28151e;
+}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__intro{
+ font:400 14px/1.48 Georgia,'Times New Roman',serif!important;
+ max-width:77ch;color:#d1c4c4;
+}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__title{
+ font-size:clamp(19px,2.2vw,29px);line-height:1.12;
+}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__note,
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__credit{
+ font-size:12px!important;line-height:1.4;color:#c5bdc1;
+}
+@media(max-width:700px){
+ body.fr-v5:has([data-cinema-country]) .fr-catalogue-section{
+  padding:12px!important;margin:10px auto!important;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__intro{
+  font-size:12px!important;line-height:1.42;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-month{
+  font-size:23px;margin:13px 0 5px;padding:9px 6px;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__item{
+  grid-template-columns:minmax(76px,28%) minmax(0,1fr);
+  gap:9px;padding:9px;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__date{
+  font-size:13px;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__title{
+  font-size:19px;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-pill{
+  padding:3px 5px;font-size:9px;
+ }
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__note,
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__credit{
+  font-size:11px!important;line-height:1.32;
+ }
+}

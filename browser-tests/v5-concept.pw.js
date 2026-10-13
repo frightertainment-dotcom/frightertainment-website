@@ -188,3 +188,74 @@ test('V5 concept stays readable at 320px without site-wide horizontal scroll',as
  expect(x.content).toBeGreaterThan(125);
  expect(x.header).toBeLessThanOrEqual(x.viewport+2);
 });
+
+
+test('Editorial Picks geometry stays fixed for every rotating film title and poster',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/movies.html');
+ const card=page.locator('.editorial-pick');
+ await expect(card).toBeVisible();
+ await expect(card).toHaveCSS('height','235px');
+ const stage=page.locator('.editorial-carousel__stage');
+ const first=await stage.boundingBox();
+ const next=page.locator('.editorial-carousel__nav[aria-label="Next editorial pick"]');
+ for(let n=0;n<4;n++){
+  await next.click();
+  await expect(card).toBeVisible();
+  const current=await stage.boundingBox();
+  expect(Math.abs(current.height-first.height)).toBeLessThanOrEqual(1);
+  const contained=await page.evaluate(()=>{
+   const host=document.querySelector('.editorial-pick').getBoundingClientRect();
+   const img=document.querySelector('.editorial-pick__art-frame').getBoundingClientRect();
+   const title=document.querySelector('.editorial-pick__title').getBoundingClientRect();
+   const links=document.querySelector('.editorial-pick__links').getBoundingClientRect();
+   return {poster:img.right<=host.right+1,title:title.right<=host.right+1,links:links.bottom<=host.bottom+2};
+  });
+  expect(contained.poster).toBe(true);
+  expect(contained.title).toBe(true);
+  expect(contained.links).toBe(true);
+ }
+ await expect(page.locator('.editorial-pick')).toHaveCSS('height','235px');
+});
+
+test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/cinema.html');
+ await expect(page.locator('body')).toHaveClass(/fr-v5/);
+ await expect(page.locator('#upcoming-cinema')).toBeVisible();
+ await expect(page.locator('#recent-cinema')).toBeVisible();
+ await expect(page.locator('.fr-v5-deeper')).toHaveCount(0);
+ const stable=await page.evaluate(()=>{
+  const intro=document.querySelector('.hub-page-intro');
+  const diary=document.querySelector('#upcoming-cinema');
+  const recent=document.querySelector('#recent-cinema');
+  return {ordered:intro.compareDocumentPosition(diary)&Node.DOCUMENT_POSITION_FOLLOWING,
+   recent:diary.compareDocumentPosition(recent)&Node.DOCUMENT_POSITION_FOLLOWING,
+   width:document.documentElement.scrollWidth,viewport:innerWidth};
+ });
+ expect(Boolean(stable.ordered)).toBe(true);
+ expect(Boolean(stable.recent)).toBe(true);
+ expect(stable.width).toBeLessThanOrEqual(stable.viewport+2);
+ await page.screenshot({path:'test-results/visual/v5-cinema-mobile.png',fullPage:false});
+});
+
+test('TV editorial requests title and original air year and displays exact matched TMDB poster',async({page})=>{
+ const img=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==','base64');
+ const queries=[];
+ await page.route('**/api/media?**',route=>{
+  const p=new URL(route.request().url()).searchParams;
+  queries.push(Object.fromEntries(p));
+  if(p.get('type')!=='tv'||!p.get('year')||!p.get('title'))return route.fulfill({status:404});
+  return route.fulfill({json:{item:{
+   type:'tv',tmdbId:1234,title:p.get('title'),firstReleaseDate:p.get('year')+'-01-01',
+   posterPath:'/verified.png',sourceUrl:'https://www.themoviedb.org/tv/1234',
+   voteAverage:7.5,voteCount:95
+  }}});
+ });
+ await page.route('https://image.tmdb.org/**',route=>route.fulfill({status:200,contentType:'image/png',body:img}));
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/tv-shows.html');
+ await expect(page.locator('.editorial-pick__poster')).toBeVisible();
+ await expect(page.locator('.editorial-pick__art-credit')).toContainText('Poster via TMDB');
+ expect(queries.some(q=>q.type==='tv'&&q.title&&/^20[0-2][0-9]$/.test(q.year))).toBe(true);
+});

@@ -326,7 +326,8 @@
   installHeader();
   main.dataset.frV5Ready='true';
   mobileDock();
-  if(theme==='home')return;
+  // Cinema stays in document order: never flash or relocate its diary after load.
+  if(theme==='home'||theme==='cinema')return;
   decorateHero();
   const config=configs[theme];if(!config)return;
   const showcase=el('div','fr-v5-front');

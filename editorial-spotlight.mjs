@@ -76,6 +76,18 @@ export const filmMediaIdentities = Object.freeze({
   '28-weeks-later': { imdb: 'tt0463854', year: 2007 },
   '28-days-later': { imdb: 'tt0289043', year: 2002 }
 });
+// TV titles use exact title + original first-air year when requesting TMDB art.
+// Ambiguous or non-matching records deliberately retain labelled first-party artwork.
+const tvEditorialYears = Object.freeze({
+  'tv-shows-0': 2019, // Marianne
+  'tv-shows-1': 2022, // Archive 81
+  'tv-shows-2': 2023, // The Fall of the House of Usher
+  'tv-shows-3': 2020, // The Haunting of Bly Manor
+  'tv-shows-4': 2019, // Kingdom
+  'tv-shows-5': 2022, // Guillermo del Toro's Cabinet of Curiosities
+  'tv-shows-expanded-6': 2021, // Yellowjackets
+  'tv-shows-expanded-7': 2019 // Evil
+});
 const indieFilmIds = Object.freeze({
   'indie-movies-0':'longlegs', 'indie-movies-1':'the-monkey',
   'indie-movies-2':'together', 'indie-movies-3':'heretic',
@@ -83,13 +95,13 @@ const indieFilmIds = Object.freeze({
 });
 export function matchedMedia(item, media) {
   const identity = item.mediaIdentity;
-  if (!identity || !media || media.type !== 'movie' || (identity.id && media.tmdbId !== identity.id) ||
+  if (!identity || !media || media.type !== (identity.type || 'movie') || (identity.id && media.tmdbId !== identity.id) ||
       !Number.isInteger(media.tmdbId) || !/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(media.posterPath || '')) return false;
   const normal = value => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   return normal(media.title) === normal(item.title) &&
     Number(String(media.firstReleaseDate || media.releaseDate || '').slice(0,4)) === identity.year &&
     Number(item.year) === identity.year &&
-    media.sourceUrl === 'https://www.themoviedb.org/movie/' + media.tmdbId;
+    media.sourceUrl === 'https://www.themoviedb.org/' + (identity.type || 'movie') + '/' + media.tmdbId;
 }
 const getFilmCandidates = (overviewData = {}) => (window.FR_MOVIES || [])
   .filter(movie => movie.editorialStatus === 'approved' && movie.id && movie.title &&
@@ -179,7 +191,7 @@ function appendVideo(parent, trailer, title) {
 }
 function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   const feature = make('section', 'editorial-pick');
-  feature.setAttribute('aria-label', config.title + ' daily editorial pick');
+  feature.setAttribute('aria-label', config.title + ' editorial selection');
   feature.dataset.dayIndex = String(dayIndex);
   feature.dataset.featureId = item.id;
 
@@ -248,10 +260,13 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
 async function loadPoster(feature, item, isCurrent) {
   const card = feature.querySelector('.editorial-pick__art-frame');
   if (!item.mediaIdentity || artHasRights(item)) return;
-  const params = new URLSearchParams({type:'movie'});
+  const params = new URLSearchParams({type:item.mediaIdentity.type || 'movie'});
   if (item.mediaIdentity.id) params.set('id', item.mediaIdentity.id);
   else if (item.mediaIdentity.imdb) params.set('imdb', item.mediaIdentity.imdb);
-  else return;
+  else if (item.mediaIdentity.type === 'tv' && item.mediaIdentity.year) {
+    params.set('title', item.title);
+    params.set('year', String(item.mediaIdentity.year));
+  } else return;
   try {
     const response = await fetch('/api/media?' + params, {headers:{accept:'application/json'}});
     if (!response.ok) return;
@@ -311,7 +326,7 @@ async function start() {
     const list = theme === 'movies' ? getFilmCandidates(primaryOverviews) :
       (data?.[config.collection] || []).filter(x => safeDestination(x.sourceUrl)).map(x => {
         const filmId = theme === 'indie' ? indieFilmIds[x.id] : '';
-        const identity = filmMediaIdentities[filmId];
+        const identity = theme === 'tv' && tvEditorialYears[x.id] ? {type:'tv',year:tvEditorialYears[x.id]} : filmMediaIdentities[filmId];
         const overview = primaryOverviews[filmId];
         return identity ? {...x, year: identity.year, mediaIdentity: identity,
           description: overview?.description || x.description,
