@@ -55,7 +55,8 @@ test('Editorial card does not invent scores, rights, or a film trailer',async({p
  if(await img.count()){
    await expect(hero.locator('.editorial-pick__art-credit')).toBeVisible();
  }else{
-   await expect(hero.locator('.editorial-pick__art-sub')).toContainText('NOT AN OFFICIAL POSTER');
+   await expect(hero.locator('.editorial-pick__art-sub')).toContainText('ORIGINAL FRIGHTERTAINMENT ART');
+    await expect(hero.locator('.editorial-pick__art-frame')).toHaveAttribute('aria-label',/not an official film poster/i);
  }
 });
 
