@@ -434,6 +434,95 @@ test('Saving a movie shows a discoverable watchlist on the homepage with a worki
  await expect(shelf.locator('[data-home-watch-items]')).toBeHidden();
 });
 
+test('Home editorial content stays inside its fixed frame with extra-long film metadata',async({page})=>{
+ for(const width of [320,360,390,430,768,1440]){
+  await page.setViewportSize({width,height:844});
+  await page.goto('/');
+  const feature=page.locator('.hub-feature');
+  await expect(feature).toBeVisible();
+  await feature.evaluate(tile=>{
+   tile.querySelector('.hub-kicker').textContent='RECENT HORROR RELEASE · OFFICIAL FILM FILE WITH VERIFIED SCREENING SOURCES';
+   tile.querySelector('h3').textContent='The Midnight Children Who Never Came Home from the Haunted House';
+   tile.querySelector('p').textContent='An independent story about a very long chain of frightening events taking place inside an abandoned haunted family home with no safe way out. Nobody who enters returns to tell what happened.';
+   let rating=tile.querySelector('.hub-feature__rating');
+   if(!rating){
+    rating=document.createElement('span');rating.className='hub-feature__rating';
+    tile.querySelector('p').before(rating);
+   }
+   rating.textContent='TMDB 9.1/10';
+   let trailer=tile.querySelector('.fr-trailer-button');
+   if(!trailer){
+    trailer=document.createElement('button');trailer.className='fr-trailer-button';
+    tile.querySelector('.hub-tile__content').append(trailer);
+   }
+   trailer.hidden=false;
+   trailer.textContent='▶ PLAY TRAILER';
+  });
+  const bounds=await feature.evaluate(tile=>{
+   const rect=tile.getBoundingClientRect();
+   const labels=[tile.querySelector('.hub-kicker'),tile.querySelector('h3'),
+    tile.querySelector('.hub-feature__rating'),tile.querySelector('p'),
+    tile.querySelector('.hub-tile__link'),tile.querySelector('.fr-trailer-button')];
+   const items=labels.map(node=>{
+    const r=node.getBoundingClientRect();
+    return {text:(node.textContent||'').slice(0,35),top:r.top,bottom:r.bottom,left:r.left,right:r.right};
+   });
+   const c=tile.querySelector('.hub-tile__content').getBoundingClientRect();
+   return {items,height:rect.height,top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right,
+    contentBottom:c.bottom,contentTop:c.top,overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(bounds.height).toBeGreaterThanOrEqual(width<=700?265:345);
+  for(const item of bounds.items){
+   expect(item.top, item.text+' top at '+width).toBeGreaterThanOrEqual(bounds.top+3);
+   expect(item.bottom, item.text+' bottom at '+width).toBeLessThanOrEqual(bounds.bottom-3);
+   expect(item.left, item.text+' left at '+width).toBeGreaterThanOrEqual(bounds.left+3);
+   expect(item.right, item.text+' right at '+width).toBeLessThanOrEqual(bounds.right-3);
+  }
+  expect(bounds.contentTop).toBeGreaterThanOrEqual(bounds.top);
+  expect(bounds.contentBottom).toBeLessThanOrEqual(bounds.bottom+1);
+  expect(bounds.overflow).toBeLessThanOrEqual(2);
+ }
+});
+
+test('Saved watchlist poster titles stay within their fixed tiles on 320 and 390 phones',async({page})=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem('frightertainment-v5-watchlist',JSON.stringify([
+   {tmdbId:1856631,title:'Insidious: Out of the Further and Beyond the Long Hallway',type:'movie',posterPath:'',year:2026},
+   {tmdbId:1689001,title:'Resident Evil: Welcome to Raccoon City with an Extra Long Title',type:'movie',posterPath:'',year:2021}
+  ]));
+ });
+ for(const width of [320,390]){
+  await page.setViewportSize({width,height:844});
+  await page.goto('/');
+  const shelf=page.locator('#my-watchlist');
+  await expect(shelf.locator('.fr-home-watch-shelf__movie')).toHaveCount(2);
+  const state=await shelf.evaluate(root=>{
+   const tiles=[...root.querySelectorAll('.fr-home-watch-shelf__item')];
+   const results=tiles.map(tile=>{
+    const movie=tile.querySelector('.fr-home-watch-shelf__movie');
+    const title=tile.querySelector('.fr-home-watch-shelf__movie-title');
+    const outer=tile.getBoundingClientRect();
+    const text=title.getBoundingClientRect();
+    const style=getComputedStyle(title);
+    return {name:title.textContent,tileBottom:outer.bottom,titleBottom:text.bottom,
+      tileHeight:outer.height,titleHeight:text.height,titleClamp:style.webkitLineClamp,
+      link:movie.getAttribute('href'),label:movie.getAttribute('aria-label')};
+   });
+   return {results,overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(state.overflow).toBeLessThanOrEqual(2);
+  for(const result of state.results){
+   expect(result.tileHeight).toBeGreaterThanOrEqual(168);
+   expect(result.tileHeight).toBeLessThanOrEqual(172);
+   expect(result.titleHeight).toBeLessThanOrEqual(43);
+   expect(result.titleBottom).toBeLessThanOrEqual(result.tileBottom+1);
+   expect(result.titleClamp).toBe('2');
+   expect(result.label).toContain(result.name);
+   expect(result.link).toMatch(/^\/media\.html\?type=movie&id=\d+$/);
+  }
+ }
+});
+
 test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/cinema.html');
