@@ -35,7 +35,12 @@ for(const [room,path,wordmark] of routes){
    await carousel.getByRole('button',{name:'Resume automatic editorial rotation'}).click();
    await expect(carousel.getByRole('button',{name:'Pause automatic editorial rotation'})).toBeVisible();
    await expect(hero.locator('.editorial-pick__synopsis')).not.toBeEmpty();
-   await expect(hero.locator('.editorial-pick__score')).toContainText('FRIGHT RATING');
+   if (['movies', 'tv', 'indie'].includes(room)) {
+     await expect(hero.locator('.editorial-pick__score')).toContainText('Rating unavailable');
+     await expect(hero.locator('.editorial-pick__score')).toContainText('TMDB audience');
+   } else {
+     await expect(hero.locator('.editorial-pick__score')).toHaveCount(0);
+   }
    const filmID=await hero.getAttribute('data-feature-id');
    expect(filmID).toBeTruthy();
    expect(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth+3))
@@ -50,7 +55,7 @@ test('Editorial card does not invent scores, rights, or a film trailer',async({p
  await page.goto('/indie-movies.html');
  const hero=page.locator('.editorial-pick');
  await expect(hero).toBeVisible();
- await expect(hero.locator('.editorial-pick__score')).toContainText('AWAITING VERIFIED SCORES');
+ await expect(hero.locator('.editorial-pick__score')).toContainText('Rating unavailable');
  const img=hero.locator('img.editorial-pick__poster');
  if(await img.count()){
    await expect(hero.locator('.editorial-pick__art-credit')).toBeVisible();

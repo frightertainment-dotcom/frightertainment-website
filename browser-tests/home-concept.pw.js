@@ -7,7 +7,7 @@ test('Homepage is a compact cinematic dashboard on a phone, not a giant feed',as
  await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
  await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
  await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(5);
- await expect(page.locator('link[href^="/homepage-concept.css"]')).toHaveCount(1);
+ await expect(page.locator('link[href^="/fr-design-system.css"]')).toHaveCount(1);
  const sizes=await page.evaluate(()=>{
   const rect=selector=>document.querySelector(selector).getBoundingClientRect();
   const intro=rect('.fr-home-intro'),featured=rect('.hub-feature'),rank=rect('.hub-charts'),support=rect('.hub-showcase__bottom');
@@ -16,9 +16,10 @@ test('Homepage is a compact cinematic dashboard on a phone, not a giant feed',as
     rankedTop:rank.top,rankedBottom:rank.bottom,supportTop:support.top,
     tabs:tabs.length,pageWidth:document.documentElement.scrollWidth,viewport:window.innerWidth};
  });
- expect(sizes.introHeight).toBeLessThan(255);
+ expect(sizes.introHeight).toBeGreaterThanOrEqual(300);
+ expect(sizes.introHeight).toBeLessThan(510);
  expect(sizes.featuredTop).toBeLessThan(sizes.rankedTop);
- expect(sizes.supportTop).toBeLessThan(sizes.rankedTop);
+ expect(sizes.supportTop).toBeGreaterThan(sizes.rankedBottom);
  expect(sizes.tabs).toBe(7);
  expect(sizes.pageWidth).toBeLessThanOrEqual(sizes.viewport+2);
  const releases=page.locator('details.fr-home-updates');
