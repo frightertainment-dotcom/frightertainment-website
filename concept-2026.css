@@ -142,6 +142,9 @@ body.fr-v5 .fr-cinema-concept__copy small{color:#c9bdba;font:400 10px/1.2 Arial,
 body.fr-v5 .fr-cinema-concept__copy a{align-self:stretch;margin-top:auto;padding:6px 3px;text-align:center;background:#ad1028;font-size:9px}
 body.fr-v5 .fr-cinema-concept__region{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:18px;background:linear-gradient(160deg,#0a1012,#060708)}
 body.fr-v5 .fr-cinema-concept__region p{font:400 13px/1.4 Arial,Helvetica,sans-serif;color:#e1d7d4}
+body.fr-v5 .fr-cinema-concept__region .fr-cinema-region{display:flex;flex-direction:column;align-items:stretch;width:100%;gap:5px;margin:9px 0 2px;color:#ddd;font:700 10px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5 .fr-cinema-concept__region .fr-cinema-region select{width:100%;min-height:34px;padding:6px 9px;color:#fff;background:#080b0d;border:1px solid #93404c;border-radius:2px}
+body.fr-v5 .fr-cinema-concept__region .fr-cinema-context{font-size:10px;margin:3px 0}
 body.fr-v5 .fr-cinema-concept__region a{border:1px solid #a54050;padding:9px 11px;margin-top:9px}
 body.fr-v5 .fr-v5-ranking__entry{height:27px;min-height:27px;overflow:hidden}
 body.fr-v5 .fr-v5-ranking__movie{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

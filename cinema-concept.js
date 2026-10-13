@@ -10,6 +10,11 @@
  section.setAttribute('aria-label','Upcoming cinema highlights');
  section.innerHTML='<div class="fr-cinema-concept__features"><div class="fr-cinema-concept__head"><h2>★ UPCOMING IN CINEMAS</h2><a href="#upcoming-cinema">VIEW RELEASE DIARY →</a></div><div class="fr-cinema-concept__cards" data-cinema-concept-cards><p>Checking verified release dates…</p></div></div><aside class="fr-cinema-concept__region"><h2>⌖ CINEMA RELEASES NEAR YOU</h2><p>See source-checked theatrical dates for <strong data-cinema-concept-country></strong>. Venues and tickets vary by location.</p><a href="#upcoming-cinema">EXPLORE THE FULL DIARY →</a></aside>';
  intro.insertAdjacentElement('afterend',section);
+ const region=section.querySelector('.fr-cinema-concept__region');
+ const selector=intro.querySelector('.fr-cinema-region');
+ const context=intro.querySelector('.fr-cinema-context');
+ if(selector)region.querySelector('h2').insertAdjacentElement('afterend',selector);
+ if(context)selector?.insertAdjacentElement('afterend',context);
  const cards=section.querySelector('[data-cinema-concept-cards]');
  const label=section.querySelector('[data-cinema-concept-country]');
  const make=(tag,className,value)=>{
