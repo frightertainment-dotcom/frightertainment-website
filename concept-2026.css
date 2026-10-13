@@ -572,3 +572,113 @@ body.fr-v5 .editorial-pick__poster{
  body.fr-v5 .editorial-pick,
  body.fr-v5 .fr-v5-explore__tile{transition:none;animation:none}
 }
+
+
+/* Owner review: an immediately usable homepage watchlist, not an obscure
+   second-page utility. HTML reserves this space from first paint. */
+body.fr-v5.hub-home .fr-home-watch-shelf{
+ width:100%;min-width:0;margin:8px auto 10px;
+ border:1px solid #74313d;border-left:3px solid #d42a45;
+ background:linear-gradient(105deg,#161013ef,#090d0ff5 72%);
+ box-shadow:inset 0 1px #ef6b7330,0 8px 24px #0008;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__header{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ min-width:0;min-height:48px;padding:8px 13px;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__label{min-width:0}
+body.fr-v5.hub-home .fr-home-watch-shelf h2{
+ margin:0;color:#ffdbd9;
+ font:700 clamp(13px,1.3vw,17px)/1.16 Arial,Helvetica,sans-serif;
+ letter-spacing:.055em;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf [data-home-watch-count]{
+ display:inline-grid;place-items:center;
+ min-width:24px;min-height:24px;padding:2px 6px;margin-left:5px;
+ border-radius:20px;border:1px solid #ad3c52;
+ background:#571621;color:#fff0ee;
+ font:700 12px Arial,Helvetica,sans-serif;letter-spacing:0;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__label p{
+ margin:3px 0 0;color:#d0bcbf;
+ font:400 11px/1.35 Arial,Helvetica,sans-serif;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__browse{
+ display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;
+ padding:9px 12px;min-height:35px;
+ border:1px solid #9b4855;border-radius:2px;
+ background:#210f15;color:#fce4e2;
+ font:700 11px/1.1 Arial,Helvetica,sans-serif;text-decoration:none;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__browse:hover,
+body.fr-v5.hub-home .fr-home-watch-shelf__browse:focus-visible{
+ border-color:#ef7886;outline-offset:2px;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__grid{
+ display:flex;gap:10px;
+ overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+ max-width:100%;padding:10px 13px 13px;
+ border-top:1px solid #503038;
+ scrollbar-width:thin;scrollbar-color:#8c3344 #0c0a0c;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__grid[hidden]{display:none!important}
+body.fr-v5.hub-home .fr-home-watch-shelf__item{
+ position:relative;flex:0 0 102px;min-width:0;
+ border:1px solid #793645;background:#07090b;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie{
+ display:flex;flex-direction:column;min-width:0;
+ color:#f7ece9;text-decoration:none;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__art{
+ display:grid;place-items:center;position:relative;
+ width:100%;height:126px;min-height:0;aspect-ratio:2/3;
+ overflow:hidden;background:#140b10;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__image{
+ width:100%;height:100%;object-fit:cover;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__fallback{
+ padding:7px;color:#eee0dd;text-align:center;
+ font:700 13px/1.12 Georgia,serif;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie-title{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ min-height:36px;overflow:hidden;padding:5px 4px;
+ text-align:center;font:700 11px/1.22 Georgia,serif;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__remove{
+ position:absolute;z-index:3;right:4px;top:4px;
+ width:28px;height:28px;display:grid;place-items:center;
+ border:1px solid #ffcbd0;border-radius:50%;
+ background:#92172e;color:white;
+ font:700 20px/1 Arial,Helvetica,sans-serif;cursor:pointer;
+ box-shadow:0 2px 9px #000b;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie:focus-visible,
+body.fr-v5.hub-home .fr-home-watch-shelf__remove:focus-visible{
+ outline:2px solid #fff0ee;outline-offset:2px;
+}
+@media(max-width:700px){
+ body.fr-v5.hub-home .fr-home-watch-shelf{margin:7px auto 10px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__header{min-height:50px;padding:7px 9px;gap:7px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__label p{font-size:10px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__browse{font-size:10px;padding:8px 7px;min-height:38px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__item{flex-basis:88px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__art{height:110px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__grid{padding:8px;gap:8px}
+}
+/* The Cinema feature and country picker are now permanent HTML landmarks,
+   not inserted and moved after JS boot. Reserve their size during loading. */
+body.fr-v5 .fr-cinema-concept__cards{
+ align-content:start;min-height:210px;
+}
+body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{
+ grid-column:1/-1;min-height:110px;
+ padding:26px 10px;text-align:center;
+ color:#d9c9c7;font:500 13px/1.4 Arial,Helvetica,sans-serif;
+}
+@media(max-width:700px){
+ body.fr-v5 .fr-cinema-concept__cards{min-height:150px}
+ body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{min-height:140px}
+}
