@@ -1289,3 +1289,6 @@ body.fr-v5 .editorial-carousel__dot::before{width:7px;height:7px}
   display:none;
  }
 }
+
+body.fr-v5 .editorial-carousel__controls[hidden],
+body.fr-v5 .editorial-carousel__pause[hidden]{display:none!important}
