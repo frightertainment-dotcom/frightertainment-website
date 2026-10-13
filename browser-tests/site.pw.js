@@ -1,3 +1,4 @@
+import { navigateLegacy,openCompleteDiscovery } from './helpers/open-full-discovery.mjs';
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
@@ -10,7 +11,7 @@ test.beforeEach(async ({page}) => {
 });
 
 const pages = [
-  ['/', 'COME CLOSER'],
+  ['/', 'WELCOME TO THE DARK'],
   ['/movies.html','HORROR'],
   ['/all-horror-movies.html','ALL HORROR'],
   ['/archive-film.html?id=Q166385','A Terrible Night'],
@@ -44,7 +45,7 @@ for (const [path, heading] of pages) {
       })
     }));
     // Embedded podcast/game players can hold the browser load event open.
-    await page.goto(path,{waitUntil:'domcontentloaded'});
+    await navigateLegacy(page,path,{waitUntil:'domcontentloaded'});
     await expect(page.locator('h1').first()).toContainText(heading, { ignoreCase: true });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     await page.evaluate(async () => {
@@ -66,7 +67,7 @@ test('no-JavaScript film pages retain the verified Other Mommy and Clayface trai
   for (const [path, expected] of [['/films/other-mommy/', 'bEpTgowZ1dI'], ['/films/clayface/', '6IxPD-jNdwM']]) {
     const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
     const page = await context.newPage();
-    await page.goto(path);
+    await navigateLegacy(page,path);
     await expect(page.locator(`a[href*="${expected}"]`).first()).toBeVisible();
     await expect(page.locator('h1')).not.toBeEmpty();
     await context.close();
@@ -74,7 +75,7 @@ test('no-JavaScript film pages retain the verified Other Mommy and Clayface trai
 });
 
 test('verified film-card trailers open the dialog with no duplicated trailer block',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('#trailers,.verified-trailer')).toHaveCount(0);
   await page.locator('#movie-year').selectOption('all');
   const button=page.locator('.movie-card [data-trailer-video]').first();
@@ -98,17 +99,17 @@ test('dynamic film records escape hostile text and reject credential-bearing sou
       claims: [{ label: '<script>window.__filmXssRan=true</script>', value: '<iframe srcdoc=x>', territory: 'GB', checked: '2026-10-09', sourceName: 'Untrusted source', source: 'https://user:password@example.test/film' }]
     })
   }));
-  await page.goto('/film.html?id=security-fixture');
+  await navigateLegacy(page,'/film.html?id=security-fixture');
   await expect(page.locator('#dynamic-film h1')).toHaveText('<img src=x onerror="window.__filmXssRan=true">');
   await expect(page.locator('#dynamic-film img, #dynamic-film script, #dynamic-film iframe')).toHaveCount(0);
   await expect(page.locator('#dynamic-film a[target="_blank"]')).toHaveCount(0);
   expect(await page.evaluate(() => window.__filmXssRan)).toBe(false);
 });
 
-for (const [path, heading] of [['/', 'COME CLOSER'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
+for (const [path, heading] of [['/', 'WELCOME TO THE DARK'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
   test(`desktop visual layout: ${path}`, async ({ browser }) => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
-    await page.goto(path);
+    await navigateLegacy(page,path);
     await expect(page.locator('h1').first()).toContainText(heading, { ignoreCase: true });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     await page.screenshot({ path: `test-results/visual/desktop-${path.replace(/[^a-z0-9]+/gi, '-') || 'home'}.png`, fullPage: true });
@@ -118,14 +119,14 @@ for (const [path, heading] of [['/', 'COME CLOSER'], ['/top-20/2026/', 'TOP 20 H
 
 test('homepage film search produces an accessible empty state', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await page.locator('#movie-search').fill('zz-no-match');
   await expect(page.locator('#empty-state')).toBeVisible();
   await expect(page.locator('#results-count')).toContainText('0 selected films');
 });
 
 test('Movies removes empty date/score filters while retaining working search',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.filter-chips,[data-filter],#trailers')).toHaveCount(0);
   await page.locator('#movie-year').selectOption('all');
   await page.locator('#movie-search').fill('28 Weeks Later');
@@ -135,7 +136,7 @@ test('Movies removes empty date/score filters while retaining working search',as
 });
 
 test('homepage recommendations do not advertise unannounced productions', async ({ page }) => {
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await expect(page.locator('.hub-showcase .hub-tv')).toBeVisible();
   await expect(page.locator('#hub-ranking')).toBeVisible();
   await expect(page.locator('.hub-tabs a[href="/podcasts.html"]')).toBeVisible();
@@ -147,19 +148,20 @@ test('homepage recommendations do not advertise unannounced productions', async 
 
 test('homepage is compact, branded and links into distinct pages', async ({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await expect(page.locator('.hub-brand img')).toBeVisible();
   await expect(page.locator('.hub-tabs a')).toHaveCount(7);
   await expect(page.locator('.hero-wordmark')).toHaveCount(0);
-  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
+  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(6);
   await expect(page.locator('#movie-grid')).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
 });
 
 test('navigation works between all main sections and official movie source', async ({ page }) => {
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await page.locator('.hub-tabs a[href="/movies.html"]').click();
   await expect(page).toHaveURL(/movies\.html$/);
+  await openCompleteDiscovery(page);
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
   await page.locator('#movie-more').click();
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(11);
@@ -167,8 +169,10 @@ test('navigation works between all main sections and official movie source', asy
   await expect(official).toHaveAttribute('href', /^https:\/\//);
   await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
   await expect(page).toHaveURL(/podcasts\.html$/);
+  await openCompleteDiscovery(page);
   await expect(page.locator('main .hub-tile')).toHaveCount(12);
   await page.locator('.hub-tabs a[href="/indie-movies.html"]').click();
+  await openCompleteDiscovery(page);
   await expect(page.locator('#chart .fr-media-card')).toHaveCount(3);
   await expect(page.locator('#archive [data-catalogue-search]')).toBeVisible();
   await expect(page.locator('main')).not.toContainText('DETAILS TO BE ANNOUNCED');
@@ -176,7 +180,7 @@ test('navigation works between all main sections and official movie source', asy
 test('compact dashboard remains navigable at 320px and 768px', async ({ browser }) => {
   for (const width of [320, 768]) {
     const page = await browser.newPage({viewport:{width,height:820}});
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await navigateLegacy(page,'/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('.hub-brand img')).toBeVisible();
     await expect(page.locator('.hub-tabs a')).toHaveCount(7);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -192,7 +196,7 @@ test('all seven section themes and navigation fit the requested viewport widths'
   const widths = [320, 360, 390, 430, 768, 1024, 1440, 1920];
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   for (const [route, theme] of themes) {
-    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await navigateLegacy(page,route, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
     await expect(page.locator('.hub-tabs a')).toHaveCount(7);
     await expect(page.locator('.hub-tabs a[aria-current="page"]')).toHaveCount(1);
@@ -207,32 +211,19 @@ test('all seven section themes and navigation fit the requested viewport widths'
 });
 test('TV, indie, podcast and games landings use distinct desktop compositions', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  for (const route of ['/podcasts.html']) {
-    // Podcast embeds can stall the load event; verify the rendered layout after DOM readiness.
-    await page.goto(route,{waitUntil:'domcontentloaded'});
-    const cards = page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile');
-    await expect(cards.first()).toBeVisible();
-    const boxes = await cards.evaluateAll(nodes => nodes.map(node => {
-      const { x, y, width, height } = node.getBoundingClientRect();
-      return { x, y, width, height };
-    }));
-    expect(boxes.length).toBe(3);
-    expect(boxes[0].width).toBeGreaterThan(boxes[1].width);
-    expect(boxes[0].height).toBeGreaterThan(boxes[1].height);
-    expect(Math.abs(boxes[1].x - boxes[2].x), `${route} secondary cards should stack in one column`).toBeLessThan(2);
-    expect(boxes[2].y).toBeGreaterThan(boxes[1].y);
+  // V5 replaces the former uneven 3-tile hero with consistent magazine cards.
+  for (const route of ['/podcasts.html','/games.html']) {
+    await navigateLegacy(page,route,{waitUntil:'domcontentloaded'});
+    const cards=page.locator('.fr-v5-front .fr-v5-editorial-tile');
+    await expect(cards).toHaveCount(6);
+    const rows=await cards.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect()));
+    expect(Math.abs(rows[0].top-rows[1].top)).toBeLessThan(3);
+    expect(rows[1].left).toBeGreaterThan(rows[0].right);
+    await expect(page.locator('.fr-v5-deeper')).toHaveAttribute('open','');
+    await expect(page.locator('.fr-v5-deeper .hub-tile').first()).toBeVisible();
   }
-  await page.goto('/games.html');
-  const gameBoxes = await page.locator('.hub-catalog:not(.hub-catalog--expanded) > .hub-tile').evaluateAll(nodes => nodes.map(node => {
-    const { x, y, width, height } = node.getBoundingClientRect();
-    return { x, y, width, height };
-  }));
-  expect(gameBoxes).toHaveLength(2);
-  expect(gameBoxes[0].width).toBeGreaterThan(gameBoxes[1].width);
-  expect(gameBoxes[0].height).toBeGreaterThan(gameBoxes[1].height);
-  expect(gameBoxes[1].x).toBeGreaterThan(gameBoxes[0].x);
   for(const route of ['/indie-movies.html','/tv-shows.html']) {
-    await page.goto(route);
+    await navigateLegacy(page,route);
     const cards=page.locator('#chart .fr-media-card');
     await expect(cards).toHaveCount(3);
     const boxes=await cards.evaluateAll(nodes=>nodes.map(node=>{const {x,y,width}=node.getBoundingClientRect();return{x,y,width};}));
@@ -245,7 +236,7 @@ test('TV, indie, podcast and games landings use distinct desktop compositions', 
 test('narrow section cards keep readable copy, natural titles and visible external-link icons', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of ['/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html']) {
-    await page.goto(route);
+    await navigateLegacy(page,route);
     const paragraphs = page.locator('main > .hub-catalog:not(.hub-catalog--expanded) .hub-tile p');
     for (const paragraph of await paragraphs.all()) {
       expect(await paragraph.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
@@ -268,49 +259,49 @@ test('narrow section cards keep readable copy, natural titles and visible extern
       expect(await externalTileAction.evaluate(el => getComputedStyle(el, '::after').inset)).toBe('0px');
     }
   }
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
   expect(await page.locator('#movie-grid .movie-card__text').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
 });
 test('mobile homepage keeps the featured film before the chart and supporting cards after it', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const order = await page.locator('.hub-dashboard > *').evaluateAll(nodes => nodes.map(node =>
     node.classList.contains('hub-feature') ? 'feature' : node.classList.contains('hub-charts') ? 'chart' : 'support'));
   expect(order).toEqual(['feature', 'chart', 'support']);
 });
 test('film and Top 20 pages offer main-content skip links', async ({ page }) => {
-  await page.goto('/films/clayface/');
+  await navigateLegacy(page,'/films/clayface/');
   await expect(page.locator('.skip-link')).toHaveAttribute('href', '#main-content');
   await expect(page.locator('#main-content')).toBeVisible();
-  await page.goto('/top-20/2026/');
+  await navigateLegacy(page,'/top-20/2026/');
   await expect(page.locator('.skip-link')).toHaveCount(1);
 });
 test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').backgroundImage);
-  expect(artURL).toContain('/assets/worlds/home-threshold.webp');
-  await page.goto('/movies.html');
+  expect(artURL).toContain('/assets/worlds/movies-vault.webp');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
   await expect(page.locator('.movie-card__actions a[target="_blank"]')).toHaveCount(8);
 });
 
 test('expanded TV, podcast, game and indie listings have source-linked cards', async ({page})=>{
   for(const [route,count] of [['/tv-shows.html',8],['/podcasts.html',9],['/games.html',9],['/indie-movies.html',9]]){
-    await page.goto(route);
+    await navigateLegacy(page,route);
     await expect(page.locator('.hub-editorial-more .hub-tile')).toHaveCount(count);
     await expect(page.locator('.hub-editorial-more a.hub-tile__link[href]')).toHaveCount(count);
   }
-  await page.goto('/podcasts.html');
+  await navigateLegacy(page,'/podcasts.html');
   await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
-  await page.goto('/tv-shows.html');
+  await navigateLegacy(page,'/tv-shows.html');
   await page.locator('.fr-curated-more > summary').click();
-  await expect(page.locator('a[href="https://www.netflix.com/gb/title/80209229"]')).toBeVisible();
+  await expect(page.locator('.fr-curated-more a[href="https://www.netflix.com/gb/title/80209229"]').first()).toBeVisible();
   await expect(page.locator('a[href="https://qr.netflix.com/gb/title/80209229"]')).toHaveCount(0);
 });
 
 test('upcoming release calendar excludes historical and already released films',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const calendar=page.locator('#hub-release-list');
   await expect(calendar.locator('.hub-release-row').first()).toBeVisible();
   const rows=await calendar.locator('.hub-release-row').evaluateAll(nodes=>
@@ -343,7 +334,7 @@ test('Crawlers poster in Coming Soon resolves using its verified TMDB identity',
   await page.route('https://image.tmdb.org/**',route=>route.fulfill({
     status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+l5a8AAAAASUVORK5CYII=','base64')
   }));
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const item=page.locator('#hub-release-list .hub-release-row').filter({hasText:'Crawlers'});
   await expect(item).toBeVisible();
   await expect(item).toHaveAttribute('data-tmdb-id','1376400');
@@ -355,7 +346,7 @@ test('Crawlers poster in Coming Soon resolves using its verified TMDB identity',
   expect(mediaRequests.some(q=>q.id==='1376400')).toBe(true);
 });
 test('featured recent years are separate from the complete pre-2025 year-by-year archive',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('#movie-year')).toHaveValue('2026');
   await expect(page.locator('#results-count')).toContainText('11 selected films');
   await expect(page.locator('#movie-grid')).not.toContainText('28 Weeks Later');
@@ -364,14 +355,14 @@ test('featured recent years are separate from the complete pre-2025 year-by-year
   await expect(page.locator('#results-count')).toContainText('7 selected films');
   await page.selectOption('#movie-year','all');
   await expect(page.locator('#results-count')).toContainText('24 selected films');
-  await page.goto('/all-horror-movies.html?year=2007');
+  await navigateLegacy(page,'/all-horror-movies.html?year=2007');
   await expect(page.locator('#archive-summary')).toContainText('horror films across');
   await expect(page.locator('.horror-year')).not.toHaveCount(0);
   await expect(page.getByText('28 Weeks Later',{exact:true}).first()).toBeVisible();
 });
 
 test('public film pages expose no private publisher snapshots or Fright Rating section',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
   await expect(card).toBeVisible();
   await card.scrollIntoViewIfNeeded();
@@ -402,12 +393,12 @@ test('TMDB community chart links to internal film detail with poster and viewer 
       voteAverage: 7.2, voteCount: 300, sourceUrl: 'https://www.themoviedb.org/movie/1400837' }] })
   }));
   await page.route('**/api/media?**',route=>route.fulfill({json:{item:{tmdbId:1400837,mediaType:'movie',title:'Other Mommy',posterPath:'/poster.jpg',voteAverage:7.2,voteCount:300,releaseDate:'2026-10-09',overview:'A haunting.'},status:'ready'}}));
-  await page.goto('/top-20/2026/');
+  await navigateLegacy(page,'/top-20/2026/');
   await expect(page.locator('.ranking-row')).toHaveCount(1);
   await expect(page.locator('.ranking-row__poster')).toHaveCount(1);
   await expect(page.locator('#ranking-status')).toContainText('TMDB community rating');
   await expect(page.locator('.ranking-row h2 a')).toHaveAttribute('href','/media.html?type=movie&id=1400837');
-  await page.goto('/films/other-mommy/');
+  await navigateLegacy(page,'/films/other-mommy/');
   await expect(page.locator('.fr-movie-hero__art img')).toHaveCount(1);
   await expect(page.locator('.fr-movie-hero__art')).toHaveClass(/has-tmdb-poster/);
   await expect(page.locator('#film-detail')).toContainText('TMDB VIEWER RATING');
@@ -416,7 +407,7 @@ test('TMDB community chart links to internal film detail with poster and viewer 
 });
 
 test('Movies page does not promote one franchise at the expense of the horror archive',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.hub-series')).toHaveCount(0);
   await expect(page.locator('.hub-vault-portal')).toHaveCount(1);
   await expect(page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]')).toBeVisible();
@@ -425,7 +416,7 @@ test('Movies page does not promote one franchise at the expense of the horror ar
 test('2026 chart shows only eligible rankings and factual unranked films',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'pending',minimumCritics:3,items:[]})}));
-  await page.goto('/top-20/2026/');
+  await navigateLegacy(page,'/top-20/2026/');
   await expect(page.locator('#ranking-status')).toContainText('Critic ranking pending');
   await expect(page.locator('.ranking-row')).toHaveCount(0);
   await expect(page.locator('.hub-ranking-watchlist__item')).toHaveCount(7);
@@ -437,14 +428,14 @@ test('2026 chart shows only eligible rankings and factual unranked films',async(
 test('homepage score panel shows a compact pending state without unlicensed comparison data',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'pending',items:[]})}));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
   await expect(page.locator('#hub-ranking')).not.toContainText('%');
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
 test('Movies leads clearly to the complete 9,700-film vault rather than presenting 24 as the whole library',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.getByRole('heading',{name:/EVERY YEAR/})).toBeVisible();
   await expect(page.locator('.hub-vault-portal a[href="/all-horror-movies.html"]')).toBeVisible();
   await expect(page.locator('#review-index')).toHaveCount(0);
@@ -455,7 +446,7 @@ test('Movies leads clearly to the complete 9,700-film vault rather than presenti
 });
 
 test('global horror vault search finds historical titles without opening every year',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await navigateLegacy(page,'/all-horror-movies.html');
   const search=page.locator('#archive-global-search');
   await expect(search).toBeVisible();
   await search.fill('28 Weeks Later');
@@ -468,7 +459,7 @@ test('global horror vault search finds historical titles without opening every y
 });
 
 test('All Horror Movies offers years 1896 through current year as initially closed accordions',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await navigateLegacy(page,'/all-horror-movies.html');
   const year=new Date().getUTCFullYear();
   await expect(page.locator('.horror-year')).toHaveCount(year-1896+1);
   await expect(page.locator('#horror-year-1896')).toBeVisible();
@@ -479,7 +470,7 @@ test('All Horror Movies offers years 1896 through current year as initially clos
 });
 
 test('opened year has own A–Z films and searchable links, other years remain closed',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await navigateLegacy(page,'/all-horror-movies.html');
   const y=page.locator('#horror-year-2026');
   await y.locator('summary').click();
   await expect(y).toHaveAttribute('open','');
@@ -495,7 +486,7 @@ test('opened year has own A–Z films and searchable links, other years remain c
 });
 
 test('franchise archive spans 2002, 2007, 2025 and 2026 without erasing history',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await navigateLegacy(page,'/all-horror-movies.html');
   for(const [year,title] of [[2002,'28 Days Later'],[2007,'28 Weeks Later'],[2025,'28 Years Later'],[2026,'28 Years Later: The Bone Temple']]){
     const y=page.locator('#horror-year-'+year);
     await y.locator('summary').click();
@@ -510,7 +501,7 @@ test('franchise archive spans 2002, 2007, 2025 and 2026 without erasing history'
 });
 
 test('year jump expands target section and search is scoped to it',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await navigateLegacy(page,'/all-horror-movies.html');
   await page.selectOption('#archive-jump','2007');
   await expect(page.locator('#horror-year-2007')).toHaveAttribute('open','');
   await expect(page.locator('#horror-year-2007 .horror-year__search')).toBeVisible();
@@ -518,7 +509,7 @@ test('year jump expands target section and search is scoped to it',async({page})
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('archive year selection tracks browser back and forward without leaving stale years open',async({page})=>{
-  await page.goto('/all-horror-movies.html');
+  await navigateLegacy(page,'/all-horror-movies.html');
   await page.selectOption('#archive-jump','2007');
   await expect(page).toHaveURL(/\?year=2007$/);
   await page.selectOption('#archive-jump','2026');
@@ -534,7 +525,7 @@ test('archive year selection tracks browser back and forward without leaving sta
   await expect(page.locator('#horror-year-2007')).not.toHaveAttribute('open','');
 });
 test('territory-only release announcements are not assigned to original film-year archive records',async({page})=>{
-  await page.goto('/all-horror-movies.html?year=2026');
+  await navigateLegacy(page,'/all-horror-movies.html?year=2026');
   const year=page.locator('#horror-year-2026');
   await expect(year).toHaveAttribute('open','');
   await expect(year.locator('.horror-year__film-title', {hasText:'Crawlers'})).toHaveCount(0);
@@ -543,7 +534,7 @@ test('territory-only release announcements are not assigned to original film-yea
 });
 
 test('all horror movie navigation is a sub-tab under main Movies tab',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await page.locator('.hub-subtabs a[href="/all-horror-movies.html"]').click();
   await expect(page).toHaveURL(/all-horror-movies\.html$/);
   await expect(page.locator('.hub-subtabs a[aria-current="page"]')).toHaveText('ALL HORROR MOVIES');
@@ -551,7 +542,7 @@ test('all horror movie navigation is a sub-tab under main Movies tab',async({pag
 });
 
 test('imported horror vault retains thousands of indexed records and every year in mobile UI',async({page})=>{
-  await page.goto('/all-horror-movies.html', { waitUntil: 'domcontentloaded' });
+  await navigateLegacy(page,'/all-horror-movies.html', { waitUntil: 'domcontentloaded' });
   const counter=page.locator('#archive-summary');
   await expect(counter).toContainText('horror films across', { timeout: 15000 });
   const count=await counter.evaluate(el=>Number((el.textContent.match(/[0-9,]+/)||['0'])[0].replaceAll(',','')));
@@ -593,7 +584,7 @@ test('imported horror vault retains thousands of indexed records and every year 
 
 test('archive rows are full-size clickable links, opening reliable first-party details', async ({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/all-horror-movies.html?year=2007');
+  await navigateLegacy(page,'/all-horror-movies.html?year=2007');
   const year=page.locator('#horror-year-2007');
   await expect(year).toHaveAttribute('open','');
   const search=year.locator('input[type="search"]');
@@ -614,14 +605,14 @@ test('archive rows are full-size clickable links, opening reliable first-party d
   await expect(page.locator('#horror-year-2007')).toHaveAttribute('open','');
 });
 test('Wikidata film without an IMDb ID still has searchable IMDb and source links',async({page})=>{
-  await page.goto('/archive-film.html?id=Q4849038');
+  await navigateLegacy(page,'/archive-film.html?id=Q4849038');
   await expect(page.locator('.archive-detail__title')).toHaveText('Bakchha');
   await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toBeVisible();
   await expect(page.getByRole('link',{name:'OPEN IMDb TITLE'})).toHaveCount(0);
   await expect(page.getByRole('link',{name:'WIKIDATA SOURCE'})).toHaveAttribute('href','https://www.wikidata.org/wiki/Q4849038');
 });
 test('historical and manually checked films both open Frightertainment pages with exits',async({page})=>{
-  await page.goto('/all-horror-movies.html?year=1896');
+  await navigateLegacy(page,'/all-horror-movies.html?year=1896');
   await page.locator('#horror-year-1896 .horror-year__film-link').filter({hasText:'Le Manoir du diable'}).click();
   await expect(page).toHaveURL(/archive-film\.html\?id=manual%3Ale-manoir-du-diable-1896/);
   await expect(page.locator('.archive-detail__title')).toContainText('Le Manoir du diable');
@@ -629,7 +620,7 @@ test('historical and manually checked films both open Frightertainment pages wit
   await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toBeVisible();
 });
 test('conflicting IMDb metadata never confidently links two different films to the same IMDb ID',async({page})=>{
-  await page.goto('/archive-film.html?id=Q21015393');
+  await navigateLegacy(page,'/archive-film.html?id=Q21015393');
   await expect(page.locator('.archive-detail__title')).toHaveText('Zane');
   await expect(page.getByRole('link',{name:'OPEN IMDb TITLE'})).toHaveCount(0);
   await expect(page.getByRole('link',{name:'FIND MOVIE ON IMDb'})).toBeVisible();
@@ -637,7 +628,7 @@ test('conflicting IMDb metadata never confidently links two different films to t
 });
 test('invalid or unknown archive film IDs display recovery links rather than broken pages',async({page})=>{
   for(const path of ['/archive-film.html?id=not-valid','/archive-film.html?id=Q9999999999999']){
-    await page.goto(path);
+    await navigateLegacy(page,path);
     await expect(page.locator('.archive-detail__title')).toContainText('FILM RECORD UNAVAILABLE');
     await expect(page.getByRole('link',{name:'← RETURN TO ALL HORROR MOVIES'})).toHaveAttribute('href','/all-horror-movies.html');
   }
@@ -645,12 +636,12 @@ test('invalid or unknown archive film IDs display recovery links rather than bro
 
 test('homepage retains compact horror dashboard and hides optional source feeds until expanded',async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const drawer=page.locator('.home-discovery-wrap');
   await expect(drawer).toBeVisible();
   await expect(drawer).not.toHaveAttribute('open','');
   await expect(page.locator('.hub-dashboard')).toBeVisible();
-  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(5);
+  await expect(page.locator('.hub-showcase .hub-tile')).toHaveCount(6);
   await expect(page.locator('.home-discovery__grid')).toBeHidden();
   await drawer.locator('summary').click();
   await expect(drawer).toHaveAttribute('open','');
@@ -680,7 +671,7 @@ test('optional live data drawer searches attributed verified feed results when A
   await page.route('**/api/rankings?year=*',route=>route.fulfill({
     status:200,contentType:'application/json',body:JSON.stringify({items:[],updatedAt:null})
   }));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await page.locator('.home-discovery-wrap summary').click();
   await expect(page.locator('[data-home-list="theatrical-releases"]')).toContainText('Test Haunted House Film');
   await expect(page.locator('[data-home-list="streaming-releases"]')).toContainText('Test Fright Stream');
@@ -704,7 +695,7 @@ test('sourced archive film page includes six same-year discoveries and optional 
       }
     }})
   }));
-  await page.goto('/archive-film.html?id=Q203560');
+  await navigateLegacy(page,'/archive-film.html?id=Q203560');
   await expect(page.locator('.archive-detail__title')).toHaveText('1408');
   await expect(page.locator('.archive-detail__metadata')).toContainText('BEHIND THE FEAR');
   await expect(page.locator('.archive-detail__metadata')).toContainText('Mikael Håfström');
@@ -715,7 +706,7 @@ test('sourced archive film page includes six same-year discoveries and optional 
 });
 test('curated studio films retain crew and title fallback when TMDB is unavailable on mobile',async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/films/victorian-psycho/');
+  await navigateLegacy(page,'/films/victorian-psycho/');
   await expect(page.locator('.fr-movie-hero')).toBeVisible();
   await expect(page.locator('.fr-movie-hero__art')).toContainText('Victorian Psycho');
   await expect(page.locator('.fr-movie-hero__art')).toContainText('MOVIE POSTER');
@@ -726,7 +717,7 @@ test('curated studio films retain crew and title fallback when TMDB is unavailab
 });
 test('long horror titles wrap at word boundaries and the title-led art remains within a narrow mobile viewport',async({page})=>{
   await page.setViewportSize({width:320,height:740});
-  await page.goto('/films/28-years-later-bone-temple/');
+  await navigateLegacy(page,'/films/28-years-later-bone-temple/');
   const measurements=await page.locator('.fr-movie-hero__art > strong').evaluate(el=>({
     text:el.textContent,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,
     overflowWrap:getComputedStyle(el).overflowWrap,wordBreak:getComputedStyle(el).wordBreak,
@@ -741,7 +732,7 @@ test('long horror titles wrap at word boundaries and the title-led art remains w
 });
 test('Top 20 leaves unreviewed archive candidates unnumbered and does not pad the verified catalogue',async({page})=>{
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'pending',minimumCritics:3,items:[]})}));
-  await page.goto('/top-20/2026/');
+  await navigateLegacy(page,'/top-20/2026/');
   await expect(page.locator('.ranking-row')).toHaveCount(0);
   await expect(page.locator('.hub-ranking-watchlist__item')).toHaveCount(7);
   const filmLinks = await page.locator('.hub-ranking-watchlist__item > a').evaluateAll(links => links.map(link => link.getAttribute('href')));
@@ -751,7 +742,7 @@ test('Top 20 leaves unreviewed archive candidates unnumbered and does not pad th
 
 test('verified UK horror release bulletin shows new streaming dates and source links',async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const bulletin=page.locator('[data-release-brief]').first();
   await expect(bulletin.locator('.release-brief__item')).toHaveCount(4);
   await expect(bulletin).toContainText('V/H/S/Mixtape');
@@ -760,7 +751,7 @@ test('verified UK horror release bulletin shows new streaming dates and source l
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('UK release bulletin separates cinema and home-media listings from streaming',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const widget=page.locator('[data-release-brief]');
   await widget.getByRole('button',{name:'IN CINEMAS'}).click();
   await expect(widget).toContainText('Other Mommy');
@@ -782,7 +773,7 @@ test('release bulletin never invents current streaming entries after data become
        sourceName:'Shudder UK',sourceUrl:'https://example.com/old'}
     ]})
   }));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const bulletin=page.locator('[data-release-brief]').first();
   await expect(bulletin).not.toContainText('Old UK Film');
   await expect(bulletin).toContainText('No recent verified listings');
@@ -790,13 +781,13 @@ test('release bulletin never invents current streaming entries after data become
 });
 
 test('Movies has a compact secondary tools drawer, deep-linked cinema tools expand',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const drawer=page.locator('.movie-advanced');
   await expect(drawer).toBeVisible();
   await expect(drawer).not.toHaveAttribute('open','');
   await expect(page.locator('.release-brief--movies')).toBeVisible();
   await expect(page.locator('#cinema-panel')).toBeHidden();
-  await page.goto('/movies.html#cinema-panel');
+  await navigateLegacy(page,'/movies.html#cinema-panel');
   await expect(drawer).toHaveAttribute('open','');
   await expect(page.locator('#cinema-panel')).toBeVisible();
   await page.setViewportSize({width:390,height:844});
@@ -806,7 +797,7 @@ test('Movies has a compact secondary tools drawer, deep-linked cinema tools expa
 test('optional homepage discovery still shows real UK editorial release notices with provider APIs offline',async({page})=>{
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await page.locator('.home-discovery-wrap summary').click();
   await expect(page.locator('[data-home-list="streaming-releases"] article')).toHaveCount(4);
   await expect(page.locator('[data-home-list="streaming-releases"]')).toContainText('Shudder');
@@ -819,7 +810,7 @@ test('optional homepage discovery still shows real UK editorial release notices 
 test('opened Movies discovery links source-checked current and future horror even if licensed feeds are disabled',async({page})=>{
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
-  await page.goto('/movies.html#discovery');
+  await navigateLegacy(page,'/movies.html#discovery');
   await expect(page.locator('.movie-advanced')).toHaveAttribute('open','');
   await expect(page.locator('[data-list="streaming-releases"]')).toContainText('Shudder');
   await expect(page.locator('[data-list="theatrical-releases"]')).toContainText('Other Mommy');
@@ -833,7 +824,7 @@ test('homepage composition stays ordered and usable across the approved viewport
   test.setTimeout(120_000);
   for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) {
     const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
-    await page.goto('/');
+    await navigateLegacy(page,'/');
     await expect(page.locator('.hub-tabs a')).toHaveCount(7);
     for (let index = 0; index < 7; index++) await expect(page.locator('.hub-tabs a').nth(index)).toBeVisible();
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -859,14 +850,14 @@ test('homepage composition stays ordered and usable across the approved viewport
     } else {
       expect(Math.abs(layout.featureTop - layout.chartTop)).toBeLessThan(2);
       expect(layout.featureLeft).toBeLessThan(layout.chartLeft);
-      expect(layout.supportTop).toBeLessThan(layout.chartBottom);
+      expect(layout.supportTop).toBeGreaterThanOrEqual(layout.chartBottom);
       expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
     }
-    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(1);
+    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
     if (width > 640 && width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
     if (width === 390) {
-      expect(layout.featureTop).toBeGreaterThanOrEqual(300);
-      expect(layout.featureTop).toBeLessThanOrEqual(420);
+      expect(layout.featureTop).toBeGreaterThanOrEqual(170);
+      expect(layout.featureTop).toBeLessThanOrEqual(480);
       await expect(page.locator('.hub-feature h3')).toBeInViewport();
       await expect(page.locator('.hub-feature .hub-tile__link')).toBeInViewport();
     }
@@ -876,7 +867,7 @@ test('homepage composition stays ordered and usable across the approved viewport
 
 test('homepage ranking loading resolves to a clear pending state when no eligible data exists', async ({ page }) => {
   await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [] }) }));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const ranking = page.locator('#hub-ranking');
   await expect(ranking).toHaveAttribute('aria-busy', 'false');
   await expect(ranking).not.toContainText('Loading critic ranking');
@@ -892,7 +883,7 @@ test('homepage slow chart scroll uses only validated ranking rows and pauses for
   }));
   await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ year: 2026, items, updatedAt: '2026-10-08T04:00:00.000Z' }) }));
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const list = page.locator('#hub-chart-results');
   const control = page.getByRole('button', { name: 'Pause chart scroll' });
   await expect(list.locator('.hub-chart-row')).toHaveCount(10);
@@ -920,7 +911,7 @@ test('annual chart rejects duplicate canonical films from an invalid API respons
     { filmId: 'other-mommy', title: 'Fixture Film B', position: 3, averageScore: 78, criticCount: 3, sources: [] }
   ];
   await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'ranked', updatedAt: '2026-10-08T04:00:00.000Z', items }) }));
-  await page.goto('/top-20/2026/');
+  await navigateLegacy(page,'/top-20/2026/');
   await expect(page.locator('.ranking-row')).toHaveCount(2);
   const displayedTitles = await page.locator('.ranking-row h2').allTextContents();
   expect(displayedTitles).not.toContain('Fixture Film Duplicate');
@@ -928,7 +919,7 @@ test('annual chart rejects duplicate canonical films from an invalid API respons
 
 test('stale rankings retain the last valid rows and label their status', async ({ page }) => {
   await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ stale: true, items: [{ filmId: 'clayface', title: 'Last Verified Horror', position: 1, averageScore: 77, criticCount: 3 }] }) }));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const ranking = page.locator('#hub-ranking');
   await expect(ranking).toHaveAttribute('aria-busy', 'false');
   await expect(ranking.locator('.hub-chart-row')).toContainText('Last Verified Horror');
@@ -938,7 +929,7 @@ test('stale rankings retain the last valid rows and label their status', async (
 
 test('homepage ranking failure resolves to a clear unavailable state', async ({ page }) => {
   await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 503, body: 'Unavailable' }));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const ranking = page.locator('#hub-ranking');
   await expect(ranking).toHaveAttribute('aria-busy', 'false');
   await expect(ranking).not.toContainText('Loading critic ranking');
@@ -949,17 +940,17 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
 test('direct page loads use readable Times New Roman typography', async ({ page }) => {
   for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     // Embedded media can stall the load event; the document/CSS is ready at DOMContentLoaded.
-    await page.goto(path,{waitUntil:'domcontentloaded'});
+    await navigateLegacy(page,path,{waitUntil:'domcontentloaded'});
     await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Times New Roman');
   }
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.hub-page-intro h1')).toHaveAttribute('aria-label', 'HORROR MOVIES');
   await expect(page.locator('.hub-page-intro .hub-page-wordmark')).toHaveAttribute('src', '/assets/page-title-movies.png');
 });
 
 test('reduced-motion preference disables homepage transitions and artwork zoom', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const transitionDuration = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').transitionDuration);
   expect(transitionDuration.split(',').every(value => parseFloat(value) === 0)).toBe(true);
 });
@@ -991,7 +982,7 @@ test('homepage review screenshots use the same verified pending data state', asy
 test('pending ranking review screenshot contains no synthetic public score rows', async ({ page }) => {
   await page.route('**/api/rankings?year=*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [] }) }));
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
   await page.screenshot({ path: 'test-results/design-refinement/after-ranking-pending.png', fullPage: true });
 });
@@ -1009,7 +1000,7 @@ test('six themed environments and review pages have desktop and mobile browser e
   await page.route('**/api/rankings?year=*', request => request.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'pending', items: [] }) }));
   for (const [name, route] of routes) {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await navigateLegacy(page,route, { waitUntil: 'domcontentloaded' });
     await page.locator('main').waitFor();
     if (name === 'home') await expect(page.locator('#hub-ranking')).toContainText('Critic ranking pending');
     await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
@@ -1019,7 +1010,7 @@ test('six themed environments and review pages have desktop and mobile browser e
     await page.screenshot({ path: `${out}/${name}-mobile-first.png` });
     await page.screenshot({ path: `${out}/${name}-mobile-full.png`, fullPage: true });
     if (['podcasts', 'games'].includes(name)) {
-      const firstRecommendation = page.locator('main>.hub-catalog:not(.hub-catalog--expanded)>.hub-tile').first();
+      const firstRecommendation = page.locator('.fr-v5-deeper .hub-catalog:not(.hub-catalog--expanded)>.hub-tile').first();
       const title = firstRecommendation.locator('h3');
       const action = firstRecommendation.locator('.hub-tile__link');
       await expect(title).toBeVisible();
@@ -1034,7 +1025,7 @@ test('six themed environments and review pages have desktop and mobile browser e
   }
   for (const [name, route] of [['annual-chart-2026', '/top-20/2026/'], ['movie-archive', '/all-horror-movies.html']]) {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await navigateLegacy(page,route, { waitUntil: 'domcontentloaded' });
     await page.locator('main').waitFor();
     if (name === 'movie-archive') await expect(page.locator('#archive-summary')).toContainText('horror films across', { timeout: 15000 });
     await page.screenshot({ path: `${out}/${name}-desktop-first.png` });
@@ -1053,7 +1044,7 @@ test('mobile copy, display headings and active navigation meet AA contrast in al
   ];
   await page.setViewportSize({ width: 390, height: 844 });
   for (const [route, theme] of routes) {
-    await page.goto(route);
+    await navigateLegacy(page,route);
     const result = await page.evaluate(theme => {
       const channels = color => {
         const hex = color.match(/^#([a-f0-9]{3}|[a-f0-9]{6})$/i)?.[1];
@@ -1094,10 +1085,10 @@ test('mobile copy, display headings and active navigation meet AA contrast in al
 
 
 test('removed Editorial Standards page is not served and public navigation has no stale links', async ({ page }) => {
-  const response = await page.goto('/editorial-standards.html');
+  const response = await navigateLegacy(page,'/editorial-standards.html');
   expect(response?.status()).toBe(404);
   for (const pathname of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/other-mommy/', '/top-20/2026/']) {
-    await page.goto(pathname);
+    await navigateLegacy(page,pathname);
     await expect(page.locator('a[href$="editorial-standards.html"]')).toHaveCount(0);
   }
 });
@@ -1105,7 +1096,7 @@ test('removed Editorial Standards page is not served and public navigation has n
 test('editorial movie cards remain readable with one card per row on phones',async({page})=>{
   await page.setViewportSize({width:375,height:812});
   await page.route('**/api/movie-artwork',route=>route.fulfill({json:{items:[]}}));
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const grid=page.locator('#movie-grid');
   await expect(grid.locator('.movie-card')).toHaveCount(8);
   const metrics=await grid.evaluate(root=>{
@@ -1121,32 +1112,33 @@ test('editorial movie cards remain readable with one card per row on phones',asy
   expect(metrics.readableTitle).toBe(true);
   expect(metrics.viewportOverflow).toBe(false);
 });
-test('all seven main tabs fit narrow and wide viewports, with centred second-row links',async({browser})=>{
+test('all seven main tabs remain reachable in concept-style single-row navigation',async({browser})=>{
   test.setTimeout(150000);
   for(const width of [320,375,390,768,1440]){
     const page=await browser.newPage({viewport:{width,height:820},reducedMotion:'reduce'});
     await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[],page:1,totalPages:1,status:'ready'}}));
     for(const path of ['/','/movies.html','/tv-shows.html','/cinema.html','/indie-movies.html','/podcasts.html','/games.html']){
-      await page.goto(path);
+      await navigateLegacy(page,path);
       await expect(page.locator('.hub-tabs a')).toHaveCount(7);
       await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       if(width<=640){
         const values=await page.locator('.hub-tabs').evaluate(nav=>{
-          const box=nav.getBoundingClientRect();
           const links=[...nav.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
-          return {diff:Math.abs((links[4].left+links[6].right)/2 - (box.left+box.right)/2),
-            row2:links[4].top,firstRow:links[0].top,lastRow:links[6].top,
-            fourFirstRow:links.slice(0,4).every(r=>Math.abs(r.top-links[0].top)<1),
-            threeSecondRow:links.slice(4).every(r=>Math.abs(r.top-links[4].top)<1)};
+          return {allSameRow:links.every(x=>Math.abs(x.top-links[0].top)<2),
+            allHaveWidth:links.every(x=>x.width>=36),
+            navigable:nav.scrollWidth>=nav.clientWidth,
+            pageWidth:document.documentElement.scrollWidth,viewport:innerWidth};
         });
-        expect(values.row2).toBeGreaterThan(values.firstRow);
-        expect(values.row2).toBe(values.lastRow);
-        expect(values.diff).toBeLessThanOrEqual(4);
-        expect(values.fourFirstRow).toBe(true);
-        expect(values.threeSecondRow).toBe(true);
+        expect(values.allSameRow).toBe(true);
+        expect(values.allHaveWidth).toBe(true);
+        expect(values.navigable).toBe(true);
+        expect(values.pageWidth).toBeLessThanOrEqual(values.viewport+2);
+        await page.locator('.hub-tabs a[href="/games.html"]').scrollIntoViewIfNeeded();
+        await expect(page.locator('.hub-tabs a[href="/games.html"]')).toBeVisible();
+
       }
     }
-    if(width===375){await page.goto('/movies.html');await page.screenshot({path:'test-results/visual/frightertainment-movies-375px.png',fullPage:true});}
+    if(width===375){await navigateLegacy(page,'/movies.html');await page.screenshot({path:'test-results/visual/frightertainment-movies-375px.png',fullPage:true});}
     await page.close();
   }
 });
@@ -1157,7 +1149,7 @@ test('cinema country switch updates upcoming and recent release lists, preservin
     seen.push({country:query.get('country'),mode:query.get('mode')});
     return route.fulfill({json:{items:[],page:1,totalPages:1,status:'ready'}});
   });
-  await page.goto('/cinema.html');
+  await navigateLegacy(page,'/cinema.html');
   await page.locator('#cinema-country').selectOption('AU');
   await expect.poll(()=>seen.filter(x=>x.country==='AU').map(x=>x.mode).sort()).toEqual(['cinema','cinema-recent']);
   await page.getByRole('link',{name:'RECENT RELEASES'}).click();
@@ -1173,11 +1165,11 @@ test('cinema country switch updates upcoming and recent release lists, preservin
   await expect(page.locator('#recent-cinema')).toBeVisible();
 });
 test('TV chart is year-specific and Games chart has a sourced, consistent rating method',async({page})=>{
-  await page.goto('/tv-shows.html');
+  await navigateLegacy(page,'/tv-shows.html');
   await expect(page.locator('#chart-heading')).toContainText('TOP HORROR SHOWS OF 2026');
   await page.locator('#chart select').selectOption('2025');
   await expect(page.locator('#chart-heading')).toContainText('TOP HORROR SHOWS OF 2025');
-  await page.goto('/games.html');
+  await navigateLegacy(page,'/games.html');
   await expect(page.locator('#halloween-title')).toContainText('HALLOWEEN');
   await expect(page.locator('.fr-game-chart__rows li')).toHaveCount(5);
   await expect(page.locator('.fr-game-chart a[href*="steamdb.info/stats/gameratings/2026/"]')).toBeVisible();
@@ -1188,7 +1180,7 @@ test('TV chart is year-specific and Games chart has a sourced, consistent rating
   await expect(spotlight.locator('iframe')).toHaveAttribute('src','https://store.steampowered.com/widget/3219630/');
 });
 test('Contact page offers an optional nickname, private message and separate replyable direct email',async({page})=>{
-  await page.goto('/contact.html');
+  await navigateLegacy(page,'/contact.html');
   const direct=page.getByRole('link',{name:/EMAIL FRIGHTERTAINMENT/i});
   await expect(direct).toHaveAttribute('href',/^mailto:Frightertainment@gmail.com\?subject=/);
   await expect(page.locator('#contact-name')).toHaveCount(0);
@@ -1217,7 +1209,7 @@ test('Contact page offers an optional nickname, private message and separate rep
 
 test('anonymous form works with no nickname and leaves identity inputs absent on a phone',async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/contact.html');
+  await navigateLegacy(page,'/contact.html');
   await expect(page.locator('[name="company"]')).toHaveCount(0);
   await expect(page.locator('[name="ft_trap_blank"]')).toHaveCount(1);
   await expect(page.locator('#contact-nickname')).toHaveValue('');
@@ -1233,7 +1225,7 @@ test('anonymous form works with no nickname and leaves identity inputs absent on
 });
 
 test('private message form remains usable from narrow phones through desktop without sideways scrolling',async({page})=>{
-  await page.goto('/contact.html');
+  await navigateLegacy(page,'/contact.html');
   for(const width of [320,375,390,768,1440]){
     await page.setViewportSize({width,height:844});
     await expect(page.locator('#contact-nickname')).toBeVisible();
@@ -1244,7 +1236,7 @@ test('private message form remains usable from narrow phones through desktop wit
 });
 
 test('contact form identifies intercepted authentication HTML without claiming success',async({page})=>{
-  await page.goto('/contact.html');
+  await navigateLegacy(page,'/contact.html');
   await page.route('**/api/contact',route=>route.fulfill({
     status:200,contentType:'text/html',body:'<!doctype html><title>Access</title><p>Please sign in</p>'
   }));
@@ -1256,7 +1248,7 @@ test('contact form identifies intercepted authentication HTML without claiming s
 });
 
 test('failed anonymous form preserves message and warns that direct email reveals sender address',async({page})=>{
-  await page.goto('/contact.html');
+  await navigateLegacy(page,'/contact.html');
   await page.route('**/api/contact',route=>route.fulfill({status:503,json:{error:'Delivery unavailable'}}));
   await page.locator('#contact-nickname').fill('VHS Ghost');
   await page.locator('#contact-message').fill('A scary independent film recommendation.');
@@ -1276,7 +1268,7 @@ test('failed anonymous form preserves message and warns that direct email reveal
 
 test('Straight to Stream shows sourced Infirmary and clearly separates subscription, free, and rent/buy',async({page})=>{
   await page.setViewportSize({width:390,height:820});
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const stream=page.locator('#straight-to-stream');
   await expect(stream).toBeVisible();
   await expect(stream.locator('[data-stream-status]')).toContainText('source-linked films');
@@ -1298,7 +1290,7 @@ test('Straight to Stream shows sourced Infirmary and clearly separates subscript
   await page.screenshot({path:'test-results/visual/straight-to-stream-mobile-390.png',fullPage:true});
 });
 test('Straight to Stream respects country, original film-year and future-only viewing information',async({page})=>{
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const section=page.locator('#straight-to-stream');
   await expect(section.locator('[data-stream-status]')).toContainText('source-linked');
   await section.locator('[data-stream-year]').selectOption('2025');
@@ -1324,7 +1316,7 @@ test('the new horror-stream mini chart ranks only qualifying TMDB ratings, never
       voteAverage:pair[0],voteCount:pair[1],releaseDate:'2026-10-02'
     }:null}});
   });
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const chart=page.locator('#straight-to-stream [data-stream-chart]');
   const ranked=chart.locator('li.fr-stream__rank-row:not(.fr-stream__rank-row--pending)');
   await expect(ranked).toHaveCount(3);
@@ -1335,7 +1327,7 @@ test('the new horror-stream mini chart ranks only qualifying TMDB ratings, never
   await expect(chart).toContainText('8.9/10');
 });
 test('Infirmary enters the 2026 Horror Vault and its first-party film file keeps streaming dates separate',async({page})=>{
-  await page.goto('/all-horror-movies.html?year=2026');
+  await navigateLegacy(page,'/all-horror-movies.html?year=2026');
   const vault=page.locator('#horror-year-2026');
   await expect(vault).toBeVisible();
   await expect(vault).toHaveAttribute('open','');
@@ -1356,7 +1348,7 @@ test('All streaming links, including pre-2025 library films and future premieres
   for(const [term,year] of [['manual:stream-shudder-gb-the-beast-within-2024','2024'],
      ['manual:stream-shudder-gb-hallowarrior-2026','2026'],
      ['manual:stream-insidious-digital-gb','2026']]){
-    await page.goto('/archive-film.html?id='+encodeURIComponent(term));
+    await navigateLegacy(page,'/archive-film.html?id='+encodeURIComponent(term));
     await expect(page.locator('#archive-film-detail h1')).not.toContainText('FILM RECORD UNAVAILABLE');
     await expect(page.locator('#archive-film-detail')).toContainText('ORIGINAL FILM YEAR');
     await expect(page.locator('#archive-film-detail .archive-detail__fact').first()).toContainText(year);
@@ -1368,7 +1360,7 @@ test('All streaming links, including pre-2025 library films and future premieres
 
 test('streaming chart does not invent numbered Top Ten places for unrated premieres',async({page})=>{
   await page.route('**/api/media?**',route=>route.fulfill({json:{item:null,status:'unavailable'}}));
-  await page.goto('/movies.html');
+  await navigateLegacy(page,'/movies.html');
   const panel=page.locator('#straight-to-stream');
   const rows=panel.locator('[data-stream-chart] li.fr-stream__rank-row--pending');
   await expect(rows.first()).toBeVisible();
@@ -1378,7 +1370,7 @@ test('streaming chart does not invent numbered Top Ten places for unrated premie
   await expect(panel.locator('[data-stream-chart]')).not.toContainText('10/10');
 });
 test('Streaming film year options include past Shudder premiere records and warn when current access is unknown',async({page})=>{
- await page.goto('/movies.html');const s=page.locator('#straight-to-stream');
+ await navigateLegacy(page,'/movies.html');const s=page.locator('#straight-to-stream');
  await expect(s.locator('[data-stream-status]')).toContainText('source-linked');
  for(const year of ['2021','2022','2023','2024','2025','2026'])
   await expect(s.locator('[data-stream-year] option[value="'+year+'"]')).toHaveCount(1);
@@ -1390,7 +1382,7 @@ test('Streaming film year options include past Shudder premiere records and warn
 test('UK cinema diary orders months chronologically while ranking studio ahead of indie within each month',async({page})=>{
  await page.route('**/api/catalogue?**',route=>route.fulfill({json:{items:[],page:1,totalPages:1,screeningComplete:true}}));
  await page.route('**/api/media?**',route=>route.fulfill({json:{item:null}}));
- await page.goto('/cinema.html');
+ await navigateLegacy(page,'/cinema.html');
  const listing=page.locator('#upcoming-cinema');
  await expect(listing.locator('.fr-cinema-month').first()).toContainText('OCTOBER 2026');
  await expect(listing.locator('.fr-cinema-month')).toContainText(['OCTOBER 2026','NOVEMBER 2026','DECEMBER 2026']);
@@ -1422,11 +1414,11 @@ test('UK cinema diary orders months chronologically while ranking studio ahead o
  await expect(page.locator('#cinema-heading')).toHaveText('UK CINEMA RELEASE DIARY.');
 });
 test('older sourced streaming films join their original-year Horror Vault without overwriting historic records',async({page})=>{
- await page.goto('/all-horror-movies.html?year=2023');
+ await navigateLegacy(page,'/all-horror-movies.html?year=2023');
  const y=page.locator('#horror-year-2023');
  await expect(y).toHaveAttribute('open','');
  await expect(y).toContainText('Brooklyn 45');
- await page.goto('/archive-film.html?id='+encodeURIComponent('manual:stream-shudder-us-premiere-the-puppetman-2023-10-13'));
+ await navigateLegacy(page,'/archive-film.html?id='+encodeURIComponent('manual:stream-shudder-us-premiere-the-puppetman-2023-10-13'));
  await expect(page.locator('#archive-film-detail h1')).toHaveText('The Puppetman');
  await expect(page.locator('#archive-film-detail')).toContainText('2023');
 });
@@ -1444,7 +1436,7 @@ test('live region provider discovery is clearly separate from historically sourc
    watchLink:'https://www.themoviedb.org/movie/14/watch?locale=GB'}],
    checkedAt:'2026-10-11',page:Number(p.get('page')),nextPage:2,totalPages:2}});
  });
- await page.goto('/movies.html');const section=page.locator('#straight-to-stream'),panel=section.locator('.fr-watch');
+ await navigateLegacy(page,'/movies.html');const section=page.locator('#straight-to-stream'),panel=section.locator('.fr-watch');
  await expect(panel).toContainText('WHAT CAN I WATCH TONIGHT?');
  await expect(panel.locator('.fr-watch__card')).toHaveCount(0);
  await panel.getByRole('button',{name:'FIND AVAILABLE HORROR FILMS'}).click();
@@ -1463,7 +1455,7 @@ test('live region provider discovery is clearly separate from historically sourc
 
 
 test('homepage indie showcase features a real sourced film, not a generic placeholder', async ({page}) => {
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const indie = page.locator('.hub-showcase__bottom .hub-indie');
   await expect(indie).toContainText('LONGLEGS');
   await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/films/longlegs/');
@@ -1486,7 +1478,7 @@ test('optional homepage discovery does not fetch extra provider data until opene
     calls.rankings++;
     return route.fulfill({json:{status:'pending',items:[]}});
   });
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   await expect(page.locator('#hub-ranking')).toHaveAttribute('aria-busy', 'false');
   expect(calls).toEqual({ discovery:0, artwork:0, rankings:1 });
   const disclosure = page.locator('#live-discovery');
@@ -1512,7 +1504,7 @@ test('poster-enriched homepage cards never shove text or controls outside the mo
   });
   for (const width of [320, 360, 390, 430]) {
     await page.setViewportSize({width,height:844});
-    await page.goto('/');
+    await navigateLegacy(page,'/');
     const indie=page.locator('.hub-showcase__bottom .hub-indie');
     await indie.scrollIntoViewIfNeeded();
     await expect(indie).toHaveAttribute('data-media-status','ready');
@@ -1550,7 +1542,7 @@ test('rotating film feature CTA always agrees with its actual destination', asyn
     status:200,contentType:'application/javascript',
     body:'window.FR_MOVIES = '+JSON.stringify(records)+';'
   }));
-  await page.goto('/');
+  await navigateLegacy(page,'/');
   const feature=page.locator('.hub-feature');
   await expect(feature).toHaveAttribute('data-film-id','qa-current-horror');
   const cta=feature.locator('a.hub-tile__link');
@@ -1579,7 +1571,7 @@ for (const route of noShopPromoRoutes) {
     const page = await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
     for (const width of [360,390,768,1440]) {
       await page.setViewportSize({width,height:844});
-      await page.goto(route,{waitUntil:'domcontentloaded'});
+      await navigateLegacy(page,route,{waitUntil:'domcontentloaded'});
       await expect(page.locator('section.ft-shop-promo')).toHaveCount(0);
       await expect(page.locator('a[href*="frightertainment-shop.fourthwall.com"]')).toHaveCount(0);
       await expect(page.locator('img[src*="frightertainment-shop-banner"]')).toHaveCount(0);

@@ -8,7 +8,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/hub.css"><link rel="stylesheet" href="/cinematic-redesign.css"><title>Home | Frightertainment</title></head><body class="hub-body hub-home" data-theme="home">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/hub.css"><link rel="stylesheet" href="/cinematic-redesign.css"><link rel="stylesheet" href="/homepage-concept.css"><link rel="stylesheet" href="/v5-magazine.css"><title>Home | Frightertainment</title></head><body class="hub-body hub-home" data-theme="home">
 <a class="skip-link" href="#main">Skip to main content</a><div class="red-thread" aria-hidden="true"></div>
 <div class="microbar hub-microbar"><div class="shell microbar__inner"><span><span class="pulse-dot"></span> THE DARK IS CALLING. STAY AWHILE.</span><span>ENTER IF YOU DARE.</span></div></div>
 <header class="header hub-header" id="top"><div class="shell hub-header__inside">
@@ -16,10 +16,11 @@
 <nav class="hub-tabs" aria-label="Main site sections"><a href="/" class="active" aria-current="page">HOME</a><a href="/movies.html">MOVIES</a><a href="/tv-shows.html">TV SHOWS</a><a href="/cinema.html">CINEMA</a><a href="/indie-movies.html">INDIE MOVIES</a><a href="/podcasts.html">PODCASTS</a><a href="/games.html">GAMES</a></nav>
 </div></header>
 <main id="main" class="shell hub-main">
-<section class="hub-intro" aria-labelledby="home-heading"><div><span class="hub-eyebrow">A DOOR LEFT OPEN</span><h1 id="home-heading">COME CLOSER. <em>THE DARK HAS STORIES.</em></h1></div><p>Find your next horror film, series, podcast or game.</p></section>
+<section class="hub-intro fr-home-intro" aria-labelledby="home-heading"><div><span class="hub-eyebrow">FRIGHTERTAINMENT · HORROR LIVES HERE</span><h1 id="home-heading">WELCOME TO <em>THE DARK.</em></h1></div><p>Discover films, series, indie nightmares, podcasts, cinema releases and games. Every corner has something worth fearing.</p></section>
 
-<section class="hub-dashboard hub-showcase" aria-label="Discover horror entertainment">
-<article class="hub-tile hub-feature"><div class="hub-tile__wash" aria-hidden="true"></div><div class="hub-tile__content"><span class="hub-kicker">HORROR FILM FILES</span><h3>THE HORROR VAULT</h3><p>Step into the archive and find a story that stays with you.</p><a class="hub-tile__link" href="/all-horror-movies.html">OPEN THE COMPLETE HORROR VAULT <span aria-hidden="true">→</span></a></div></article>
+<div class="fr-home-dashboard-heading"><div><span class="hub-eyebrow">YOUR HORROR DISCOVERY DASHBOARD</span><h2>WHAT HAUNTS YOU <em>TONIGHT?</em></h2></div><a href="/movies.html">EXPLORE MOVIES <span aria-hidden="true">→</span></a></div>
+<section class="hub-dashboard hub-showcase" id="home-showcase" aria-label="Discover horror entertainment">
+<article class="hub-tile hub-feature" aria-label="Featured horror movie"><div class="hub-tile__wash" aria-hidden="true"></div><div class="hub-tile__content"><span class="hub-kicker">TONIGHT’S FEATURED HORROR FILM</span><h3>THE HORROR VAULT</h3><p>Step into the archive and find a story that stays with you.</p><a class="hub-tile__link" href="/all-horror-movies.html">OPEN THE COMPLETE HORROR VAULT <span aria-hidden="true">→</span></a></div></article>
 <aside class="hub-charts" aria-labelledby="chart-heading"><div class="hub-charts__top"><span class="hub-eyebrow">TMDB VIEWER RATING /10</span><h2 id="chart-heading">TOP 20 HORROR <em>FILMS · 2026</em></h2><p>Horror films ranked by TMDB viewer scores.</p></div>
 <div id="hub-ranking" aria-live="polite" aria-busy="true"><div class="hub-ranking__state" role="status"><strong>Loading horror chart…</strong><p>Checking TMDB viewer scores.</p></div></div>
 <a class="hub-charts__all" href="/top-20/2026/">VIEW ANNUAL CHART <span aria-hidden="true">→</span></a>
@@ -29,10 +30,9 @@
 <article class="hub-tile hub-podcast"><div class="hub-tile__wash" aria-hidden="true"></div><div class="hub-tile__content"><span class="hub-kicker">HORROR AUDIO · EDITORIAL PICK</span><h3>THE NOSLEEP PODCAST</h3><p>Original horror stories for the dark hours.</p><a class="hub-tile__link" href="/podcasts.html">EXPLORE PODCASTS <span aria-hidden="true">→</span></a></div></article>
 <article class="hub-tile hub-indie" data-media-type="movie" data-media-title="Longlegs" data-media-year="2024"><img class="hub-editorial-poster" data-media-field="poster" alt="Longlegs poster" hidden><div class="hub-tile__wash" aria-hidden="true"></div><div class="hub-tile__content"><span class="hub-kicker">INDEPENDENT HORROR · EDITORIAL PICK</span><h3>LONGLEGS</h3><p>Occult horror with a disturbing FBI investigation.</p><span class="hub-feature__rating" data-media-field="rating"></span><button type="button" class="fr-trailer-button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button><a class="hub-tile__link" href="/films/longlegs/">EXPLORE THIS FILM <span aria-hidden="true">→</span></a></div></article>
 <article class="hub-tile hub-games"><div class="hub-tile__wash" aria-hidden="true"></div><div class="hub-tile__content"><span class="hub-kicker">HORROR GAMES · EDITORIAL PICK</span><h3>AMNESIA: THE BUNKER</h3><p>Survival horror worth discovering.</p><a class="hub-tile__link" href="/games.html">EXPLORE GAMES <span aria-hidden="true">→</span></a></div></article>
+<article class="hub-tile hub-cinema"><div class="hub-tile__wash" aria-hidden="true"></div><div class="hub-tile__content"><span class="hub-kicker">HORROR AT THE CINEMA</span><h3>CINEMA</h3><p>See what is arriving on the big screen.</p><a class="hub-tile__link" href="/cinema.html">CINEMA RELEASES <span aria-hidden="true">→</span></a></div></article>
 </div></section>
-<section class="release-brief" aria-label="Latest verified horror release announcements">
- <div data-release-brief><p>Checking the latest horror releases…</p></div>
-</section>
+<details class="fr-home-updates" id="latest-horror"><summary><span><span class="hub-eyebrow">FRESH FROM THE DARK</span><strong>THE LATEST HORROR DROPS</strong><small>Browse verified streaming, cinema and upcoming releases</small></span><span class="fr-home-updates__action">VIEW UPDATES ↓</span></summary><section class="release-brief" aria-label="Latest verified horror release announcements"><div data-release-brief><p>Checking the latest horror releases…</p></div></section></details>
 <details class="home-discovery-wrap" id="live-discovery">
   <summary class="home-discovery-wrap__summary">
     <span><span class="hub-eyebrow">MORE TO EXPLORE</span><strong>MORE HORROR DISCOVERIES</strong><small>Browse more films, releases and viewing options</small></span>
@@ -52,4 +52,4 @@
 </section>
 </details>
 </main>
-<footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span> <a href="/credits.html">CREDITS</a> <a href="/contact.html">CONTACT US</a><a href="/privacy.html">PRIVACY</a></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/home-discovery.js" defer></script><script src="/release-brief.js" defer></script><script src="/hub.js" defer></script><script src="/media-ui.js" defer></script></body></html>
+<footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span> <a href="/credits.html">CREDITS</a> <a href="/contact.html">CONTACT US</a><a href="/privacy.html">PRIVACY</a></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/home-discovery.js" defer></script><script src="/release-brief.js" defer></script><script src="/hub.js" defer></script><script src="/media-ui.js" defer></script><script src="/v5-magazine.js"></script></body></html>
