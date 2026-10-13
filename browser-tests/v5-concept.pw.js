@@ -318,6 +318,54 @@ test('Capture every approved section at phone and desktop widths for owner compa
  }
 });
 
+test('original editorial fallback is art-directed and clearly not an official poster',async({page})=>{
+ for(const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html','/games.html']){
+  await page.setViewportSize({width:390,height:844});
+  await page.goto(route);
+  const art=page.locator('.editorial-pick__art-frame');
+  await expect(art).toBeVisible();
+  // Matched real posters have their own licensed UI, and must never be covered by a fallback.
+  if(await art.evaluate(node=>node.classList.contains('editorial-pick__art-frame--poster')))continue;
+  await expect(art).toHaveAttribute('aria-label',/not an official film poster/i);
+  const info=await art.evaluate(node=>({
+    background:getComputedStyle(node).backgroundImage,
+    title:node.querySelector('.editorial-pick__art-title')?.textContent?.trim()||'',
+    width:node.getBoundingClientRect().width,
+    overflow:document.documentElement.scrollWidth-innerWidth
+  }));
+  expect(info.background).toContain('/assets/worlds/');
+  expect(info.title.length).toBeGreaterThan(3);
+  expect(info.width).toBeGreaterThan(70);
+  expect(info.overflow).toBeLessThanOrEqual(2);
+ }
+});
+
+test('Movies mobile discovery has five illustrated links on a centred 3+2 grid',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/movies.html');
+ const cards=page.locator('.fr-v5-explore__tile');
+ await expect(cards).toHaveCount(5);
+ const layout=await cards.evaluateAll(nodes=>{
+  const a=nodes.map(n=>n.getBoundingClientRect());
+  return {
+    heights:a.map(r=>r.height),
+    tops:a.map(r=>r.top),
+    images:nodes.map(n=>getComputedStyle(n).backgroundImage),
+    hrefs:nodes.map(n=>n.getAttribute('href')),
+    overflow:document.documentElement.scrollWidth-innerWidth,
+    center:Math.abs((a[3].left+a[4].right)/2 - (a[0].left+a[2].right)/2)
+  };
+ });
+ expect(layout.heights.every(h=>h>=85)).toBe(true);
+ expect(layout.images.every(s=>s.includes('/assets/worlds/'))).toBe(true);
+ expect(layout.hrefs.every(h=>h?.startsWith('/'))).toBe(true);
+ expect(Math.abs(layout.tops[0]-layout.tops[2])).toBeLessThanOrEqual(2);
+ expect(layout.tops[3]).toBeGreaterThan(layout.tops[2]+10);
+ expect(Math.abs(layout.tops[3]-layout.tops[4])).toBeLessThanOrEqual(2);
+ expect(layout.center).toBeLessThanOrEqual(3);
+ expect(layout.overflow).toBeLessThanOrEqual(2);
+});
+
 test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/cinema.html');
