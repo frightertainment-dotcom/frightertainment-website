@@ -403,3 +403,24 @@ body.hub-body.fr-v5.hub-section .hub-page-intro>p{font:400 14px/1.4 Arial,Helvet
 @media(min-width:701px){
  body.fr-v5 .editorial-pick__art-frame{width:180px;min-width:180px;height:255px;max-height:255px;aspect-ratio:2/3}
 }
+
+
+/* Expanded trailers must never be cropped by the fixed editorial carousel
+   preview footprint. Normal slides keep identical heights; user-opened media
+   earns additional space rather than hiding the player or controls. */
+body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){
+ height:auto!important;min-height:310px!important;max-height:none!important;
+ overflow:visible;align-items:stretch;
+}
+body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]) .editorial-pick__content{
+ height:auto;min-height:0;max-height:none;overflow:visible;justify-content:center;
+}
+@media(max-width:700px){
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:210px!important}
+}
+@media(max-width:379px){
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:220px!important}
+}
+@media(max-width:359px){
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:232px!important}
+}
