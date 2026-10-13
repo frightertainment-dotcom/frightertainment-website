@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-13T23:14:14.612Z",
+  "capturedAt": "2026-10-13T23:42:43.246Z",
   "origin": "http://127.0.0.1:4173",
   "captures": [
     {
@@ -155,15 +155,15 @@
           "status": 404
         },
         {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
           "path": "/api/discovery",
           "status": 404
         },
         {
           "path": "/api/movie-artwork",
-          "status": 404
-        },
-        {
-          "path": "/api/rankings",
           "status": 404
         },
         {
@@ -319,11 +319,11 @@
           "status": 404
         },
         {
-          "path": "/api/rankings",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/rankings",
           "status": 404
         },
         {
@@ -713,11 +713,11 @@
           "status": 404
         },
         {
-          "path": "/api/media",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/media",
           "status": 404
         },
         {
@@ -1107,15 +1107,15 @@
           "status": 404
         },
         {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
           "path": "/api/discovery",
           "status": 404
         },
         {
           "path": "/api/rankings",
-          "status": 404
-        },
-        {
-          "path": "/api/movie-artwork",
           "status": 404
         },
         {
@@ -1234,10 +1234,6 @@
           "status": 404
         },
         {
-          "path": "/api/movie-artwork",
-          "status": 404
-        },
-        {
           "path": "/api/discovery",
           "status": 404
         },
@@ -1250,7 +1246,7 @@
           "status": 404
         },
         {
-          "path": "/api/media",
+          "path": "/api/movie-artwork",
           "status": 404
         },
         {
@@ -1270,7 +1266,19 @@
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
           "status": 404
         },
         {
@@ -1278,15 +1286,7 @@
           "status": 404
         },
         {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
-          "status": 404
-        },
-        {
-          "path": "/api/media",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
