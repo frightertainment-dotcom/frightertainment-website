@@ -1027,3 +1027,38 @@ body.fr-v5 .fr-v5-front{position:relative}
 @media(prefers-reduced-motion:reduce){
  body.fr-v5 .fr-v5-icon-control{transition:none}
 }
+
+
+/* CONCEPT TRAILER CINEMA STILL: poster-based, but landscape-framed like the
+   approved desktop module. No unlicensed video stills or fake trailer links. */
+body.fr-v5 .fr-v5-trailer__content{padding:9px;gap:6px}
+body.fr-v5 .fr-v5-trailer__film{
+ position:relative;display:flex;align-items:end;justify-content:flex-start;
+ width:100%;min-height:128px;aspect-ratio:16/8;overflow:hidden;
+ padding:14px;text-shadow:0 2px 10px #000;
+ background:#090709;border:1px solid #373039;
+}
+body.fr-v5 .fr-v5-trailer__film .fr-v5-poster__art{
+ position:absolute;inset:0;z-index:0;
+ width:100%;height:100%;aspect-ratio:auto;overflow:hidden;
+ border:0;background:#150c11;
+}
+body.fr-v5 .fr-v5-trailer__film .fr-v5-poster__image{
+ width:100%;height:100%;object-fit:cover;object-position:center 33%;
+ filter:brightness(.51) contrast(1.06) saturate(.86);
+}
+body.fr-v5 .fr-v5-trailer__film .fr-v5-poster__fallback{
+ display:grid;place-items:center;width:100%;height:100%;
+ font-size:clamp(16px,1.9vw,24px);
+ background:linear-gradient(70deg,#120c10d7,#15090b77),url('/assets/worlds/movies-vault.webp') center/cover no-repeat;
+}
+body.fr-v5 .fr-v5-trailer__film strong{
+ position:relative;z-index:1;align-self:end;
+ margin:0 0 3px;color:#f4e7e3;max-width:85%;
+ font:700 clamp(18px,1.9vw,25px)/1.1 Georgia,serif;
+ overflow-wrap:break-word;
+}
+body.fr-v5 .fr-v5-trailer__play{
+ min-height:37px;background:#8d1e31;border-color:#cd4b5e;
+ color:#fff;font:700 11px system-ui,sans-serif;letter-spacing:.04em;
+}
