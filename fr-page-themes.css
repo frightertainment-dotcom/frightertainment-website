@@ -159,7 +159,11 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-diary__media img { width:100%; height
   body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region { min-height:0; }
 }
 @media (min-width:701px) and (max-width:800px) {
-  body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) { padding-bottom:14px; }
+  /* Give the longest real game title its own readable landscape track at the
+     narrow two-column breakpoint. The fallback must fit across font engines. */
+  body.fr-v5[data-theme='games'] .editorial-pick { grid-template-columns:minmax(230px,34%) minmax(0,1fr); }
+  body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) { aspect-ratio:3/2; gap:4px; padding:10px 12px 12px; }
+  body.fr-v5[data-theme='games'] .editorial-pick__art-title { font-size:21px; }
 }
 @media (max-width:700px) {
   body.fr-v5[data-theme='podcasts'] .editorial-pick__art-frame { width:min(100%,180px); }

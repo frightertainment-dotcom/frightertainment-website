@@ -82,9 +82,9 @@ test('Five TMDB fixture rankings form one readable Home group without an inner s
   }
 });
 
-test('Game fallback artwork keeps its title clear of the credit at mobile and desktop widths', async ({ page }) => {
+test('Game fallback artwork keeps its title clear of the credit at mobile, tablet and desktop widths', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  for (const width of [320, 390, 768, 980, 1440]) {
+  for (const width of [320, 390, 701, 768, 800, 980, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/games.html');
     const dots = page.locator('.editorial-carousel__dot');
@@ -97,13 +97,17 @@ test('Game fallback artwork keeps its title clear of the credit at mobile and de
       const state = await page.locator('.editorial-pick__art-frame').first().evaluate(frame => {
         const artTitle = frame.querySelector('.editorial-pick__art-title');
         const credit = frame.querySelector('.editorial-pick__art-sub');
-        return { frame: frame.getBoundingClientRect(), title: artTitle.getBoundingClientRect(),
+        const eyebrow = frame.querySelector('.editorial-pick__art-eyebrow');
+        return { frame: frame.getBoundingClientRect(), eyebrow: eyebrow.getBoundingClientRect(), title: artTitle.getBoundingClientRect(),
           credit: credit.getBoundingClientRect(), lineHeight: parseFloat(getComputedStyle(artTitle).lineHeight) };
       });
-      expect(state.title.height).toBeGreaterThanOrEqual(state.lineHeight - 1);
-      expect(state.title.top).toBeGreaterThanOrEqual(state.frame.top);
-      expect(state.title.bottom).toBeLessThanOrEqual(state.credit.top);
-      expect(state.credit.bottom).toBeLessThanOrEqual(state.frame.bottom);
+      const context = `${width}px, slide ${index + 1}, ${title}`;
+      expect(state.eyebrow.top, context).toBeGreaterThanOrEqual(state.frame.top);
+      expect(state.eyebrow.bottom, context).toBeLessThanOrEqual(state.title.top);
+      expect(state.title.height, context).toBeGreaterThanOrEqual(state.lineHeight - 1);
+      expect(state.title.top, context).toBeGreaterThanOrEqual(state.frame.top);
+      expect(state.title.bottom, context).toBeLessThanOrEqual(state.credit.top);
+      expect(state.credit.bottom, context).toBeLessThanOrEqual(state.frame.bottom);
     }
   }
 });
