@@ -1196,3 +1196,44 @@ body.fr-v5 .fr-v5-trailer__play{
  body.fr-v5 .editorial-pick__why{-webkit-line-clamp:1}
  body.fr-v5 .editorial-pick__facts{padding:4px}
 }
+
+
+/* CINEMATIC PANEL BALANCE — verified source labels rather than cramped metadata */
+body.fr-v5 .fr-v5-trailer__content{position:relative;isolation:isolate}
+body.fr-v5 .fr-v5-trailer__play{
+ position:absolute;left:50%;top:50%;z-index:5;
+ width:47px;height:47px;min-height:47px;
+ border:2px solid #fff6f2;border-radius:50%;
+ display:grid;place-items:center;padding:0 0 0 3px;
+ transform:translate(-50%,-50%);
+ color:#fff;text-shadow:0 1px 5px #000;
+ background:#0706089e;box-shadow:0 0 0 5px #07060859,0 5px 17px #000c;
+ font:700 20px/1 Georgia,serif;
+}
+body.fr-v5 .fr-v5-trailer__play:hover{
+ background:#ad2539;box-shadow:0 0 18px #f24f62a8;
+}
+body.fr-v5 .fr-v5-trailer__film{min-height:115px}
+body.fr-v5 .fr-v5-watchlist__grid>.fr-v5-empty{
+ min-height:96px;font-size:12px;
+}
+body.fr-v5 .fr-v5-panel__head p{font-size:10px;line-height:1.2}
+@media(min-width:1000px){
+ body.fr-v5 .fr-v5-trailer__film{min-height:110px;aspect-ratio:16/7}
+ body.fr-v5 .fr-v5-watchlist__grid{min-height:98px}
+}
+@media(min-width:380px) and (max-width:700px){
+ body.fr-v5 .editorial-pick__facts>span:not(.editorial-pick__facts-label){
+  display:none;
+ }
+ body.fr-v5 .editorial-pick__facts{
+  justify-content:center;align-items:center;text-align:center;
+  min-width:0;padding:6px 3px;gap:6px;
+  overflow-wrap:normal;
+ }
+ body.fr-v5 .editorial-pick__facts strong{font-size:15px}
+ body.fr-v5 .editorial-pick__facts small{
+  font-size:8px;line-height:1.25;word-break:normal;
+ }
+ body.fr-v5 .editorial-pick__facts-label{font-size:8px;letter-spacing:0}
+}
