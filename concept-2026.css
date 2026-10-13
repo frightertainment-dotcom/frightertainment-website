@@ -681,6 +681,6 @@ body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{
 @media(max-width:700px){
  /* The three cinema feature cards occupy about this height once hydrated.
     Preallocate it so a short scroll does not jump the release diary. */
- body.fr-v5 .fr-cinema-concept__cards{min-height:212px}
- body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{min-height:200px}
+ body.fr-v5 .fr-cinema-concept__cards{min-height:182px}
+ body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{min-height:175px}
 }
