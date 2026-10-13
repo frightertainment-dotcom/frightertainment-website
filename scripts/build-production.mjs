@@ -11,7 +11,7 @@ const publicFiles = [
   'film.html',
   'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
   'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js', 'streaming-watch.js',
-  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'homepage-concept.css', 'v5-magazine.css', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
+  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'homepage-concept.css', 'v5-magazine.css', 'concept-2026.css', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [

@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'v5-magazine.*'
+      - 'concept-2026.css'
+      - 'assets/concept-haunted-house.png'
       - 'browser-tests/v5-concept.pw.js'
       - 'cinematic-redesign.css'
       - 'homepage-concept.css'
@@ -38,12 +40,15 @@ jobs:
         run: |
           test -f dist/v5-magazine.css
           test -f dist/v5-magazine.js
+          test -f dist/concept-2026.css
+          test -f dist/assets/concept-haunted-house.png
           test -f dist/assets/v5-haunted-moon.svg
           test -f dist/assets/frightertainment-brand.png
           test -f dist/assets/page-title-movies.png
           test -f dist/assets/page-title-indie-movies.png
           grep -q 'v5-magazine.css' dist/movies.html
           grep -q 'v5-magazine.js' dist/indie-movies.html
+          grep -q 'concept-2026.css' dist/index.html
       - run: npx playwright install --with-deps chromium
       - name: Check V5 mobile and desktop concept contracts
         run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
@@ -51,7 +56,7 @@ jobs:
         if: always()
         run: |
           mkdir -p visual-evidence
-          for name in v5-indie-mobile v5-movies-desktop v5-home-mobile; do
+          for name in v5-indie-mobile v5-movies-desktop v5-home-mobile v5-cinema-mobile; do
             if test -f "test-results/visual/$name.png"; then cp "test-results/visual/$name.png" visual-evidence/; fi
           done
       - name: Verify poster logic, original catalogues and consent-gated embeds
@@ -62,7 +67,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import base64
-          for name in ('v5-indie-mobile','v5-movies-desktop'):
+          for name in ('v5-indie-mobile','v5-movies-desktop','v5-home-mobile','v5-cinema-mobile'):
               p = Path('visual-evidence') / (name + '.png')
               if not p.is_file():
                   continue

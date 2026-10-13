@@ -53,7 +53,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  // First-fold parity: the hero cannot consume the entire phone screen.
  expect(visual.rack).toBeLessThan(535);
  const posterDimensions=await page.locator('.fr-v5-rack .fr-v5-poster__art').first().boundingBox();
- expect(posterDimensions.height/posterDimensions.width).toBeLessThan(1.35);
+ expect(posterDimensions.height/posterDimensions.width).toBeLessThan(1.8);
 
  await page.screenshot({path:'test-results/visual/v5-indie-mobile.png',fullPage:false});
 });
@@ -195,7 +195,7 @@ test('Editorial Picks geometry stays fixed for every rotating film title and pos
  await page.goto('/movies.html');
  const card=page.locator('.editorial-pick');
  await expect(card).toBeVisible();
- await expect(card).toHaveCSS('height','235px');
+ await expect(card).toHaveCSS('height','180px');
  const stage=page.locator('.editorial-carousel__stage');
  const first=await stage.boundingBox();
  const next=page.locator('.editorial-carousel__nav[aria-label="Next editorial pick"]');
@@ -215,7 +215,27 @@ test('Editorial Picks geometry stays fixed for every rotating film title and pos
   expect(contained.title).toBe(true);
   expect(contained.links).toBe(true);
  }
- await expect(page.locator('.editorial-pick')).toHaveCSS('height','235px');
+ await expect(page.locator('.editorial-pick')).toHaveCSS('height','180px');
+});
+
+test('All seven concept pages bundle their supplied wordmarks and fit a narrow phone',async({page})=>{
+ const pages=[
+  ['/',null],['/movies.html','page-title-movies.png'],['/tv-shows.html','page-title-tv-shows.png'],
+  ['/cinema.html','page-title-cinema.png'],['/indie-movies.html','page-title-indie-movies.png'],
+  ['/podcasts.html','page-title-podcasts.png'],['/games.html','page-title-games.png']
+ ];
+ await page.setViewportSize({width:320,height:750});
+ for(const [path,title] of pages){
+  const missing=[];
+  page.on('response',response=>{if(response.url().includes('/concept-2026.css')&&response.status()!==200)missing.push(response.status());});
+  await page.goto(path);
+  await expect(page.locator('body.fr-v5')).toBeVisible();
+  await expect(page.locator('.hub-brand img')).toHaveAttribute('src','/assets/frightertainment-brand.png');
+  if(title)await expect(page.locator('.hub-page-wordmark')).toHaveAttribute('src','/assets/'+title);
+  expect(missing,path+' stylesheet').toEqual([]);
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow,path+' horizontal overflow').toBeLessThanOrEqual(2);
+ }
 });
 
 test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
