@@ -136,7 +136,7 @@
   return button;
  };
  const addWatchlist=parent=>{
-  const p=panel('fr-v5-watchlist','MY WATCHLIST','Your saved horror films.','/all-horror-movies.html');
+  const p=panel('fr-v5-watchlist','MY WATCHLIST','Your saved horror films.','/#my-watchlist');
   const grid=el('div','fr-v5-watchlist__grid');p.append(grid);parent.append(p);
   const render=()=>{
    const items=savedWatch();
@@ -153,6 +153,42 @@
    }));
   };
   document.addEventListener('fr-v5-watchlist-updated',render);
+  render();
+ };
+ const mountHomeWatchlist=()=>{
+  const section=document.querySelector('#my-watchlist');
+  if(!section)return;
+  const grid=section.querySelector('[data-home-watch-items]');
+  const count=section.querySelector('[data-home-watch-count]');
+  const description=section.querySelector('[data-home-watch-description]');
+  if(!grid||!count||!description)return;
+  const render=()=>{
+   const items=savedWatch();
+   count.textContent=String(items.length);
+   section.dataset.hasItems=String(items.length>0);
+   grid.hidden=items.length===0;
+   if(!items.length){
+    grid.replaceChildren();
+    description.textContent='Save a horror film with + in Movies, then find it here.';
+    return;
+   }
+   description.textContent='Tap a saved poster to see film details. Saved on this browser.';
+   grid.replaceChildren(...items.map(item=>{
+    const box=el('div','fr-home-watch-shelf__item');
+    const a=link('',filmHref(item,item.type),'fr-home-watch-shelf__movie');
+    a.setAttribute('aria-label','Open details for '+item.title);
+    a.append(image(item,item.type),el('strong','fr-home-watch-shelf__movie-title',item.title));
+    const remove=el('button','fr-home-watch-shelf__remove','×');
+    remove.type='button';
+    remove.setAttribute('aria-label','Remove '+item.title+' from my watchlist');
+    remove.addEventListener('click',()=>toggleWatch(item));
+    box.append(a,remove);
+    return box;
+   }));
+  };
+  document.addEventListener('fr-v5-watchlist-updated',render);
+  window.addEventListener('storage',event=>{if(event.key===watchKey||event.key===null)render();});
+  window.addEventListener('pageshow',render);
   render();
  };
  const installHeader=()=>{
@@ -352,7 +388,8 @@
   main.dataset.frV5Ready='true';
   mobileDock();
   // Cinema stays in document order: never flash or relocate its diary after load.
-  if(theme==='home'||theme==='cinema')return;
+  if(theme==='home'){mountHomeWatchlist();return;}
+  if(theme==='cinema')return;
   decorateHero();
   const config=configs[theme];if(!config)return;
   const showcase=el('div','fr-v5-front');
