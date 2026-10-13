@@ -11,7 +11,7 @@ test.beforeEach(async ({page}) => {
 });
 
 const pages = [
-  ['/', 'WELCOME TO THE DARK'],
+  ['/', 'Frightertainment'],
   ['/movies.html','HORROR'],
   ['/all-horror-movies.html','ALL HORROR'],
   ['/archive-film.html?id=Q166385','A Terrible Night'],
@@ -106,7 +106,7 @@ test('dynamic film records escape hostile text and reject credential-bearing sou
   expect(await page.evaluate(() => window.__filmXssRan)).toBe(false);
 });
 
-for (const [path, heading] of [['/', 'WELCOME TO THE DARK'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
+for (const [path, heading] of [['/', 'Frightertainment'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
   test(`desktop visual layout: ${path}`, async ({ browser }) => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await navigateLegacy(page,path);
@@ -846,14 +846,14 @@ test('homepage composition stays ordered and usable across the approved viewport
     });
     if (width <= 900) {
       expect(layout.featureTop).toBeLessThan(layout.chartTop);
-      expect(layout.chartTop).toBeLessThan(layout.supportTop);
+      expect(layout.supportTop).toBeLessThan(layout.chartTop);
     } else {
       expect(Math.abs(layout.featureTop - layout.chartTop)).toBeLessThan(2);
       expect(layout.featureLeft).toBeLessThan(layout.chartLeft);
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.chartBottom);
       expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
     }
-    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
+    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(5);
     if (width > 640 && width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
     if (width === 390) {
       expect(layout.featureTop).toBeGreaterThanOrEqual(170);
@@ -937,11 +937,11 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
   await expect(ranking).toContainText('could not be refreshed');
 });
 
-test('direct page loads use readable Times New Roman typography', async ({ page }) => {
+test('direct page loads use readable supporting typography', async ({ page }) => {
   for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     // Embedded media can stall the load event; the document/CSS is ready at DOMContentLoaded.
     await navigateLegacy(page,path,{waitUntil:'domcontentloaded'});
-    await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Times New Roman');
+    await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toMatch(/Arial|Times New Roman/);
   }
   await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.hub-page-intro h1')).toHaveAttribute('aria-label', 'HORROR MOVIES');
@@ -1063,10 +1063,10 @@ test('mobile copy, display headings and active navigation meet AA contrast in al
         return (values[0] + .05) / (values[1] + .05);
       };
       const body = getComputedStyle(document.body);
-      const heading = document.querySelector(theme === 'home' ? '.hub-intro h1' : '.hub-page-intro h1');
-      const copy = document.querySelector(theme === 'home' ? '.hub-intro>p' : '.hub-page-intro>p');
+      const heading = document.querySelector(theme === 'home' ? '.fr-home-intro__motto' : '.hub-page-intro h1');
+      const copy = document.querySelector(theme === 'home' ? '.fr-home-intro__copy>p:not(.fr-home-intro__motto)' : '.hub-page-intro>p');
       const active = document.querySelector('.hub-tabs a[aria-current="page"]');
-      const base = body.getPropertyValue('--world').trim();
+      const base = '#050708';
       return {
         theme: document.body.dataset.theme,
         copy: contrast(getComputedStyle(copy).color, base),

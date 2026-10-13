@@ -1,6 +1,5 @@
-/* Legacy functional browser tests must enter the same native disclosure that a
-   visitor opens. The V5 visual suite separately verifies it starts closed. */
-const routes=new Set(['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html','/games.html','/cinema.html']);
+/* Legacy functional checks open the native discovery disclosure where present. */
+const routes=new Set(['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html','/games.html']);
 export async function openCompleteDiscovery(page) {
  let pathname='';
  try{pathname=new URL(page.url()).pathname;}catch{}

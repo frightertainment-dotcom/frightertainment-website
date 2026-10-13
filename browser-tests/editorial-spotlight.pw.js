@@ -18,7 +18,7 @@ for(const [room,path,wordmark] of routes){
    await page.goto(path,{waitUntil:'domcontentloaded'});
    await expect(page.locator('.hub-brand img[src="/assets/frightertainment-brand.png"]')).toBeVisible();
    await expect(page.locator('.hub-page-intro img[src="/assets/'+wordmark+'"]')).toBeVisible();
-   const hero=page.locator('.hub-page-intro + .editorial-carousel .editorial-pick');
+   const hero=page.locator('.editorial-carousel .editorial-pick');
    await expect(hero).toBeVisible({timeout:10000});
    await expect(hero.locator('.editorial-pick__title')).not.toBeEmpty();
    const carousel=page.locator('.editorial-carousel');
@@ -30,7 +30,7 @@ for(const [room,path,wordmark] of routes){
    await carousel.getByRole('button',{name:'Next editorial pick'}).click();
    await expect.poll(()=>carousel.getAttribute('data-feature-id')).not.toBe(before);
    await expect(page.locator('.editorial-carousel__status')).toContainText('OF');
-   await expect(page.locator('.hub-page-intro + .editorial-carousel')).toBeVisible();
+   await expect(carousel).toBeVisible();
    await expect(carousel.getByRole('button',{name:'Resume automatic editorial rotation'})).toBeVisible();
    await carousel.getByRole('button',{name:'Resume automatic editorial rotation'}).click();
    await expect(carousel.getByRole('button',{name:'Pause automatic editorial rotation'})).toBeVisible();

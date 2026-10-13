@@ -18,7 +18,7 @@ test('Homepage is a compact cinematic dashboard on a phone, not a giant feed',as
  });
  expect(sizes.introHeight).toBeLessThan(255);
  expect(sizes.featuredTop).toBeLessThan(sizes.rankedTop);
- expect(sizes.rankedBottom).toBeLessThanOrEqual(sizes.supportTop+3);
+ expect(sizes.supportTop).toBeLessThan(sizes.rankedTop);
  expect(sizes.tabs).toBe(7);
  expect(sizes.pageWidth).toBeLessThanOrEqual(sizes.viewport+2);
  const releases=page.locator('details.fr-home-updates');
