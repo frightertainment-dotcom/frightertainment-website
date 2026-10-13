@@ -136,7 +136,7 @@
   return button;
  };
  const addWatchlist=parent=>{
-  const p=panel('fr-v5-watchlist','MY WATCHLIST','Saved on this device. Add films using + on the posters below.','/all-horror-movies.html');
+  const p=panel('fr-v5-watchlist','MY WATCHLIST','Your saved horror films.','/all-horror-movies.html');
   const grid=el('div','fr-v5-watchlist__grid');p.append(grid);parent.append(p);
   const render=()=>{
    const items=savedWatch();
@@ -224,7 +224,7 @@
   }catch{mockFreeState(list,'Release notices are temporarily unavailable. Use the complete discovery tools below.');}
  };
  const addRanking=async(parent)=>{
-  const p=panel('fr-v5-ranking','TOP 20 HORROR','TMDB community rankings, where available.','/top-20/'+new Date().getFullYear()+'/');
+  const p=panel('fr-v5-ranking','TOP 20 HORROR','Verified viewer rankings.','/top-20/'+new Date().getFullYear()+'/');
   const list=el('ol','fr-v5-ranking__list');p.append(list);parent.append(p);
   list.append(el('li','fr-v5-loading','Loading verified annual scores…'));
   try {
@@ -246,7 +246,7 @@
   } catch{mockFreeState(list,'The live rankings could not be loaded. Open the annual ranking page to retry.');}
  };
  const addTrailer=async(parent,type)=>{
-  const p=panel('fr-v5-trailer','LATEST TRAILERS','Play an official film trailer, when verified.',type==='indie'?'#trending':'#upcoming');
+  const p=panel('fr-v5-trailer',type==='indie'?'LATEST INDIE TRAILERS':'LATEST TRAILERS','Verified official trailers.',type==='indie'?'#trending':'#upcoming');
   const node=el('div','fr-v5-trailer__content');
   node.append(el('p','fr-v5-loading','Checking official trailers…'));p.append(node);parent.append(p);
   try{
@@ -255,7 +255,8 @@
    if(!featured){mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
    const a=link('',filmHref(featured,type),'fr-v5-trailer__film');
    a.append(image(featured,type),el('strong','',featured.title));
-   const play=link('▶  WATCH OFFICIAL TRAILER','#','fr-v5-trailer__play');
+   const play=link('▶','#','fr-v5-trailer__play');
+   play.setAttribute('aria-label','Watch official trailer for '+featured.title);
    if(!guard(play,mediaKey(featured))){mockFreeState(node,'No verified video available.');return;}
    node.replaceChildren(a,play);
   }catch{mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
