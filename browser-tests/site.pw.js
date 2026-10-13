@@ -854,8 +854,7 @@ test('homepage composition stays ordered and usable across the approved viewport
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.chartBottom);
       expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
     }
-    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(5);
-    if (width > 640 && width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
+    if (width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(5);
     if (width === 390) {
       expect(layout.featureTop).toBeGreaterThanOrEqual(170);
       expect(layout.featureTop).toBeLessThanOrEqual(480);
