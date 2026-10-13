@@ -376,6 +376,22 @@
     jobs.push(addRanking(upper));
     jobs.push(addTrailer(upper,'movie'));
     showcase.append(upper);
+    // The approved desktop composition pairs the editorial film and the
+    // working chart. Keep the source-backed chart after the hero on phones.
+    const ranking=upper.querySelector('.fr-v5-ranking');
+    const spotlight=el('div','fr-v5-spotlight-row');
+    const wide=window.matchMedia('(min-width:1000px)');
+    const arrange=()=>{
+      if(wide.matches){
+        main.insertBefore(spotlight,showcase);
+        spotlight.append(after,ranking);
+      }else{
+        main.insertBefore(after,showcase);
+        upper.insertBefore(ranking,upper.children[1]||null);
+        spotlight.remove();
+      }
+    };
+    arrange();wide.addEventListener('change',arrange);
    }
    jobs.push(showPosterRack(config,showcase));
    if(theme==='indie'||theme==='tv'){
@@ -387,7 +403,7 @@
   }
 
   if(theme!=='home'&&document.querySelector('.fr-v5-front')){
-   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
+   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&!node.classList.contains('fr-v5-spotlight-row')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
    if(original.length){
     const details=el('details','fr-v5-deeper');
     details.id='fr-v5-complete-discovery';

@@ -58,22 +58,24 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  await page.screenshot({path:'test-results/visual/v5-indie-mobile.png',fullPage:false});
 });
 
-test('V5 desktop Movies matches three-panels-above-eight-posters layout',async({page})=>{
+test('V5 desktop Movies pairs editorial pick with the chart above eight posters',async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto('/movies.html');
- await expect(page.locator('.fr-v5-front .fr-v5-feature-panels .fr-v5-panel')).toHaveCount(3);
+ await expect(page.locator('.fr-v5-front .fr-v5-feature-panels .fr-v5-panel')).toHaveCount(2);
+ await expect(page.locator('.fr-v5-spotlight-row > .fr-v5-ranking')).toBeVisible();
  await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(8);
  await expect(page.locator('.fr-v5-ranking__entry')).toHaveCount(10);
  await expect(page.locator('.fr-v5-deeper')).toBeVisible();
  await expect(page.locator('.fr-v5-deeper')).not.toHaveAttribute('open','');
  const layout=await page.evaluate(()=>{
   const box=s=>document.querySelector(s).getBoundingClientRect();
-  const hero=box('.editorial-carousel'),panel=box('.fr-v5-feature-panels'),rack=box('.fr-v5-rack');
+  const hero=box('.editorial-carousel'),chart=box('.fr-v5-spotlight-row > .fr-v5-ranking'),panel=box('.fr-v5-feature-panels'),rack=box('.fr-v5-rack');
   const arts=[...document.querySelectorAll('.fr-v5-feature-panels>.fr-v5-panel')].map(x=>x.getBoundingClientRect());
-  return {posterNext:panel.top>hero.top,panelsOneRow:Math.max(...arts.map(a=>a.top))-Math.min(...arts.map(a=>a.top))<6,
+  return {posterNext:panel.top>hero.top,chartAlongside:Math.abs(hero.top-chart.top)<6,panelsOneRow:Math.max(...arts.map(a=>a.top))-Math.min(...arts.map(a=>a.top))<6,
    rackAfter:rack.top>=panel.bottom,pageWidth:document.documentElement.scrollWidth,viewport:innerWidth};
  });
  expect(layout.posterNext).toBe(true);
+ expect(layout.chartAlongside).toBe(true);
  expect(layout.panelsOneRow).toBe(true);
  expect(layout.rackAfter).toBe(true);
  expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewport+2);
