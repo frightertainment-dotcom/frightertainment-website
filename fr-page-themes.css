@@ -46,6 +46,42 @@ body.fr-v5[data-theme='games'] {
   --pick-scene:var(--fr-scene-current);
 }
 
+/* A carousel page reserves the normal-state space needed by its longest
+   editorial item. The content, poster and controls remain distinct tracks;
+   opening a player can still expand the card. */
+@media (min-width:1101px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:clamp(525px,calc(8vw + 424px),580px); }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:clamp(550px,calc(5vw + 500px),600px); }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:clamp(580px,calc(6vw + 520px),640px); }
+}
+@media (min-width:1001px) and (max-width:1100px) {
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:530px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:560px; }
+}
+@media (min-width:701px) and (max-width:800px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:430px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:470px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:510px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:430px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:415px; }
+}
+@media (max-width:700px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:670px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:720px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:750px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:620px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:620px; }
+}
+@media (max-width:380px) {
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:800px; }
+}
+@media (max-width:359px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:740px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:735px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:640px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:635px; }
+}
+
 body.fr-v5 .hub-catalog .hub-tile:first-child::before { background-image:var(--fr-scene-current); }
 body.fr-v5 .hub-catalog .hub-tile:not(:first-child)::before { background-image:linear-gradient(90deg,#0506079c,#05060742),var(--fr-scene-current); }
 body.fr-v5 .hub-catalog .hub-tile__wash { background:linear-gradient(90deg,#060708ec,#060708a6 54%,#0607083b); }
