@@ -424,3 +424,151 @@ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]) .editorial-pick__
 @media(max-width:359px){
  body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:232px!important}
 }
+
+
+/* Concept fidelity round three: art-led editorials and illustrated discovery */
+/* Real posters are handled by the existing exact-identity media resolver.
+   This treatment only decorates ORIGINAL site artwork when a verified poster
+   is unavailable. Do not depict this as official film artwork. */
+body.fr-v5 .editorial-pick{
+ background:
+   radial-gradient(ellipse at 94% 22%,#b5142b30,transparent 46%),
+   linear-gradient(95deg,#050607f8 0%,#06070aee 49%,#060609af 100%),
+   var(--pick-scene) 76% center/cover no-repeat #060709;
+ border-color:#b12a3b;
+ box-shadow:inset 0 0 0 1px #ed4b5c24,inset 0 0 36px #8d13282b,0 12px 32px #000b;
+}
+body.fr-v5 .editorial-pick::after{
+ border-color:#f34c6342;
+ box-shadow:inset 0 0 19px #df1d3a18;
+ pointer-events:none;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ position:relative;isolation:isolate;
+ display:flex;flex-direction:column;
+ justify-content:flex-end;align-items:center;
+ padding:15px 11px;gap:8px;
+ color:#fff8f4;
+ border:1px solid #b94b58;
+ background:
+   linear-gradient(180deg,#08070b20 0%,#12070a22 32%,#060508cb 75%,#040507f6 100%),
+   var(--pick-scene) center/cover no-repeat #0d0b0c;
+ box-shadow:0 0 0 3px #070607,0 0 0 4px #90313f,0 0 26px #d02b3d39,0 19px 35px #000d;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster)::before{
+ content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(ellipse at 52% 28%,#df455624,transparent 51%);
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-eyebrow{
+ position:absolute;top:9px;left:7px;right:7px;
+ color:#f8d7d7;font:700 9px/1.25 Arial,Helvetica,sans-serif;
+ letter-spacing:.055em;text-align:center;text-shadow:0 2px 6px #000;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+ display:block;max-width:100%;
+ font:700 clamp(21px,2.45vw,34px)/1.01 var(--fr-header-font,Georgia,serif);
+ overflow-wrap:normal;word-break:normal;hyphens:none;
+ color:#fff4f0;text-align:center;text-wrap:balance;
+ text-shadow:0 3px 4px #000,0 5px 21px #000;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-sub{
+ display:block;width:100%;max-width:100%;
+ color:#f8bec7;font:700 8px/1.3 Arial,Helvetica,sans-serif;
+ letter-spacing:.075em;text-align:center;
+ text-shadow:0 2px 5px #000;
+}
+body.fr-v5 .editorial-pick__title{
+ color:#ffc3c5;
+ font-family:var(--fr-header-font,Georgia,serif)!important;
+ text-shadow:0 3px 13px #000,0 0 17px #b30e3125;
+}
+body.fr-v5 .editorial-pick__synopsis{
+ color:#ebe5e3;
+ font-family:Arial,Helvetica,sans-serif!important;
+ line-height:1.4;
+}
+body.fr-v5 .editorial-pick__links :is(.editorial-pick__cta,summary){
+ border-radius:2px;
+ box-shadow:inset 0 1px #ffffff20,0 5px 14px #0007;
+}
+body.fr-v5 .editorial-pick__links :is(.editorial-pick__cta,summary):focus-visible{
+ outline:2px solid #ffe6e8;outline-offset:3px;
+}
+@media(min-width:1000px){
+ body.fr-v5 .editorial-pick:not(:has(.editorial-pick__trailer[open])){
+  height:350px!important;min-height:350px!important;max-height:350px!important;
+  grid-template-columns:minmax(190px,26%) minmax(0,1fr) minmax(125px,17%);
+  gap:clamp(15px,2vw,26px);padding:39px 19px 18px;
+ }
+ body.fr-v5 .editorial-pick__art-frame{
+  width:min(100%,196px);min-width:0;max-width:196px;
+  height:278px;max-height:278px;aspect-ratio:2/3;
+ }
+ body.fr-v5 .editorial-pick__title{font-size:clamp(28px,2.6vw,38px)}
+ body.fr-v5 .editorial-pick__synopsis{font-size:14px;line-height:1.48}
+}
+/* This is the tabbed-style discovery rail on Movies, not a tiny text grid. */
+@media(max-width:700px){
+ body.fr-v5 .fr-v5-explore{
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:7px;margin:10px auto 12px;padding:0;
+  border:0;background:transparent;
+ }
+ body.fr-v5 .fr-v5-explore h2{
+  grid-column:1/-1;font-size:13px;letter-spacing:.035em;
+  border-left:2px solid #dc314b;padding-left:8px;margin:0 0 2px;
+ }
+ body.fr-v5 .fr-v5-explore__tile{
+  grid-column:span 2;display:flex;
+  justify-content:flex-start;align-items:flex-end;
+  min-width:0;min-height:92px;padding:10px 7px;
+  color:#fff5f2;text-align:left;
+  font:700 12px/1.16 Arial,Helvetica,sans-serif;
+  text-shadow:0 2px 5px #000,0 0 11px #000;
+  border:1px solid #9f3345;
+  border-radius:3px;
+  background:
+    linear-gradient(180deg,#04070a12,#040507e3),
+    url('/assets/worlds/movies-vault.webp') center/cover no-repeat #070a0c!important;
+  box-shadow:inset 0 -26px 33px #03040575;
+ }
+ body.fr-v5 .fr-v5-explore__tile:nth-of-type(4){grid-column:2 / span 2}
+ body.fr-v5 .fr-v5-explore__tile:nth-of-type(5){grid-column:4 / span 2}
+ body.fr-v5 .fr-v5-explore__tile[data-art="indie"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/indie-projection.webp')!important;
+ }
+ body.fr-v5 .fr-v5-explore__tile[data-art="top"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/home-threshold.webp')!important;
+ }
+ body.fr-v5 .fr-v5-explore__tile[data-art="new"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/tv-broadcast.webp')!important;
+ }
+ body.fr-v5 .fr-v5-explore__tile[data-art="classics"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/games-control-room.webp')!important;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+  padding:10px 6px;gap:6px;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+  font-size:clamp(17px,4vw,23px);line-height:1.05;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-eyebrow{
+  font-size:7px;line-height:1.15;top:8px;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-sub{
+  font-size:7px;line-height:1.18;letter-spacing:0;
+ }
+ body.fr-v5 .editorial-pick__title{font-size:clamp(18px,4.65vw,24px)}
+ body.fr-v5 .editorial-pick__synopsis{font-size:12px;line-height:1.35}
+}
+/* Site-owned atmosphere should not obscure an authenticated real film poster. */
+body.fr-v5 .editorial-pick__art-frame--poster{
+ background:#080708;
+}
+body.fr-v5 .editorial-pick__poster{
+ width:100%;height:100%;object-fit:cover;
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 .editorial-pick,
+ body.fr-v5 .fr-v5-explore__tile{transition:none;animation:none}
+}
