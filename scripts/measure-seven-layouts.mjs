@@ -9,8 +9,9 @@ const routes = [
   ['cinema', '/cinema.html'], ['indie', '/indie-movies.html'],
   ['podcasts', '/podcasts.html'], ['games', '/games.html']
 ];
-const widths = [320, 360, 379, 381, 390, 430, 699, 701, 768, 799,
-  801, 900, 980, 999, 1000, 1024, 1099, 1101, 1280, 1440, 1920];
+const widths = [320, 359, 360, 379, 380, 381, 390, 430, 699, 700, 701,
+  768, 799, 800, 801, 900, 980, 999, 1000, 1001, 1024, 1099,
+  1100, 1101, 1280, 1440, 1920];
 const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || '/usr/bin/chromium',
   args: ['--no-sandbox']
@@ -58,6 +59,7 @@ for (const [name, route] of routes) {
 // Emulates Chrome's phone desktop-site viewport shape. A physical phone remains
 // necessary to verify browser chrome changes and the actual OS setting.
 const desktopSite = [];
+await mkdir('docs/evidence/after', { recursive: true });
 for (const [name, route] of routes) {
   const context = await browser.newContext({
     viewport: { width: 980, height: 844 }, screen: { width: 390, height: 844 },
@@ -75,18 +77,25 @@ for (const [name, route] of routes) {
     zoom: visualViewport?.scale ?? null,
     countryPresent: !!document.querySelector('#cinema-country')
   }), name));
+  await page.screenshot({
+    path: `docs/evidence/after/${name}-phone-desktop-site980-first.jpg`,
+    type: 'jpeg', quality: 82
+  });
   await context.close();
 }
 await browser.close();
-await mkdir('docs/evidence/after', { recursive: true });
 await writeFile('docs/evidence/after/layout-matrix.json', JSON.stringify({
   capturedAt: new Date().toISOString(), origin, browser: browser.version(),
   state: 'Local static fallback; /api/ unavailable', widths, observations,
   desktopSite, physicalDeviceVerified: false
 }, null, 2) + '\n');
 const failed = observations.filter(item => item.issues.length);
-console.log(`${observations.length} viewport observations; ${failed.length} issue entries; ${desktopSite.length} emulated phone desktop-site observations`);
-if (failed.length) {
+const desktopSiteFailed = desktopSite.filter(item => item.innerWidth !== 980 ||
+  item.screenWidth !== 390 || item.dpr !== 3 || item.documentWidth > item.innerWidth + 2 ||
+  item.theme !== item.name || (item.name === 'cinema' && !item.countryPresent));
+console.log(`${observations.length} viewport observations; ${failed.length} issue entries; ${desktopSite.length} emulated phone desktop-site observations; ${desktopSiteFailed.length} desktop-site issues`);
+if (failed.length || desktopSiteFailed.length) {
   console.log(failed.slice(0, 12).map(item => `${item.name} ${item.width}: ${item.issues.join(', ')}`).join('\n'));
+  console.log(desktopSiteFailed.map(item => `${item.name}: ${JSON.stringify(item)}`).join('\n'));
   process.exitCode = 1;
 }
