@@ -1292,3 +1292,51 @@ body.fr-v5 .editorial-carousel__dot::before{width:7px;height:7px}
 
 body.fr-v5 .editorial-carousel__controls[hidden],
 body.fr-v5 .editorial-carousel__pause[hidden]{display:none!important}
+
+
+/* FINAL FIRST-FOLD COMPRESSION — 390px Indie reference.
+   Full synopsis/source still reachable via the film file and complete discovery. */
+@media(max-width:700px){
+ body.fr-v5 .editorial-pick__genre{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;
+  overflow:hidden;text-overflow:ellipsis;
+ }
+ body.fr-v5 .editorial-pick__synopsis{
+  -webkit-line-clamp:2;line-height:1.24;
+ }
+ body.fr-v5 .editorial-pick__meta{
+  margin:3px 0 0;padding-top:3px;gap:2px 6px;
+ }
+ body.fr-v5 .editorial-pick__links .editorial-pick__source{
+  display:none!important;
+ }
+ body.fr-v5 .editorial-pick__links{margin-top:3px}
+ body.fr-v5 .editorial-pick__why{-webkit-line-clamp:1}
+ body.fr-v5 .editorial-carousel__controls{
+  min-height:27px;height:27px;max-height:27px;
+ }
+ body.fr-v5 .editorial-carousel__nav,
+ body.fr-v5 .editorial-carousel__pause{
+  min-height:25px;height:25px;width:27px;min-width:27px;
+ }
+ body.fr-v5 .editorial-carousel__dot{
+  width:25px!important;height:25px!important;
+ }
+ body.fr-v5 .fr-v5-front{margin-top:2px}
+ /* Owner screenshot: short poster tiles showing artwork first, not the
+    inherited very tall catalogue cards. Portraits crop, never stretch. */
+ body.fr-v5 main[data-catalogue-type="indie"] .fr-v5-rack .fr-v5-poster__art,
+ body.fr-v5 main[data-catalogue-type="tv"] .fr-v5-rack .fr-v5-poster__art{
+  aspect-ratio:1/1.17;
+ }
+ body.fr-v5 main[data-catalogue-type="indie"] .fr-v5-rack .fr-v5-poster__image,
+ body.fr-v5 main[data-catalogue-type="tv"] .fr-v5-rack .fr-v5-poster__image{
+  object-fit:cover;object-position:center 28%;
+ }
+ body.fr-v5 .fr-v5-rack .fr-v5-poster__bottom{
+  min-height:20px;padding:3px 4px;
+ }
+ body.fr-v5 .fr-v5-rack .fr-v5-poster__bottom strong{
+  font-size:9px;
+ }
+}
