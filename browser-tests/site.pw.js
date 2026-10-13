@@ -841,7 +841,12 @@ test('homepage composition stays ordered and usable across the approved viewport
         chartLeft: chart.left,
         supportTop: support.top,
         desktopColumns: getComputedStyle(document.querySelector('.hub-dashboard')).gridTemplateColumns,
-        supportColumns: getComputedStyle(document.querySelector('.hub-showcase__bottom')).gridTemplateColumns
+        supportColumns: getComputedStyle(document.querySelector('.hub-showcase__bottom')).gridTemplateColumns,
+        supportCards: [...document.querySelectorAll('.hub-showcase__bottom .hub-tile')].map(node => {
+          const rect = node.getBoundingClientRect();
+          return { left: rect.left, right: rect.right, top: rect.top };
+        }),
+        supportCenter: (support.left + support.right) / 2
       };
     });
     if (width <= 900) {
@@ -854,7 +859,20 @@ test('homepage composition stays ordered and usable across the approved viewport
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.chartBottom);
       expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
     }
-    if (width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(5);
+    if (width <= 700) {
+      expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(6);
+      expect(layout.supportCards).toHaveLength(5);
+      // The first three scenic destinations share a row; the last two
+      // are evenly centred underneath rather than creating dead space.
+      const cards = layout.supportCards;
+      expect(Math.abs(cards[0].top - cards[1].top)).toBeLessThanOrEqual(2);
+      expect(Math.abs(cards[1].top - cards[2].top)).toBeLessThanOrEqual(2);
+      expect(cards[3].top).toBeGreaterThan(cards[2].top + 10);
+      expect(Math.abs(cards[3].top - cards[4].top)).toBeLessThanOrEqual(2);
+      expect(Math.abs((cards[3].left + cards[4].right) / 2 - layout.supportCenter)).toBeLessThanOrEqual(3);
+    } else if (width <= 900) {
+      expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(5);
+    }
     if (width === 390) {
       expect(layout.featureTop).toBeGreaterThanOrEqual(170);
       expect(layout.featureTop).toBeLessThanOrEqual(480);
