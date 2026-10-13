@@ -58,7 +58,7 @@ jobs:
         if: always()
         run: |
           mkdir -p visual-evidence
-          for name in v5-indie-mobile v5-movies-desktop v5-home-mobile v5-cinema-mobile; do
+          for name in v5-indie-mobile v5-movies-desktop v5-home-mobile v5-cinema-mobile concept-home-mobile concept-movies-mobile concept-tv-mobile concept-cinema-mobile concept-indie-mobile concept-podcasts-mobile concept-games-mobile concept-home-desktop concept-movies-desktop concept-tv-desktop concept-cinema-desktop concept-indie-desktop concept-podcasts-desktop concept-games-desktop; do
             if test -f "test-results/visual/$name.png"; then cp "test-results/visual/$name.png" visual-evidence/; fi
           done
       - name: Verify poster logic, original catalogues and consent-gated embeds
@@ -69,7 +69,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import base64
-          for name in ('v5-indie-mobile','v5-movies-desktop','v5-home-mobile','v5-cinema-mobile'):
+          for name in ('concept-home-mobile','concept-movies-mobile','concept-tv-mobile','concept-cinema-mobile','concept-indie-mobile','concept-podcasts-mobile','concept-games-mobile'):
               p = Path('visual-evidence') / (name + '.png')
               if not p.is_file():
                   continue

@@ -240,6 +240,21 @@ test('All seven concept pages bundle their supplied wordmarks and fit a narrow p
  }
 });
 
+test('Capture every approved section at phone and desktop widths for owner comparison',async({page})=>{
+ const pages=[['/','home'],['/movies.html','movies'],['/tv-shows.html','tv'],['/cinema.html','cinema'],
+  ['/indie-movies.html','indie'],['/podcasts.html','podcasts'],['/games.html','games']];
+ for(const [route,name] of pages){
+  for(const [size,width,height] of [['mobile',390,844],['desktop',1440,900]]){
+   await page.setViewportSize({width,height});
+   await page.goto(route,{waitUntil:'domcontentloaded'});
+   if(name==='home')await expect(page.locator('.hub-feature')).toBeVisible();
+   else if(name==='cinema')await expect(page.locator('.fr-cinema-concept__card').first()).toBeVisible();
+   else await expect(page.locator('.fr-v5-front')).toBeVisible();
+   await page.screenshot({path:`test-results/visual/concept-${name}-${size}.png`,fullPage:false});
+  }
+ }
+});
+
 test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/cinema.html');
