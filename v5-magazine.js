@@ -376,6 +376,19 @@
     jobs.push(addRanking(upper));
     jobs.push(addTrailer(upper,'movie'));
     showcase.append(upper);
+    const explore=el('nav','fr-v5-explore');
+    explore.setAttribute('aria-label','Explore horror movies');
+    explore.append(el('h2','','EXPLORE MOVIES'));
+    for(const [label,href,art] of [
+      ['ALL MOVIES','/all-horror-movies.html','all'],
+      ['NEW RELEASES','/movies.html#straight-to-stream','new'],
+      ['INDIE','/indie-movies.html','indie'],
+      ['CULT CLASSICS','/all-horror-movies.html?year=1980','classics'],
+      ['TOP 20','/top-20/','top']
+    ]){
+     const a=link(label+'  ›',href,'fr-v5-explore__tile');a.dataset.art=art;explore.append(a);
+    }
+    main.insertBefore(explore,showcase);
     // The approved desktop composition pairs the editorial film and the
     // working chart. Keep the source-backed chart after the hero on phones.
     const ranking=upper.querySelector('.fr-v5-ranking');
@@ -383,10 +396,10 @@
     const wide=window.matchMedia('(min-width:1000px)');
     const arrange=()=>{
       if(wide.matches){
-        main.insertBefore(spotlight,showcase);
+        main.insertBefore(spotlight,explore);
         spotlight.append(after,ranking);
       }else{
-        main.insertBefore(after,showcase);
+        main.insertBefore(after,explore);
         upper.insertBefore(ranking,upper.children[1]||null);
         spotlight.remove();
       }
@@ -403,7 +416,7 @@
   }
 
   if(theme!=='home'&&document.querySelector('.fr-v5-front')){
-   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&!node.classList.contains('fr-v5-spotlight-row')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
+   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&!node.classList.contains('fr-v5-spotlight-row')&&!node.classList.contains('fr-v5-explore')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
    if(original.length){
     const details=el('details','fr-v5-deeper');
     details.id='fr-v5-complete-discovery';

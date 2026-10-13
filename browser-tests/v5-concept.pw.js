@@ -63,6 +63,7 @@ test('V5 desktop Movies pairs editorial pick with the chart above eight posters'
  await page.goto('/movies.html');
  await expect(page.locator('.fr-v5-front .fr-v5-feature-panels .fr-v5-panel')).toHaveCount(2);
  await expect(page.locator('.fr-v5-spotlight-row > .fr-v5-ranking')).toBeVisible();
+ await expect(page.locator('.fr-v5-explore__tile')).toHaveCount(5);
  await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(8);
  await expect(page.locator('.fr-v5-ranking__entry')).toHaveCount(10);
  await expect(page.locator('.fr-v5-deeper')).toBeVisible();
@@ -85,6 +86,7 @@ test('V5 desktop Movies pairs editorial pick with the chart above eight posters'
 test('Original tools remain functional and accessible through the full discovery disclosure',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/movies.html');
+ await expect(page.locator('.fr-v5-explore__tile')).toHaveCount(5);
  const details=page.locator('.fr-v5-deeper');
  await expect(details).toBeVisible();
  await expect(page.locator('#straight-to-stream')).not.toBeVisible();
