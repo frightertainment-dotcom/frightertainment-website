@@ -48,11 +48,12 @@ jobs:
       - name: Check V5 mobile and desktop concept contracts
         run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
       - name: Preserve actual first-fold screenshots
+        if: always()
         run: |
           mkdir -p visual-evidence
-          cp test-results/visual/v5-indie-mobile.png visual-evidence/
-          cp test-results/visual/v5-movies-desktop.png visual-evidence/
-          cp test-results/visual/v5-home-mobile.png visual-evidence/
+          for name in v5-indie-mobile v5-movies-desktop v5-home-mobile; do
+            if test -f "test-results/visual/$name.png"; then cp "test-results/visual/$name.png" visual-evidence/; fi
+          done
       - name: Verify poster logic, original catalogues and consent-gated embeds
         run: npx playwright test browser-tests/catalogue.pw.js browser-tests/editorial-poster.pw.js browser-tests/embeds.pw.js --reporter=list
       - name: Export first-fold fixture screenshots for visual inspection
