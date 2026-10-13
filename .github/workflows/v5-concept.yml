@@ -60,17 +60,18 @@ jobs:
           mkdir -p visual-evidence
           for name in v5-indie-mobile v5-movies-desktop v5-home-mobile v5-cinema-mobile concept-home-mobile concept-movies-mobile concept-tv-mobile concept-cinema-mobile concept-indie-mobile concept-podcasts-mobile concept-games-mobile concept-home-desktop concept-movies-desktop concept-tv-desktop concept-cinema-desktop concept-indie-desktop concept-podcasts-desktop concept-games-desktop; do
             if test -f "test-results/visual/$name.png"; then cp "test-results/visual/$name.png" visual-evidence/; fi
+            if test -f "test-results/visual/$name.jpg"; then cp "test-results/visual/$name.jpg" visual-evidence/; fi
           done
       - name: Verify poster logic, original catalogues and consent-gated embeds
         run: npx playwright test browser-tests/catalogue.pw.js browser-tests/editorial-poster.pw.js browser-tests/embeds.pw.js --reporter=list
-      - name: Export first-fold fixture screenshots for visual inspection
+      - name: Export compact first-fold fixture screenshots for visual inspection
         if: always()
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import base64
           for name in ('concept-home-mobile','concept-movies-mobile','concept-tv-mobile','concept-cinema-mobile','concept-indie-mobile','concept-podcasts-mobile','concept-games-mobile','concept-home-desktop','concept-movies-desktop','concept-tv-desktop','concept-cinema-desktop','concept-indie-desktop','concept-podcasts-desktop','concept-games-desktop'):
-              p = Path('visual-evidence') / (name + '.png')
+              p = Path('visual-evidence') / (name + '.jpg')
               if not p.is_file():
                   continue
               value = base64.b64encode(p.read_bytes()).decode('ascii')

@@ -253,6 +253,7 @@ test('Capture every approved section at phone and desktop widths for owner compa
    else if(name==='cinema')await expect(page.locator('.fr-cinema-concept__card').first()).toBeVisible();
    else await expect(page.locator('.fr-v5-front')).toBeVisible();
    await page.screenshot({path:`test-results/visual/concept-${name}-${size}.png`,fullPage:false});
+   await page.screenshot({path:`test-results/visual/concept-${name}-${size}.jpg`,type:'jpeg',quality:35,fullPage:false});
   }
  }
 });
