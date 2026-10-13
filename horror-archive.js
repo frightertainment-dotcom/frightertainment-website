@@ -140,6 +140,11 @@
     };
     field.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,90);});
     clear.addEventListener('click',()=>{field.value='';render();field.focus();});
+    const initialQuery=new URLSearchParams(location.search).get('q');
+    if(initialQuery){
+      field.value=initialQuery.slice(0,100);
+      render();
+    }
   }
   const node=(tag,className,text)=>{
     const n=document.createElement(tag);
