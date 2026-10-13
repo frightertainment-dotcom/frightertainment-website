@@ -69,7 +69,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import base64
-          for name in ('concept-home-mobile','concept-movies-mobile','concept-tv-mobile','concept-cinema-mobile','concept-indie-mobile','concept-podcasts-mobile','concept-games-mobile'):
+          for name in ('concept-home-mobile','concept-movies-mobile','concept-tv-mobile','concept-cinema-mobile','concept-indie-mobile','concept-podcasts-mobile','concept-games-mobile','concept-home-desktop','concept-movies-desktop','concept-tv-desktop','concept-cinema-desktop','concept-indie-desktop','concept-podcasts-desktop','concept-games-desktop'):
               p = Path('visual-evidence') / (name + '.png')
               if not p.is_file():
                   continue

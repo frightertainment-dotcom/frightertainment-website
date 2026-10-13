@@ -44,7 +44,7 @@
     feature.dataset.mediaType='movie';feature.dataset.mediaTitle=movie.title;feature.dataset.mediaEager='true';
     feature.dataset.mediaYear=String((movie.claims||[]).find(x=>x.field==='filmYear')?.value || (movie.claims||[]).find(x=>x.field==='releaseDate')?.value.slice(0,4)||'');
     const img=document.createElement('img');img.className='hub-feature__poster';img.dataset.mediaField='poster';img.hidden=true;feature.prepend(img);
-    const p=feature.querySelector('.hub-tile__content p');p.dataset.mediaField='overview';
+    const p=feature.querySelector('.hub-tile__content p');
     const rating=document.createElement('span');rating.className='hub-feature__rating';rating.dataset.mediaField='rating';p.before(rating);
     const button=document.createElement('button');button.className='fr-trailer-button';button.type='button';button.dataset.mediaField='trailer';button.hidden=true;feature.querySelector('.hub-tile__content').append(button);
   }
