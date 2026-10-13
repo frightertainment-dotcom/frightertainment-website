@@ -267,6 +267,10 @@ body.fr-v5 .fr-v5-panel :is(a,button):focus-visible,body.fr-v5 .editorial-carous
  body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__wash{
   background:linear-gradient(180deg,#07080a44,#07080af2)!important
  }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-cinema::before{
+  background-image:url('/assets/worlds/movies-vault.webp');
+  background-size:cover;background-position:60% center
+ }
  body.fr-v5.hub-home .hub-showcase__bottom .fr-home-category::before{content:'◉';display:block;color:#f01838;font-size:20px;line-height:1;margin-bottom:5px}
  body.fr-v5.hub-home .hub-showcase__bottom .hub-tv .fr-home-category::before{content:'▣'}
  body.fr-v5.hub-home .hub-showcase__bottom .hub-indie .fr-home-category::before{content:'✹'}
