@@ -3,7 +3,10 @@
    watchlists, ranking values, video links or third-party poster rights. */
 (() => {
  'use strict';
- const theme=location.pathname.endsWith('/cinema.html')?'cinema':document.body?.dataset.theme;
+ // Page identity is explicit so alternate URLs and delayed work cannot turn
+ // Cinema's movie catalogue into the Movies magazine layout. Other pages still
+ // use their existing theme value until their markup declares data-page.
+ const theme=document.body?.dataset.page||document.body?.dataset.theme;
  if (!['movies','indie','tv','podcasts','games','home','cinema'].includes(theme)) return;
  const main=document.querySelector('main');
  const intro=main?.querySelector('.hub-page-intro');
@@ -276,7 +279,9 @@
     const li=el('li','fr-v5-ranking__entry');
     const position=el('span','fr-v5-ranking__position',String(x.position).padStart(2,'0'));
     const item=link(x.title,x.tmdbId?'/media.html?type=movie&id='+Number(x.tmdbId):'/top-20/'+new Date().getFullYear()+'/','fr-v5-ranking__movie');
-    const score=el('span','fr-v5-ranking__score',(x.averageScore/10).toFixed(1));
+    const score=el('span','fr-v5-ranking__score');
+    if(data.ratingKind==='tmdb-community')window.FRRatingBadge.render(score,window.FRRatingBadge.fromTmdbChart(x,'compact'));
+    else score.textContent=(x.averageScore/10).toFixed(1);
     li.append(position,item,score);list.append(li);
    }
   } catch{mockFreeState(list,'The live rankings could not be loaded. Open the annual ranking page to retry.');}

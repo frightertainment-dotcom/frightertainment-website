@@ -59,8 +59,7 @@
   if (chartFoot) chartFoot.textContent = year + ' · SOURCE-LINKED RANKINGS';
   const fullChart = document.querySelector('.hub-charts__all');
   if (fullChart) fullChart.href = '/top-20/' + year + '/';
-  const isCompact = matchMedia('(max-width: 900px)').matches;
-  const previewLimit = isCompact ? 5 : 10;
+  const previewLimit = 5;
   const safeSource = value => {
     try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
     catch { return ''; }
@@ -127,90 +126,6 @@
     return disclosure;
   }
 
-  function setupScroll(list, controls, button) {
-    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = 0;
-    let previousTime = 0;
-    let animationPosition = list.scrollTop;
-    let manualPause = motionPreference.matches;
-    let transientPause = false;
-    let inViewport = !('IntersectionObserver' in window);
-    let reachedEnd = false;
-    const updateControl = () => {
-      button.disabled = motionPreference.matches;
-      button.setAttribute('aria-pressed', String(!manualPause && !reachedEnd && !motionPreference.matches));
-      button.textContent = motionPreference.matches ? 'Slow scroll off (reduced motion)' : reachedEnd ? 'Restart slow chart scroll' : manualPause ? 'Start slow chart scroll' : 'Pause chart scroll';
-    };
-    const stop = () => { if (frame) cancelAnimationFrame(frame); frame = 0; previousTime = 0; };
-    const step = time => {
-      if (manualPause || transientPause || !inViewport || document.hidden || reachedEnd || motionPreference.matches) { stop(); return; }
-      if (list.scrollHeight - list.clientHeight <= 2) { controls.hidden = true; stop(); return; }
-      controls.hidden = false;
-      if (previousTime) {
-        // Keep fractional progress outside scrollTop: Chromium can quantize its readback,
-        // which otherwise discards each sub-pixel increment and stalls this slow scroll.
-        const elapsed = Math.min(Math.max(0, time - previousTime), 100);
-        animationPosition = Math.min(animationPosition + elapsed * 0.006, Math.max(0, list.scrollHeight - list.clientHeight));
-        list.scrollTop = animationPosition;
-      }
-      previousTime = time;
-      const atEnd = list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
-      if (atEnd) { reachedEnd = true; stop(); updateControl(); return; }
-      frame = requestAnimationFrame(step);
-    };
-    const play = () => {
-      if (motionPreference.matches || !inViewport || document.hidden) return;
-      if (reachedEnd) { list.scrollTop = 0; animationPosition = 0; reachedEnd = false; }
-      else animationPosition = list.scrollTop;
-      manualPause = false;
-      updateControl();
-      stop();
-      frame = requestAnimationFrame(step);
-    };
-    const pause = () => { manualPause = true; stop(); updateControl(); };
-    controls.hidden = true;
-    button.addEventListener('click', () => manualPause || reachedEnd ? play() : pause());
-    list.addEventListener('pointerenter', () => { transientPause = true; stop(); });
-    list.addEventListener('pointerleave', () => { transientPause = false; if (!manualPause && !reachedEnd) play(); });
-    list.addEventListener('focusin', () => { transientPause = true; stop(); });
-    list.addEventListener('focusout', event => {
-      if (event.relatedTarget && list.contains(event.relatedTarget)) return;
-      transientPause = false;
-      if (!manualPause && !reachedEnd) play();
-    });
-    button.addEventListener('focusin', () => { transientPause = true; stop(); });
-    button.addEventListener('focusout', () => {
-      transientPause = false;
-      if (!manualPause && !reachedEnd) play();
-    });
-    list.addEventListener('wheel', pause, { passive: true });
-    list.addEventListener('touchstart', pause, { passive: true, once: true });
-    list.addEventListener('pointerdown', pause, { passive: true });
-    list.addEventListener('keydown', event => {
-      if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)) pause();
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop();
-      else if (!manualPause && !transientPause && inViewport && !reachedEnd) play();
-    });
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(entries => {
-        inViewport = entries[0]?.isIntersecting === true;
-        if (!inViewport) stop();
-        else if (!manualPause && !transientPause && !document.hidden && !reachedEnd) play();
-      }, { threshold: 0.15 });
-      observer.observe(list);
-    }
-    motionPreference.addEventListener?.('change', event => {
-      if (event.matches) { manualPause = true; stop(); }
-      else { manualPause = false; if (inViewport && !document.hidden) play(); }
-      updateControl();
-    });
-    updateControl();
-    if (motionPreference.matches) controls.setAttribute('data-reduced-motion', 'true');
-    else play();
-  }
-
   function renderRows(items) {
     const seenFilms = new Set();
     const seenPositions = new Set();
@@ -249,7 +164,9 @@
       title.href = ratingKind === 'tmdb-community' ? '/media.html?type=movie&id='+encodeURIComponent(item.tmdbId || String(item.filmId).replace('tmdb-','')) : filmHref(item.filmId);
       const score = document.createElement('span');
       score.className = 'score';
-      score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
+      if (ratingKind === 'tmdb-community') {
+        window.FRRatingBadge.render(score, window.FRRatingBadge.fromTmdbChart(item, 'compact'));
+      } else score.textContent = (item.averageScore / 10).toFixed(1) + '/10';
       const meta = document.createElement('div');
       meta.className = 'chart-meta';
       const count = document.createElement('span');
@@ -281,19 +198,6 @@
       list.append(row);
     }
     const ids = new Set(valid.map(item => item.filmId));
-    if (valid.length >= 8 && !isCompact) {
-      const controls = document.createElement('div');
-      controls.className = 'hub-chart-motion';
-      const note = document.createElement('span');
-      note.textContent = 'SLOW SCROLL · PAUSES ON HOVER, FOCUS OR MANUAL SCROLL';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.setAttribute('aria-controls', list.id);
-      controls.append(note, button);
-      setupScroll(list, controls, button);
-      list.classList.add('hub-chart-list--scrolling');
-      return { node: [list, controls], ids, count: valid.length };
-    }
     return { node: list, ids, count: valid.length };
   }
 

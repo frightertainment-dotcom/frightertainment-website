@@ -6,7 +6,10 @@
   const href = item => '/media.html?type=' + mediaType(item) + '&id=' + id(item) + (document.body.dataset.catalogueType === 'indie' ? '&section=indie' : '');
   const poster = item => /^\/[A-Za-z0-9_/-]+\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? 'https://image.tmdb.org/t/p/w500' + item.posterPath : '';
   const prettyDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat('en-GB', {dateStyle:'medium',timeZone:'UTC'}).format(new Date(value + 'T12:00:00Z')) : '';
-  const score = item => Number(item.voteCount) > 0 && Number(item.voteAverage) > 0 ? `<span class="movie-card__score" aria-label="TMDB viewer rating ${Number(item.voteAverage).toFixed(1)} out of 10 from ${Number(item.voteCount)} votes"><small>TMDB </small>${Number(item.voteAverage).toFixed(1)}<small>/10</small></span>` : '<span class="fr-media-unrated">Not yet rated</span>';
+  // /api/catalogue is TMDB-backed and exposes voteAverage on the 0–10 scale.
+  const score = item => item?.ratingKind === 'tmdb-community' ?
+    window.FRRatingBadge.html(window.FRRatingBadge.fromTmdbMedia(item, 'compact')) :
+    '<span class="fr-media-unrated">Rating unavailable</span>';
   const trailer = item => {
     const key = item.trailer?.key || item.trailerVideoId;
     const verified = /^[A-Za-z0-9_-]{11}$/.test(key || '');

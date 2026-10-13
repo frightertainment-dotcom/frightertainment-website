@@ -12,6 +12,8 @@
  if(!section)return;
  const cards=section.querySelector('[data-cinema-concept-cards]');
  const label=section.querySelector('[data-cinema-concept-country]');
+ if(!cards||!label||section.dataset.frCinemaConceptReady)return;
+ section.dataset.frCinemaConceptReady='true';
  const make=(tag,className,value)=>{
   const node=document.createElement(tag);node.className=className;
   if(value!==undefined)node.textContent=value;return node;

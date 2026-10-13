@@ -4,11 +4,11 @@ on:
   pull_request:
     paths:
       - 'v5-magazine.*'
-      - 'concept-2026.css'
-      - 'assets/concept-haunted-house.png'
+      - 'fr-design-system.css'
+      - 'fr-page-themes.css'
+      - 'fr-rating-badge.*'
+      - 'assets/themes/**'
       - 'browser-tests/v5-concept.pw.js'
-      - 'cinematic-redesign.css'
-      - 'homepage-concept.css'
       - 'index.html'
       - 'movies.html'
       - 'tv-shows.html'
@@ -18,7 +18,7 @@ on:
       - 'games.html'
       - 'podcasts.html'
       - 'styles.css'
-      - 'assets/v5-haunted-moon.svg'
+      - 'assets/frightertainment-f.png'
       - 'scripts/build-preview.mjs'
   workflow_dispatch:
 
@@ -37,20 +37,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:preview
-      - name: Check original branding and concept assets are in preview bundle
+      - name: Check original branding and seven page assets are in preview bundle
         run: |
           test -f dist/v5-magazine.css
           test -f dist/v5-magazine.js
-          test -f dist/concept-2026.css
-          test -f dist/assets/concept-haunted-house.png
+          test -f dist/fr-design-system.css
+          test -f dist/fr-page-themes.css
+          test -f dist/fr-rating-badge.css
+          test -f dist/fr-rating-badge.js
+          test -f dist/assets/frightertainment-f.png
+          for theme in home movies tv cinema indie podcasts games; do test -f "dist/assets/themes/$theme-wide.webp"; test -f "dist/assets/themes/$theme-mobile.webp"; done
           test -f dist/cinema-concept.js
-          test -f dist/assets/v5-haunted-moon.svg
           test -f dist/assets/frightertainment-brand.png
           test -f dist/assets/page-title-movies.png
           test -f dist/assets/page-title-indie-movies.png
           grep -q 'v5-magazine.css' dist/movies.html
           grep -q 'v5-magazine.js' dist/indie-movies.html
-          grep -q 'concept-2026.css' dist/index.html
+          grep -q 'fr-design-system.css' dist/index.html
       - run: npx playwright install --with-deps chromium
       - name: Check V5 mobile and desktop concept contracts
         run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
