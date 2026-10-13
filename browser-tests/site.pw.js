@@ -296,7 +296,7 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
   await expect(page.locator('a[href="https://podcasts.apple.com/gb/podcast/knifepoint-horror/id406250030"]')).toHaveText(/LISTEN ON APPLE PODCASTS/);
   await navigateLegacy(page,'/tv-shows.html');
   await page.locator('.fr-curated-more > summary').click();
-  await expect(page.locator('a[href="https://www.netflix.com/gb/title/80209229"]')).toBeVisible();
+  await expect(page.locator('.fr-curated-more a[href="https://www.netflix.com/gb/title/80209229"]').first()).toBeVisible();
   await expect(page.locator('a[href="https://qr.netflix.com/gb/title/80209229"]')).toHaveCount(0);
 });
 
