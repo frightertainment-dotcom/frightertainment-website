@@ -1237,3 +1237,55 @@ body.fr-v5 .fr-v5-panel__head p{font-size:10px;line-height:1.2}
  }
  body.fr-v5 .editorial-pick__facts-label{font-size:8px;letter-spacing:0}
 }
+
+
+/* CONCEPT CAROUSEL — compact, keyboard accessible one-row controls.
+   Keep previous/next and pause operational; show icon-sized controls + dots. */
+body.fr-v5 .editorial-carousel__controls{
+ display:flex!important;flex-wrap:nowrap!important;
+ align-items:center;justify-content:center;gap:4px!important;
+ max-width:100%;min-height:24px;padding:1px 2px!important;
+ margin:0;background:transparent;border:0;
+}
+body.fr-v5 .editorial-carousel__controls>*{order:initial!important}
+body.fr-v5 .editorial-carousel__dots{
+ display:flex!important;flex:0 0 auto!important;
+ flex-basis:auto!important;justify-content:center;gap:2px;
+}
+body.fr-v5 .editorial-carousel__status{display:none!important}
+body.fr-v5 .editorial-carousel__nav,
+body.fr-v5 .editorial-carousel__pause{
+ min-width:29px;min-height:29px;width:29px;height:29px;
+ padding:2px!important;display:grid;place-items:center;
+ overflow:hidden;white-space:nowrap;
+ font-size:0!important;
+ border:0;color:#cab3b5;background:transparent;
+}
+body.fr-v5 .editorial-carousel__nav::first-letter{font-size:0}
+body.fr-v5 .editorial-carousel__nav::after{
+ content:'‹';font:700 21px/1 Georgia,serif;
+}
+body.fr-v5 .editorial-carousel__nav[aria-label="Next editorial pick"]::after{content:'›'}
+body.fr-v5 .editorial-carousel__pause::after{
+ content:'Ⅱ';font:600 12px/1 Arial,sans-serif;
+}
+body.fr-v5 .editorial-carousel__pause[aria-label="Resume automatic editorial rotation"]::after{content:'▶'}
+body.fr-v5 .editorial-carousel__nav:hover,
+body.fr-v5 .editorial-carousel__pause:hover{color:#fff;background:#3c141d}
+body.fr-v5 .editorial-carousel__dot{width:30px!important;height:30px!important}
+body.fr-v5 .editorial-carousel__dot::before{width:7px;height:7px}
+@media(max-width:700px){
+ body.fr-v5 .editorial-carousel__controls{height:33px;min-height:33px;max-height:33px}
+ body.fr-v5 .editorial-carousel__dots{gap:1px}
+ body.fr-v5 .editorial-carousel__dot{width:28px!important;height:29px!important}
+ body.fr-v5 .editorial-pick__source{
+  width:auto!important;min-height:19px!important;
+  padding:2px 0!important;font-size:8px!important;
+  background:transparent!important;border:0!important;
+  text-decoration:underline!important;color:#e9b3b8!important;
+ }
+ body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro>.hub-eyebrow,
+ body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro>.hub-eyebrow{
+  display:none;
+ }
+}
