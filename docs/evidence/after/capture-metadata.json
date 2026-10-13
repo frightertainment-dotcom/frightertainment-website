@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-13T22:56:00.737Z",
+  "capturedAt": "2026-10-13T23:14:14.612Z",
   "origin": "http://127.0.0.1:4173",
   "captures": [
     {
@@ -134,13 +134,13 @@
           "x": 0,
           "y": 423,
           "width": 390,
-          "height": 670,
-          "clientHeight": 670,
-          "scrollHeight": 670
+          "height": 686,
+          "clientHeight": 686,
+          "scrollHeight": 686
         },
         "synopsis": {
           "x": 16,
-          "y": 783.921875,
+          "y": 789.265625,
           "width": 358,
           "height": 87,
           "clientHeight": 87,
@@ -155,15 +155,15 @@
           "status": 404
         },
         {
-          "path": "/api/rankings",
-          "status": 404
-        },
-        {
           "path": "/api/discovery",
           "status": 404
         },
         {
           "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
           "status": 404
         },
         {
@@ -262,9 +262,9 @@
           "x": 0,
           "y": 504.796875,
           "width": 1440,
-          "height": 539.1875,
-          "clientHeight": 539,
-          "scrollHeight": 539
+          "height": 555.1875,
+          "clientHeight": 555,
+          "scrollHeight": 555
         },
         "synopsis": {
           "x": 438.3125,
@@ -319,11 +319,11 @@
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/rankings",
           "status": 404
         },
         {
-          "path": "/api/rankings",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
@@ -390,13 +390,13 @@
           "x": 12,
           "y": 423,
           "width": 366,
-          "height": 720,
-          "clientHeight": 720,
-          "scrollHeight": 720
+          "height": 736,
+          "clientHeight": 736,
+          "scrollHeight": 736
         },
         "synopsis": {
           "x": 28,
-          "y": 819.421875,
+          "y": 820.421875,
           "width": 334,
           "height": 43.5,
           "clientHeight": 44,
@@ -474,13 +474,13 @@
           "x": 60,
           "y": 504.796875,
           "width": 1320,
-          "height": 572,
-          "clientHeight": 572,
-          "scrollHeight": 572
+          "height": 588,
+          "clientHeight": 588,
+          "scrollHeight": 588
         },
         "synopsis": {
           "x": 467.109375,
-          "y": 724.28125,
+          "y": 671.40625,
           "width": 778.265625,
           "height": 28.765625,
           "clientHeight": 29,
@@ -680,13 +680,13 @@
           "x": 12,
           "y": 423,
           "width": 366,
-          "height": 750,
-          "clientHeight": 750,
-          "scrollHeight": 750
+          "height": 766,
+          "clientHeight": 766,
+          "scrollHeight": 766
         },
         "synopsis": {
           "x": 28,
-          "y": 792.859375,
+          "y": 789.359375,
           "width": 334,
           "height": 87,
           "clientHeight": 87,
@@ -764,17 +764,17 @@
           "x": 60,
           "y": 504.796875,
           "width": 1320,
-          "height": 606.390625,
-          "clientHeight": 606,
-          "scrollHeight": 606
+          "height": 622.390625,
+          "clientHeight": 622,
+          "scrollHeight": 622
         },
         "synopsis": {
           "x": 467.109375,
           "y": 671.40625,
           "width": 778.265625,
-          "height": 86.296875,
-          "clientHeight": 86,
-          "scrollHeight": 86
+          "height": 115.0625,
+          "clientHeight": 115,
+          "scrollHeight": 115
         },
         "chart": null,
         "country": null
@@ -848,13 +848,13 @@
           "x": 12,
           "y": 423,
           "width": 366,
-          "height": 620,
-          "clientHeight": 620,
-          "scrollHeight": 620
+          "height": 636,
+          "clientHeight": 636,
+          "scrollHeight": 636
         },
         "synopsis": {
           "x": 28,
-          "y": 769.15625,
+          "y": 774.484375,
           "width": 334,
           "height": 43.5,
           "clientHeight": 44,
@@ -976,13 +976,13 @@
           "x": 12,
           "y": 423,
           "width": 366,
-          "height": 620,
-          "clientHeight": 620,
-          "scrollHeight": 620
+          "height": 636,
+          "clientHeight": 636,
+          "scrollHeight": 636
         },
         "synopsis": {
           "x": 28,
-          "y": 786.65625,
+          "y": 791.984375,
           "width": 334,
           "height": 43.5,
           "clientHeight": 44,
@@ -1086,17 +1086,17 @@
           "x": 0,
           "y": 432.890625,
           "width": 320,
-          "height": 740,
-          "clientHeight": 740,
-          "scrollHeight": 740
+          "height": 756,
+          "clientHeight": 756,
+          "scrollHeight": 756
         },
         "synopsis": {
           "x": 16,
-          "y": 806.078125,
+          "y": 826.078125,
           "width": 288,
           "height": 87,
           "clientHeight": 87,
-          "scrollHeight": 152
+          "scrollHeight": 131
         },
         "chart": null,
         "country": null
@@ -1143,11 +1143,11 @@
           "status": 404
         },
         {
-          "path": "/api/catalogue",
+          "path": "/api/rankings",
           "status": 404
         },
         {
-          "path": "/api/rankings",
+          "path": "/api/catalogue",
           "status": 404
         },
         {
@@ -1221,9 +1221,9 @@
           "x": 325.921875,
           "y": 551.28125,
           "width": 624.6875,
-          "height": 100.625,
-          "clientHeight": 101,
-          "scrollHeight": 101
+          "height": 75.46875,
+          "clientHeight": 75,
+          "scrollHeight": 75
         },
         "chart": null,
         "country": null
@@ -1234,11 +1234,11 @@
           "status": 404
         },
         {
-          "path": "/api/discovery",
+          "path": "/api/movie-artwork",
           "status": 404
         },
         {
-          "path": "/api/movie-artwork",
+          "path": "/api/discovery",
           "status": 404
         },
         {
@@ -1340,9 +1340,9 @@
           "x": 15.359375,
           "y": 443,
           "width": 737.265625,
-          "height": 510,
-          "clientHeight": 510,
-          "scrollHeight": 510
+          "height": 526,
+          "clientHeight": 526,
+          "scrollHeight": 526
         },
         "synopsis": {
           "x": 262.828125,
@@ -1506,9 +1506,9 @@
           "x": 15.359375,
           "y": 443,
           "width": 737.265625,
-          "height": 430,
-          "clientHeight": 430,
-          "scrollHeight": 430
+          "height": 446,
+          "clientHeight": 446,
+          "scrollHeight": 446
         },
         "synopsis": {
           "x": 262.828125,
