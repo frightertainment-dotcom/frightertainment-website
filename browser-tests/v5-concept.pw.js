@@ -49,6 +49,12 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  expect(visual.artRight).toBeLessThanOrEqual(visual.textLeft+4);
  expect(visual.pageWidth).toBeLessThanOrEqual(visual.viewport+2);
  expect(visual.legacyOpen).toBe(false);
+
+ // First-fold parity: the hero cannot consume the entire phone screen.
+ expect(visual.rack).toBeLessThan(535);
+ const posterDimensions=await page.locator('.fr-v5-rack .fr-v5-poster__art').first().boundingBox();
+ expect(posterDimensions.height/posterDimensions.width).toBeLessThan(1.35);
+
  await page.screenshot({path:'test-results/visual/v5-indie-mobile.png',fullPage:false});
 });
 
