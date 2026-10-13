@@ -523,6 +523,49 @@ test('Saved watchlist poster titles stay within their fixed tiles on 320 and 390
  }
 });
 
+
+test('cinematic surfaces are borderless but remain structured and keyboard navigable',async({page})=>{
+ for(const width of [390,1440]){
+  await page.setViewportSize({width,height:900});
+  for(const route of ['/', '/movies.html', '/tv-shows.html', '/cinema.html', '/indie-movies.html', '/podcasts.html', '/games.html']){
+   await page.goto(route);
+   await expect(page.locator('.hub-header')).toBeVisible();
+   const selector=route==='/'?'.hub-feature':route==='/cinema.html'?'.fr-cinema-concept__features':'.editorial-pick';
+   const feature=page.locator(selector);
+   await expect(feature).toBeVisible();
+   const geometry=await feature.evaluate(el=>{
+    const rect=el.getBoundingClientRect();
+    const css=getComputedStyle(el);
+    return {width:rect.width,height:rect.height,
+      borderTop:parseFloat(css.borderTopWidth),borderRight:parseFloat(css.borderRightWidth),
+      borderBottom:parseFloat(css.borderBottomWidth),borderLeft:parseFloat(css.borderLeftWidth),
+      shadow:css.boxShadow,
+      viewportOverflow:document.documentElement.scrollWidth-innerWidth};
+   });
+   expect(geometry.height).toBeGreaterThan(125);
+   expect(geometry.width).toBeGreaterThan(220);
+   expect(geometry.borderTop).toBe(0);
+   expect(geometry.borderRight).toBe(0);
+   expect(geometry.borderBottom).toBe(0);
+   expect(geometry.borderLeft).toBe(0);
+   expect(geometry.shadow).not.toBe('none');
+   expect(geometry.viewportOverflow).toBeLessThanOrEqual(2);
+   if(route==='/'){
+    const chart=page.locator('.hub-charts');
+    await expect(chart).toBeVisible();
+    const chartBorder=await chart.evaluate(el=>getComputedStyle(el).borderTopWidth);
+    expect(chartBorder).toBe('0px');
+    const tiles=await page.locator('.hub-showcase__bottom .hub-tile').evaluateAll(xs=>xs.map(x=>({
+      border:getComputedStyle(x).borderTopWidth,
+      art:getComputedStyle(x,'::before').backgroundImage
+    })));
+    expect(tiles).toHaveLength(5);
+    expect(tiles.every(x=>x.border==='0px')).toBe(true);
+    expect(tiles.every(x=>x.art.includes('assets/'))).toBe(true);
+   }
+  }
+ }
+});
 test('Cinema renders with V5 at first paint and retains the release diary in document order',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/cinema.html');
