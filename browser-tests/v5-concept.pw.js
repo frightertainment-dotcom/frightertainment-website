@@ -254,6 +254,34 @@ test('All seven editorial pages protect mobile dock clearance and real copy at 3
  }
 });
 
+test('Opening the editorial trailer can expand beyond a fixed carousel card',async({page})=>{
+ for(const width of [390,1440]){
+  await page.setViewportSize({width,height:844});
+  await page.goto('/movies.html');
+  await expect(page.locator('.editorial-pick')).toBeVisible();
+  const before=await page.locator('.editorial-pick').evaluate(node=>node.getBoundingClientRect().height);
+  await page.locator('.editorial-pick__links').evaluate(node=>{
+   const details=document.createElement('details');
+   details.className='editorial-pick__trailer';
+   details.open=true;
+   const summary=document.createElement('summary');
+   summary.textContent='Example expanded player for layout verification';
+   const player=document.createElement('div');
+   player.className='editorial-pick__video';
+   player.style.height='260px';
+   details.append(summary,player);
+   node.append(details);
+  });
+  const measured=await page.locator('.editorial-pick').evaluate(node=>{
+   const player=node.querySelector('.editorial-pick__video').getBoundingClientRect();
+   const outer=node.getBoundingClientRect();
+   return {height:outer.height,playerBottom:player.bottom,outerBottom:outer.bottom};
+  });
+  expect(measured.height).toBeGreaterThan(before);
+  expect(measured.playerBottom).toBeLessThanOrEqual(measured.outerBottom+1);
+ }
+});
+
 test('All seven concept pages bundle their supplied wordmarks and fit a narrow phone',async({page})=>{
  const pages=[
   ['/',null],['/movies.html','page-title-movies.png'],['/tv-shows.html','page-title-tv-shows.png'],
