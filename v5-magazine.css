@@ -822,3 +822,208 @@ body.fr-v5 main[data-catalogue-type="tv"]>.fr-v5-deeper{order:3}
   padding:4px 8px!important;font-size:9px!important;
  }
 }
+
+
+/* V5 OWNER CONCEPT PARITY — FUNCTIONAL HEADER, WATCHLIST AND POSTER-LED FINISH
+   Approved reference: 1000125443 mobile Indie, 1000125445 desktop Movies.
+   Explicit responsive geometry, no fabricated ratings, quotes or fake profiles. */
+body.fr-v5 .hub-header__inside{
+ grid-template-columns:minmax(170px,255px) minmax(0,1fr) auto;
+ column-gap:clamp(8px,1.5vw,25px);
+}
+body.fr-v5 .fr-v5-header-tools{
+ display:flex;align-items:center;justify-content:flex-end;gap:10px;
+ min-width:0;position:relative;z-index:61;
+}
+body.fr-v5 .fr-v5-header-tools details{position:relative;min-width:0}
+body.fr-v5 .fr-v5-header-tools summary::-webkit-details-marker{display:none}
+body.fr-v5 .fr-v5-icon-control{
+ display:grid;place-items:center;cursor:pointer;list-style:none;
+ width:39px;height:39px;border-radius:50%;
+ border:1px solid transparent;color:#f1e6e7;
+ font:500 27px/1 Arial,sans-serif;
+ background:#0b090b;transition:background .18s,border-color .18s;
+}
+body.fr-v5 .fr-v5-icon-control:hover,
+body.fr-v5 .fr-v5-header-tools details[open] .fr-v5-icon-control{
+ background:#32121a;border-color:#d34d5c;
+}
+body.fr-v5 .fr-v5-header-menu{display:none}
+body.fr-v5 .fr-v5-menu-list,
+body.fr-v5 .fr-v5-search-form{
+ position:absolute;top:calc(100% + 12px);z-index:100;
+ border:1px solid #a43b4b;background:#0a090bf9;
+ box-shadow:0 15px 38px #000f,0 0 0 2px #14080d;
+ padding:10px;min-width:250px;
+}
+body.fr-v5 .fr-v5-menu-list{left:0;display:flex;flex-direction:column;gap:2px}
+body.fr-v5 .fr-v5-menu-list a{
+ display:block;padding:10px;color:#f4e7e6;text-decoration:none;
+ font:700 12px/1.3 system-ui,sans-serif;letter-spacing:.1em;
+ border-bottom:1px solid #4d2834;
+}
+body.fr-v5 .fr-v5-menu-list a:hover{background:#6f1929}
+body.fr-v5 .fr-v5-search-form{right:-50px;display:grid;gap:8px;min-width:min(345px,85vw)}
+body.fr-v5 .fr-v5-search-form label{font:700 11px system-ui,sans-serif;color:#d9b1b8}
+body.fr-v5 .fr-v5-search-form input{
+ min-width:0;width:100%;min-height:42px;padding:8px 12px;color:#fff;
+ background:#121114;border:1px solid #80505a;font:400 14px system-ui,sans-serif;
+}
+body.fr-v5 .fr-v5-search-form button{
+ min-height:40px;background:#a72538;color:#fff;border:1px solid #e06c76;
+ font:700 12px system-ui,sans-serif;
+}
+body.fr-v5 .fr-v5-contact-icon{
+ display:grid;place-items:center;width:38px;height:38px;
+ flex:none;border-radius:50%;border:2px solid #e03d50;
+ color:#f1cad2;text-decoration:none;background:radial-gradient(circle,#4f1a25,#0c080a);
+ font:23px/1 Georgia,serif;
+}
+body.fr-v5 .fr-v5-header-tools :is(a,summary,button,input):focus-visible{
+ outline:2px solid #fff4f3;outline-offset:3px;
+}
+/* Operational watchlist: empty state is truthful; no fake saved-film count. */
+body.fr-v5 .fr-v5-watchlist__grid{
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+ align-items:stretch;gap:7px;min-height:126px;padding:10px;
+}
+body.fr-v5 .fr-v5-watchlist__grid>.fr-v5-empty{
+ grid-column:1/-1;margin:0;min-height:125px;
+ display:grid;place-items:center;text-align:center;padding:17px;
+ background:linear-gradient(115deg,#0c1012f6,#0b080bd7),
+ url('/assets/worlds/movies-vault.webp') center/cover no-repeat;
+ border:1px dashed #6a3842;
+ font:400 13px/1.5 system-ui,sans-serif;color:#decfd3;
+}
+body.fr-v5 .fr-v5-watchlist__saved{
+ position:relative;min-width:0;
+ background:#08090a;border:1px solid #3e3b40;
+}
+body.fr-v5 .fr-v5-watchlist__item{display:flex;flex-direction:column;height:100%;text-decoration:none;color:#eee1e0}
+body.fr-v5 .fr-v5-watchlist__item .fr-v5-poster__art{aspect-ratio:2/3}
+body.fr-v5 .fr-v5-watchlist__title{
+ min-height:24px;padding:6px 3px;color:#d9cbd0;
+ font:600 9px/1.2 system-ui,sans-serif;text-align:center;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+body.fr-v5 .fr-v5-poster-card{position:relative;min-width:0}
+body.fr-v5 .fr-v5-poster-card>.fr-v5-poster{height:100%}
+body.fr-v5 .fr-v5-watch-toggle{
+ position:absolute;top:5px;right:5px;z-index:2;
+ display:grid;place-items:center;
+ width:28px;height:28px;padding:0;border:1px solid #f1b6c0;
+ border-radius:50%;background:#070608e9;color:#fff;
+ font:700 19px/1 Arial,sans-serif;
+ box-shadow:0 3px 9px #000d;cursor:pointer;
+}
+body.fr-v5 .fr-v5-watch-toggle[aria-pressed="true"]{background:#9f2437;border-color:#ff7c91}
+body.fr-v5 .fr-v5-watchlist__saved>.fr-v5-watch-toggle{width:24px;height:24px;font-size:15px}
+body.fr-v5 .fr-v5-watch-toggle:focus-visible{outline:3px solid #fff;outline-offset:2px}
+body.fr-v5 .fr-v5-poster-card:focus-within{outline:2px solid #e55c6e;outline-offset:2px}
+/* Low, cinematic panels instead of the inherited blocky Netflix-style rectangles. */
+body.fr-v5 .fr-v5-panel{
+ border:1px solid #30383b;border-radius:3px 10px 3px 10px;
+ background:linear-gradient(145deg,#0d1314f4,#060708f9 83%);
+ box-shadow:0 11px 27px #000b,inset 0 1px #ffffff12;
+}
+body.fr-v5 .fr-v5-panel__head{border-bottom-color:#3d3d3f}
+body.fr-v5 .fr-v5-ranking__list{min-height:131px}
+body.fr-v5 .fr-v5-poster-grid .fr-v5-poster__fallback{
+ font-size:clamp(12px,1.15vw,19px);
+}
+body.fr-v5 .fr-v5-announced__row>.fr-v5-poster__art{aspect-ratio:2/3;height:auto}
+body.fr-v5 .editorial-pick__facts{
+ background:#080708d9;border:1px solid #64343e;box-shadow:inset 0 0 12px #601b252a;
+}
+body.fr-v5 .editorial-pick__title{color:#df5665;text-shadow:0 3px 9px #000d}
+body.fr-v5 .editorial-pick__cta{background:#ac1d31;color:#fff}
+body.fr-v5 .fr-v5-front{position:relative}
+@media(min-width:1000px){
+ body.fr-v5 .fr-v5-feature-panels{
+  display:grid;grid-template-columns:1.22fr 1fr .88fr;gap:10px;
+ }
+ body.fr-v5 .fr-v5-watchlist__grid{min-height:134px}
+ body.fr-v5 .fr-v5-poster-grid{gap:8px}
+ body.fr-v5 .hub-header__inside{min-height:75px}
+}
+@media(max-width:999px) and (min-width:701px){
+ body.fr-v5 .hub-header__inside{grid-template-columns:minmax(150px,195px) minmax(0,1fr) auto}
+ body.fr-v5 .fr-v5-header-tools{gap:2px}
+ body.fr-v5 .fr-v5-header-tools .fr-v5-icon-control{width:30px;height:35px;font-size:22px}
+ body.fr-v5 .fr-v5-contact-icon{width:33px;height:33px;font-size:19px}
+ body.fr-v5 .fr-v5-watchlist__grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ /* The reference has a centred logo, real controls at either side, and
+    one compact navigation row; no scrolling is required for text/content. */
+ body.fr-v5 .hub-header__inside{
+  display:grid!important;grid-template-columns:minmax(44px,1fr) auto minmax(78px,1fr);
+  grid-template-rows:54px 45px;align-items:center;gap:0 4px;
+  padding:4px 9px 2px;position:relative;min-height:0;width:100%;
+ }
+ body.fr-v5 .hub-brand{
+  grid-column:2;grid-row:1;width:min(56vw,225px);
+  height:51px;justify-self:center;align-self:center;
+ }
+ body.fr-v5 .fr-v5-header-tools{
+  display:contents;
+ }
+ body.fr-v5 .fr-v5-header-menu{
+  display:block;position:absolute;left:5px;top:7px;z-index:90;
+ }
+ body.fr-v5 .fr-v5-header-search{
+  position:absolute;right:54px;top:7px;z-index:90;
+ }
+ body.fr-v5 .fr-v5-contact-icon{
+  position:absolute;right:5px;top:14px;z-index:89;
+  width:33px;height:33px;font-size:20px;
+ }
+ body.fr-v5 .fr-v5-icon-control{width:41px;height:41px;background:transparent}
+ body.fr-v5 .fr-v5-menu-list{top:44px;left:2px;min-width:240px}
+ body.fr-v5 .fr-v5-search-form{
+  position:absolute;top:46px;right:-50px;
+  min-width:min(328px,calc(100vw - 24px));
+ }
+ body.fr-v5 .hub-tabs{
+  grid-column:1/-1;grid-row:2;
+  display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:0!important;justify-items:stretch;align-items:stretch;
+  width:100%;min-width:0;padding:0;
+  overflow:visible!important;overscroll-behavior:auto;
+  border-bottom:1px solid #56232f;
+ }
+ body.fr-v5 .hub-tabs a{
+  flex:none!important;display:flex;align-items:center;justify-content:center;
+  width:100%;min-width:0;min-height:41px;
+  padding:4px 2px!important;white-space:normal!important;
+  font:700 clamp(8px,2.3vw,10px)/1.1 system-ui,sans-serif!important;
+  letter-spacing:0!important;overflow-wrap:normal;
+  text-align:center;
+ }
+ body.fr-v5 .hub-tabs a.active,body.fr-v5 .hub-tabs a[aria-current="page"]{
+  color:#ff8796!important;border-bottom:3px solid #fa3a50!important;
+ }
+ body.fr-v5.hub-section .hub-page-intro{
+  margin:4px auto 4px;max-width:none;
+  padding:12px 12px 10px!important;
+ }
+ body.fr-v5 .hub-page-wordmark{max-height:60px;max-width:91%}
+ body.fr-v5 .hub-page-intro>p{font-size:12px;line-height:1.42}
+ body.fr-v5 .fr-v5-watchlist__grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:7px}
+ body.fr-v5 .fr-v5-watchlist__grid>.fr-v5-empty{min-height:92px}
+ body.fr-v5 .fr-v5-watchlist__title{font-size:8px}
+ body.fr-v5 .fr-v5-poster-card>.fr-v5-poster .fr-v5-poster__bottom{
+  font-size:9px;min-height:24px;padding:4px;
+ }
+ body.fr-v5 .fr-v5-watch-toggle{width:25px;height:25px;font-size:17px;right:3px;top:3px}
+ body.fr-v5 .fr-v5-feature-panels{grid-template-columns:1fr}
+ body.fr-v5 .editorial-pick__facts{background:#0a0709e8}
+}
+@media(max-width:360px){
+ body.fr-v5 .hub-brand{width:min(49vw,190px)}
+ body.fr-v5 .fr-v5-header-search{right:43px}
+ body.fr-v5 .hub-tabs a{font-size:8px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 .fr-v5-icon-control{transition:none}
+}
