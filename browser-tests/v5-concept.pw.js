@@ -245,6 +245,8 @@ test('Cinema renders with V5 at first paint and retains the release diary in doc
  await page.goto('/cinema.html');
  await expect(page.locator('body')).toHaveClass(/fr-v5/);
  await expect(page.locator('#upcoming-cinema')).toBeVisible();
+ await expect(page.locator('.fr-cinema-concept__card')).toHaveCount(4);
+ await expect(page.locator('.fr-cinema-concept__region')).toContainText('UNITED KINGDOM');
  await expect(page.locator('#recent-cinema')).toBeVisible();
  await expect(page.locator('.fr-v5-deeper')).toHaveCount(0);
  const stable=await page.evaluate(()=>{
@@ -259,6 +261,19 @@ test('Cinema renders with V5 at first paint and retains the release diary in doc
  expect(Boolean(stable.recent)).toBe(true);
  expect(stable.width).toBeLessThanOrEqual(stable.viewport+2);
  await page.screenshot({path:'test-results/visual/v5-cinema-mobile.png',fullPage:false});
+});
+
+test('Cinema highlights follow the selected country and link to the screened source',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/cinema.html');
+ await expect(page.locator('.fr-cinema-concept__card')).toHaveCount(4);
+ await page.locator('#cinema-country').selectOption('US');
+ await expect(page.locator('.fr-cinema-concept__region')).toContainText('UNITED STATES');
+ const count=await page.locator('.fr-cinema-concept__card').count();
+ expect(count).toBeGreaterThan(0);
+ const link=page.locator('.fr-cinema-concept__card a').first();
+ await expect(link).toHaveAttribute('href',/^https:\/\//);
+ await expect(link).toHaveAttribute('rel','noopener noreferrer');
 });
 
 test('TV editorial requests title and original air year and displays exact matched TMDB poster',async({page})=>{
