@@ -875,6 +875,60 @@ test('homepage ranking loading resolves to a clear pending state when no eligibl
   await expect(ranking).toContainText('Verified critic scores are not yet available.');
 });
 
+test('homepage mobile TMDB ranking rows never collide when populated with five films', async ({ page }) => {
+  const items = Array.from({ length: 5 }, (_, index) => ({
+    filmId: 'tmdb-' + (1400001 + index),
+    tmdbId: 1400001 + index,
+    title: [
+      'The Haunting of Long Forgotten Midnight Streets',
+      'Whispers from the Burial Ground',
+      'A Night No One Survives',
+      'The Door Beneath the House',
+      'Shadows and a Second Awakening'
+    ][index],
+    position: index + 1,
+    averageScore: 88 - index * 3,
+    voteCount: 55 + index * 25,
+    posterPath: '/poster-for-test.jpg'
+  }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      status: 'ranked', ratingKind: 'tmdb-community', items,
+      updatedAt: '2026-10-12T09:00:00Z'
+    })
+  }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await navigateLegacy(page, '/');
+  await expect(page.locator('#hub-ranking .hub-chart-row')).toHaveCount(5);
+  const layout = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('#hub-ranking .hub-chart-row')];
+    const bounds = node => node.getBoundingClientRect();
+    const nextSection = document.querySelector('.fr-home-updates');
+    const chart = document.querySelector('.hub-charts');
+    const annualLink = chart.querySelector('.hub-charts__all');
+    const last = bounds(rows[rows.length - 1]);
+    return {
+      rowCollision: rows.slice(1).some((row, index) => bounds(rows[index]).bottom > bounds(row).top + 1),
+      titleScoreCollision: rows.some(row => {
+        const title = row.querySelector('a');
+        const score = row.querySelector('.score');
+        return bounds(title).right > bounds(score).left + 1;
+      }),
+      chartLinkCollision: last.bottom > bounds(annualLink).top + 1,
+      sectionCollision: bounds(chart).bottom > bounds(nextSection).top + 1,
+      chartLinkClipped: bounds(annualLink).bottom > bounds(chart).bottom + 1,
+      horizontalOverflow: document.documentElement.scrollWidth > innerWidth
+    };
+  });
+  expect(layout).toEqual({
+    rowCollision: false, titleScoreCollision: false, chartLinkCollision: false,
+    sectionCollision: false, chartLinkClipped: false, horizontalOverflow: false
+  });
+  await page.screenshot({ path: 'test-results/design-refinement/home-ranking-tmdb-five-mobile.png', fullPage: true });
+});
+
 test('homepage slow chart scroll uses only validated ranking rows and pauses for keyboard focus', async ({ page }) => {
   const items = Array.from({ length: 10 }, (_, index) => ({
     filmId: `fixture-film-${index + 1}`, title: `Fixture Horror ${index + 1}`, position: index + 1,
