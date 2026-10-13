@@ -224,7 +224,7 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   // A missing licensed Fright Rating is not a numerical zero.
   meta.append(make('span', 'editorial-pick__score', typeof item.frightRating === 'number' &&
     item.frightRating >= 0 && item.frightRating <= 10 && item.ratingEvidence?.approved === true ?
-    'FRIGHT RATING ' + item.frightRating.toFixed(1) + '/10' : 'FRIGHT RATING · PENDING'));
+    'FRIGHT RATING ' + item.frightRating.toFixed(1) + '/10' : 'FRIGHT RATING · AWAITING VERIFIED SCORES'));
   const checked = dateLabel(item.checkedAt);
   if (checked) meta.append(make('span', '', 'SOURCE CHECKED ' + checked));
   content.append(meta);
