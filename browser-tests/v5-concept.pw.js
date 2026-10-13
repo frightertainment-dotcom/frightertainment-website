@@ -116,3 +116,69 @@ test('Home keeps authentic site logo and working chart with condensed presentati
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
  await page.screenshot({path:'test-results/visual/v5-home-mobile.png',fullPage:false});
 });
+
+
+test('V5 owner-concept header is usable on mobile and keeps seven real tabs',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/indie-movies.html');
+ const header=page.locator('.hub-header');
+ await expect(header.locator('.fr-v5-header-menu summary')).toBeVisible();
+ await expect(header.locator('.fr-v5-header-search summary')).toBeVisible();
+ await expect(header.locator('.fr-v5-contact-icon')).toHaveAttribute('href','/contact.html');
+ const metrics=await header.evaluate(el=>{
+  const tabs=[...el.querySelectorAll('.hub-tabs a')].map(x=>x.getBoundingClientRect());
+  return {count:tabs.length,rows:new Set(tabs.map(r=>Math.round(r.y))).size,
+    widths:tabs.map(r=>r.width),overflow:document.documentElement.scrollWidth-innerWidth};
+ });
+ expect(metrics.count).toBe(7);
+ expect(metrics.rows).toBe(1);
+ expect(Math.min(...metrics.widths)).toBeGreaterThan(35);
+ expect(metrics.overflow).toBeLessThanOrEqual(2);
+ await header.locator('.fr-v5-header-menu summary').click();
+ await expect(header.locator('.fr-v5-menu-list a')).toHaveCount(7);
+ await header.locator('.fr-v5-header-search summary').click();
+ await expect(header.locator('.fr-v5-header-menu')).not.toHaveAttribute('open','');
+ await header.locator('#fr-v5-global-search').fill('Longlegs');
+ await header.locator('.fr-v5-search-form button').click();
+ await expect(page).toHaveURL(/all-horror-movies\.html\?q=Longlegs/);
+ await expect(page.locator('#archive-global-search')).toHaveValue('Longlegs');
+ await expect(page.locator('#archive-global-results')).toBeVisible();
+});
+
+test('V5 watchlist is real: adding, persisting and removing a sourced movie',async({page})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto('/movies.html');
+ const rack=page.locator('.fr-v5-rack');
+ await expect(rack.locator('.fr-v5-poster')).toHaveCount(8);
+ const watch=page.locator('.fr-v5-watchlist');
+ await expect(watch).toContainText('Nothing saved yet');
+ const save=rack.locator('.fr-v5-watch-toggle').first();
+ await expect(save).toHaveAttribute('aria-pressed','false');
+ await save.click();
+ await expect(save).toHaveAttribute('aria-pressed','true');
+ await expect(watch.locator('.fr-v5-watchlist__saved')).toHaveCount(1);
+ const stored=await page.evaluate(()=>localStorage.getItem('frightertainment-v5-watchlist'));
+ expect(JSON.parse(stored)).toHaveLength(1);
+ await page.reload();
+ await expect(page.locator('.fr-v5-watchlist__saved')).toHaveCount(1);
+ await page.locator('.fr-v5-watchlist__saved .fr-v5-watch-toggle').click();
+ await expect(page.locator('.fr-v5-watchlist__saved')).toHaveCount(0);
+ await expect(page.locator('.fr-v5-watchlist')).toContainText('Nothing saved yet');
+});
+
+test('V5 concept stays readable at 320px without site-wide horizontal scroll',async({page})=>{
+ await page.setViewportSize({width:320,height:750});
+ await page.goto('/movies.html');
+ await expect(page.locator('.editorial-carousel')).toBeVisible();
+ await expect(page.locator('.fr-v5-header-tools .fr-v5-icon-control')).toHaveCount(2);
+ const x=await page.evaluate(()=>({
+  document:document.documentElement.scrollWidth,viewport:innerWidth,
+  poster:document.querySelector('.editorial-pick__art-frame').getBoundingClientRect().width,
+  content:document.querySelector('.editorial-pick__content').getBoundingClientRect().width,
+  header:document.querySelector('.hub-header').getBoundingClientRect().width
+ }));
+ expect(x.document).toBeLessThanOrEqual(x.viewport+2);
+ expect(x.poster).toBeGreaterThan(70);
+ expect(x.content).toBeGreaterThan(125);
+ expect(x.header).toBeLessThanOrEqual(x.viewport+2);
+});
