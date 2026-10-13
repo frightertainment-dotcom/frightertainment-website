@@ -100,7 +100,10 @@ for(const [room,path,wordmark] of [
    expect(box.width).toBeLessThanOrEqual(width+2);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width+2);
    const art=await carousel.locator('.editorial-pick__art-frame').boundingBox();
-   expect(art.width).toBeGreaterThan(Math.min(150,width*0.275));
+   // Three-column owner concept reserves a real year/source facts rail at 380-700px.
+   // Assert a readable portrait width appropriate to that visual contract.
+   const minPortrait=width>=380&&width<=700?Math.min(125,width*0.23):Math.min(150,width*0.275);
+   expect(art.width).toBeGreaterThan(minPortrait);
    expect(art.height/art.width).toBeGreaterThan(1.35);
    await expect(carousel.getByRole('button',{name:'Next editorial pick'})).toBeVisible();
   }
