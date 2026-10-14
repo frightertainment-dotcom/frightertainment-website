@@ -186,3 +186,58 @@ test('Mobile editorial story starts alongside the actual poster, not in a dead b
     expect(layout.overflow, route).toBeLessThanOrEqual(layout.viewport + 2);
   }
 });
+
+
+test('An offline catalogue keeps real Frightertainment editorial discovery visible', async ({ page }) => {
+  await page.route('**/api/catalogue?**', route => route.fulfill({status:503,body:'Unavailable'}));
+  for (const [path,sourceType] of [
+    ['/movies.html','local'],
+    ['/tv-shows.html','remote'],
+    ['/indie-movies.html','mixed']
+  ]) {
+    for (const width of [390,1440]) {
+      await page.setViewportSize({width,height:900});
+      await page.goto(path);
+      const shelf = page.locator('.fr-v5-rack');
+      const curated = shelf.locator('.fr-v5-curated-card');
+      await expect(curated).toHaveCount(6);
+      await expect(shelf.locator('.fr-v5-empty')).toContainText('Live catalogue');
+      const links = await curated.evaluateAll(nodes => nodes.map(node => ({
+        href:node.getAttribute('href'),
+        title:node.querySelector('.fr-v5-curated-card__title')?.textContent,
+        excerpt:node.querySelector('.fr-v5-curated-card__synopsis')?.textContent,
+        score:!!node.querySelector('.fr-rating-badge'),
+        scrollWidth:node.scrollWidth,
+        clientWidth:node.clientWidth
+      })));
+      for (const link of links) {
+        expect(link.title?.length,path).toBeGreaterThan(2);
+        expect(link.excerpt?.length,path).toBeGreaterThan(22);
+        expect(link.score,path+' has no invented audience score').toBe(false);
+        expect(link.scrollWidth,path+' tile overflow').toBeLessThanOrEqual(link.clientWidth+1);
+        expect(link.href,path).toMatch(/^(https:\/\/|\/films\/)/);
+      }
+      if (sourceType === 'local') expect(links.every(x=>x.href.startsWith('/films/'))).toBe(true);
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+      if (sourceType!=='local') {
+        await expect(page.locator('.fr-v5-announced, .fr-v5-trailer')).toHaveCount(0);
+      }
+    }
+  }
+});
+
+test('Cinema diary retains genuine territory-verified releases when live feed fails', async ({ page }) => {
+  await page.route('**/api/catalogue?**', route => route.fulfill({status:503,body:'Unavailable'}));
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/cinema.html');
+  const section=page.locator('#upcoming-cinema');
+  await expect(section.locator('.fr-cinema-diary__item--verified').first()).toBeVisible();
+  await expect(section.locator('.fr-catalogue-status')).toContainText('source-checked upcoming cinema dates');
+  await expect(section.locator('.fr-catalogue-status')).toContainText('Live catalogue temporarily unavailable');
+  const firstSource=section.locator('.fr-cinema-diary__source').first();
+  await expect(firstSource).toHaveAttribute('href',/^https:\/\//);
+  await page.locator('#cinema-country').selectOption('US');
+  await expect(section.locator('.fr-catalogue-status')).toContainText('UNITED STATES');
+  await expect(section.locator('.fr-cinema-diary__item--verified').first()).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+});
