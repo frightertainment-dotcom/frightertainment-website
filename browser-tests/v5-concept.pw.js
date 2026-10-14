@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 
 const items=Array.from({length:12},(_,i)=>({
- tmdbId:120000+i,mediaType:'movie',type:'movie',title:['Nightfall','The Abandoned','Hellbound','Blood Moon','Buried Alive','Cursed House','Deep Woods','Deadwater','The Witching','Basement','Night Watch','Reckoning'][i],
+ indieVerified:true,tmdbId:120000+i,mediaType:'movie',type:'movie',title:['Nightfall','The Abandoned','Hellbound','Blood Moon','Buried Alive','Cursed House','Deep Woods','Deadwater','The Witching','Basement','Night Watch','Reckoning'][i],
  posterPath:'/example'+i+'.jpg',voteAverage:7.3,voteCount:135,releaseDate:'2026-10-05',
  overview:'A source-linked horror title worth investigating.',trailerVideoId:'abcdefghijk'
 }));
