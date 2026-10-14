@@ -530,6 +530,20 @@ async function start() {
       resizeFrame = window.requestAnimationFrame(reserveEditorialSpace);
     };
     window.addEventListener('resize', resizeEditorial, {passive:true});
+    // The V5 Movies page moves this carousel into a narrower desktop editorial
+    // column after initial insertion. Its width changes without a window resize;
+    // re-measure all slides at their *actual* column width before rotation.
+    host.addEventListener('fr:editorial-layout-change', reserveEditorialSpace);
+    let measuredWidth = host.getBoundingClientRect().width;
+    const widthObserver = new ResizeObserver(entries => {
+      const nextWidth = entries[0]?.contentRect.width || 0;
+      if (nextWidth > 0 && Math.abs(nextWidth - measuredWidth) > 2) {
+        measuredWidth = nextWidth;
+        resizeEditorial();
+      }
+    });
+    widthObserver.observe(host);
+    window.addEventListener('pagehide', () => widthObserver.disconnect(), {once:true});
     document.fonts?.ready?.then(resizeEditorial).catch(() => {});
     startAutoplay();
   } catch (error) {
