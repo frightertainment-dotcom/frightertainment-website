@@ -1973,3 +1973,38 @@ body.fr-v5 .fr-v5-ranking__skeleton-score{width:78px;max-width:100%}
   min-height:49px;gap:5px;
  }
 }
+
+/* Phase 2: mobile Top 20 — readable film titles and stable rating column. */
+@media (max-width: 700px) {
+  body.fr-v5.hub-home .hub-chart-row {
+    grid-template-columns: 34px minmax(0, 1fr) 112px !important;
+    column-gap: 10px !important;
+    min-height: 66px !important;
+    padding: 12px 12px !important;
+    align-items: center !important;
+  }
+  body.fr-v5.hub-home .hub-chart-row > a {
+    min-width: 0 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
+  body.fr-v5.hub-home .hub-chart-row .score {
+    min-width: 0 !important;
+    width: 100% !important;
+    justify-content: flex-end !important;
+  }
+  body.fr-v5.hub-home .hub-chart-row .fr-rating-badge__source {
+    white-space: nowrap !important;
+  }
+}
+@media (max-width: 375px) {
+  body.fr-v5.hub-home .hub-chart-row {
+    grid-template-columns: 30px minmax(0, 1fr) 100px !important;
+    column-gap: 7px !important;
+    padding-inline: 9px !important;
+  }
+  body.fr-v5.hub-home .hub-chart-row > a { font-size: 12px !important; }
+}
