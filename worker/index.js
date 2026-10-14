@@ -197,6 +197,9 @@ async function handleTMDBMedia(env, request, catalogue = false) {
       options.catalogueVersion=5;
     }
     if (cinemaMode) options.catalogueVersion = 4;
+    // Indie V6 is a source-reviewed catalogue, not the former broad TMDB candidate feed.
+    // Change snapshot identity so previously cached studio/franchise entries cannot recur.
+    if (type === 'indie') options.catalogueVersion = 6;
   } else {
     options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
     if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');
