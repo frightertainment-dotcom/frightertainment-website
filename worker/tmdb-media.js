@@ -202,6 +202,18 @@ async function indieFilmFromSource(env, record, country) {
     indieReviewedAt:INDIE_REVIEW_DATE, indieClassification:'source-checked-independent-production',
     tmdbPopularity:Number.isFinite(raw.popularity)?raw.popularity:0 };
 }
+// Collapse simultaneous homepage Indie requests and allow short-lived edge-isolate
+// reuse without requiring a new database, external cache service or added secrets.
+const indieLookupCache = new Map();
+function indieFilmCached(env, record, country) {
+  const key = country+'|'+record.year+'|'+record.title;
+  const cached = indieLookupCache.get(key);
+  if (cached && cached.expires > Date.now()) return cached.promise;
+  const promise = indieFilmFromSource(env,record,country).catch(() => null);
+  indieLookupCache.set(key,{promise,expires:Date.now()+5*60*1000});
+  if (indieLookupCache.size > 250) indieLookupCache.clear();
+  return promise;
+}
 async function fetchVerifiedIndieCatalogue(env, options) {
   const mode = options.mode === 'chart' ? 'top' : options.mode;
   const year = Number(options.year) || new Date().getUTCFullYear();
@@ -212,7 +224,9 @@ async function fetchVerifiedIndieCatalogue(env, options) {
     records = VERIFIED_INDIE_FILMS.filter(item => item.year === year &&
       (!query || normalizeTitle(item.title).includes(query)));
   } else if (mode === 'upcoming') {
-    records = VERIFIED_INDIE_FILMS.filter(item => item.year >= new Date().getUTCFullYear() - 1);
+    // A festival premiere from months ago is NOT evidence of an upcoming opening.
+    // Only publish separately confirmed future release events in this area.
+    records = VERIFIED_INDIE_FILMS.filter(item => item.nextReleaseDate && item.nextReleaseDate > today());
   } else {
     // Show a representative recent selection, not an unverified global popularity chart.
     records = VERIFIED_INDIE_FILMS.filter(item => item.year >= new Date().getUTCFullYear() - 3);
@@ -226,7 +240,7 @@ async function fetchVerifiedIndieCatalogue(env, options) {
   const resolved = await mapBounded(chunk, async record => {
     // Festival records remain discoverable even if TMDB is missing a match.
     // Such source-only items have no invented poster, trailer, date or rating.
-    try { return await indieFilmFromSource(env,record,options.country || 'GB') || sourcedIndieFallback(record); }
+    try { return await indieFilmCached(env,record,options.country || 'GB') || sourcedIndieFallback(record); }
     catch { return sourcedIndieFallback(record); }
   });
   const now = today();
