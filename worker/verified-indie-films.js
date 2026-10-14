@@ -54,7 +54,7 @@ const records = [
   ['Amulet',2020,'s20'],
   ['The Hole in the Ground',2019,'s19'],
   ['Depraved',2019,'glass'],
-  ['The Innkeepers',2010,'glass'],
+  ['The Innkeepers',2011,'glass'],
   ['Stake Land',2010,'glass'],
   ['Bitter Feast',2010,'glass'],
   ['The House of the Devil',2009,'glass'],
