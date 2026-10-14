@@ -113,7 +113,7 @@
           let data = await response.json();
           if (request !== requestNumber) return;
           if (!Array.isArray(data.items)) throw new Error('Catalogue unavailable');
-          let items = data.items.filter(item => item.title && (id(item) > 0 || (type === 'indie' && item.indieVerified && indieEvidence(item))));
+          let items = data.items.filter(item => item.title && (type === 'indie' ? item.indieVerified === true && (id(item) > 0 || indieEvidence(item)) : id(item) > 0));
           if (type === 'indie' && Array.isArray(data.availableYears) && yearSelect) {
             const verifiedYears = data.availableYears.filter(y => Number.isInteger(y) && y >= 1888 && y <= thisYear);
             if (verifiedYears.length && yearSelect.options.length !== verifiedYears.length) {
