@@ -24,6 +24,32 @@
       atmosphere.setAttribute('aria-hidden', 'true');
       atmosphere.append(span('veil'), span('mist'), span('beam'), span('particles'));
       scene.append(atmosphere);
+      // Desktop-only projected light follows the viewer very gently.
+      // Text, links and film details never move, and touch devices skip it.
+      if (window.matchMedia('(pointer:fine)').matches) {
+        let scheduled = false;
+        let pointerX = 73, pointerY = 37;
+        scene.addEventListener('pointermove', event => {
+          if (motion.matches || body.classList.contains('fr-motion-paused')) return;
+          const rect = scene.getBoundingClientRect();
+          if (!rect.width || !rect.height) return;
+          pointerX = Math.max(5, Math.min(95, (event.clientX - rect.left) * 100 / rect.width));
+          pointerY = Math.max(5, Math.min(95, (event.clientY - rect.top) * 100 / rect.height));
+          if (scheduled) return;
+          scheduled = true;
+          window.requestAnimationFrame(() => {
+            scheduled = false;
+            if (scene.isConnected) {
+              scene.style.setProperty('--fr-light-x', pointerX.toFixed(1) + '%');
+              scene.style.setProperty('--fr-light-y', pointerY.toFixed(1) + '%');
+            }
+          });
+        }, {passive:true});
+        scene.addEventListener('pointerleave', () => {
+          scene.style.removeProperty('--fr-light-x');
+          scene.style.removeProperty('--fr-light-y');
+        }, {passive:true});
+      }
     }
   };
 
