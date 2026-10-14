@@ -1519,3 +1519,103 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    margin-top:0!important;flex:0 0 auto!important;
  }
 }
+
+
+/* Editorial first-fold balance: the film story occupies the right of the poster,
+   not a third of a phone followed by an enormous empty band. */
+@media(min-width:360px) and (max-width:430px){
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick{
+   display:grid!important;
+   grid-template-columns:minmax(118px,37%) minmax(0,1fr)!important;
+   grid-template-areas:'art copy' 'facts facts'!important;
+   grid-template-rows:auto auto!important;
+   column-gap:clamp(9px,2.7vw,13px)!important;
+   row-gap:14px!important;
+   align-items:start!important;
+   min-height:0!important;height:auto!important;block-size:auto!important;
+   padding:41px 11px 18px!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__art{
+   grid-area:art!important;grid-column:1!important;grid-row:1!important;
+   align-self:start!important;justify-content:flex-start!important;
+   width:100%!important;min-height:0!important;height:auto!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__art-frame{
+   width:100%!important;min-width:118px!important;max-width:100%!important;
+   aspect-ratio:2/3;
+ }
+ body.fr-v5[data-theme='podcasts'] .editorial-pick__art-frame{aspect-ratio:1!important}
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__content{
+   grid-area:copy!important;grid-column:2!important;grid-row:1!important;
+   align-self:start!important;justify-content:flex-start!important;
+   min-width:0!important;max-height:none!important;
+   height:auto!important;overflow:visible!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__title{
+   font-size:clamp(24px,6.2vw,29px)!important;
+   line-height:1.02!important;text-wrap:balance;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__series{
+   font-size:9px!important;letter-spacing:.06em!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__genre{
+   font-size:9px!important;line-height:1.3!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__synopsis{
+   font-size:12px!important;line-height:1.5!important;
+   margin-top:11px!important;max-height:none!important;
+   overflow:visible!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__why{
+   font-size:12px!important;line-height:1.36!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__links{
+   display:flex!important;flex-wrap:wrap!important;gap:5px!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__facts{
+   grid-area:facts!important;grid-column:1/-1!important;grid-row:2!important;
+ }
+}
+@media(max-width:359px){
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__art{
+   justify-content:center!important;
+ }
+ body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__art-frame{
+   width:min(76%,240px)!important;min-width:150px!important;
+   max-width:240px!important;
+ }
+}
+
+/* Put the programme and editorial stories within the desktop first fold:
+   the environment photograph remains a hero, not a 600px empty spacer. */
+@media(min-width:1000px){
+ body.fr-v5.hub-section[data-theme] .hub-page-intro{
+   min-height:clamp(327px,25vw,385px)!important;
+   margin-bottom:14px!important;
+   padding:clamp(29px,3.1vw,48px)!important;
+ }
+ body.fr-v5[data-theme='cinema'] .hub-page-intro{min-height:332px!important}
+ body.fr-v5[data-theme='movies'] .hub-page-intro{min-height:367px!important}
+ body.fr-v5[data-theme='tv'] .hub-page-intro{min-height:354px!important}
+ body.fr-v5[data-theme='indie'] .hub-page-intro{min-height:354px!important}
+ body.fr-v5[data-theme='games'] .hub-page-intro{min-height:354px!important}
+ body.fr-v5[data-theme='podcasts'] .hub-page-intro{min-height:354px!important}
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{
+   padding:27px 20px 10px!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-marquee__eyebrow{
+   margin:5px 0 8px!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head>a{
+   margin-top:7px!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{
+   padding-top:9px!important;
+ }
+}
+@media(min-width:701px) and (max-width:999px){
+ body.fr-v5.hub-section[data-theme] .hub-page-intro{
+   min-height:clamp(305px,33vw,357px)!important;
+   padding:clamp(26px,3.5vw,40px)!important;
+ }
+}
