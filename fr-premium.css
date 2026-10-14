@@ -1632,3 +1632,25 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    letter-spacing:-.045em!important;
  }
 }
+
+
+/* All five home destinations live in a single shared grid track on wider
+   screens; art can subtly brighten without shifting cards out of alignment. */
+@media(min-width:901px){
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-showcase__bottom{
+   grid-auto-flow:row!important;
+   align-items:stretch!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile{
+   grid-row:1!important;
+   margin:0!important;top:0!important;bottom:auto!important;
+   align-self:stretch!important;justify-self:stretch!important;
+   transform:none!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile:hover{
+   transform:none!important;filter:brightness(1.1)!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile:hover::before{
+   transform:scale(1.045);transition:transform .4s ease!important;
+ }
+}
