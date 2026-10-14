@@ -229,7 +229,7 @@ async function fetchVerifiedIndieCatalogue(env, options) {
     records = VERIFIED_INDIE_FILMS.filter(item => item.nextReleaseDate && item.nextReleaseDate > today());
   } else {
     // Show a representative recent selection, not an unverified global popularity chart.
-    records = VERIFIED_INDIE_FILMS.filter(item => item.year >= new Date().getUTCFullYear() - 3);
+    records = VERIFIED_INDIE_FILMS.filter(item => item.year >= new Date().getUTCFullYear() - 3).slice(0,12);
   }
   const count = records.length;
   // 12 genuine selections at a time, not 40 unverified candidates per request.
