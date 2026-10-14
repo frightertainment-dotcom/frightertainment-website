@@ -49,6 +49,10 @@ test('Priority assets are discoverable from document head without blocking font 
 });
 
 test('Verified editorial bootstraps on first paint without three blocking JSON fetches',async({page})=>{
+  await page.route('**/api/catalogue?**',async route=>{
+    await new Promise(resolve=>setTimeout(resolve,2600));
+    await route.fulfill({status:503,body:'Unavailable'});
+  });
   for(const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html','/games.html']){
     const hits=[];
     await page.route('**/data/editorial*.json', async request=>{
