@@ -1662,3 +1662,26 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    margin-bottom:5px!important;
  }
 }
+
+/* Final cross-viewport alignment and first-fold cinema release clearance. */
+@media(min-width:901px){
+ body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile{
+   position:relative!important;inset:auto!important;
+   grid-row:1!important;align-self:stretch!important;
+   margin:0!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom{
+   grid-template-rows:minmax(0,auto)!important;
+   align-items:stretch!important;
+ }
+}
+@media(min-width:1000px){
+ body.fr-v5[data-theme='cinema'] .hub-page-intro{
+   min-height:312px!important;
+   padding-top:29px!important;padding-bottom:22px!important;
+   margin-bottom:0!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept{
+   margin-top:0!important;padding-top:9px!important;
+ }
+}
