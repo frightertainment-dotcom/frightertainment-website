@@ -503,6 +503,11 @@ async function start() {
         candidate.style.setProperty('max-block-size', 'none', 'important');
         candidate.style.setProperty('height', 'auto', 'important');
         candidate.style.setProperty('block-size', 'auto', 'important');
+        if (theme === 'movies' && window.innerWidth >= 1600 && prepared.mediaIdentity && !artHasRights(prepared)) {
+          candidate.querySelector('.editorial-pick__facts')?.append(make('small', 'editorial-pick__tmdb-credit', 'Poster and optional audience score: TMDB. TMDB does not endorse this site. See Credits for attribution.'));
+          const extra = candidate.querySelector('.editorial-pick__links');
+          if (extra && !extra.querySelector('.editorial-pick__media-trailer')) extra.append(make('span', 'editorial-pick__source editorial-pick__media-trailer', 'WATCH OFFICIAL TRAILER ↗'));
+        }
         probe.replaceChildren(candidate);
         tallest = Math.max(tallest, Math.ceil(candidate.getBoundingClientRect().height));
       }
