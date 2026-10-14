@@ -1908,3 +1908,68 @@ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile :is(.hub-tile__link,.fr-trai
   body.fr-v5 .fr-v5-curated-card{transition:none!important;transform:none!important}
   body.fr-v5 .fr-v5-curated-card:is(:hover,:focus-visible){transform:none!important}
 }
+
+
+/* No visual swap: stable reserved imagery and ranking tracks are rendered in
+   the premium geometry before optional live API responses arrive. */
+body.fr-v5 .fr-v5-poster-skeleton {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  background:none;
+  box-sizing:border-box;
+  pointer-events:none;
+}
+body.fr-v5 .fr-v5-poster-skeleton__art {
+  display:block;
+  flex:0 0 auto;
+  width:100%;
+  min-width:0;
+  aspect-ratio:2/3;
+  background:
+    linear-gradient(135deg,#0c0b0eb8,#0a0a0db0 50%,#1e1319ba),
+    var(--fr-scene-current) center/cover no-repeat,
+    #100e13;
+  box-shadow:0 15px 30px #0008;
+  opacity:.64;
+}
+body.fr-v5 .fr-v5-poster-skeleton__title {
+  display:block;
+  width:72%;
+  max-width:72%;
+  height:12px;
+  margin:11px 0 17px;
+  background:linear-gradient(90deg,#bba6ab24,#5f4b5321,#15141a13);
+  border-radius:2px;
+}
+body.fr-v5 .fr-v5-poster-skeleton:nth-child(3n+2) .fr-v5-poster-skeleton__title{width:56%}
+body.fr-v5 .fr-v5-poster-skeleton:nth-child(3n) .fr-v5-poster-skeleton__title{width:85%}
+body.fr-v5 .fr-v5-ranking__skeleton-entry {
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:29px minmax(0,1fr) minmax(87px,max-content);
+  align-items:center;
+  min-width:0;
+  min-height:47px;
+  gap:7px;
+  padding:9px 5px;
+  border:0;
+  border-bottom:1px solid #ddd6d015;
+}
+body.fr-v5 .fr-v5-ranking__skeleton-entry>span{
+  display:block;
+  border-radius:2px;
+  height:10px;
+  background:linear-gradient(90deg,#9f8c9426,#48404c1c);
+}
+body.fr-v5 .fr-v5-ranking__skeleton-position{width:17px}
+body.fr-v5 .fr-v5-ranking__skeleton-title{width:clamp(54px,72%,176px)}
+body.fr-v5 .fr-v5-ranking__skeleton-score{width:78px;max-width:100%}
+@media(max-width:700px){
+ body.fr-v5 .fr-v5-ranking__skeleton-entry{
+  grid-template-columns:23px minmax(0,1fr) minmax(81px,max-content);
+  min-height:49px;gap:5px;
+ }
+}

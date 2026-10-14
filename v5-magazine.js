@@ -303,28 +303,29 @@
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-poster-grid');
   grid.setAttribute('aria-live','polite');
-  grid.append(el('p','fr-v5-loading','Finding source-linked releases…'));
+  // Image-sized reserved slots keep the exact final shelf geometry. Do not
+  // switch a visible editorial layout into a differently sized poster grid.
+  const count=config.type==='indie'?6:8;
+  const slots=Array.from({length:count},()=>{
+   const card=el('div','fr-v5-poster-skeleton');
+   card.setAttribute('aria-hidden','true');
+   card.append(el('span','fr-v5-poster-skeleton__art'),
+    el('span','fr-v5-poster-skeleton__title'));
+   return card;
+  });
+  grid.replaceChildren(...slots);
   p.append(grid);host.append(p);
-  // Populate real, attributed editorial selections immediately while the
-  // remote catalogue is checked. Later source-backed posters replace them
-  // without exposing a blank section or pretending the picks are live.
-  const initial=showCuratedFallback(p,config.type);
-  const clearEditorial=()=>{
-   p.querySelector('.fr-v5-curated-grid')?.remove();
-   p.querySelector('.fr-v5-curated-intro')?.remove();
-  };
   try{
    const data=await fetchList(config.type,config.mode);
-   await initial;
    if(!data.length){
     mockFreeState(grid,'Live catalogue has no qualifying titles yet. Explore our sourced editorial selections below.');
+    await showCuratedFallback(p,config.type);
     return;
    }
-   grid.replaceChildren(...data.slice(0,config.type==='indie'?6:8).map(x=>poster(x,config.type)));
-   clearEditorial();
+   grid.replaceChildren(...data.slice(0,count).map(x=>poster(x,config.type)));
   }catch{
-   await initial;
    mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');
+   await showCuratedFallback(p,config.type);
   }
  };
  const addNotices=async(parent)=>{
@@ -349,7 +350,18 @@
  const addRanking=async(parent)=>{
   const p=panel('fr-v5-ranking','TOP 20 HORROR','Verified viewer rankings.','/top-20/'+new Date().getFullYear()+'/');
   const list=el('ol','fr-v5-ranking__list');p.append(list);parent.append(p);
-  list.append(el('li','fr-v5-loading','Loading verified annual scores…'));
+  // Reserve real row heights until sourced rankings arrive. Unlike the
+  // former one-line loading label, replacing this ledger will not move
+  // the poster shelves hundreds of pixels after first paint.
+  list.setAttribute('aria-label','Source-backed annual horror rankings');
+  list.append(...Array.from({length:10},()=>{
+   const row=el('li','fr-v5-ranking__skeleton-entry');
+   row.setAttribute('aria-hidden','true');
+   row.append(el('span','fr-v5-ranking__skeleton-position'),
+    el('span','fr-v5-ranking__skeleton-title'),
+    el('span','fr-v5-ranking__skeleton-score'));
+   return row;
+  }));
   try {
    const response=await fetch('/api/rankings?year='+new Date().getFullYear(),{headers:{accept:'application/json'}});
    if(!response.ok)throw Error('ranking unavailable');
