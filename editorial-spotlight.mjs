@@ -320,7 +320,14 @@ async function start() {
   if (!config || !intro) return;
 
   try {
-    const sources = await Promise.all([
+    // Generated at build time from already-public verified editorial files.
+    // Fast path runs in the same task as the first layout; slow path remains
+    // available for local development or a genuinely missing bootstrap file.
+    const bootstrap=window.FR_EDITORIAL_BOOTSTRAP;
+    const sources=bootstrap?.schemaVersion===1 && bootstrap.editorial &&
+      bootstrap.settings && bootstrap.overviews
+      ? [theme==='movies'?null:bootstrap.editorial, bootstrap.settings, bootstrap.overviews]
+      : await Promise.all([
       theme === 'movies' ? Promise.resolve(null) : fetch('/data/editorial.json').then(response => {
         if (!response.ok) throw new Error('Editorial source not reachable');
         return response.json();

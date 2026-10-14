@@ -47,3 +47,25 @@ test('Priority assets are discoverable from document head without blocking font 
     expect(state.css).toBe(true);
   }
 });
+
+test('Verified editorial bootstraps on first paint without three blocking JSON fetches',async({page})=>{
+  for(const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html','/games.html']){
+    const hits=[];
+    await page.route('**/data/editorial*.json', async request=>{
+      hits.push(request.request().url());
+      await new Promise(resolve=>setTimeout(resolve,1400));
+      await request.continue();
+    });
+    await page.route('**/data/movie-editorial-overviews.json', async request=>{
+      hits.push(request.request().url());
+      await new Promise(resolve=>setTimeout(resolve,1400));
+      await request.continue();
+    });
+    await page.goto(route,{waitUntil:'domcontentloaded'});
+    await expect(page.locator('.editorial-carousel')).toBeVisible({timeout:5000});
+    await expect(page.locator('.fr-v5-front')).toBeVisible({timeout:5000});
+    expect(hits,'No start-up editorial JSON fetches required on '+route).toEqual([]);
+    await expect(page.locator('.fr-v5-curated-card').first()).toBeVisible();
+    await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+  }
+});

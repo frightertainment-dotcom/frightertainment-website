@@ -255,6 +255,10 @@
    }
    const key=type==='tv'?'tv-shows':type==='indie'?'indie-movies':'';
    if(!key)return [];
+   const cached=window.FR_EDITORIAL_BOOTSTRAP?.editorial?.[key];
+   if(Array.isArray(cached))return cached
+     .filter(x=>x&&typeof x.title==='string'&&x.title.trim().length>0&&
+       typeof x.description==='string'&&curatedLink(x.sourceUrl)).slice(0,6);
    const response=await fetch('/data/editorial.json',{headers:{accept:'application/json'}});
    if(!response.ok)throw Error('Curated recommendations unavailable');
    const data=await response.json();
@@ -301,11 +305,27 @@
   grid.setAttribute('aria-live','polite');
   grid.append(el('p','fr-v5-loading','Finding source-linked releases…'));
   p.append(grid);host.append(p);
+  // Populate real, attributed editorial selections immediately while the
+  // remote catalogue is checked. Later source-backed posters replace them
+  // without exposing a blank section or pretending the picks are live.
+  const initial=showCuratedFallback(p,config.type);
+  const clearEditorial=()=>{
+   p.querySelector('.fr-v5-curated-grid')?.remove();
+   p.querySelector('.fr-v5-curated-intro')?.remove();
+  };
   try{
    const data=await fetchList(config.type,config.mode);
-   if(!data.length){mockFreeState(grid,'Live catalogue has no qualifying titles yet. Explore our sourced editorial selections below.');await showCuratedFallback(p,config.type);return;}
+   await initial;
+   if(!data.length){
+    mockFreeState(grid,'Live catalogue has no qualifying titles yet. Explore our sourced editorial selections below.');
+    return;
+   }
    grid.replaceChildren(...data.slice(0,config.type==='indie'?6:8).map(x=>poster(x,config.type)));
-  }catch{mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');await showCuratedFallback(p,config.type);}
+   clearEditorial();
+  }catch{
+   await initial;
+   mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');
+  }
  };
  const addNotices=async(parent)=>{
   const p=panel('fr-v5-notices','LATEST HORROR DROPS','Source-checked UK release notices.','#straight-to-stream');
