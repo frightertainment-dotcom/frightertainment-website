@@ -36,8 +36,13 @@ async function markHtmlNoIndex(directory) {
     if (entry.isDirectory()) {
       await markHtmlNoIndex(file);
     } else if (entry.name.endsWith('.html')) {
-      const html = await readFile(file, 'utf8');
+      let html = await readFile(file, 'utf8');
       if (!/<head(?:\s|>)/i.test(html)) throw new Error('HTML head missing in ' + file.href);
+      // Generated film/ranking pages can predate the current build: ensure
+      // supporting routes receive the same visual identity without modifying
+      // their source claims or accidentally overriding the seven V5 landings.
+      if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
+        html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
       await writeFile(file, html.replace(/<head(\s[^>]*)?>/i,
         match => match + '<meta name="robots" content="noindex,nofollow,noarchive">'));
     }

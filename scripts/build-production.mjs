@@ -63,7 +63,9 @@ async function instrumentPublicHtml(directory) {
     const current = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
     if (entry.isDirectory()) { await instrumentPublicHtml(current); continue; }
     if (!entry.name.endsWith('.html')) continue;
-    const html = await readFile(current, 'utf8');
+    let html = await readFile(current, 'utf8');
+    if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
+      html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
     await writeFile(current, injectWebAnalytics(html, publicWebAnalyticsSiteToken));
   }
 }
