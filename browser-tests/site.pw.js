@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
 const tinyPoster = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Yk4zh8AAAAASUVORK5CYII=', 'base64');
-const catalogueFixture = type => Array.from({length:3},(_,index)=>({tmdbId:100+index,mediaType:type==='tv'?'tv':'movie',title:['The Haunted House','Nightmare Returns','The Last Broadcast'][index],posterPath:'/poster.jpg',voteAverage:7.2,voteCount:300,releaseDate:'2026-01-02',overview:'A horror story unfolds.'}));
+const catalogueFixture = type => Array.from({length:3},(_,index)=>({indieVerified:type==='indie',tmdbId:100+index,mediaType:type==='tv'?'tv':'movie',title:['The Haunted House','Nightmare Returns','The Last Broadcast'][index],posterPath:'/poster.jpg',voteAverage:7.2,voteCount:300,releaseDate:'2026-01-02',overview:'A horror story unfolds.'}));
 test.beforeEach(async ({page}) => {
   await page.route('**/image.tmdb.org/**',route=>route.fulfill({contentType:'image/png',body:tinyPoster}));
   await page.route('**/api/media?**',route=>route.fulfill({json:{item:null,status:'unavailable'}}));
