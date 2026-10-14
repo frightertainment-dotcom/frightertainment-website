@@ -60,7 +60,7 @@ test('Cinema release marquee stays country-specific, source-linked and legible a
           height:container.height
         };
       })
-    })));
+    }));
     expect(checks.scrollWidth, String(width)).toBeLessThanOrEqual(checks.windowWidth+2);
     for (const card of checks.cards) {
       expect(card.titleAndDateSeparated, String(width)+' '+card.title).toBeTruthy();
