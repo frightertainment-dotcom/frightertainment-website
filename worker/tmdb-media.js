@@ -247,10 +247,10 @@ async function fetchVerifiedIndieCatalogue(env, options) {
   let items = resolved.filter(Boolean);
   if(mode === 'upcoming') items = items.filter(item => item.releaseDate && item.releaseDate > now)
     .sort((a,b) => a.releaseDate.localeCompare(b.releaseDate));
-  if(mode === 'trending') items = items.filter(item => item.releaseDate && item.releaseDate <= now)
+  if(mode === 'trending') items = items.filter(item => item.firstReleaseDate && item.firstReleaseDate <= now)
     .sort((a,b) => b.tmdbPopularity-a.tmdbPopularity || b.voteCount-a.voteCount).slice(0,12);
   if(mode === 'top') items = items.filter(item => item.voteCount >= 50 && item.voteAverage !== null &&
-    item.releaseDate && item.releaseDate <= now)
+    item.firstReleaseDate && item.firstReleaseDate <= now)
     .sort((a,b) => b.voteAverage-a.voteAverage || b.voteCount-a.voteCount)
     .slice(0,20).map((item,index) => ({
       ...item,position:index+1,averageScore:Math.round(item.voteAverage*10)
