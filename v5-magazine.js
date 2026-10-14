@@ -389,7 +389,7 @@
   try{
    const data=await fetchList(type,'trending');
    const featured=data.find(x=>/^[A-Za-z0-9_-]{11}$/.test(mediaKey(x)));
-   if(!featured){p.remove();return;}
+   if(!featured){if(type==='indie')mockFreeState(node,'No matched official indie trailer is currently available.');else p.remove();return;}
    const a=link('',filmHref(featured,type),'fr-v5-trailer__film');
    a.append(image(featured,type),el('strong','',featured.title));
    const play=link('▶','#','fr-v5-trailer__play');
@@ -404,7 +404,7 @@
   try{
    const data=await fetchList(type,'upcoming');
    const film=data.find(x=>x&&valid(x));
-   if(!film){p.remove();return;}
+   if(!film){if(type==='indie')mockFreeState(node,'Upcoming independent horror releases will appear here when their dates are confirmed.');else p.remove();return;}
    const a=link('',filmHref(film,type),'fr-v5-announced__row');
    a.append(image(film,type));
    const copy=el('div','fr-v5-announced__copy');
