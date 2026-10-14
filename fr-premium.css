@@ -1482,3 +1482,40 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    font-size:clamp(13px,1.5vw,19px)!important;
  }
 }
+
+
+/* Five destination posters share a deliberate baseline from 901px upwards.
+   Smaller tablets still retain the more spacious three/two-column layout. */
+@media(min-width:901px) and (max-width:1150px){
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-showcase__bottom{
+   display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+   align-items:stretch!important;gap:10px!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{
+   min-height:300px!important;height:100%!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__content{
+   position:relative!important;
+   display:flex!important;flex-direction:column!important;
+   justify-content:flex-end!important;align-items:flex-start!important;
+   height:100%!important;min-height:100%!important;
+   padding:11px!important;gap:6px!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile h3{
+   font-size:clamp(20px,2.1vw,25px)!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__link{
+   margin-top:0!important;flex:0 0 auto!important;
+   width:100%!important;font-size:9px!important;
+   white-space:nowrap!important;min-height:34px!important;
+ }
+}
+@media(min-width:1151px){
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__content{
+   position:relative!important;height:100%!important;
+   min-height:100%!important;justify-content:flex-end!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__link{
+   margin-top:0!important;flex:0 0 auto!important;
+ }
+}
