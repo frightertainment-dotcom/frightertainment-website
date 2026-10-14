@@ -1278,16 +1278,6 @@ body.fr-v5 .editorial-carousel__dot::before{width:7px;height:7px}
  body.fr-v5 .editorial-carousel__controls{height:33px;min-height:33px;max-height:33px}
  body.fr-v5 .editorial-carousel__dots{gap:1px}
  body.fr-v5 .editorial-carousel__dot{width:28px!important;height:29px!important}
- body.fr-v5 .editorial-pick__source{
-  width:auto!important;min-height:19px!important;
-  padding:2px 0!important;font-size:8px!important;
-  background:transparent!important;border:0!important;
-  text-decoration:underline!important;color:#e9b3b8!important;
- }
- body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro>.hub-eyebrow,
- body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro>.hub-eyebrow{
-  display:none;
- }
 }
 
 body.fr-v5 .editorial-carousel__controls[hidden],
@@ -1306,9 +1296,6 @@ body.fr-v5 .editorial-carousel__pause[hidden]{display:none!important}
  }
  body.fr-v5 .editorial-pick__meta{
   margin:3px 0 0;padding-top:3px;gap:2px 6px;
- }
- body.fr-v5 .editorial-pick__links .editorial-pick__source{
-  display:none!important;
  }
  body.fr-v5 .editorial-pick__links{margin-top:3px}
  body.fr-v5 .editorial-pick__why{-webkit-line-clamp:1}

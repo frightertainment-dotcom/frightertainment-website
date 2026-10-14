@@ -1,13 +1,13 @@
 import { navigateLegacy,openCompleteDiscovery } from './helpers/open-full-discovery.mjs';
 import {test,expect} from '@playwright/test';
-const film = {tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,trailer:{key:'abcdefghijk',name:'Official trailer'}};
-const series = {...film,tmdbId:456,mediaType:'tv',title:'Haunted Series'};
+const film = {tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,ratingKind:'tmdb-community',sourceUrl:'https://www.themoviedb.org/movie/123',trailer:{key:'abcdefghijk',name:'Official trailer'}};
+const series = {...film,tmdbId:456,mediaType:'tv',title:'Haunted Series',sourceUrl:'https://www.themoviedb.org/tv/456'};
 test('indie charts and paged archive use TMDB metadata and year changes',async({page})=>{
  await page.route('**/api/catalogue?**',route=>{const query=new URL(route.request().url()).searchParams;route.fulfill({json:{items:[film],page:Number(query.get('page')),totalPages:query.get('mode')==='archive'?2:1,totalResults:2,status:'ready'}});});
  await navigateLegacy(page,'/indie-movies.html');
  await expect(page.locator('#chart .fr-media-card')).toHaveCount(1);
  await expect(page.locator('#chart')).toContainText('7.8');
- await expect(page.locator('#chart img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
+ await expect(page.locator('#chart .tmdb-card-poster')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
  await expect(page.locator('#chart [data-trailer-video]')).toHaveAttribute('data-trailer-video','abcdefghijk');
  const changed=page.waitForRequest(req=>req.url().includes('/api/catalogue?')&&req.url().includes('year=2025')&&req.url().includes('mode=chart'));
  await page.locator('#chart select').selectOption('2025');await changed;
@@ -22,8 +22,8 @@ test('TV sections and internal detail render series metadata without Fright Rati
  for(const section of ['chart','trending','upcoming','archive'])await expect(page.locator('#'+section+' .fr-media-card')).toHaveCount(1);
  await page.locator('#chart h3 a').click();
  await expect(page.locator('#media-detail h1')).toHaveText('Haunted Series');
- await expect(page.locator('#media-detail img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
- await expect(page.locator('#media-detail')).toContainText('120 viewer votes');
+ await expect(page.locator('#media-detail .fr-media-detail__poster img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
+ await expect(page.locator('#media-detail .fr-rating-badge')).toHaveAttribute('aria-label',/TMDB audience rating 7\.8 out of 10 from 120 votes/);
  await expect(page.locator('#media-detail')).not.toContainText('FRIGHT RATING');
 });
 

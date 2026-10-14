@@ -209,16 +209,18 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
       card.replaceChildren(
         make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'),
         make('strong', 'editorial-pick__art-title', item.title),
-        make('span', 'editorial-pick__art-sub', 'FRIGHTERTAINMENT ORIGINAL DISPLAY ART · NOT AN OFFICIAL POSTER')
+        make('span', 'editorial-pick__art-sub', 'ORIGINAL FRIGHTERTAINMENT ART')
       );
+      card.setAttribute('aria-label', 'Original Frightertainment art, not an official film poster');
       card.classList.remove('editorial-pick__art-frame--poster');
     }, {once:true});
     card.append(img);
     card.append(make('small', 'editorial-pick__art-credit', 'Artwork © ' + item.posterCredit));
   } else {
+    card.setAttribute('aria-label', 'Original Frightertainment art, not an official film poster');
     card.append(make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'));
     card.append(make('strong', 'editorial-pick__art-title', item.title));
-    card.append(make('span', 'editorial-pick__art-sub', 'FRIGHTERTAINMENT ORIGINAL DISPLAY ART · NOT AN OFFICIAL POSTER'));
+    card.append(make('span', 'editorial-pick__art-sub', 'ORIGINAL FRIGHTERTAINMENT ART'));
   }
   art.append(card);
 
@@ -233,10 +235,12 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   content.append(make('p', 'editorial-pick__synopsis', item.description));
   if (extraText) content.append(make('p', 'editorial-pick__why', extraText));
   const meta = make('div', 'editorial-pick__meta');
-  // A missing licensed Fright Rating is not a numerical zero.
-  meta.append(make('span', 'editorial-pick__score', typeof item.frightRating === 'number' &&
-    item.frightRating >= 0 && item.frightRating <= 10 && item.ratingEvidence?.approved === true ?
-    'FRIGHT RATING ' + item.frightRating.toFixed(1) + '/10' : 'FRIGHT RATING · AWAITING VERIFIED SCORES'));
+  if (item.mediaIdentity && ['movie','tv'].includes(item.mediaIdentity.type || 'movie')) {
+    const score = make('span', 'editorial-pick__score');
+    window.FRRatingBadge.render(score, {score:null,source:'tmdb-community',voteCount:null,
+      size:'standard',state:'loading'});
+    meta.append(score);
+  }
   const checked = dateLabel(item.checkedAt);
   if (checked) meta.append(make('span', '', 'SOURCE CHECKED ' + checked));
   content.append(meta);
@@ -259,7 +263,12 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
 }
 async function loadPoster(feature, item, isCurrent) {
   const card = feature.querySelector('.editorial-pick__art-frame');
-  if (!item.mediaIdentity || artHasRights(item)) return;
+  const score = feature.querySelector('.editorial-pick__score');
+  const unavailable = () => {
+    if (isCurrent() && score?.isConnected) window.FRRatingBadge.render(score,
+      {score:null,source:'tmdb-community',voteCount:null,size:'standard'});
+  };
+  if (!item.mediaIdentity) return;
   const params = new URLSearchParams({type:item.mediaIdentity.type || 'movie'});
   if (item.mediaIdentity.id) params.set('id', item.mediaIdentity.id);
   else if (item.mediaIdentity.imdb) params.set('imdb', item.mediaIdentity.imdb);
@@ -269,9 +278,16 @@ async function loadPoster(feature, item, isCurrent) {
   } else return;
   try {
     const response = await fetch('/api/media?' + params, {headers:{accept:'application/json'}});
-    if (!response.ok) return;
+    if (!response.ok) { unavailable(); return; }
     const media = (await response.json())?.item;
-    if (!isCurrent() || !matchedMedia(item, media)) return;
+    if (!isCurrent()) return;
+    if (!matchedMedia(item, media)) { unavailable(); return; }
+    if (score?.isConnected) {
+      if (media.ratingKind === 'tmdb-community')
+        window.FRRatingBadge.render(score, window.FRRatingBadge.fromTmdbMedia(media, 'standard'));
+      else unavailable();
+    }
+    if (artHasRights(item)) return;
     const image = new Image();
     image.alt = 'Poster for ' + item.title + ' (' + item.year + '), via TMDB';
     image.className = 'editorial-pick__poster';
@@ -285,9 +301,6 @@ async function loadPoster(feature, item, isCurrent) {
     card.append(make('small', 'editorial-pick__art-credit', 'Poster via TMDB · ' + item.title + ' (' + item.year + ')'));
     feature.querySelector('.editorial-pick__facts').append(make('small', 'editorial-pick__tmdb-credit',
       'Poster and optional audience score: TMDB. TMDB does not endorse this site. See Credits for attribution.'));
-    const score = feature.querySelector('.editorial-pick__score');
-    if (Number.isFinite(media.voteAverage) && media.voteAverage > 0 && media.voteCount > 0)
-      score.textContent = 'TMDB AUDIENCE · ' + media.voteAverage.toFixed(1) + '/10 · ' + media.voteCount + ' votes';
     if (media.trailer?.source === 'TMDB official video listing' &&
         /^https:\/\/www\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}$/.test(media.trailer.url || '')) {
       const links = feature.querySelector('.editorial-pick__links');
@@ -296,6 +309,7 @@ async function loadPoster(feature, item, isCurrent) {
     }
   } catch {
     // Network and image failures retain the labelled original display art.
+    unavailable();
   }
 }
 

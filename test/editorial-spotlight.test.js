@@ -25,7 +25,8 @@ test('Actual section-title logo assets and editorial module both retained',async
   const h=await read(path);
   assert.match(h,/page-title-(?:movies|tv-shows|indie-movies|podcasts|games)\.png/,path);
   assert.match(h,/editorial-spotlight\.mjs/,path);
-  assert.match(h,/cinematic-redesign\.css/,path);
+  assert.match(h,/fr-design-system\.css/,path);
+  assert.match(h,/fr-page-themes\.css/,path);
   assert.match(h,/editorial-spotlight\.css/,path);
  }
  assert.match(await read('index.html'),/frightertainment-brand\.png/);
@@ -33,12 +34,14 @@ test('Actual section-title logo assets and editorial module both retained',async
 test('Public and preview builds include the vetted editorial asset and data files',async()=>{
  for(const path of ['scripts/build-preview.mjs','scripts/build-production.mjs']){
   const s=await read(path);
-  for(const token of ['editorial-spotlight.mjs','editorial-spotlight.css','cinematic-redesign.css','data/editorial.json','data/editorial-spotlight-overrides.json'])assert.ok(s.includes(token),path+' missing '+token);
+  for(const token of ['editorial-spotlight.mjs','editorial-spotlight.css','fr-design-system.css','fr-page-themes.css','fr-rating-badge.js','data/editorial.json','data/editorial-spotlight-overrides.json'])assert.ok(s.includes(token),path+' missing '+token);
  }
 });
-test('Show no fabricated Fright Rating and gate official poster reuse on permission',async()=>{
+test('Only exact TMDB media identities receive audience badges; direct poster reuse needs permission',async()=>{
  const js=await read('editorial-spotlight.mjs');
- assert.match(js,/ratingEvidence\?\.approved === true/);
+ assert.match(js,/if \(item\.mediaIdentity && \['movie','tv'\]/);
+ assert.match(js,/matchedMedia\(item, media\)/);
+ assert.match(js,/FRRatingBadge\.fromTmdbMedia\(media/);
  assert.match(js,/posterLicenceStatus === 'approved'/);
  assert.match(js,/posterPermissionEvidence/);
 });

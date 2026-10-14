@@ -18,5 +18,8 @@
    card.append(no,body);root.append(card);
   });
   document.querySelector('#podcast-chart-checked').textContent='Checked '+new Intl.DateTimeFormat('en-GB',{dateStyle:'medium'}).format(new Date(data.checkedAt+'T12:00:00Z'))+' · weekly refresh · editorial order';
- }).catch(()=>{root.textContent='Podcast cover information is temporarily unavailable. Browse the editor selections below.';});
+ }).catch(()=>{
+  root.textContent='Podcast cover information is temporarily unavailable. Browse the editor selections below.';
+  document.querySelector('#podcast-chart-checked').textContent='Podcast list unavailable · editor selections remain available';
+ });
 })();

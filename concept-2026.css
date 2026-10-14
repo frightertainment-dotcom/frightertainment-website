@@ -1,0 +1,1083 @@
+/* Seven-page concept implementation. This file intentionally loads last.
+   The source art is a background only; logos, controls, film names and data
+   remain real DOM content. */
+body.fr-v5{
+ --concept-ink:#050607;--concept-panel:#090e10;--concept-line:#344047;
+ --concept-red:#db1832;--concept-bright:#ff4d59;--concept-text:#f4eeeb;
+ --concept-muted:#c8c3c0;
+ background:
+  linear-gradient(180deg,#020304d9 0%,#050708eb 34%,#030506f5 100%),
+  url('/assets/horror-wall-wide.webp') center top/cover no-repeat #050607!important;
+ color:var(--concept-text);
+ font-family:Arial,Helvetica,sans-serif;
+ overflow-x:clip;
+}
+body.fr-v5 *,body.fr-v5 *::before,body.fr-v5 *::after{box-sizing:border-box}
+body.fr-v5 :is(.hub-main,main.shell){width:min(1320px,calc(100% - 32px));max-width:1320px;min-width:0}
+body.fr-v5 .hub-header{position:relative;z-index:15;background:#030405ed!important;border:1px solid #67202b;border-radius:10px 10px 0 0;box-shadow:0 0 0 3px #000c,0 8px 25px #000d}
+body.fr-v5 .hub-header__inside{width:min(1320px,calc(100% - 24px));min-height:68px;grid-template-columns:minmax(155px,240px) minmax(0,1fr) auto;gap:14px;padding:4px 0}
+body.fr-v5 .hub-brand{width:100%;max-width:235px}
+body.fr-v5 .hub-brand img{max-height:58px;filter:drop-shadow(0 2px 5px #080000)}
+body.fr-v5 .hub-tabs{justify-content:center;gap:0;min-width:0}
+body.fr-v5 .hub-tabs a{flex:0 1 auto;padding:12px clamp(5px,.85vw,13px);min-height:50px;color:#e4dddd;font:700 clamp(10px,.78vw,12px)/1.25 Arial,Helvetica,sans-serif;letter-spacing:.02em}
+body.fr-v5 .hub-tabs a.active,body.fr-v5 .hub-tabs a[aria-current="page"]{color:#ff5360!important;border-bottom-color:#e92438!important}
+body.fr-v5 .fr-v5-header-tools{min-width:0;gap:7px}
+body.fr-v5 .fr-v5-contact-icon{border-radius:50%;border-color:#c72238;color:#fff}
+body.fr-v5 .hub-page-intro,body.fr-v5 .hub-intro.fr-home-intro{
+ position:relative;isolation:isolate;width:100%;max-width:none;
+ margin:0 auto 12px;min-height:226px;padding:24px clamp(18px,3.2vw,45px);
+ border:0;border-bottom:1px solid #9e2131;border-radius:0;
+ background:linear-gradient(90deg,#030508d9 0%,#030508a8 32%,transparent 68%),
+  url('/assets/concept-haunted-house.png') center 49%/cover no-repeat #050708!important;
+ box-shadow:inset 0 -32px 34px #050608cf;
+}
+body.fr-v5.hub-home .hub-main{padding-top:0}
+body.fr-v5.hub-home .fr-home-intro{display:flex;align-items:center;height:260px;min-height:260px}
+body.fr-v5.hub-home .fr-home-intro__copy{width:min(530px,65%);min-width:0}
+body.fr-v5.hub-home .fr-home-intro h1 img{display:block;width:min(100%,420px);max-height:82px;object-fit:contain;object-position:left center;filter:drop-shadow(0 2px 3px #000)}
+body.fr-v5.hub-home .fr-home-intro__motto{font:700 11px/1.2 Arial,Helvetica,sans-serif!important;letter-spacing:.47em;color:#e8e0df;margin:0 0 8px!important}
+body.fr-v5.hub-home .fr-home-intro__actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+body.fr-v5.hub-home .fr-home-intro__actions a{display:inline-flex;align-items:center;justify-content:center;min-height:32px;max-width:100%;padding:7px 13px;background:#cf0d26;color:#fff;border:1px solid #ff4859;border-radius:2px;font:700 11px/1.2 Arial,Helvetica,sans-serif;text-decoration:none}
+body.fr-v5.hub-home .fr-home-intro__actions a+a{background:#08090bbd;border-color:#a09494}
+body.fr-v5.hub-home .fr-home-dashboard-heading{margin:2px 0 6px}
+body.fr-v5.hub-home .fr-home-dashboard-heading h2{font:700 17px/1.1 Arial,Helvetica,sans-serif;margin:3px 0 0}
+body.fr-v5.hub-home .fr-home-dashboard-heading .hub-eyebrow{font:700 9px/1.3 Arial,Helvetica,sans-serif}
+body.fr-v5.hub-home .hub-dashboard.hub-showcase{gap:9px;grid-template-columns:minmax(0,1.6fr) minmax(260px,.8fr)}
+body.fr-v5.hub-home .hub-feature{height:350px;min-height:350px;border:2px solid #b81931;border-radius:4px}
+body.fr-v5.hub-home .hub-feature .hub-tile__content{max-width:75%;padding:18px}
+body.fr-v5.hub-home .hub-feature h3{font:700 clamp(24px,2.7vw,38px)/1.06 Georgia,'Times New Roman',serif}
+body.fr-v5.hub-home .hub-feature p{font:400 13px/1.35 Arial,Helvetica,sans-serif}
+body.fr-v5.hub-home .hub-charts{height:350px;min-height:350px;overflow:hidden;border-color:#b81931;border-radius:4px}
+body.fr-v5.hub-home #hub-ranking{max-height:200px;min-height:0;overflow-y:auto;scrollbar-color:#9c2737 #0b0d0e}
+body.fr-v5.hub-home .hub-charts__top{padding:9px 12px 7px;background:#090d0eea}
+body.fr-v5.hub-home .hub-charts h2{font:700 16px/1.2 Arial,Helvetica,sans-serif;margin:2px 0}
+/* Home is a concise ranking preview; trailer and vote details are on
+   the full annual chart. Rows must always size to their titles. */
+body.fr-v5.hub-home .hub-chart-row{
+ height:auto;min-height:43px;display:grid;
+ grid-template-columns:30px minmax(0,1fr) auto;grid-template-rows:auto;
+ gap:8px;padding:9px 11px;align-items:center;
+ font:700 13px/1.25 Arial,Helvetica,sans-serif
+}
+body.fr-v5.hub-home .hub-chart-row .position{grid-column:1;grid-row:1;font-size:13px}
+body.fr-v5.hub-home .hub-chart-row>a,
+body.fr-v5.hub-home .hub-chart-row--poster>a{
+ grid-column:2;grid-row:1;min-width:0;max-width:100%;
+ font:700 13px/1.25 Arial,Helvetica,sans-serif;overflow-wrap:normal;word-break:normal
+}
+body.fr-v5.hub-home .hub-chart-row .score,
+body.fr-v5.hub-home .hub-chart-row--poster .score{
+ grid-column:3;grid-row:1;white-space:nowrap;text-align:right;
+ font:700 13px/1.2 Arial,Helvetica,sans-serif
+}
+body.fr-v5.hub-home .hub-chart-row :is(.hub-chart-poster,.movement,.chart-meta){display:none}
+body.fr-v5.hub-home .hub-chart-row--poster{
+ grid-template-columns:30px minmax(0,1fr) auto;grid-template-rows:auto
+}
+body.fr-v5.hub-home .hub-showcase__bottom{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{height:145px;min-height:145px;border:1px solid #931b2b;border-radius:3px}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__content{padding:7px}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile h3{font:700 clamp(14px,1.5vw,20px)/1.05 Georgia,'Times New Roman',serif}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile p{font:400 10px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5.hub-home .fr-home-category{display:none}
+body.fr-v5 .hub-page-intro::before,body.fr-v5 .hub-intro.fr-home-intro::after{display:none}
+body.fr-v5 .hub-page-intro>*{position:relative;z-index:1;min-width:0}
+body.fr-v5 .hub-page-intro .hub-eyebrow,body.fr-v5 .fr-home-intro .hub-eyebrow{
+ color:#e2d6d3;font:700 10px/1.3 Arial,Helvetica,sans-serif;letter-spacing:.32em;text-shadow:0 1px 4px #000
+}
+body.fr-v5 .hub-page-intro h1,body.fr-v5 .fr-home-intro h1{margin:6px 0 2px!important}
+body.fr-v5 .hub-page-wordmark{width:auto;height:auto;max-width:min(510px,60%);max-height:110px;object-position:left center;filter:drop-shadow(0 2px 3px #000)}
+body.fr-v5 .hub-page-intro>p,body.fr-v5 .fr-home-intro>p,body.fr-v5 .fr-home-intro p{
+ max-width:470px!important;margin:5px 0 8px!important;color:#f2ebe9;
+ font:400 clamp(12px,1vw,15px)/1.42 Arial,Helvetica,sans-serif!important;text-shadow:0 2px 5px #000
+}
+body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps){max-width:610px;margin-top:8px}
+body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps) a{font:700 10px/1.15 Arial,Helvetica,sans-serif}
+body.fr-v5 .editorial-carousel{width:100%;max-width:none;margin:7px auto 9px}
+body.fr-v5 .editorial-pick{
+ height:310px!important;min-height:310px!important;max-height:310px!important;
+ display:grid;grid-template-columns:minmax(0,28%) minmax(0,1fr) minmax(0,18%);
+ gap:clamp(12px,1.9vw,25px);padding:39px 16px 14px;
+ border:2px solid #b81931;border-radius:4px;
+ background:linear-gradient(90deg,#040607f5,#08090be0 60%,#080506d9),var(--pick-scene) center/cover no-repeat;
+ box-shadow:0 0 0 3px #020303,0 0 0 4px #7d1222,0 8px 22px #000d,inset 0 0 30px #73061645
+}
+body.fr-v5 .editorial-pick::before{
+ content:'★  EDITORIAL PICKS'!important;height:29px;padding:6px 12px;
+ font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;
+ background:linear-gradient(90deg,#b2081e,#45070fa8 62%,transparent)
+}
+body.fr-v5 .editorial-pick__art{height:100%;overflow:hidden;align-items:center}
+body.fr-v5 .editorial-pick__art-frame{height:100%;width:auto;max-width:100%;aspect-ratio:2/3;max-height:252px;overflow:hidden}
+body.fr-v5 .editorial-pick__content{display:flex;flex-direction:column;justify-content:center;align-self:stretch;min-height:0;overflow:hidden}
+body.fr-v5 .editorial-pick__title{flex-shrink:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;font:700 clamp(22px,2.3vw,34px)/1.08 Georgia,'Times New Roman',serif;max-height:2.2em;overflow:hidden}
+body.fr-v5 .editorial-pick__synopsis{font:400 13px/1.4 Arial,Helvetica,sans-serif;margin:5px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+body.fr-v5 .editorial-pick__why{font-size:11px;margin:5px 0;max-height:2.9em;overflow:hidden}
+body.fr-v5 .editorial-pick__meta{margin:5px 0;padding-top:4px}
+body.fr-v5 .editorial-pick__links{margin-top:6px;gap:6px}
+body.fr-v5 .editorial-pick__facts{height:100%;max-height:250px;overflow:hidden;border-radius:2px}
+body.fr-v5 .editorial-carousel__controls{height:24px;padding:2px;justify-content:center}
+body.fr-v5 .fr-v5-front{width:100%;max-width:none;margin:7px auto 15px;gap:10px}
+body.fr-v5 .fr-v5-panel,body.fr-v5 .fr-catalogue-section{
+ border:1px solid var(--concept-line);border-radius:3px;
+ background:linear-gradient(155deg,#0c1113f7,#06090bf9 82%);
+ box-shadow:0 5px 18px #000a
+}
+body.fr-v5 .fr-v5-panel__head,body.fr-v5 .fr-catalogue-head{min-height:41px;padding:7px 11px;border-bottom:1px solid #394046}
+body.fr-v5 .fr-v5-panel__head h2{color:#f4eeea;font:700 15px/1.18 Arial,Helvetica,sans-serif;letter-spacing:.03em}
+body.fr-v5 .fr-v5-panel__head p{color:#c7c2bd;font:400 10px/1.3 Arial,Helvetica,sans-serif}
+body.fr-v5 .fr-v5-panel__all{font:700 10px/1 Arial,Helvetica,sans-serif}
+body.fr-v5 .fr-v5-rack{min-height:222px}
+body.fr-v5 .fr-v5-poster-grid{min-height:176px}
+body.fr-v5 .fr-v5-poster-card,body.fr-v5 .fr-v5-poster,body.fr-v5 .fr-v5-editorial-tile{min-width:0;overflow:hidden}
+body.fr-v5 .fr-v5-poster__art{aspect-ratio:2/3;overflow:hidden}
+body.fr-v5 .fr-v5-poster__image{display:block;width:100%;height:100%;object-fit:cover}
+body.fr-v5 .fr-v5-poster__bottom strong,body.fr-v5 .fr-v5-editorial-tile strong{
+ display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere
+}
+body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile{height:170px;min-height:170px;max-height:170px;border:1px solid #674046;border-radius:2px;background-position:center;background-size:cover}
+body.fr-v5[data-theme="podcasts"] .podcast-chart.fr-v5-pinned{margin:0;width:100%;max-height:265px;overflow:auto;border:1px solid #3b4649;border-radius:3px}
+body.fr-v5[data-theme="podcasts"] .podcast-chart.fr-v5-pinned .fr-catalogue-head h2{font:700 15px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5[data-theme="games"] .fr-v5-editorial-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+body.fr-v5[data-theme="games"] .fr-v5-editorial-tile{height:170px;min-height:170px;max-height:170px;border:1px solid #674046;border-radius:2px}
+body.fr-v5:has([data-cinema-country]) .hub-page-intro{min-height:240px;padding-bottom:18px}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-region{position:relative;z-index:2;display:inline-flex;gap:6px;align-items:center;max-width:100%;font:700 10px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-region select{max-width:100%;color:#fff;background:#080b0c;border:1px solid #9e4652}
+body.fr-v5:has([data-cinema-country]) .fr-catalogue-section{max-width:none;margin:8px 0}
+body.fr-v5:has([data-cinema-country]) .fr-catalogue-head h2{font:700 clamp(15px,1.4vw,21px)/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__item{min-height:0;max-width:100%}
+body.fr-v5:has([data-cinema-country]) .fr-cinema-diary__title{overflow-wrap:anywhere}
+body.fr-v5 .fr-cinema-concept{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(250px,.9fr);gap:9px;width:100%;margin:9px 0 12px}
+body.fr-v5 .fr-cinema-concept__features,body.fr-v5 .fr-cinema-concept__region{min-width:0;padding:9px;border:1px solid #a81a30;border-radius:3px;background:#05090beb}
+body.fr-v5 .fr-cinema-concept__head{display:flex;justify-content:space-between;gap:9px;align-items:center;margin:0 0 8px;border-bottom:1px solid #9b1d2c}
+body.fr-v5 .fr-cinema-concept h2{font:700 16px/1.2 Arial,Helvetica,sans-serif;margin:0 0 7px;color:#f7eee9}
+body.fr-v5 .fr-cinema-concept a{color:#fff;text-decoration:none;font:700 10px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5 .fr-cinema-concept a:hover{text-decoration:underline}
+body.fr-v5 .fr-cinema-concept__cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;min-height:210px}
+body.fr-v5 .fr-cinema-concept__card{min-width:0;display:flex;flex-direction:column;border:1px solid #69232c;background:#0b1011}
+body.fr-v5 .fr-cinema-concept__art{height:125px;background:linear-gradient(180deg,#03040420,#030404c2),url('/assets/concept-haunted-house.png') 73% center/auto 100% no-repeat #13181a;overflow:hidden}
+body.fr-v5 .fr-cinema-concept__card:nth-child(2) .fr-cinema-concept__art{background-image:linear-gradient(180deg,#03040420,#030404c2),url('/assets/worlds/movies-vault.webp');background-size:cover}
+body.fr-v5 .fr-cinema-concept__card:nth-child(3) .fr-cinema-concept__art{background-image:linear-gradient(180deg,#03040420,#030404c2),url('/assets/worlds/indie-projection.webp');background-size:cover}
+body.fr-v5 .fr-cinema-concept__card:nth-child(4) .fr-cinema-concept__art{background-image:linear-gradient(180deg,#03040420,#030404c2),url('/assets/worlds/home-threshold.webp');background-size:cover}
+body.fr-v5 .fr-cinema-concept__art img{width:100%;height:100%;object-fit:cover}
+body.fr-v5 .fr-cinema-concept__copy{display:flex;flex-direction:column;gap:3px;padding:6px;flex:1}
+body.fr-v5 .fr-cinema-concept__copy strong{font:700 12px/1.1 Arial,Helvetica,sans-serif;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+body.fr-v5 .fr-cinema-concept__copy small{color:#c9bdba;font:400 10px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5 .fr-cinema-concept__copy a{align-self:stretch;margin-top:auto;padding:6px 3px;text-align:center;background:#ad1028;font-size:9px}
+body.fr-v5 .fr-cinema-concept__region{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:18px;background:linear-gradient(160deg,#0a1012,#060708)}
+body.fr-v5 .fr-cinema-concept__region p{font:400 13px/1.4 Arial,Helvetica,sans-serif;color:#e1d7d4}
+body.fr-v5 .fr-cinema-concept__region .fr-cinema-region{display:flex;flex-direction:column;align-items:stretch;width:100%;gap:5px;margin:9px 0 2px;color:#ddd;font:700 10px/1.2 Arial,Helvetica,sans-serif}
+body.fr-v5 .fr-cinema-concept__region .fr-cinema-region select{width:100%;min-height:34px;padding:6px 9px;color:#fff;background:#080b0d;border:1px solid #93404c;border-radius:2px}
+body.fr-v5 .fr-cinema-concept__region .fr-cinema-context{font-size:10px;margin:3px 0}
+body.fr-v5 .fr-cinema-concept__region a{border:1px solid #a54050;padding:9px 11px;margin-top:9px}
+body.fr-v5 .fr-v5-ranking__entry{height:27px;min-height:27px;overflow:hidden}
+body.fr-v5 .fr-v5-ranking__movie{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.fr-v5 .fr-v5-feature-panels>*{min-width:0}
+body.fr-v5 .fr-v5-spotlight-row{width:100%;max-width:none;min-width:0;display:grid;grid-template-columns:minmax(0,2.13fr) minmax(290px,.9fr);gap:9px;align-items:stretch;margin:7px auto 10px}
+body.fr-v5 .fr-v5-spotlight-row .editorial-carousel{min-width:0;margin:0}
+body.fr-v5 .fr-v5-spotlight-row .fr-v5-ranking{height:334px;max-height:334px;overflow:hidden;border:1px solid #ad2337;border-radius:3px;background:#050809f2}
+body.fr-v5 .fr-v5-spotlight-row .fr-v5-ranking__list{display:block;max-height:269px;overflow:auto}
+body.fr-v5 .fr-v5-spotlight-row .fr-v5-ranking__entry{height:24px;min-height:24px}
+body.fr-v5 .fr-v5-explore{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:7px auto 9px}
+body.fr-v5 .fr-v5-explore h2{grid-column:1/-1;font:700 14px/1.1 Arial,Helvetica,sans-serif;margin:0;color:#f0e6e4}
+body.fr-v5 .fr-v5-explore__tile{display:flex;align-items:end;min-width:0;min-height:75px;padding:9px;color:#fff;text-decoration:none;font:700 13px/1.15 Arial,Helvetica,sans-serif;border:1px solid #a0192f;border-radius:2px;background:linear-gradient(0deg,#040507ee,#05050600 80%),url('/assets/worlds/movies-vault.webp') center/cover no-repeat #0d1011}
+body.fr-v5 .fr-v5-explore__tile[data-art="indie"]{background-image:linear-gradient(0deg,#040507ee,#05050600 80%),url('/assets/worlds/indie-projection.webp')}
+body.fr-v5 .fr-v5-explore__tile[data-art="top"]{background-image:linear-gradient(0deg,#040507ee,#05050600 80%),url('/assets/worlds/home-threshold.webp')}
+body.fr-v5 .fr-v5-explore__tile[data-art="classics"]{background-position:center,70% center}
+body.fr-v5 .fr-v5-explore__tile:hover,body.fr-v5 .fr-v5-explore__tile:focus-visible{border-color:#ff5262;box-shadow:0 0 12px #a6112a88}
+body.fr-v5 .fr-v5-deeper{margin:10px 0 30px}
+body.fr-v5 .fr-v5-deeper__summary{border-color:#55323a;background:#0b1012}
+body.fr-v5 .fr-v5-mobile-dock{background:#050708f5;border-top:1px solid #822132}
+body.fr-v5 .hub-tile,body.fr-v5 .fr-game-spotlight{min-width:0;overflow:hidden}
+body.fr-v5 .hub-tile__content{min-width:0}
+body.fr-v5 .hub-tile :is(h3,p){overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical}
+body.fr-v5 .hub-tile h3{-webkit-line-clamp:2}
+body.fr-v5 .hub-tile p{-webkit-line-clamp:3}
+body.fr-v5 .hub-tile__wash{pointer-events:none}
+body.fr-v5 .fr-v5-panel :is(a,button):focus-visible,body.fr-v5 .editorial-carousel :is(a,button):focus-visible{outline:2px solid #ffe2e3;outline-offset:2px}
+@media(min-width:1000px){
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase{grid-template-rows:350px auto}
+ body.fr-v5 .fr-cinema-concept__features,body.fr-v5 .fr-cinema-concept__region{height:290px;max-height:290px;overflow:hidden}
+ body.fr-v5 .fr-cinema-concept__region{justify-content:flex-start;padding:12px}
+ body.fr-v5 .fr-cinema-concept__region p{font-size:12px;line-height:1.25;margin:4px 0}
+ body.fr-v5 .fr-cinema-concept__region .fr-cinema-region{margin:5px 0 2px}
+ body.fr-v5 .fr-cinema-concept__region a{margin-top:5px}
+ body.fr-v5 .fr-v5-front{gap:10px}
+ body.fr-v5 .fr-v5-feature-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ body.fr-v5 .fr-v5-secondary-panels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ body.fr-v5 .hub-home .hub-dashboard{gap:12px}
+}
+@media(max-width:999px){
+ body.fr-v5 .hub-header__inside{display:grid;grid-template-columns:minmax(130px,1fr) auto;gap:0 8px}
+ body.fr-v5 .hub-tabs{grid-column:1/-1;grid-row:2;justify-content:center}
+ body.fr-v5 .fr-v5-header-tools{grid-column:2;grid-row:1}
+ body.fr-v5 .hub-page-wordmark{max-width:65%}
+}
+@media(max-width:700px){
+ body.fr-v5 .fr-v5-explore{gap:4px;margin:3px auto 7px;padding:7px;border:1px solid #30383c;border-radius:3px;background:#070b0ced}
+ body.fr-v5 .fr-v5-explore h2{font-size:11px}
+ body.fr-v5 .fr-v5-explore__tile{justify-content:center;align-items:center;min-height:48px;padding:4px 2px;text-align:center;font-size:9px;line-height:1.08;background-image:none!important;background:#0a0d0f!important;border-color:#44474a}
+ body.fr-v5 .fr-cinema-concept{grid-template-columns:minmax(0,1fr);gap:7px;margin:6px 0 8px}
+ body.fr-v5 .fr-cinema-concept h2{font-size:12px}
+ body.fr-v5 .fr-cinema-concept__cards{grid-template-columns:repeat(3,minmax(0,1fr));min-height:150px;gap:4px}
+ body.fr-v5 .fr-cinema-concept__card:nth-child(n+4){display:none}
+ body.fr-v5 .fr-cinema-concept__art{height:90px}
+ body.fr-v5 .fr-cinema-concept__copy strong{font-size:10px}
+ body.fr-v5 .fr-cinema-concept__copy a{font-size:8px}
+ body.fr-v5 .fr-cinema-concept__region{padding:9px}
+ body.fr-v5 .fr-cinema-concept__region p{font-size:11px;margin:0}
+ body.fr-v5 .fr-cinema-concept__region a{margin-top:7px}
+ body.fr-v5 .fr-v5-spotlight-row{display:contents}
+ body.fr-v5.hub-home .fr-home-intro{height:220px;min-height:220px}
+ body.fr-v5.hub-home .fr-home-intro__copy{width:100%;align-self:end}
+ body.fr-v5.hub-home .fr-home-intro h1 img{width:min(100%,310px);max-height:75px}
+ body.fr-v5.hub-home .fr-home-intro__motto{font-size:11px!important;letter-spacing:.2em}
+ body.fr-v5.hub-home .fr-home-intro__actions a{font-size:11px;min-height:38px;padding:7px 10px}
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase{grid-template-columns:minmax(0,1fr);grid-template-areas:'feature' 'support' 'ranking'}
+ body.fr-v5.hub-home .hub-feature{height:195px;min-height:195px}
+ body.fr-v5.hub-home .hub-feature .hub-tile__content{max-width:82%;padding:10px}
+ body.fr-v5.hub-home .hub-feature h3{font-size:24px}
+ body.fr-v5.hub-home .hub-feature p{font-size:13px;line-height:1.35;-webkit-line-clamp:2}
+ body.fr-v5.hub-home .hub-charts{height:auto;min-height:0;overflow:visible}
+ body.fr-v5.hub-home #hub-ranking{max-height:none;overflow:visible}
+ body.fr-v5.hub-home .hub-chart-row{min-height:48px;padding:10px 12px}
+ body.fr-v5.hub-home .hub-chart-row>a{font-size:14px}
+ body.fr-v5.hub-home .hub-charts__top p{font-size:12px;line-height:1.35}
+ /* Illustrated destinations, with two centred on the second row. */
+ body.fr-v5.hub-home .hub-showcase__bottom{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;overflow:visible}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{grid-column:span 2}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile:nth-child(4){grid-column:2 / span 2}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile:nth-child(5){grid-column:4 / span 2}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{
+  height:106px;min-height:106px;overflow:hidden;
+  border:1px solid #9b3a47;box-shadow:inset 0 -28px 35px #030304bb
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile:last-child{min-height:106px}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__content{padding:4px}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile h3{font:700 clamp(7px,2.1vw,10px)/1.1 Arial,Helvetica,sans-serif;margin:0;overflow-wrap:anywhere}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile :is(.hub-kicker,p,.hub-tile__link,.fr-trailer-button,.hub-feature__rating){display:none}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{position:relative}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile h3{display:none}
+ body.fr-v5.hub-home .hub-showcase__bottom .fr-home-category{
+  display:block;color:#fff7f4;font:700 12px/1.25 Arial,Helvetica,sans-serif;
+  text-align:center;text-shadow:0 2px 8px #000,0 1px 3px #000
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile .fr-home-category::before{display:none!important}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__wash{
+  background:linear-gradient(180deg,#07080a44,#07080af2)!important
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-cinema::before{
+  background-image:url('/assets/worlds/movies-vault.webp');
+  background-size:cover;background-position:60% center
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .fr-home-category::before{content:'◉';display:block;color:#f01838;font-size:20px;line-height:1;margin-bottom:5px}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tv .fr-home-category::before{content:'▣'}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-indie .fr-home-category::before{content:'✹'}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-podcast .fr-home-category::before{content:'♫'}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-games .fr-home-category::before{content:'✦'}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-cinema .fr-home-category::before{content:'▤'}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__content{display:flex;align-items:flex-end;justify-content:center;height:100%;padding:10px 5px}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile .hub-tile__link{display:block!important;position:absolute;inset:0;z-index:4;font-size:0;color:transparent;background:transparent;border:0;padding:0;opacity:0}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile .hub-tile__link:focus-visible{opacity:1;outline:2px solid #fff;outline-offset:-2px}
+ body.fr-v5 :is(.hub-main,main.shell){width:calc(100% - 18px);min-width:0}
+ body.fr-v5 .hub-header{border-radius:0}
+ body.fr-v5 .hub-header__inside{width:calc(100% - 18px);min-height:0;padding:3px 0 0;grid-template-columns:minmax(0,1fr) auto}
+ body.fr-v5 .hub-brand{max-width:188px}
+ body.fr-v5 .hub-brand img{max-height:52px}
+ body.fr-v5 .hub-tabs{width:100%;max-width:100%;gap:0;overflow:hidden}
+ body.fr-v5 .hub-tabs a{flex:1 1 0;min-width:0;min-height:38px;padding:8px 1px 7px;font:700 clamp(9px,2.35vw,11px)/1.15 Arial,Helvetica,sans-serif;letter-spacing:0;white-space:normal;overflow-wrap:normal}
+ body.fr-v5 .hub-page-intro,body.fr-v5 .hub-intro.fr-home-intro{
+  width:100%;height:215px;min-height:215px;max-height:215px;
+  margin:0 auto 6px;padding:17px 13px 10px;
+  background:linear-gradient(180deg,#03050720 0%,#030507a9 30%,#030507d5 100%),
+   url('/assets/concept-haunted-house.png') 72% 38%/auto 100% no-repeat #050708!important;
+  overflow:hidden
+ }
+ body.fr-v5 .hub-page-intro .hub-eyebrow{font-size:8px;letter-spacing:.17em}
+ body.fr-v5 .hub-page-wordmark{width:auto;max-width:80%;max-height:65px}
+ body.fr-v5 .hub-page-intro>p,body.fr-v5 .fr-home-intro p{max-width:340px!important;font-size:13px!important;line-height:1.32!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+ body.fr-v5 .hub-page-intro :is(.hub-subtabs,.hub-section-jumps){display:none!important}
+ body.fr-v5 .editorial-carousel{width:100%;margin:4px auto 7px}
+ body.fr-v5 .editorial-pick{
+  height:210px!important;min-height:210px!important;max-height:210px!important;
+  grid-template-columns:minmax(0,39%) minmax(0,1fr);
+  gap:8px;padding:30px 7px 6px
+ }
+ body.fr-v5 .editorial-pick::before{height:25px;padding:4px 7px;font-size:9px}
+ body.fr-v5 .editorial-pick__art{height:100%;align-self:stretch}
+ body.fr-v5 .editorial-pick__art-frame{height:min(100%,168px);max-height:168px;width:clamp(98px,26vw,132px)}
+ body.fr-v5 .editorial-pick__content{padding:0;justify-content:center}
+ body.fr-v5 .editorial-pick__title{font:700 clamp(17px,4.55vw,22px)/1.12 Georgia,'Times New Roman',serif;max-height:3.35em;margin:3px 0}
+ body.fr-v5 .editorial-pick__synopsis{font:400 12px/1.34 Arial,Helvetica,sans-serif;-webkit-line-clamp:2;margin:4px 0}
+ body.fr-v5 .editorial-pick__links{margin-top:4px}
+ body.fr-v5 .editorial-pick__links :is(a,summary){font-size:11px;min-height:36px;padding:8px 9px;line-height:1.2}
+ body.fr-v5 .editorial-pick__facts,body.fr-v5 .editorial-pick__why,body.fr-v5 .editorial-pick__meta{display:none}
+ body.fr-v5 .editorial-pick__eyebrow{display:none}
+ body.fr-v5 .editorial-pick__series{font-size:9px;line-height:1.2;margin:0 0 3px;letter-spacing:.05em}
+ body.fr-v5 .editorial-pick__genre{font-size:10px;line-height:1.2}
+ body.fr-v5 .editorial-pick__art-title{font-size:clamp(13px,3.7vw,17px);line-height:1.1;-webkit-line-clamp:3}
+ body.fr-v5 .fr-v5-front{width:100%;margin:4px auto 10px;gap:7px}
+ body.fr-v5 .fr-v5-panel__head{padding:6px 8px;min-height:34px}
+ body.fr-v5 .fr-v5-panel__head h2{font-size:12px}
+ body.fr-v5 .fr-v5-panel__head p{display:none}
+ body.fr-v5 .fr-v5-rack{min-height:160px}
+ body.fr-v5 .fr-v5-poster-grid{min-height:123px}
+ body.fr-v5 .fr-v5-feature-panels,body.fr-v5 .fr-v5-secondary-panels{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+ body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile{height:105px;min-height:105px;max-height:105px;padding:6px}
+ body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile:nth-child(n+4){display:none}
+ body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile strong{font-size:11px;line-height:1.05}
+ body.fr-v5[data-theme="podcasts"] .fr-v5-editorial-tile :is(.fr-v5-editorial-tile__eyebrow,small,.fr-v5-editorial-tile__go){display:none}
+ body.fr-v5[data-theme="games"] .fr-v5-editorial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ body.fr-v5[data-theme="games"] .fr-v5-editorial-tile{height:100px;min-height:100px;max-height:100px;padding:7px}
+ body.fr-v5[data-theme="games"] .fr-v5-editorial-tile strong{font-size:13px}
+ body.fr-v5:has([data-cinema-country]) .hub-page-intro{height:220px;min-height:220px;max-height:220px}
+ body.fr-v5:has([data-cinema-country]) .fr-cinema-region{font-size:9px}
+ body.fr-v5 .fr-v5-mobile-dock{height:auto;min-height:60px;max-height:none;padding-bottom:calc(6px + env(safe-area-inset-bottom))}
+ body.fr-v5 .fr-v5-mobile-dock a{min-height:46px}
+ body.fr-v5 .fr-v5-mobile-dock small{font-size:10px;line-height:1.15}
+ body.fr-v5{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+}
+@media(max-width:359px){
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile h3{font-size:7px}
+ body.fr-v5 .hub-tabs{display:flex;flex-wrap:wrap;justify-content:center}
+ body.fr-v5 .hub-tabs a{flex:0 0 24%;font-size:8px;min-height:24px;padding:5px 1px}
+ body.fr-v5 .hub-page-intro,body.fr-v5 .hub-intro.fr-home-intro{height:195px;min-height:195px;max-height:195px}
+ body.fr-v5 .editorial-pick{height:232px!important;min-height:232px!important;max-height:232px!important}
+ body.fr-v5 .editorial-pick__art-frame{height:170px;width:94px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 *,body.fr-v5 *::before,body.fr-v5 *::after{scroll-behavior:auto!important;animation-duration:0s!important;transition-duration:0s!important}
+}
+@media(max-width:700px){
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{height:220px;min-height:220px;max-height:220px}
+ body.fr-v5.hub-home .fr-home-intro__motto{display:block;-webkit-line-clamp:unset;overflow:visible}
+}
+@media(max-width:359px){
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{height:195px;min-height:195px;max-height:195px}
+}
+
+/* Later legacy V5 rules have greater specificity than the shared concept
+   masthead. Give all seven pages the approved scenic art at both sizes. */
+body.hub-body.fr-v5.hub-section .hub-page-intro,
+body.hub-body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro,
+body.hub-body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro{
+ min-height:226px!important;max-height:226px!important;
+ margin:0 auto 8px!important;padding:19px 34px!important;
+ background:linear-gradient(90deg,#030508e8 0%,#030508a8 38%,transparent 75%),url('/assets/concept-haunted-house.png') center 45%/cover no-repeat #050708!important;
+}
+body.hub-body.fr-v5.hub-section .hub-page-wordmark{max-height:108px;max-width:min(510px,65%)}
+body.hub-body.fr-v5.hub-section .hub-page-intro>p{font:400 14px/1.4 Arial,Helvetica,sans-serif!important;max-width:465px;margin:5px 0 9px!important}
+@media(max-width:700px){
+ body.fr-v5 .hub-header__inside{
+  display:grid!important;grid-template-columns:minmax(44px,1fr) auto minmax(78px,1fr)!important;
+  grid-template-rows:54px 40px!important;gap:0 4px!important;
+  width:100%!important;padding:4px 9px 2px!important;
+ }
+ body.fr-v5 .hub-brand{grid-column:2;grid-row:1;width:min(56vw,225px);justify-self:center}
+ body.fr-v5 .fr-v5-header-tools{display:contents;grid-column:auto;grid-row:auto}
+ body.fr-v5 .hub-tabs{grid-column:1/-1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));flex-wrap:nowrap;overflow:visible!important}
+ body.fr-v5 .hub-tabs a{flex:none;min-height:42px;padding:5px 1px!important}
+ body.hub-body.fr-v5.hub-section .hub-page-intro,
+ body.hub-body.fr-v5.hub-section[data-theme="movies"] .hub-page-intro,
+ body.hub-body.fr-v5.hub-section[data-theme="indie"] .hub-page-intro{
+  display:block!important;height:202px!important;min-height:202px!important;max-height:202px!important;
+  padding:17px 13px 8px!important;margin:0 auto 5px!important;
+  background:linear-gradient(180deg,#03050730 0%,#03050793 42%,#030507da 100%),url('/assets/concept-haunted-house.png') 72% center/auto 100% no-repeat #050708!important;
+ }
+ body.hub-body.fr-v5.hub-section .hub-page-wordmark{max-height:66px;max-width:86%}
+ body.hub-body.fr-v5.hub-section .hub-page-intro>p{font:400 13px/1.3 Arial,Helvetica,sans-serif!important;max-width:340px;margin:4px 0!important}
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{height:218px;min-height:218px;max-height:218px}
+}
+@media(max-width:359px){
+ body.hub-body.fr-v5.hub-section .hub-page-intro{height:190px!important;min-height:190px!important;max-height:190px!important}
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{height:190px;min-height:190px;max-height:190px}
+ body.fr-v5 .hub-tabs{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));flex-wrap:nowrap}
+ body.fr-v5 .hub-tabs a{width:100%;min-height:38px;font-size:9px!important;padding:5px 1px!important}
+}
+@media(min-width:360px) and (max-width:379px){
+ body.fr-v5 .editorial-pick{height:220px!important;min-height:220px!important;max-height:220px!important}
+ body.fr-v5 .editorial-pick__art-frame{width:28vw;height:168px}
+}
+@media(min-width:701px){
+ body.fr-v5 .editorial-pick__art-frame{width:180px;min-width:180px;height:255px;max-height:255px;aspect-ratio:2/3}
+}
+
+
+/* Expanded trailers must never be cropped by the fixed editorial carousel
+   preview footprint. Normal slides keep identical heights; user-opened media
+   earns additional space rather than hiding the player or controls. */
+body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){
+ height:auto!important;min-height:310px!important;max-height:none!important;
+ overflow:visible;align-items:stretch;
+}
+body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]) .editorial-pick__content{
+ height:auto;min-height:0;max-height:none;overflow:visible;justify-content:center;
+}
+@media(max-width:700px){
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:210px!important}
+}
+@media(max-width:379px){
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:220px!important}
+}
+@media(max-width:359px){
+ body.fr-v5 .editorial-pick:has(.editorial-pick__trailer[open]){min-height:232px!important}
+}
+
+
+/* Concept fidelity round three: art-led editorials and illustrated discovery */
+/* Real posters are handled by the existing exact-identity media resolver.
+   This treatment only decorates ORIGINAL site artwork when a verified poster
+   is unavailable. Do not depict this as official film artwork. */
+body.fr-v5 .editorial-pick{
+ background:
+   radial-gradient(ellipse at 94% 22%,#b5142b30,transparent 46%),
+   linear-gradient(95deg,#050607f8 0%,#06070aee 49%,#060609af 100%),
+   var(--pick-scene) 76% center/cover no-repeat #060709;
+ border-color:#b12a3b;
+ box-shadow:inset 0 0 0 1px #ed4b5c24,inset 0 0 36px #8d13282b,0 12px 32px #000b;
+}
+body.fr-v5 .editorial-pick::after{
+ border-color:#f34c6342;
+ box-shadow:inset 0 0 19px #df1d3a18;
+ pointer-events:none;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ position:relative;isolation:isolate;
+ display:flex;flex-direction:column;
+ justify-content:flex-end;align-items:center;
+ padding:15px 11px;gap:8px;
+ color:#fff8f4;
+ border:1px solid #b94b58;
+ background:
+   linear-gradient(180deg,#08070b20 0%,#12070a22 32%,#060508cb 75%,#040507f6 100%),
+   var(--pick-scene) center/cover no-repeat #0d0b0c;
+ box-shadow:0 0 0 3px #070607,0 0 0 4px #90313f,0 0 26px #d02b3d39,0 19px 35px #000d;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster)::before{
+ content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(ellipse at 52% 28%,#df455624,transparent 51%);
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-eyebrow{
+ position:absolute;top:9px;left:7px;right:7px;
+ color:#f8d7d7;font:700 9px/1.25 Arial,Helvetica,sans-serif;
+ letter-spacing:.055em;text-align:center;text-shadow:0 2px 6px #000;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+ display:block;max-width:100%;
+ font:700 clamp(21px,2.45vw,34px)/1.01 var(--fr-header-font,Georgia,serif);
+ overflow-wrap:normal;word-break:normal;hyphens:none;
+ color:#fff4f0;text-align:center;text-wrap:balance;
+ text-shadow:0 3px 4px #000,0 5px 21px #000;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-sub{
+ display:block;width:100%;max-width:100%;
+ color:#f8bec7;font:700 8px/1.3 Arial,Helvetica,sans-serif;
+ letter-spacing:.075em;text-align:center;
+ text-shadow:0 2px 5px #000;
+}
+body.fr-v5 .editorial-pick__title{
+ color:#ffc3c5;
+ font-family:var(--fr-header-font,Georgia,serif)!important;
+ text-shadow:0 3px 13px #000,0 0 17px #b30e3125;
+}
+body.fr-v5 .editorial-pick__synopsis{
+ color:#ebe5e3;
+ font-family:Arial,Helvetica,sans-serif!important;
+ line-height:1.4;
+}
+body.fr-v5 .editorial-pick__links :is(.editorial-pick__cta,summary){
+ border-radius:2px;
+ box-shadow:inset 0 1px #ffffff20,0 5px 14px #0007;
+}
+body.fr-v5 .editorial-pick__links :is(.editorial-pick__cta,summary):focus-visible{
+ outline:2px solid #ffe6e8;outline-offset:3px;
+}
+@media(min-width:1000px){
+ body.fr-v5 .editorial-pick:not(:has(.editorial-pick__trailer[open])){
+  height:350px!important;min-height:350px!important;max-height:350px!important;
+  grid-template-columns:minmax(190px,26%) minmax(0,1fr) minmax(125px,17%);
+  gap:clamp(15px,2vw,26px);padding:39px 19px 18px;
+ }
+ body.fr-v5 .editorial-pick__art-frame{
+  width:min(100%,196px);min-width:0;max-width:196px;
+  height:278px;max-height:278px;aspect-ratio:2/3;
+ }
+ body.fr-v5 .editorial-pick__title{font-size:clamp(28px,2.6vw,38px)}
+ body.fr-v5 .editorial-pick__synopsis{font-size:14px;line-height:1.48}
+}
+/* This is the tabbed-style discovery rail on Movies, not a tiny text grid. */
+@media(max-width:700px){
+ body.fr-v5 .fr-v5-explore{
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:7px;margin:10px auto 12px;padding:0;
+  border:0;background:transparent;
+ }
+ body.fr-v5 .fr-v5-explore h2{
+  grid-column:1/-1;font-size:13px;letter-spacing:.035em;
+  border-left:2px solid #dc314b;padding-left:8px;margin:0 0 2px;
+ }
+ body.fr-v5 .fr-v5-explore__tile{
+  grid-column:span 2;display:flex;
+  justify-content:flex-start;align-items:flex-end;
+  min-width:0;min-height:92px;padding:10px 7px;
+  color:#fff5f2;text-align:left;
+  font:700 12px/1.16 Arial,Helvetica,sans-serif;
+  text-shadow:0 2px 5px #000,0 0 11px #000;
+  border:1px solid #9f3345;
+  border-radius:3px;
+  background:
+    linear-gradient(180deg,#04070a12,#040507e3),
+    url('/assets/worlds/movies-vault.webp') center/cover no-repeat #070a0c!important;
+  box-shadow:inset 0 -26px 33px #03040575;
+ }
+ body.fr-v5 .fr-v5-explore__tile:nth-of-type(4){grid-column:2 / span 2}
+ body.fr-v5 .fr-v5-explore__tile:nth-of-type(5){grid-column:4 / span 2}
+ body.fr-v5 .fr-v5-explore__tile[data-art="indie"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/indie-projection.webp')!important;
+ }
+ body.fr-v5 .fr-v5-explore__tile[data-art="top"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/home-threshold.webp')!important;
+ }
+ body.fr-v5 .fr-v5-explore__tile[data-art="new"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/tv-broadcast.webp')!important;
+ }
+ body.fr-v5 .fr-v5-explore__tile[data-art="classics"]{
+  background-image:linear-gradient(180deg,#04070a12,#040507e3),url('/assets/worlds/games-control-room.webp')!important;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+  padding:10px 6px;gap:6px;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+  font-size:clamp(17px,4vw,23px);line-height:1.05;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-eyebrow{
+  font-size:7px;line-height:1.15;top:8px;
+ }
+ body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-sub{
+  font-size:7px;line-height:1.18;letter-spacing:0;
+ }
+ body.fr-v5 .editorial-pick__title{font-size:clamp(18px,4.65vw,24px)}
+ body.fr-v5 .editorial-pick__synopsis{font-size:12px;line-height:1.35}
+}
+/* Site-owned atmosphere should not obscure an authenticated real film poster. */
+body.fr-v5 .editorial-pick__art-frame--poster{
+ background:#080708;
+}
+body.fr-v5 .editorial-pick__poster{
+ width:100%;height:100%;object-fit:cover;
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 .editorial-pick,
+ body.fr-v5 .fr-v5-explore__tile{transition:none;animation:none}
+}
+
+
+/* Owner review: an immediately usable homepage watchlist, not an obscure
+   second-page utility. HTML reserves this space from first paint. */
+body.fr-v5.hub-home .fr-home-watch-shelf{
+ width:100%;min-width:0;margin:8px auto 10px;
+ border:1px solid #74313d;border-left:3px solid #d42a45;
+ background:linear-gradient(105deg,#161013ef,#090d0ff5 72%);
+ box-shadow:inset 0 1px #ef6b7330,0 8px 24px #0008;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__header{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ min-width:0;min-height:48px;padding:8px 13px;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__label{min-width:0}
+body.fr-v5.hub-home .fr-home-watch-shelf h2{
+ margin:0;color:#ffdbd9;
+ font:700 clamp(13px,1.3vw,17px)/1.16 Arial,Helvetica,sans-serif;
+ letter-spacing:.055em;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf [data-home-watch-count]{
+ display:inline-grid;place-items:center;
+ min-width:24px;min-height:24px;padding:2px 6px;margin-left:5px;
+ border-radius:20px;border:1px solid #ad3c52;
+ background:#571621;color:#fff0ee;
+ font:700 12px Arial,Helvetica,sans-serif;letter-spacing:0;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__label p{
+ margin:3px 0 0;color:#d0bcbf;
+ font:400 11px/1.35 Arial,Helvetica,sans-serif;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__browse{
+ display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;
+ padding:9px 12px;min-height:35px;
+ border:1px solid #9b4855;border-radius:2px;
+ background:#210f15;color:#fce4e2;
+ font:700 11px/1.1 Arial,Helvetica,sans-serif;text-decoration:none;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__browse:hover,
+body.fr-v5.hub-home .fr-home-watch-shelf__browse:focus-visible{
+ border-color:#ef7886;outline-offset:2px;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__grid{
+ display:flex;gap:10px;
+ overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+ max-width:100%;padding:10px 13px 13px;
+ border-top:1px solid #503038;
+ scrollbar-width:thin;scrollbar-color:#8c3344 #0c0a0c;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__grid[hidden]{display:none!important}
+body.fr-v5.hub-home .fr-home-watch-shelf__item{
+ position:relative;flex:0 0 102px;min-width:0;
+ border:1px solid #793645;background:#07090b;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie{
+ display:flex;flex-direction:column;min-width:0;
+ color:#f7ece9;text-decoration:none;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__art{
+ display:grid;place-items:center;position:relative;
+ width:100%;height:126px;min-height:0;aspect-ratio:2/3;
+ overflow:hidden;background:#140b10;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__image{
+ width:100%;height:100%;object-fit:cover;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__fallback{
+ padding:7px;color:#eee0dd;text-align:center;
+ font:700 13px/1.12 Georgia,serif;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie-title{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ min-height:36px;overflow:hidden;padding:5px 4px;
+ text-align:center;font:700 11px/1.22 Georgia,serif;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__remove{
+ position:absolute;z-index:3;right:4px;top:4px;
+ width:28px;height:28px;display:grid;place-items:center;
+ border:1px solid #ffcbd0;border-radius:50%;
+ background:#92172e;color:white;
+ font:700 20px/1 Arial,Helvetica,sans-serif;cursor:pointer;
+ box-shadow:0 2px 9px #000b;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie:focus-visible,
+body.fr-v5.hub-home .fr-home-watch-shelf__remove:focus-visible{
+ outline:2px solid #fff0ee;outline-offset:2px;
+}
+@media(max-width:700px){
+ body.fr-v5.hub-home .fr-home-watch-shelf{margin:7px auto 10px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__header{min-height:50px;padding:7px 9px;gap:7px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__label p{font-size:10px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__browse{font-size:10px;padding:8px 7px;min-height:38px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__item{flex-basis:88px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__art{height:110px}
+ body.fr-v5.hub-home .fr-home-watch-shelf__grid{padding:8px;gap:8px}
+}
+/* The Cinema feature and country picker are now permanent HTML landmarks,
+   not inserted and moved after JS boot. Reserve their size during loading. */
+body.fr-v5 .fr-cinema-concept__cards{
+ align-content:start;min-height:210px;
+}
+body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{
+ grid-column:1/-1;min-height:110px;
+ padding:26px 10px;text-align:center;
+ color:#d9c9c7;font:500 13px/1.4 Arial,Helvetica,sans-serif;
+}
+@media(max-width:700px){
+ /* The three cinema feature cards occupy about this height once hydrated.
+    Preallocate it so a short scroll does not jump the release diary. */
+ body.fr-v5 .fr-cinema-concept__cards{min-height:182px}
+ body.fr-v5 .fr-cinema-concept__cards>.fr-cinema-concept__empty{min-height:175px}
+}
+
+
+/* Home card geometry: fit the content to the design, never the design to content. */
+/* A fixed visual composition: no intrinsically sized child may drag the small
+   file label above the top border or stretch the section. Clamp text intentionally
+   with the complete title still exposed on the film details link. */
+body.fr-v5.hub-home .hub-feature{
+ min-width:0;min-height:0;height:350px;max-height:350px;
+ display:grid;align-items:stretch;overflow:hidden;
+}
+body.fr-v5.hub-home .hub-feature>.hub-tile__content{
+ position:relative;z-index:3;
+ box-sizing:border-box;width:100%;max-width:100%;height:100%;min-height:0;
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ grid-template-rows:repeat(4,min-content) 42px;
+ grid-template-areas:"kicker kicker" "title title" "score score" "synopsis synopsis" "details trailer";
+ align-content:center;align-items:center;column-gap:9px;row-gap:8px;
+ overflow:hidden;padding:22px 22px 20px;
+}
+body.fr-v5.hub-home .hub-feature .hub-kicker{
+ grid-area:kicker;min-width:0;max-width:100%;margin:0;
+ font:700 11px/1.25 Arial,Helvetica,sans-serif;letter-spacing:.085em;
+ white-space:nowrap;text-overflow:ellipsis;overflow:hidden;
+}
+body.fr-v5.hub-home .hub-feature h3{
+ grid-area:title;min-width:0;max-width:75%;margin:0;
+ font:700 clamp(25px,2.7vw,38px)/1.06 Georgia,'Times New Roman',serif;
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden;text-wrap:balance;overflow-wrap:break-word;
+}
+body.fr-v5.hub-home .hub-feature .hub-feature__rating{
+ grid-area:score;justify-self:start;margin:0;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+body.fr-v5.hub-home .hub-feature p{
+ grid-area:synopsis;max-width:73%;min-width:0;margin:0;
+ font:400 13px/1.38 Arial,Helvetica,sans-serif;
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden;text-overflow:ellipsis;
+}
+body.fr-v5.hub-home .hub-feature .hub-tile__link,
+body.fr-v5.hub-home .hub-feature .fr-trailer-button{
+ position:relative;max-width:100%;min-width:0;width:100%;height:42px;min-height:42px;
+ display:flex;align-items:center;justify-content:center;gap:6px;
+ padding:7px 8px;margin:0;white-space:normal;text-align:center;
+ font:700 11px/1.14 Georgia,'Times New Roman',serif;letter-spacing:.01em;
+ overflow:hidden;
+}
+body.fr-v5.hub-home .hub-feature .hub-tile__link{grid-area:details}
+body.fr-v5.hub-home .hub-feature .fr-trailer-button{grid-area:trailer}
+body.fr-v5.hub-home .hub-feature .fr-trailer-button[hidden]{
+ display:none!important;
+}
+body.fr-v5.hub-home .hub-feature .hub-tile__link:has(+ .fr-trailer-button[hidden]){
+ grid-column:1/3;width:fit-content;max-width:100%;
+}
+/* The artwork may continue beneath the actions, but every text region remains
+   on a readable dark surface and within the same fixed feature boundary. */
+body.fr-v5.hub-home .hub-feature .hub-tile__wash{
+ background:linear-gradient(90deg,#050507f7 0%,#080609e9 51%,#080609aa 82%,#0806095d 100%);
+}
+@media(max-width:700px){
+ body.fr-v5.hub-home .hub-feature{
+  height:270px;min-height:270px;max-height:270px;
+ }
+ body.fr-v5.hub-home .hub-feature>.hub-tile__content{
+  padding:15px 12px 13px;
+  grid-template-rows:repeat(4,min-content) 42px;
+  row-gap:7px;column-gap:7px;
+ }
+ body.fr-v5.hub-home .hub-feature .hub-kicker{font-size:10px;line-height:1.25;letter-spacing:.025em}
+ body.fr-v5.hub-home .hub-feature h3{
+  font-size:clamp(24px,6.4vw,29px);line-height:1.05;max-width:78%;
+ }
+ body.fr-v5.hub-home .hub-feature p{font-size:12px;line-height:1.28;max-width:77%}
+ body.fr-v5.hub-home .hub-feature .hub-feature__rating{font-size:12px}
+ body.fr-v5.hub-home .hub-feature .hub-tile__link,
+ body.fr-v5.hub-home .hub-feature .fr-trailer-button{
+  font-size:clamp(10px,2.8vw,12px);line-height:1.15;
+ }
+}
+@media(max-width:359px){
+ body.fr-v5.hub-home .hub-feature{height:266px;min-height:266px;max-height:266px}
+ body.fr-v5.hub-home .hub-feature>.hub-tile__content{padding:12px 9px;row-gap:6px}
+ body.fr-v5.hub-home .hub-feature h3{font-size:22px}
+ body.fr-v5.hub-home .hub-feature p{font-size:11px}
+}
+/* Watchlist cards have fixed image and label tracks. Two lines is a deliberate
+   maximum, not an invitation for text to run outside the card. */
+body.fr-v5.hub-home .fr-home-watch-shelf__item{
+ display:grid;grid-template-rows:minmax(0,1fr);
+ height:186px;max-height:186px;min-height:0;overflow:hidden;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie{
+ display:grid;grid-template-rows:142px 42px;
+ width:100%;height:184px;min-height:0;overflow:hidden;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__art{
+ width:100%;height:142px;min-height:142px;max-height:142px;
+ aspect-ratio:auto;overflow:hidden;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie-title{
+ box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+ -webkit-line-clamp:2;
+ height:42px;min-height:0;max-height:42px;width:100%;
+ padding:4px 4px;overflow:hidden!important;
+ color:#f1e4e1;font:700 11px/1.35 Georgia,'Times New Roman',serif;
+ overflow-wrap:anywhere;word-break:normal;text-wrap:wrap;text-align:center;
+}
+@media(max-width:700px){
+ body.fr-v5.hub-home .fr-home-watch-shelf__item{
+  height:170px;max-height:170px;min-height:0;
+ }
+ body.fr-v5.hub-home .fr-home-watch-shelf__movie{
+  height:168px;grid-template-rows:126px 42px;
+ }
+ body.fr-v5.hub-home .fr-home-watch-shelf__movie .fr-v5-poster__art{
+  height:126px;min-height:126px;max-height:126px;
+ }
+}
+
+
+/* Frightertainment art direction: atmospheric surfaces, not bordered boxes. */
+/* Shared visual system: each module has its own bounded geometry and existing
+   semantic content. We replace the cheap-looking outlined boxes with light,
+   image, depth and whitespace. Functional focus rings remain untouched. */
+body.fr-v5{
+ --fr-atmos-edge:rgba(255,194,198,.095);
+ --fr-atmos-separator:rgba(222,111,123,.16);
+ --fr-atmos-glow:rgba(181,32,53,.22);
+ --fr-atmos-ink:#f5ebe7;
+ --fr-atmos-quiet:#d6c5c6;
+}
+/* Screen-wide accents belong to the page's typographic hierarchy, not to
+   an outline around every block. */
+body.fr-v5 .fr-v5-panel,
+body.fr-v5 .fr-catalogue-section,
+body.fr-v5 .fr-stream,
+body.fr-v5 .fr-game-chart,
+body.fr-v5 .podcast-chart,
+body.fr-v5 .hub-release-calendar,
+body.fr-v5 .hub-vault-portal,
+body.fr-v5 .fr-v5-deeper{
+ border:0!important;border-radius:2px!important;
+ background:linear-gradient(153deg,rgba(17,22,24,.94) 0%,rgba(7,10,12,.95) 65%,rgba(9,10,13,.98) 100%)!important;
+ box-shadow:inset 0 1px 0 var(--fr-atmos-edge),0 20px 32px rgba(0,0,0,.37)!important;
+}
+/* The main feature is a cinematic stage: illuminated art to the right,
+   controlled black gradient for copy, no red rectangle boxing it in. */
+body.fr-v5.hub-home .hub-feature{
+ border:0!important;border-radius:2px 19px 2px 2px!important;
+ background:#080709!important;
+ box-shadow:0 23px 45px #000a,inset 0 -65px 75px #070609b0,inset 0 1px 0 var(--fr-atmos-edge)!important;
+}
+body.fr-v5.hub-home .hub-feature::before{
+ background-image:url('/assets/worlds/movies-vault.webp');
+ background-position:72% 47%;background-size:cover;
+ filter:brightness(1.12) contrast(1.14) saturate(.97);
+ transform:none;opacity:.9;
+}
+body.fr-v5.hub-home .hub-feature::after{
+ background:radial-gradient(ellipse at 82% 33%,rgba(194,20,42,.22),transparent 38%);
+}
+body.fr-v5.hub-home .hub-feature .hub-tile__wash{
+ background:linear-gradient(91deg,#050608f7 0%,#080608ec 35%,#060507b3 60%,#06050753 100%);
+}
+body.fr-v5.hub-home .hub-feature .hub-kicker{
+ color:#f2b5bd;letter-spacing:.09em;
+}
+body.fr-v5.hub-home .hub-feature h3{
+ color:#fff2ed;text-shadow:0 2px 9px #000,0 8px 24px #000;
+}
+body.fr-v5.hub-home .hub-feature .hub-tile__link{
+ background:linear-gradient(120deg,#be1d38,#801524)!important;
+ border:1px solid #cf5363!important;
+ box-shadow:0 8px 22px #0009,inset 0 1px 0 #fff2!important;
+}
+body.fr-v5.hub-home .hub-feature .fr-trailer-button{
+ background:rgba(13,9,12,.85)!important;
+ border-color:rgba(243,139,150,.48)!important;
+}
+/* Ranking is an adjoining dossier, not another framed widget. */
+body.fr-v5.hub-home .hub-charts,
+body.fr-v5 .fr-v5-spotlight-row .fr-v5-ranking{
+ border:0!important;border-radius:2px!important;
+ background:linear-gradient(160deg,#131114 0%,#0b0d10 54%,#060709 100%)!important;
+ box-shadow:inset 0 1px var(--fr-atmos-edge),inset 0 0 55px rgba(130,22,40,.085),0 20px 34px #0007!important;
+}
+body.fr-v5 .hub-charts::before,
+body.fr-v5 .hub-charts::after{
+ border:0!important;box-shadow:none!important;
+}
+body.fr-v5.hub-home .hub-charts__top{
+ background:radial-gradient(ellipse at 0 0,rgba(143,22,44,.18),transparent 73%);
+ border-bottom:0!important;padding-bottom:12px;
+}
+body.fr-v5.hub-home .hub-charts__top .hub-eyebrow{
+ color:#cfa3a9;letter-spacing:.11em;
+}
+body.fr-v5.hub-home .hub-charts h2{color:#f5e8e5}
+body.fr-v5.hub-home .hub-chart-row{
+ border-bottom:1px solid var(--fr-atmos-separator)!important;
+ background:transparent!important;
+}
+body.fr-v5.hub-home .hub-chart-row:nth-child(even){
+ background:rgba(146,30,49,.045)!important;
+}
+body.fr-v5.hub-home .hub-charts__all{
+ border:0!important;border-radius:2px!important;
+ background:linear-gradient(110deg,#8e2032,#51111f)!important;
+}
+body.fr-v5.hub-home .hub-charts__foot{color:#bca6a9}
+/* The five landing tiles rely on photography/atmosphere. A clipped upper
+   corner and low title wash provide structure without a rectangular stroke. */
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile,
+body.fr-v5 .fr-v5-explore__tile,
+body.fr-v5 .fr-v5-editorial-tile{
+ border:0!important;border-radius:0!important;
+ clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+ box-shadow:inset 0 -45px 45px rgba(0,0,0,.62),0 9px 25px #0007!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile::before{
+ filter:contrast(1.13) saturate(.9) brightness(.91)!important;
+ opacity:.95;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__wash{
+ background:linear-gradient(180deg,rgba(0,0,0,0) 23%,rgba(6,6,8,.35) 49%,rgba(6,7,10,.96) 100%)!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .fr-home-category{
+ color:#fff2ee;text-shadow:0 2px 10px #000,0 2px 4px #000;
+ letter-spacing:.035em;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile:focus-within,
+body.fr-v5 .fr-v5-explore__tile:focus-visible,
+body.fr-v5 .fr-v5-editorial-tile:focus-visible{
+ filter:brightness(1.2);
+ outline:2px solid #ffe2e6;outline-offset:2px;
+}
+body.fr-v5 .fr-v5-explore{
+ border:0!important;background:transparent!important;
+}
+body.fr-v5 .fr-v5-explore__tile{
+ text-shadow:0 2px 7px #000,0 4px 16px #000;
+}
+body.fr-v5 .fr-v5-explore__tile:hover,
+body.fr-v5 .fr-v5-editorial-tile:hover{
+ filter:brightness(1.16);
+}
+/* Section headings use a short editorial marker, not a horizontal box. */
+body.fr-v5 .fr-v5-panel__head,
+body.fr-v5 .fr-catalogue-head{
+ position:relative;border-bottom:0!important;
+ padding-block:12px 10px;
+}
+body.fr-v5 .fr-v5-panel__head::before{
+ content:'';position:absolute;left:10px;top:12px;
+ width:2px;height:21px;
+ background:linear-gradient(#ff5263,#732032);
+ box-shadow:0 0 11px rgba(206,31,53,.28);
+}
+body.fr-v5 .fr-v5-panel__head-copy{
+ padding-inline-start:11px;
+}
+body.fr-v5 .fr-v5-panel__head h2{
+ font-family:Georgia,'Times New Roman',serif;
+ letter-spacing:.025em;
+}
+body.fr-v5 .fr-v5-panel__all{
+ color:#e5acb3;white-space:nowrap;
+}
+body.fr-v5 .fr-v5-panel__all:hover{text-decoration:underline;text-underline-offset:3px}
+/* Magazine editorials lose external boxing; the actual art/promo frame can
+   retain a subtle hairline because that is a poster, not a section outline. */
+body.fr-v5 .editorial-pick{
+ border:0!important;border-radius:2px 17px 2px 2px!important;
+ box-shadow:inset 0 1px 0 var(--fr-atmos-edge),inset 0 -48px 72px #0506087e,0 18px 39px #0009!important;
+}
+body.fr-v5 .editorial-pick::after{
+ display:none!important;
+}
+body.fr-v5 .editorial-pick::before{
+ background:linear-gradient(90deg,rgba(179,22,46,.93),rgba(112,20,34,.69) 46%,transparent 91%)!important;
+ box-shadow:none!important;
+}
+/* Save-film cards are actual posters. Their image edge can remain defined,
+   but the watchlist shelf should feel like a floating rail, not a boxed app. */
+body.fr-v5.hub-home .fr-home-watch-shelf{
+ border:0!important;border-left:0!important;border-radius:2px!important;
+ position:relative;
+ background:linear-gradient(96deg,rgba(40,17,26,.96) 0%,rgba(16,16,20,.96) 59%,rgba(8,12,14,.96) 100%)!important;
+ box-shadow:inset 0 1px var(--fr-atmos-edge),0 15px 31px #0008!important;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf::before{
+ content:'';position:absolute;left:13px;top:0;
+ width:47px;height:2px;
+ background:linear-gradient(90deg,#f04c60,rgba(240,76,96,0));
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__grid{
+ border-top:0!important;padding-top:7px;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__item{
+ border:0!important;border-radius:2px!important;
+ background:#08090b!important;
+ box-shadow:0 8px 23px #000a;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__movie-title{
+ color:#f5eae6;
+}
+body.fr-v5.hub-home .fr-home-watch-shelf__browse{
+ background:rgba(81,22,35,.68);border:1px solid rgba(230,111,125,.37);
+}
+/* Cinema's promo and country modules are part of one editorial spread,
+   separated by image depth and spacing instead of identical red boxes. */
+body.fr-v5 .fr-cinema-concept__features,
+body.fr-v5 .fr-cinema-concept__region{
+ border:0!important;border-radius:2px!important;
+ box-shadow:inset 0 1px var(--fr-atmos-edge),0 16px 34px #0008!important;
+}
+body.fr-v5 .fr-cinema-concept__features{
+ background:linear-gradient(145deg,#111116f3,#080b0df9)!important;
+}
+body.fr-v5 .fr-cinema-concept__region{
+ background:radial-gradient(ellipse at 100% 0,rgba(156,26,46,.12),transparent 65%),linear-gradient(150deg,#10161af7,#07090bf8)!important;
+}
+body.fr-v5 .fr-cinema-concept__head{
+ border-bottom:1px solid var(--fr-atmos-separator)!important;
+}
+body.fr-v5 .fr-cinema-concept__card{
+ border:0!important;border-radius:0!important;
+ background:#090d10;
+ box-shadow:0 7px 17px #000b!important;
+ clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%);
+}
+body.fr-v5 .fr-cinema-concept__copy{
+ background:linear-gradient(180deg,#0c1012,#090b0e);
+}
+body.fr-v5 .fr-cinema-concept__copy a{
+ background:linear-gradient(115deg,#8d1d31,#6e1827);
+ border:0;border-radius:2px;
+}
+/* Disclosure sections are doors into further content, not more boxes. */
+body.fr-v5 .fr-v5-deeper__summary{
+ border:0!important;box-shadow:inset 3px 0 rgba(184,39,58,.55);
+}
+body.fr-v5 .fr-v5-deeper[open]>.fr-v5-deeper__summary{
+ border-bottom:1px solid var(--fr-atmos-separator)!important;
+}
+body.fr-v5.hub-home .fr-home-updates,
+body.fr-v5.hub-home .home-discovery-wrap{
+ border:0!important;border-radius:2px!important;
+ background:linear-gradient(110deg,#141013ee,#0a0e11f8 82%)!important;
+ box-shadow:inset 0 1px var(--fr-atmos-edge),0 12px 24px #0008!important;
+}
+body.fr-v5.hub-home .fr-home-updates>summary,
+body.fr-v5.hub-home .home-discovery-wrap__summary{
+ border:0!important;background:transparent!important;
+}
+body.fr-v5.hub-home .fr-home-updates__action,
+body.fr-v5.hub-home .home-discovery-wrap__action{
+ border:0!important;border-radius:2px;
+ background:linear-gradient(105deg,#842137,#571525);
+}
+/* Individual catalog posters retain their natural edges; don't add more
+   strokes around every poster in the editorial rack. */
+body.fr-v5 .fr-v5-poster-card,
+body.fr-v5 .fr-v5-poster,
+body.fr-v5 .fr-media-card,
+body.fr-v5 .fr-v5-watchlist__saved{
+ border:0!important;border-radius:2px!important;
+ box-shadow:0 8px 16px rgba(0,0,0,.45)!important;
+}
+body.fr-v5 .fr-v5-poster-card>.fr-v5-poster,
+body.fr-v5 .fr-v5-watchlist__item{
+ box-shadow:none!important;
+}
+@media(max-width:700px){
+ body.fr-v5.hub-home .hub-feature{
+  border-radius:2px 12px 2px 2px!important;
+ }
+ body.fr-v5.hub-home .hub-feature::before{
+  background-position:68% center;
+  filter:brightness(.95) contrast(1.15) saturate(.95);
+ }
+ body.fr-v5.hub-home .hub-feature .hub-tile__wash{
+  background:linear-gradient(90deg,#050608f9 0%,#070609f0 46%,#070608b9 75%,#08060981 100%);
+ }
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase{gap:10px}
+ body.fr-v5 .fr-v5-panel__head{padding-block:10px 8px}
+ body.fr-v5 .fr-v5-panel__head::before{top:11px;height:17px}
+ body.fr-v5 .fr-cinema-concept__features,
+ body.fr-v5 .fr-cinema-concept__region{border-radius:2px!important}
+ body.fr-v5.hub-home .fr-home-watch-shelf::before{left:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 .fr-v5-explore__tile,
+ body.fr-v5 .fr-v5-editorial-tile{transition:none!important}
+}

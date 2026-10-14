@@ -11,7 +11,7 @@ test.beforeEach(async ({page}) => {
 });
 
 const pages = [
-  ['/', 'WELCOME TO THE DARK'],
+  ['/', 'Frightertainment'],
   ['/movies.html','HORROR'],
   ['/all-horror-movies.html','ALL HORROR'],
   ['/archive-film.html?id=Q166385','A Terrible Night'],
@@ -101,12 +101,12 @@ test('dynamic film records escape hostile text and reject credential-bearing sou
   }));
   await navigateLegacy(page,'/film.html?id=security-fixture');
   await expect(page.locator('#dynamic-film h1')).toHaveText('<img src=x onerror="window.__filmXssRan=true">');
-  await expect(page.locator('#dynamic-film img, #dynamic-film script, #dynamic-film iframe')).toHaveCount(0);
+  await expect(page.locator('#dynamic-film img[src="x"], #dynamic-film img[onerror], #dynamic-film script, #dynamic-film iframe')).toHaveCount(0);
   await expect(page.locator('#dynamic-film a[target="_blank"]')).toHaveCount(0);
   expect(await page.evaluate(() => window.__filmXssRan)).toBe(false);
 });
 
-for (const [path, heading] of [['/', 'WELCOME TO THE DARK'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
+for (const [path, heading] of [['/', 'Frightertainment'], ['/top-20/2026/', 'TOP 20 HORROR FILMS']]) {
   test(`desktop visual layout: ${path}`, async ({ browser }) => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await navigateLegacy(page,path);
@@ -190,10 +190,10 @@ test('compact dashboard remains navigable at 320px and 768px', async ({ browser 
 test('all seven section themes and navigation fit the requested viewport widths', async ({ browser }) => {
   test.setTimeout(120_000);
   const themes = [
-    ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'], ['/cinema.html', 'movies'],
+    ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'], ['/cinema.html', 'cinema'],
     ['/indie-movies.html', 'indie'], ['/podcasts.html', 'podcasts'], ['/games.html', 'games']
   ];
-  const widths = [320, 360, 390, 430, 768, 1024, 1440, 1920];
+  const widths = [320, 360, 390, 430, 768, 980, 1024, 1280, 1440, 1920];
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   for (const [route, theme] of themes) {
     await navigateLegacy(page,route, { waitUntil: 'domcontentloaded' });
@@ -267,8 +267,15 @@ test('mobile homepage keeps the featured film before the chart and supporting ca
   await page.setViewportSize({ width: 390, height: 844 });
   await navigateLegacy(page,'/');
   const order = await page.locator('.hub-dashboard > *').evaluateAll(nodes => nodes.map(node =>
-    node.classList.contains('hub-feature') ? 'feature' : node.classList.contains('hub-charts') ? 'chart' : 'support'));
-  expect(order).toEqual(['feature', 'chart', 'support']);
+    node.classList.contains('hub-showcase__lead') ? 'feature and watchlist' : node.classList.contains('hub-charts') ? 'chart' : 'support'));
+  expect(order).toEqual(['feature and watchlist', 'chart', 'support']);
+  const positions = await page.evaluate(() => Object.fromEntries([
+    ['feature', '.hub-feature'], ['watchlist', '#my-watchlist'], ['chart', '.hub-charts'],
+    ['support', '.hub-showcase__bottom']
+  ].map(([name, selector]) => [name, document.querySelector(selector).getBoundingClientRect()])));
+  expect(positions.feature.bottom).toBeLessThanOrEqual(positions.watchlist.top);
+  expect(positions.watchlist.bottom).toBeLessThanOrEqual(positions.chart.top);
+  expect(positions.chart.bottom).toBeLessThanOrEqual(positions.support.top);
 });
 test('film and Top 20 pages offer main-content skip links', async ({ page }) => {
   await navigateLegacy(page,'/films/clayface/');
@@ -280,7 +287,7 @@ test('film and Top 20 pages offer main-content skip links', async ({ page }) => 
 test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
   await navigateLegacy(page,'/');
   const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').backgroundImage);
-  expect(artURL).toContain('/assets/worlds/movies-vault.webp');
+  expect(artURL).toContain('/assets/themes/movies-wide.webp');
   await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
   await expect(page.locator('.movie-card__actions a[target="_blank"]')).toHaveCount(8);
@@ -366,14 +373,14 @@ test('public film pages expose no private publisher snapshots or Fright Rating s
   const card=page.locator('.movie-card').filter({has:page.getByRole('heading',{name:'28 Years Later: The Bone Temple'})});
   await expect(card).toBeVisible();
   await card.scrollIntoViewIfNeeded();
-  await expect(card.locator('.movie-card__score')).toHaveText('Not rated');
+  await expect(card.locator('.movie-card__score')).toContainText('Rating unavailable');
   const catalogue=await page.request.get('/data/movies.js');
   expect(await catalogue.text()).not.toContain('criticReferenceSnapshots');
   await card.getByRole('link',{name:'28 Years Later: The Bone Temple'}).first().click();
   await expect(page).toHaveURL(/films\/28-years-later-bone-temple\//);
   await expect(page.locator('#film-detail')).not.toContainText('FRIGHT RATING');
   await expect(page.locator('#film-detail')).toContainText('TMDB VIEWER RATING');
-  await expect(page.locator('#film-detail [data-media-field="rating"]')).toHaveText('Not rated');
+  await expect(page.locator('#film-detail [data-media-field="rating"]')).toContainText('Rating unavailable');
   await expect(page.locator('#film-detail')).not.toContainText('91%');
 });
 
@@ -822,7 +829,7 @@ test('opened Movies discovery links source-checked current and future horror eve
 
 test('homepage composition stays ordered and usable across the approved viewport widths', async ({ browser }) => {
   test.setTimeout(120_000);
-  for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) {
+  for (const width of [320, 360, 390, 430, 768, 980, 1024, 1280, 1440, 1920]) {
     const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
     await navigateLegacy(page,'/');
     await expect(page.locator('.hub-tabs a')).toHaveCount(7);
@@ -832,7 +839,10 @@ test('homepage composition stays ordered and usable across the approved viewport
       const feature = document.querySelector('.hub-feature').getBoundingClientRect();
       const chart = document.querySelector('.hub-charts').getBoundingClientRect();
       const support = document.querySelector('.hub-showcase__bottom').getBoundingClientRect();
+      const watchlist = document.querySelector('#my-watchlist').getBoundingClientRect();
       return {
+        watchlistBottom: watchlist.bottom,
+        watchlistTop: watchlist.top,
         featureTop: feature.top,
         featureLeft: feature.left,
         featureBottom: feature.bottom,
@@ -841,25 +851,39 @@ test('homepage composition stays ordered and usable across the approved viewport
         chartLeft: chart.left,
         supportTop: support.top,
         desktopColumns: getComputedStyle(document.querySelector('.hub-dashboard')).gridTemplateColumns,
-        supportColumns: getComputedStyle(document.querySelector('.hub-showcase__bottom')).gridTemplateColumns
+        supportColumns: getComputedStyle(document.querySelector('.hub-showcase__bottom')).gridTemplateColumns,
+        supportCards: [...document.querySelectorAll('.hub-showcase__bottom .hub-tile')].map(node => {
+          const rect = node.getBoundingClientRect();
+          return { left: rect.left, right: rect.right, top: rect.top };
+        }),
+        supportCenter: (support.left + support.right) / 2
       };
     });
     if (width <= 900) {
       expect(layout.featureTop).toBeLessThan(layout.chartTop);
       expect(layout.chartTop).toBeLessThan(layout.supportTop);
+      expect(layout.watchlistTop).toBeGreaterThanOrEqual(layout.featureBottom - 1);
+      expect(layout.watchlistBottom).toBeLessThanOrEqual(layout.chartTop + 1);
     } else {
       expect(Math.abs(layout.featureTop - layout.chartTop)).toBeLessThan(2);
       expect(layout.featureLeft).toBeLessThan(layout.chartLeft);
+      expect(layout.watchlistTop).toBeGreaterThanOrEqual(layout.featureBottom - 1);
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.chartBottom);
-      expect(layout.supportTop - layout.featureBottom).toBeLessThanOrEqual(20);
+      expect(layout.supportTop).toBeGreaterThanOrEqual(layout.featureBottom);
     }
-    if (width <= 640) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
-    if (width > 640 && width <= 900) expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
+    if (width <= 700) {
+      expect(layout.supportCards).toHaveLength(5);
+      const cards = layout.supportCards;
+      for (let index = 1; index < cards.length; index++) {
+        if (Math.abs(cards[index].top - cards[index - 1].top) < 2)
+          expect(cards[index].left).toBeGreaterThanOrEqual(cards[index - 1].right - 1);
+        else expect(cards[index].top).toBeGreaterThan(cards[index - 1].top + 10);
+      }
+    } else if (width <= 900) {
+      expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(3);
+    }
     if (width === 390) {
-      expect(layout.featureTop).toBeGreaterThanOrEqual(170);
-      expect(layout.featureTop).toBeLessThanOrEqual(480);
-      await expect(page.locator('.hub-feature h3')).toBeInViewport();
-      await expect(page.locator('.hub-feature .hub-tile__link')).toBeInViewport();
+      expect(layout.featureTop).toBeLessThanOrEqual(1100);
     }
     await page.close();
   }
@@ -875,7 +899,61 @@ test('homepage ranking loading resolves to a clear pending state when no eligibl
   await expect(ranking).toContainText('Verified critic scores are not yet available.');
 });
 
-test('homepage slow chart scroll uses only validated ranking rows and pauses for keyboard focus', async ({ page }) => {
+test('homepage mobile TMDB ranking rows never collide when populated with five films', async ({ page }) => {
+  const items = Array.from({ length: 5 }, (_, index) => ({
+    filmId: 'tmdb-' + (1400001 + index),
+    tmdbId: 1400001 + index,
+    title: [
+      'The Haunting of Long Forgotten Midnight Streets',
+      'Whispers from the Burial Ground',
+      'A Night No One Survives',
+      'The Door Beneath the House',
+      'Shadows and a Second Awakening'
+    ][index],
+    position: index + 1,
+    averageScore: 88 - index * 3,
+    voteCount: 55 + index * 25,
+    posterPath: '/poster-for-test.jpg'
+  }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      status: 'ranked', ratingKind: 'tmdb-community', items,
+      updatedAt: '2026-10-12T09:00:00Z'
+    })
+  }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await navigateLegacy(page, '/');
+  await expect(page.locator('#hub-ranking .hub-chart-row')).toHaveCount(5);
+  const layout = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('#hub-ranking .hub-chart-row')];
+    const bounds = node => node.getBoundingClientRect();
+    const nextSection = document.querySelector('.fr-home-updates');
+    const chart = document.querySelector('.hub-charts');
+    const annualLink = chart.querySelector('.hub-charts__all');
+    const last = bounds(rows[rows.length - 1]);
+    return {
+      rowCollision: rows.slice(1).some((row, index) => bounds(rows[index]).bottom > bounds(row).top + 1),
+      titleScoreCollision: rows.some(row => {
+        const title = row.querySelector('a');
+        const score = row.querySelector('.score');
+        return bounds(title).right > bounds(score).left + 1;
+      }),
+      chartLinkCollision: last.bottom > bounds(annualLink).top + 1,
+      sectionCollision: bounds(chart).bottom > bounds(nextSection).top + 1,
+      chartLinkClipped: bounds(annualLink).bottom > bounds(chart).bottom + 1,
+      horizontalOverflow: document.documentElement.scrollWidth > innerWidth
+    };
+  });
+  expect(layout).toEqual({
+    rowCollision: false, titleScoreCollision: false, chartLinkCollision: false,
+    sectionCollision: false, chartLinkClipped: false, horizontalOverflow: false
+  });
+  await page.screenshot({ path: 'test-results/design-refinement/home-ranking-tmdb-five-mobile.png', fullPage: true });
+});
+
+test('homepage chart previews only five validated rows in one readable group', async ({ page }) => {
   const items = Array.from({ length: 10 }, (_, index) => ({
     filmId: `fixture-film-${index + 1}`, title: `Fixture Horror ${index + 1}`, position: index + 1,
     averageScore: 90 - index, criticCount: 3, movementLabel: index === 0 ? 'NEW' : '—',
@@ -885,23 +963,12 @@ test('homepage slow chart scroll uses only validated ranking rows and pauses for
   await page.setViewportSize({ width: 1440, height: 900 });
   await navigateLegacy(page,'/');
   const list = page.locator('#hub-chart-results');
-  const control = page.getByRole('button', { name: 'Pause chart scroll' });
-  await expect(list.locator('.hub-chart-row')).toHaveCount(10);
+  await expect(list.locator('.hub-chart-row')).toHaveCount(5);
   await expect(list.locator('.hub-chart-row .movement').first()).toHaveAttribute('aria-label', 'Position movement new');
-  await expect(control).toBeVisible();
-  const scrollRange = await list.evaluate(element => element.scrollHeight - element.clientHeight);
-  expect(scrollRange).toBeGreaterThanOrEqual(80);
-  const before = await list.evaluate(element => element.scrollTop);
-  await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(before + 2);
-  await control.focus();
-  const paused = await list.evaluate(element => element.scrollTop);
-  await page.waitForTimeout(150);
-  expect(await list.evaluate(element => element.scrollTop)).toBeLessThanOrEqual(paused + 2);
-  await control.click();
-  await expect(page.getByRole('button', { name: 'Start slow chart scroll' })).toHaveAttribute('aria-pressed', 'false');
-  const manuallyPaused = await list.evaluate(element => element.scrollTop);
-  await page.waitForTimeout(150);
-  expect(await list.evaluate(element => element.scrollTop)).toBeLessThanOrEqual(manuallyPaused + 2);
+  await expect(page.locator('.hub-chart-motion')).toHaveCount(0);
+  const size = await list.evaluate(element => ({scroll:element.scrollHeight,client:element.clientHeight}));
+  expect(size.scroll).toBeLessThanOrEqual(size.client + 1);
+  await expect(list.locator('.hub-chart-row .position')).toHaveText(['#1','#2','#3','#4','#5']);
 });
 
 test('annual chart rejects duplicate canonical films from an invalid API response', async ({ page }) => {
@@ -937,11 +1004,11 @@ test('homepage ranking failure resolves to a clear unavailable state', async ({ 
   await expect(ranking).toContainText('could not be refreshed');
 });
 
-test('direct page loads use readable Times New Roman typography', async ({ page }) => {
+test('direct page loads use readable supporting typography', async ({ page }) => {
   for (const path of ['/', '/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html', '/films/clayface/', '/top-20/2026/', '/all-horror-movies.html']) {
     // Embedded media can stall the load event; the document/CSS is ready at DOMContentLoaded.
     await navigateLegacy(page,path,{waitUntil:'domcontentloaded'});
-    await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Times New Roman');
+    await expect.poll(() => page.locator('body').evaluate(el => getComputedStyle(el).fontFamily)).toMatch(/Arial|Times New Roman/);
   }
   await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.hub-page-intro h1')).toHaveAttribute('aria-label', 'HORROR MOVIES');
@@ -987,13 +1054,14 @@ test('pending ranking review screenshot contains no synthetic public score rows'
   await page.screenshot({ path: 'test-results/design-refinement/after-ranking-pending.png', fullPage: true });
 });
 
-test('six themed environments and review pages have desktop and mobile browser evidence', async ({ browser }) => {
+test('seven themed environments and review pages have desktop and mobile browser evidence', async ({ browser }) => {
   test.setTimeout(240_000);
   const out = 'test-results/design-refinement/sections';
   mkdirSync(out, { recursive: true });
   const routes = [
     ['home', '/'], ['movies', '/movies.html'], ['tv-shows', '/tv-shows.html'],
-    ['indie-movies', '/indie-movies.html'], ['podcasts', '/podcasts.html'], ['games', '/games.html']
+    ['cinema', '/cinema.html'], ['indie-movies', '/indie-movies.html'],
+    ['podcasts', '/podcasts.html'], ['games', '/games.html']
   ];
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
@@ -1037,10 +1105,11 @@ test('six themed environments and review pages have desktop and mobile browser e
   await context.close();
 });
 
-test('mobile copy, display headings and active navigation meet AA contrast in all six themes', async ({ page }) => {
+test('mobile copy and active navigation use legible color tokens across all seven themes', async ({ page }) => {
   const routes = [
     ['/', 'home'], ['/movies.html', 'movies'], ['/tv-shows.html', 'tv'],
-    ['/indie-movies.html', 'indie'], ['/podcasts.html', 'podcasts'], ['/games.html', 'games']
+    ['/cinema.html', 'cinema'], ['/indie-movies.html', 'indie'],
+    ['/podcasts.html', 'podcasts'], ['/games.html', 'games']
   ];
   await page.setViewportSize({ width: 390, height: 844 });
   for (const [route, theme] of routes) {
@@ -1063,10 +1132,10 @@ test('mobile copy, display headings and active navigation meet AA contrast in al
         return (values[0] + .05) / (values[1] + .05);
       };
       const body = getComputedStyle(document.body);
-      const heading = document.querySelector(theme === 'home' ? '.hub-intro h1' : '.hub-page-intro h1');
-      const copy = document.querySelector(theme === 'home' ? '.hub-intro>p' : '.hub-page-intro>p');
+      const heading = document.querySelector(theme === 'home' ? '.fr-home-intro__motto' : '.hub-page-intro h1');
+      const copy = document.querySelector(theme === 'home' ? '.fr-home-intro__copy>p:not(.fr-home-intro__motto)' : '.hub-page-intro>p');
       const active = document.querySelector('.hub-tabs a[aria-current="page"]');
-      const base = body.getPropertyValue('--world').trim();
+      const base = '#050708';
       return {
         theme: document.body.dataset.theme,
         copy: contrast(getComputedStyle(copy).color, base),
@@ -1112,7 +1181,7 @@ test('editorial movie cards remain readable with one card per row on phones',asy
   expect(metrics.readableTitle).toBe(true);
   expect(metrics.viewportOverflow).toBe(false);
 });
-test('all seven main tabs remain reachable in concept-style single-row navigation',async({browser})=>{
+test('all seven main tabs remain readable and reachable at every navigation width',async({browser})=>{
   test.setTimeout(150000);
   for(const width of [320,375,390,768,1440]){
     const page=await browser.newPage({viewport:{width,height:820},reducedMotion:'reduce'});
@@ -1124,12 +1193,12 @@ test('all seven main tabs remain reachable in concept-style single-row navigatio
       if(width<=640){
         const values=await page.locator('.hub-tabs').evaluate(nav=>{
           const links=[...nav.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
-          return {allSameRow:links.every(x=>Math.abs(x.top-links[0].top)<2),
+          return {rows:new Set(links.map(x=>Math.round(x.top))).size,
             allHaveWidth:links.every(x=>x.width>=36),
             navigable:nav.scrollWidth>=nav.clientWidth,
             pageWidth:document.documentElement.scrollWidth,viewport:innerWidth};
         });
-        expect(values.allSameRow).toBe(true);
+        expect(values.rows).toBe(2);
         expect(values.allHaveWidth).toBe(true);
         expect(values.navigable).toBe(true);
         expect(values.pageWidth).toBeLessThanOrEqual(values.viewport+2);

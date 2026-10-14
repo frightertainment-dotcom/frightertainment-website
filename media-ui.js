@@ -30,7 +30,9 @@
     if (!root.isConnected) return;
     root.dataset.mediaStatus = item ? 'ready' : 'unavailable';
     if (!item) {
-      root.querySelectorAll('[data-media-field="rating"]').forEach(node => {node.textContent='Not rated';});
+      root.querySelectorAll('[data-media-field="rating"]').forEach(node => {
+        window.FRRatingBadge.render(node,{score:null,source:'tmdb-community',voteCount:null,size:'compact'});
+      });
       for(const [field,label] of Object.entries({'poster-status':'Poster unavailable','trailer-status':'No official trailer available','date':'Release date unavailable','overview':'A synopsis is not available for this title.'}))root.querySelectorAll(`[data-media-field="${field}"]`).forEach(node=>{node.textContent=label;});
       return;
     }
@@ -49,9 +51,9 @@
           break;
         }
         case 'rating': {
-          const rated=Number.isFinite(item.voteAverage)&&item.voteAverage>0&&item.voteCount>0;
-          node.textContent=rated?'TMDB '+item.voteAverage.toFixed(1)+'/10':'Not rated';
-          node.setAttribute('aria-label',rated?`TMDB viewer rating ${item.voteAverage.toFixed(1)} out of 10 from ${item.voteCount} votes`:'No TMDB viewer rating yet');
+          if (item.ratingKind === 'tmdb-community')
+            window.FRRatingBadge.render(node,window.FRRatingBadge.fromTmdbMedia(item,'compact'));
+          else node.textContent = 'Rating unavailable';
           break;
         }
         case 'votes':node.textContent=item.voteCount>0?new Intl.NumberFormat('en-GB').format(item.voteCount)+' viewer votes':'';break;

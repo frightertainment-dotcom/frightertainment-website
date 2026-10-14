@@ -3,7 +3,10 @@
    watchlists, ranking values, video links or third-party poster rights. */
 (() => {
  'use strict';
- const theme=location.pathname.endsWith('/cinema.html')?'cinema':document.body?.dataset.theme;
+ // Page identity is explicit so alternate URLs and delayed work cannot turn
+ // Cinema's movie catalogue into the Movies magazine layout. Other pages still
+ // use their existing theme value until their markup declares data-page.
+ const theme=document.body?.dataset.page||document.body?.dataset.theme;
  if (!['movies','indie','tv','podcasts','games','home','cinema'].includes(theme)) return;
  const main=document.querySelector('main');
  const intro=main?.querySelector('.hub-page-intro');
@@ -55,19 +58,37 @@
  const poster=(x,type)=>{
   const a=link('',filmHref(x,type),'fr-v5-poster');
   const art=image(x,type);
-  const foot=el('div','fr-v5-poster__bottom');
+  const foot=link('',filmHref(x,type),'fr-v5-poster__bottom');
   foot.append(el('strong','',x.title));
   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
-  a.append(art,foot);
+  a.append(art);
   a.setAttribute('aria-label','Explore '+x.title+' details');
-  if(type==='movie' || type==='indie'){
-   const box=el('article','fr-v5-poster-card');
-   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
-   box.append(a,watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
-   return box;
+  const box=el('article','fr-v5-poster-card');
+  const media=el('div','fr-v5-poster__media');
+  media.append(a);
+  box.append(media,foot);
+  const source=link('SOURCE',`https://www.themoviedb.org/${type==='tv'?'tv':'movie'}/${itemId(x)}`,'fr-v5-poster__source');
+  source.setAttribute('aria-label','TMDB source for '+x.title);
+  source.target='_blank';source.rel='noopener noreferrer';
+  media.append(source);
+  if(x.ratingKind==='tmdb-community'&&Number.isFinite(x.voteAverage)&&Number.isInteger(x.voteCount)&&x.voteCount>0){
+   const rating=el('span','fr-v5-poster__rating');
+   rating.append(window.FRRatingBadge.create(window.FRRatingBadge.fromTmdbMedia(x,'compact')));
+   media.append(rating);
   }
-  return a;
+  const video=mediaKey(x);
+  if(/^[A-Za-z0-9_-]{11}$/.test(video)){
+   const play=el('button','fr-v5-poster__trailer','▶ TRAILER');
+   play.type='button';play.dataset.trailerVideo=video;play.dataset.trailerTitle=x.title;
+   play.setAttribute('aria-label','Play official trailer for '+x.title);
+   media.append(play);
+  }
+  if(type==='movie' || type==='indie'){
+   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+   media.append(watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
+  }
+  return box;
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
  const catalogueRequests=new Map();
@@ -135,24 +156,40 @@
   document.addEventListener('fr-v5-watchlist-updated',update);
   return button;
  };
- const addWatchlist=parent=>{
-  const p=panel('fr-v5-watchlist','MY WATCHLIST','Your saved horror films.','/all-horror-movies.html');
-  const grid=el('div','fr-v5-watchlist__grid');p.append(grid);parent.append(p);
+ const mountHomeWatchlist=()=>{
+  const section=document.querySelector('#my-watchlist');
+  if(!section)return;
+  const grid=section.querySelector('[data-home-watch-items]');
+  const count=section.querySelector('[data-home-watch-count]');
+  const description=section.querySelector('[data-home-watch-description]');
+  if(!grid||!count||!description)return;
   const render=()=>{
    const items=savedWatch();
+   count.textContent=String(items.length);
+   section.dataset.hasItems=String(items.length>0);
+   grid.hidden=items.length===0;
    if(!items.length){
-    mockFreeState(grid,'Nothing saved yet. Press + on a film poster below to make your list.');
+    grid.replaceChildren();
+    description.textContent='Save a horror film with + in Movies, then find it here.';
     return;
    }
-   grid.replaceChildren(...items.slice(0,5).map(item=>{
-    const a=link('',filmHref(item,item.type),'fr-v5-watchlist__item');
-    a.setAttribute('aria-label','Open '+item.title);
-    a.append(image(item,item.type),el('span','fr-v5-watchlist__title',item.title));
-    const box=el('div','fr-v5-watchlist__saved');box.append(a,watchButton(item));
+   description.textContent='Tap a saved poster to see film details. Saved on this browser.';
+   grid.replaceChildren(...items.map(item=>{
+    const box=el('div','fr-home-watch-shelf__item');
+    const a=link('',filmHref(item,item.type),'fr-home-watch-shelf__movie');
+    a.setAttribute('aria-label','Open details for '+item.title);
+    a.append(image(item,item.type),el('strong','fr-home-watch-shelf__movie-title',item.title));
+    const remove=el('button','fr-home-watch-shelf__remove','×');
+    remove.type='button';
+    remove.setAttribute('aria-label','Remove '+item.title+' from my watchlist');
+    remove.addEventListener('click',()=>toggleWatch(item));
+    box.append(a,remove);
     return box;
    }));
   };
   document.addEventListener('fr-v5-watchlist-updated',render);
+  window.addEventListener('storage',event=>{if(event.key===watchKey||event.key===null)render();});
+  window.addEventListener('pageshow',render);
   render();
  };
  const installHeader=()=>{
@@ -201,7 +238,7 @@
   try{
    const data=await fetchList(config.type,config.mode);
    if(!data.length) return mockFreeState(grid,'No verified titles are available in this selection yet. Explore the complete catalogue below.');
-   grid.replaceChildren(...data.slice(0,config.type==='indie'?3:8).map(x=>poster(x,config.type)));
+   grid.replaceChildren(...data.slice(0,config.type==='indie'?6:8).map(x=>poster(x,config.type)));
   }catch{mockFreeState(grid,'The live catalogue is unavailable right now. The full catalogue and archive remain below.');}
  };
  const addNotices=async(parent)=>{
@@ -240,26 +277,28 @@
     const li=el('li','fr-v5-ranking__entry');
     const position=el('span','fr-v5-ranking__position',String(x.position).padStart(2,'0'));
     const item=link(x.title,x.tmdbId?'/media.html?type=movie&id='+Number(x.tmdbId):'/top-20/'+new Date().getFullYear()+'/','fr-v5-ranking__movie');
-    const score=el('span','fr-v5-ranking__score',(x.averageScore/10).toFixed(1));
+    const score=el('span','fr-v5-ranking__score');
+    if(data.ratingKind==='tmdb-community')window.FRRatingBadge.render(score,window.FRRatingBadge.fromTmdbChart(x,'compact'));
+    else score.textContent=(x.averageScore/10).toFixed(1);
     li.append(position,item,score);list.append(li);
    }
   } catch{mockFreeState(list,'The live rankings could not be loaded. Open the annual ranking page to retry.');}
  };
- const addTrailer=async(parent,type)=>{
+ const addTrailer=async(parent,type,{hideWhenUnavailable=false}={})=>{
   const p=panel('fr-v5-trailer',type==='indie'?'LATEST INDIE TRAILERS':'LATEST TRAILERS','Verified official trailers.',type==='indie'?'#trending':'#upcoming');
   const node=el('div','fr-v5-trailer__content');
   node.append(el('p','fr-v5-loading','Checking official trailers…'));p.append(node);parent.append(p);
   try{
    const data=await fetchList(type,'trending');
    const featured=data.find(x=>/^[A-Za-z0-9_-]{11}$/.test(mediaKey(x)));
-   if(!featured){mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
+   if(!featured){if(hideWhenUnavailable)p.remove();else mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
    const a=link('',filmHref(featured,type),'fr-v5-trailer__film');
    a.append(image(featured,type),el('strong','',featured.title));
    const play=link('▶','#','fr-v5-trailer__play');
    play.setAttribute('aria-label','Watch official trailer for '+featured.title);
    if(!guard(play,mediaKey(featured))){mockFreeState(node,'No verified video available.');return;}
    node.replaceChildren(a,play);
-  }catch{mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
+  }catch{if(hideWhenUnavailable)p.remove();else mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
  };
  const addUpcoming=async(parent,type)=>{
   const p=panel('fr-v5-announced','NEWLY ANNOUNCED','Upcoming horror worth watching.',type==='indie'?'#upcoming':'#upcoming');
@@ -291,10 +330,35 @@
    grid.replaceChildren(...entries.map(x=>{
     const a=link('',x.sourceUrl,'fr-v5-editorial-tile');
     a.target='_blank';a.rel='noopener noreferrer';
+    a.dataset.editorialTitle=x.title;
     a.style.setProperty('--fr-v5-tile-image','url("'+backdrop+'")');
     a.append(el('span','fr-v5-editorial-tile__eyebrow',x.category||config.editorial),el('strong','',x.title),el('small','',x.sourceName||'Publisher source'),el('span','fr-v5-editorial-tile__go','EXPLORE  ›'));
     return a;
    }));
+   if(config.editorial==='podcasts'){
+    // This route already supplies creator artwork. Match by exact title and
+    // retain the house scene whenever an image is absent or fails to load.
+    try{
+     const response=await fetch('/api/podcasts',{headers:{accept:'application/json'}});
+     if(response.ok){
+      const shows=await response.json();
+      const covers=new Map((Array.isArray(shows.items)?shows.items:[])
+       .filter(x=>x&&typeof x.title==='string'&&typeof x.artworkUrl==='string')
+       .map(x=>[x.title.trim().toLocaleLowerCase('en-GB'),x.artworkUrl]));
+      for(const tile of grid.querySelectorAll('[data-editorial-title]')){
+       const url=covers.get(tile.dataset.editorialTitle.trim().toLocaleLowerCase('en-GB'));
+       if(!url)continue;
+       try{
+        const parsed=new URL(url);
+        if(parsed.protocol!=='https:')continue;
+        const art=new Image();
+        art.onload=()=>tile.style.setProperty('--fr-v5-tile-image','url("'+parsed.href.replace(/"/g,'%22')+'")');
+        art.src=parsed.href;
+       }catch{}
+      }
+     }
+    }catch{}
+   }
   }catch{mockFreeState(grid,'Recommendations are unavailable. Explore the editorial selections below.');}
  };
  function mobileDock(){
@@ -327,7 +391,8 @@
   main.dataset.frV5Ready='true';
   mobileDock();
   // Cinema stays in document order: never flash or relocate its diary after load.
-  if(theme==='home'||theme==='cinema')return;
+  if(theme==='home'){mountHomeWatchlist();return;}
+  if(theme==='cinema')return;
   decorateHero();
   const config=configs[theme];if(!config)return;
   const showcase=el('div','fr-v5-front');
@@ -338,13 +403,47 @@
   const jobs=[];
   if(config.editorial){
    jobs.push(addEditorialList(config,showcase));
+   // Keep the working chart accessible in the visible page composition.
+   // Its order is editorial; it is not an invented audience rating.
+   if(theme==='podcasts'){
+    const chart=main.querySelector('.podcast-chart');
+    if(chart){chart.classList.add('fr-v5-pinned');showcase.append(chart);}
+   }
   }else{
    const upper=el('div','fr-v5-feature-panels');
    if(theme==='movies'){
-    addWatchlist(upper);
     jobs.push(addRanking(upper));
-    jobs.push(addTrailer(upper,'movie'));
+    jobs.push(addTrailer(upper,'movie',{hideWhenUnavailable:true}));
     showcase.append(upper);
+    const explore=el('nav','fr-v5-explore');
+    explore.setAttribute('aria-label','Explore horror movies');
+    explore.append(el('h2','','EXPLORE MOVIES'));
+    for(const [label,href,art] of [
+      ['ALL MOVIES','/all-horror-movies.html','all'],
+      ['NEW RELEASES','/movies.html#straight-to-stream','new'],
+      ['INDIE','/indie-movies.html','indie'],
+      ['CULT CLASSICS','/all-horror-movies.html?year=1980','classics'],
+      ['TOP 20','/top-20/','top']
+    ]){
+     const a=link(label+'  ›',href,'fr-v5-explore__tile');a.dataset.art=art;explore.append(a);
+    }
+    main.insertBefore(explore,showcase);
+    // The approved desktop composition pairs the editorial film and the
+    // working chart. Keep the source-backed chart after the hero on phones.
+    const ranking=upper.querySelector('.fr-v5-ranking');
+    const spotlight=el('div','fr-v5-spotlight-row');
+    const wide=window.matchMedia('(min-width:1000px)');
+    const arrange=()=>{
+      if(wide.matches){
+        main.insertBefore(spotlight,explore);
+        spotlight.append(after,ranking);
+      }else{
+        main.insertBefore(after,explore);
+        upper.insertBefore(ranking,upper.children[1]||null);
+        spotlight.remove();
+      }
+    };
+    arrange();wide.addEventListener('change',arrange);
    }
    jobs.push(showPosterRack(config,showcase));
    if(theme==='indie'||theme==='tv'){
@@ -356,7 +455,7 @@
   }
 
   if(theme!=='home'&&document.querySelector('.fr-v5-front')){
-   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper'));
+   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&!node.classList.contains('fr-v5-spotlight-row')&&!node.classList.contains('fr-v5-explore')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
    if(original.length){
     const details=el('details','fr-v5-deeper');
     details.id='fr-v5-complete-discovery';

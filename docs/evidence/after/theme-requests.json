@@ -1,0 +1,244 @@
+{
+  "capturedAt": "2026-10-13T22:24:01.908Z",
+  "origin": "http://127.0.0.1:4173",
+  "state": "Local static fallback",
+  "observations": [
+    {
+      "page": "home",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/home-mobile.webp",
+          "bytes": 192120
+        },
+        {
+          "path": "/assets/themes/movies-wide.webp",
+          "bytes": 109288
+        },
+        {
+          "path": "/assets/themes/tv-wide.webp",
+          "bytes": 61046
+        },
+        {
+          "path": "/assets/themes/podcasts-wide.webp",
+          "bytes": 72144
+        },
+        {
+          "path": "/assets/themes/indie-wide.webp",
+          "bytes": 87468
+        },
+        {
+          "path": "/assets/themes/games-wide.webp",
+          "bytes": 95340
+        },
+        {
+          "path": "/assets/themes/cinema-wide.webp",
+          "bytes": 63912
+        }
+      ],
+      "totalThemeBytes": 681318
+    },
+    {
+      "page": "home",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/home-wide.webp",
+          "bytes": 165324
+        },
+        {
+          "path": "/assets/themes/movies-wide.webp",
+          "bytes": 109288
+        },
+        {
+          "path": "/assets/themes/tv-wide.webp",
+          "bytes": 61046
+        },
+        {
+          "path": "/assets/themes/podcasts-wide.webp",
+          "bytes": 72144
+        },
+        {
+          "path": "/assets/themes/indie-wide.webp",
+          "bytes": 87468
+        },
+        {
+          "path": "/assets/themes/games-wide.webp",
+          "bytes": 95340
+        },
+        {
+          "path": "/assets/themes/cinema-wide.webp",
+          "bytes": 63912
+        }
+      ],
+      "totalThemeBytes": 654522
+    },
+    {
+      "page": "movies",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/movies-mobile.webp",
+          "bytes": 143906
+        },
+        {
+          "path": "/assets/themes/cinema-wide.webp",
+          "bytes": 63912
+        },
+        {
+          "path": "/assets/themes/indie-wide.webp",
+          "bytes": 87468
+        },
+        {
+          "path": "/assets/themes/home-wide.webp",
+          "bytes": 165324
+        }
+      ],
+      "totalThemeBytes": 460610
+    },
+    {
+      "page": "movies",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/movies-wide.webp",
+          "bytes": 109288
+        },
+        {
+          "path": "/assets/themes/cinema-wide.webp",
+          "bytes": 63912
+        },
+        {
+          "path": "/assets/themes/indie-wide.webp",
+          "bytes": 87468
+        },
+        {
+          "path": "/assets/themes/home-wide.webp",
+          "bytes": 165324
+        }
+      ],
+      "totalThemeBytes": 425992
+    },
+    {
+      "page": "tv",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/tv-mobile.webp",
+          "bytes": 76296
+        }
+      ],
+      "totalThemeBytes": 76296
+    },
+    {
+      "page": "tv",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/tv-wide.webp",
+          "bytes": 61046
+        }
+      ],
+      "totalThemeBytes": 61046
+    },
+    {
+      "page": "cinema",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/cinema-mobile.webp",
+          "bytes": 93252
+        }
+      ],
+      "totalThemeBytes": 93252
+    },
+    {
+      "page": "cinema",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/cinema-wide.webp",
+          "bytes": 63912
+        }
+      ],
+      "totalThemeBytes": 63912
+    },
+    {
+      "page": "indie",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/indie-mobile.webp",
+          "bytes": 116574
+        }
+      ],
+      "totalThemeBytes": 116574
+    },
+    {
+      "page": "indie",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/indie-wide.webp",
+          "bytes": 87468
+        }
+      ],
+      "totalThemeBytes": 87468
+    },
+    {
+      "page": "podcasts",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/podcasts-mobile.webp",
+          "bytes": 72654
+        }
+      ],
+      "totalThemeBytes": 72654
+    },
+    {
+      "page": "podcasts",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/podcasts-wide.webp",
+          "bytes": 72144
+        }
+      ],
+      "totalThemeBytes": 72144
+    },
+    {
+      "page": "games",
+      "width": 390,
+      "assets": [
+        {
+          "path": "/assets/themes/games-mobile.webp",
+          "bytes": 96480
+        }
+      ],
+      "totalThemeBytes": 96480
+    },
+    {
+      "page": "games",
+      "width": 1440,
+      "assets": [
+        {
+          "path": "/assets/themes/games-wide.webp",
+          "bytes": 95340
+        }
+      ],
+      "totalThemeBytes": 95340
+    }
+  ],
+  "legacyFileSizeReferences": [
+    {
+      "path": "assets/horror-wall-wide.webp",
+      "bytes": 230418
+    },
+    {
+      "path": "assets/worlds/movies-vault.webp",
+      "bytes": 59076
+    }
+  ],
+  "caveat": "File sizes and browser resource names are measured; old-page network transfer and live-preview speed were not measured."
+}
