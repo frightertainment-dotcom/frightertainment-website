@@ -71,10 +71,14 @@ test('Verified editorial bootstraps on first paint without three blocking JSON f
     await expect(page.locator('.fr-v5-front')).toBeVisible({timeout:5000});
     const bootstrapCovered=hits.filter(url=>/\/data\/(?:editorial\.json|editorial-spotlight-overrides\.json|movie-editorial-overviews\.json)(?:\?|$)/.test(url));
     expect(bootstrapCovered,'Bootstrap-covered JSON never blocks the initial editorial card on '+route).toEqual([]);
-    // The source-backed poster area is dimensioned immediately. Only if the
-    // catalogue times out does the verified editorial alternative appear.
-    await expect(page.locator('.fr-v5-poster-skeleton').first()).toBeVisible();
-    await expect(page.locator('.fr-v5-curated-card').first()).toBeVisible({timeout:10000});
+    // Film/TV shelves reserve poster slots while the live API is pending,
+    // then show real sourced editorial alternatives on API failure. Podcast
+    // and Games use their own immediate first-party editorial tile shelf.
+    if (['/movies.html','/tv-shows.html','/indie-movies.html'].includes(route)) {
+      await expect(page.locator('.fr-v5-curated-card').first()).toBeVisible({timeout:10000});
+    } else {
+      await expect(page.locator('.fr-v5-editorial-tile').first()).toBeVisible({timeout:10000});
+    }
     await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
   }
 });
