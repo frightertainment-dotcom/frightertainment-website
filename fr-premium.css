@@ -2044,3 +2044,13 @@ body.fr-v5 .fr-v5-ranking__skeleton-score{width:78px;max-width:100%}
     letter-spacing: -0.01em !important;
   }
 }
+
+/* Phase 2 alignment finish: line up every mobile chart title after the rank. */
+@media (max-width: 700px) {
+  body.fr-v5.hub-home .hub-chart-row > a {
+    justify-self: stretch !important;
+    text-align: left !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
