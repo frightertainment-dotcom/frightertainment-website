@@ -30,7 +30,7 @@
   const syncPreference = () => body.classList.toggle('fr-motion-paused', motion.matches);
   const setupMotionControl = () => {
     if (motion.matches || document.querySelector('.fr-motion-toggle')) return;
-    const host = document.querySelector('.fr-v5-header-tools') || document.querySelector('.hub-header__inside');
+    const host = document.querySelector('.hub-footer .footer__bottom') || document.querySelector('.hub-footer');
     if (!host) return;
     const button = document.createElement('button');
     button.type = 'button';
