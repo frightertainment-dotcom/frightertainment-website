@@ -1526,7 +1526,7 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
 @media(min-width:360px) and (max-width:430px){
  body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick{
    display:grid!important;
-   grid-template-columns:minmax(118px,37%) minmax(0,1fr)!important;
+   grid-template-columns:minmax(135px,41%) minmax(0,1fr)!important;
    grid-template-areas:'art copy' 'facts facts'!important;
    grid-template-rows:auto auto!important;
    column-gap:clamp(9px,2.7vw,13px)!important;
@@ -1652,5 +1652,13 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
  }
  body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile:hover::before{
    transform:scale(1.045);transition:transform .4s ease!important;
+ }
+}
+
+
+/* Cinema programme begins immediately after the shorter masthead on desktop. */
+@media(min-width:1000px){
+ body.fr-v5[data-theme='cinema'] .hub-page-intro{
+   margin-bottom:5px!important;
  }
 }
