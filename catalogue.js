@@ -3,7 +3,8 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const mediaType = item => item.mediaType === 'tv' || item.type === 'tv' ? 'tv' : 'movie';
   const id = item => Number(item.tmdbId || (/^\d+$/.test(String(item.id)) ? item.id : 0));
-  const href = item => '/media.html?type=' + mediaType(item) + '&id=' + id(item) + (document.body.dataset.catalogueType === 'indie' ? '&section=indie' : '');
+  const indieEvidence = item => /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com)\//i.test(item?.indieSourceUrl || '') ? item.indieSourceUrl : '';
+  const href = item => !id(item) && item.indieVerified && indieEvidence(item) ? indieEvidence(item) : '/media.html?type=' + mediaType(item) + '&id=' + id(item) + (document.body.dataset.catalogueType === 'indie' ? '&section=indie' : '');
   const poster = item => /^\/[A-Za-z0-9_/-]+\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? 'https://image.tmdb.org/t/p/w500' + item.posterPath : '';
   const prettyDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat('en-GB', {dateStyle:'medium',timeZone:'UTC'}).format(new Date(value + 'T12:00:00Z')) : '';
   // /api/catalogue is TMDB-backed and exposes voteAverage on the 0–10 scale.
@@ -22,13 +23,15 @@
     const hasTrailer = /^[A-Za-z0-9_-]{11}$/.test(key || '');
     const rating = item.ratingKind === 'tmdb-community' && Number.isInteger(item.voteCount) && item.voteCount > 0 &&
       Number.isFinite(item.voteAverage) ? score(item) : '';
-    const source = `https://www.themoviedb.org/${mediaType(item)}/${id(item)}`;
+    const source = id(item) ? `https://www.themoviedb.org/${mediaType(item)}/${id(item)}` : indieEvidence(item);
+    const external = !id(item) && item.indieVerified ? ' target="_blank" rel="noopener noreferrer"' : '';
+    const indieCredit = item.indieVerified && indieEvidence(item) ? `<p class="fr-media-card__meta"><a href="${escape(indieEvidence(item))}" target="_blank" rel="noopener noreferrer">INDIE SOURCE: ${escape(item.indieSourceName || 'Festival')}</a></p>` : '';
     const date = prettyDate(item.releaseDate || item.firstReleaseDate);
     const theatrical = !!item.theatricalDate;
     const places = { GB:'UK', US:'US', CA:'Canada', AU:'Australia', IE:'Ireland' };
     const label = theatrical ? (places[item.releaseCountry] || item.releaseCountry || 'Regional') + ' cinema release'
       : mediaType(item)==='tv' ? 'First aired' : item.releaseCountry==='GB' ? 'UK release' : 'First release';
-    return `<article class="movie-card fr-media-card" data-media-type="${mediaType(item)}" data-tmdb-id="${id(item)}"><div class="fr-media-card__artwork"><a class="movie-card__art fr-media-card__poster" href="${href(item)}" aria-label="Explore ${escape(item.title)}">${image ? `<img class="tmdb-card-poster" src="${image}" alt="${escape(item.title)} poster" loading="lazy" decoding="async" width="500" height="750">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder"><strong>${escape(item.title)}</strong><small>Poster unavailable</small></div></div>`}${rank ? `<span class="fr-chart-rank">${rank}</span>` : ''}</a><a class="fr-media-card__source" href="${source}" target="_blank" rel="noopener noreferrer" aria-label="TMDB source for ${escape(item.title)}">SOURCE</a>${rating ? `<span class="fr-media-card__rating">${rating}</span>` : ''}${hasTrailer ? `<button type="button" class="fr-media-card__trailer" data-trailer-video="${escape(key)}" data-trailer-title="${escape(item.title)}" aria-label="Play official trailer for ${escape(item.title)}">▶ TRAILER</button>` : ''}</div><div class="movie-card__body fr-media-card__body"><div class="movie-card__headline"><h3><a href="${href(item)}">${escape(item.title)}</a></h3></div><p class="fr-media-card__meta" data-media-field="date">${date ? `${escape(label)} · ${escape(date)}${item.releaseCountry && !theatrical ? ' · ' + escape(item.releaseCountry) : ''}` : 'Premiere date not announced'}</p><p class="movie-card__text">${escape(item.overview || 'Explore the title details and available trailer.')}</p><div class="fr-media-card__actions">${hasTrailer ? '' : trailer(item)}<a href="${href(item)}">DETAILS →</a></div></div></article>`;
+    return `<article class="movie-card fr-media-card" data-media-type="${mediaType(item)}" data-tmdb-id="${id(item)}"><div class="fr-media-card__artwork"><a class="movie-card__art fr-media-card__poster" href="${href(item)}"${external} aria-label="Explore ${escape(item.title)}">${image ? `<img class="tmdb-card-poster" src="${image}" alt="${escape(item.title)} poster" loading="lazy" decoding="async" width="500" height="750">` : `<div class="movie-card__poster-fill"><div class="movie-card__placeholder"><strong>${escape(item.title)}</strong><small>Poster unavailable</small></div></div>`}${rank ? `<span class="fr-chart-rank">${rank}</span>` : ''}</a><a class="fr-media-card__source" href="${escape(source)}" target="_blank" rel="noopener noreferrer" aria-label="Source for ${escape(item.title)}">SOURCE</a>${rating ? `<span class="fr-media-card__rating">${rating}</span>` : ''}${hasTrailer ? `<button type="button" class="fr-media-card__trailer" data-trailer-video="${escape(key)}" data-trailer-title="${escape(item.title)}" aria-label="Play official trailer for ${escape(item.title)}">▶ TRAILER</button>` : ''}</div><div class="movie-card__body fr-media-card__body"><div class="movie-card__headline"><h3><a href="${href(item)}"${external}>${escape(item.title)}</a></h3></div><p class="fr-media-card__meta" data-media-field="date">${date ? `${escape(label)} · ${escape(date)}${item.releaseCountry && !theatrical ? ' · ' + escape(item.releaseCountry) : ''}` : (item.indieVerified && item.indieOriginalYear ? `FILM YEAR · ${item.indieOriginalYear} · FESTIVAL RECORD` : 'Premiere date not announced')}</p>${indieCredit}<p class="movie-card__text">${escape(item.overview || 'Explore the title details and available trailer.')}</p><div class="fr-media-card__actions">${hasTrailer || !id(item) ? '' : trailer(item)}<a href="${href(item)}"${external}>${id(item) ? 'DETAILS' : 'FILM SOURCE'} →</a></div></div></article>`;
   };
   window.FR_CATALOGUE = {escape,mediaType,id,href,poster,prettyDate,score,trailer,card};
 
@@ -110,7 +113,14 @@
           let data = await response.json();
           if (request !== requestNumber) return;
           if (!Array.isArray(data.items)) throw new Error('Catalogue unavailable');
-          let items = data.items.filter(item => id(item) > 0 && item.title);
+          let items = data.items.filter(item => item.title && (id(item) > 0 || (type === 'indie' && item.indieVerified && indieEvidence(item))));
+          if (type === 'indie' && Array.isArray(data.availableYears) && yearSelect) {
+            const verifiedYears = data.availableYears.filter(y => Number.isInteger(y) && y >= 1888 && y <= thisYear);
+            if (verifiedYears.length && yearSelect.options.length !== verifiedYears.length) {
+              yearSelect.innerHTML = verifiedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+              yearSelect.value = String(year);
+            }
+          }
           if (type === 'indie' && mode === 'chart') {
             const collected = new Map(items.map(item => [id(item), item]));
             const seenPages = new Set([page]);
@@ -127,7 +137,7 @@
               if (!continuation.ok) break;
               data = await continuation.json();
               if (request !== requestNumber) return;
-              for (const item of data.items || []) if (id(item) > 0 && item.title && Number(item.voteCount) >= 50) collected.set(id(item),item);
+              for (const item of data.items || []) if (id(item) > 0 && item.indieVerified && Number(item.voteCount) >= 50) collected.set(id(item),item);
             }
             items = [...collected.values()].sort((a,b) => Number(b.voteAverage)-Number(a.voteAverage) || Number(b.voteCount)-Number(a.voteCount) || a.title.localeCompare(b.title)).slice(0,20);
           }
