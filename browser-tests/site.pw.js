@@ -267,8 +267,15 @@ test('mobile homepage keeps the featured film before the chart and supporting ca
   await page.setViewportSize({ width: 390, height: 844 });
   await navigateLegacy(page,'/');
   const order = await page.locator('.hub-dashboard > *').evaluateAll(nodes => nodes.map(node =>
-    node.classList.contains('hub-feature') ? 'feature' : node.classList.contains('hub-charts') ? 'chart' : 'support'));
-  expect(order).toEqual(['feature', 'chart', 'support']);
+    node.classList.contains('hub-showcase__lead') ? 'feature and watchlist' : node.classList.contains('hub-charts') ? 'chart' : 'support'));
+  expect(order).toEqual(['feature and watchlist', 'chart', 'support']);
+  const positions = await page.evaluate(() => Object.fromEntries([
+    ['feature', '.hub-feature'], ['watchlist', '#my-watchlist'], ['chart', '.hub-charts'],
+    ['support', '.hub-showcase__bottom']
+  ].map(([name, selector]) => [name, document.querySelector(selector).getBoundingClientRect()])));
+  expect(positions.feature.bottom).toBeLessThanOrEqual(positions.watchlist.top);
+  expect(positions.watchlist.bottom).toBeLessThanOrEqual(positions.chart.top);
+  expect(positions.chart.bottom).toBeLessThanOrEqual(positions.support.top);
 });
 test('film and Top 20 pages offer main-content skip links', async ({ page }) => {
   await navigateLegacy(page,'/films/clayface/');
@@ -835,6 +842,7 @@ test('homepage composition stays ordered and usable across the approved viewport
       const watchlist = document.querySelector('#my-watchlist').getBoundingClientRect();
       return {
         watchlistBottom: watchlist.bottom,
+        watchlistTop: watchlist.top,
         featureTop: feature.top,
         featureLeft: feature.left,
         featureBottom: feature.bottom,
@@ -854,10 +862,12 @@ test('homepage composition stays ordered and usable across the approved viewport
     if (width <= 900) {
       expect(layout.featureTop).toBeLessThan(layout.chartTop);
       expect(layout.chartTop).toBeLessThan(layout.supportTop);
-      expect(layout.featureTop).toBeGreaterThanOrEqual(layout.watchlistBottom - 1);
+      expect(layout.watchlistTop).toBeGreaterThanOrEqual(layout.featureBottom - 1);
+      expect(layout.watchlistBottom).toBeLessThanOrEqual(layout.chartTop + 1);
     } else {
       expect(Math.abs(layout.featureTop - layout.chartTop)).toBeLessThan(2);
       expect(layout.featureLeft).toBeLessThan(layout.chartLeft);
+      expect(layout.watchlistTop).toBeGreaterThanOrEqual(layout.featureBottom - 1);
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.chartBottom);
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.featureBottom);
     }
@@ -873,7 +883,6 @@ test('homepage composition stays ordered and usable across the approved viewport
       expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(3);
     }
     if (width === 390) {
-      expect(layout.featureTop).toBeGreaterThanOrEqual(layout.watchlistBottom - 1);
       expect(layout.featureTop).toBeLessThanOrEqual(1100);
     }
     await page.close();

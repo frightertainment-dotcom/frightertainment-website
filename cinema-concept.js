@@ -32,24 +32,19 @@
    cards.append(make('p','fr-cinema-concept__empty','No confirmed upcoming cinema dates for this country yet. Check the release diary for updates.'));
    return;
   }
-  for(const row of upcoming){
+  for(const [index,row] of upcoming.entries()){
    const card=make('article','fr-cinema-concept__card');
-   const art=make('div','fr-cinema-concept__art');
-   art.setAttribute('role','img');art.setAttribute('aria-label','Frightertainment cinema illustration, not an official film poster');
-   const copy=make('div','fr-cinema-concept__copy');
-   copy.append(make('strong','',row.title),make('small','',new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(row.date+'T12:00:00Z'))));
-   const a=make('a','','VIEW SCREENING SOURCE');a.href=row.sourceUrl;a.target='_blank';a.rel='noopener noreferrer';
-   copy.append(a);card.append(art,copy);cards.append(card);
-   if(Number.isInteger(row.tmdbId)&&row.tmdbId>0){
-    fetch('/api/media?type=movie&id='+row.tmdbId).then(response=>response.ok?response.json():null).then(data=>{
-     if(current!==edition||!card.isConnected)return;
-     const item=data?.item;
-     if(item?.tmdbId!==row.tmdbId||!/^\/[a-zA-Z0-9_/-]+\.(?:jpg|png|webp)$/.test(item.posterPath||''))return;
-     const image=new Image();image.alt='Official poster for '+row.title;image.loading='lazy';
-     image.onload=()=>{art.replaceChildren(image);art.removeAttribute('role');art.removeAttribute('aria-label')};
-     image.src='https://image.tmdb.org/t/p/w342'+item.posterPath;
-    }).catch(()=>{});
-   }
+   card.dataset.releaseDate=row.date;
+   const order=make('span','fr-cinema-concept__order',String(index+1).padStart(2,'0'));
+   order.setAttribute('aria-hidden','true');
+   const title=make('strong','fr-cinema-concept__title',row.title);
+   const date=make('time','fr-cinema-concept__date',new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(row.date+'T12:00:00Z')));
+   date.dateTime=row.date;
+   const details=make('span','fr-cinema-concept__details',(row.edition==='re-release'?'RE-RELEASE':'NEW RELEASE')+' · '+(row.reach==='limited'?'LIMITED CINEMAS':'GENERAL RELEASE'));
+   const source=make('a','fr-cinema-concept__source','SOURCE');
+   source.href=row.sourceUrl;source.target='_blank';source.rel='noopener noreferrer';
+   source.setAttribute('aria-label','Verified screening source for '+row.title+' on '+date.textContent);
+   card.append(order,title,date,details,source);cards.append(card);
   }
  }
  country.addEventListener('change',render);

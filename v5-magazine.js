@@ -58,19 +58,37 @@
  const poster=(x,type)=>{
   const a=link('',filmHref(x,type),'fr-v5-poster');
   const art=image(x,type);
-  const foot=el('div','fr-v5-poster__bottom');
+  const foot=link('',filmHref(x,type),'fr-v5-poster__bottom');
   foot.append(el('strong','',x.title));
   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
-  a.append(art,foot);
+  a.append(art);
   a.setAttribute('aria-label','Explore '+x.title+' details');
-  if(type==='movie' || type==='indie'){
-   const box=el('article','fr-v5-poster-card');
-   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
-   box.append(a,watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
-   return box;
+  const box=el('article','fr-v5-poster-card');
+  const media=el('div','fr-v5-poster__media');
+  media.append(a);
+  box.append(media,foot);
+  const source=link('SOURCE',`https://www.themoviedb.org/${type==='tv'?'tv':'movie'}/${itemId(x)}`,'fr-v5-poster__source');
+  source.setAttribute('aria-label','TMDB source for '+x.title);
+  source.target='_blank';source.rel='noopener noreferrer';
+  media.append(source);
+  if(x.ratingKind==='tmdb-community'&&Number.isFinite(x.voteAverage)&&Number.isInteger(x.voteCount)&&x.voteCount>0){
+   const rating=el('span','fr-v5-poster__rating');
+   rating.append(window.FRRatingBadge.create(window.FRRatingBadge.fromTmdbMedia(x,'compact')));
+   media.append(rating);
   }
-  return a;
+  const video=mediaKey(x);
+  if(/^[A-Za-z0-9_-]{11}$/.test(video)){
+   const play=el('button','fr-v5-poster__trailer','▶ TRAILER');
+   play.type='button';play.dataset.trailerVideo=video;play.dataset.trailerTitle=x.title;
+   play.setAttribute('aria-label','Play official trailer for '+x.title);
+   media.append(play);
+  }
+  if(type==='movie' || type==='indie'){
+   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+   media.append(watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
+  }
+  return box;
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
  const catalogueRequests=new Map();
@@ -137,26 +155,6 @@
   update();button.addEventListener('click',()=>toggleWatch(x));
   document.addEventListener('fr-v5-watchlist-updated',update);
   return button;
- };
- const addWatchlist=parent=>{
-  const p=panel('fr-v5-watchlist','MY WATCHLIST','Your saved horror films.','/#my-watchlist');
-  const grid=el('div','fr-v5-watchlist__grid');p.append(grid);parent.append(p);
-  const render=()=>{
-   const items=savedWatch();
-   if(!items.length){
-    mockFreeState(grid,'Nothing saved yet. Press + on a film poster below to make your list.');
-    return;
-   }
-   grid.replaceChildren(...items.slice(0,5).map(item=>{
-    const a=link('',filmHref(item,item.type),'fr-v5-watchlist__item');
-    a.setAttribute('aria-label','Open '+item.title);
-    a.append(image(item,item.type),el('span','fr-v5-watchlist__title',item.title));
-    const box=el('div','fr-v5-watchlist__saved');box.append(a,watchButton(item));
-    return box;
-   }));
-  };
-  document.addEventListener('fr-v5-watchlist-updated',render);
-  render();
  };
  const mountHomeWatchlist=()=>{
   const section=document.querySelector('#my-watchlist');
@@ -240,7 +238,7 @@
   try{
    const data=await fetchList(config.type,config.mode);
    if(!data.length) return mockFreeState(grid,'No verified titles are available in this selection yet. Explore the complete catalogue below.');
-   grid.replaceChildren(...data.slice(0,config.type==='indie'?3:8).map(x=>poster(x,config.type)));
+   grid.replaceChildren(...data.slice(0,config.type==='indie'?6:8).map(x=>poster(x,config.type)));
   }catch{mockFreeState(grid,'The live catalogue is unavailable right now. The full catalogue and archive remain below.');}
  };
  const addNotices=async(parent)=>{
@@ -286,21 +284,21 @@
    }
   } catch{mockFreeState(list,'The live rankings could not be loaded. Open the annual ranking page to retry.');}
  };
- const addTrailer=async(parent,type)=>{
+ const addTrailer=async(parent,type,{hideWhenUnavailable=false}={})=>{
   const p=panel('fr-v5-trailer',type==='indie'?'LATEST INDIE TRAILERS':'LATEST TRAILERS','Verified official trailers.',type==='indie'?'#trending':'#upcoming');
   const node=el('div','fr-v5-trailer__content');
   node.append(el('p','fr-v5-loading','Checking official trailers…'));p.append(node);parent.append(p);
   try{
    const data=await fetchList(type,'trending');
    const featured=data.find(x=>/^[A-Za-z0-9_-]{11}$/.test(mediaKey(x)));
-   if(!featured){mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
+   if(!featured){if(hideWhenUnavailable)p.remove();else mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
    const a=link('',filmHref(featured,type),'fr-v5-trailer__film');
    a.append(image(featured,type),el('strong','',featured.title));
    const play=link('▶','#','fr-v5-trailer__play');
    play.setAttribute('aria-label','Watch official trailer for '+featured.title);
    if(!guard(play,mediaKey(featured))){mockFreeState(node,'No verified video available.');return;}
    node.replaceChildren(a,play);
-  }catch{mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
+  }catch{if(hideWhenUnavailable)p.remove();else mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
  };
  const addUpcoming=async(parent,type)=>{
   const p=panel('fr-v5-announced','NEWLY ANNOUNCED','Upcoming horror worth watching.',type==='indie'?'#upcoming':'#upcoming');
@@ -414,9 +412,8 @@
   }else{
    const upper=el('div','fr-v5-feature-panels');
    if(theme==='movies'){
-    addWatchlist(upper);
     jobs.push(addRanking(upper));
-    jobs.push(addTrailer(upper,'movie'));
+    jobs.push(addTrailer(upper,'movie',{hideWhenUnavailable:true}));
     showcase.append(upper);
     const explore=el('nav','fr-v5-explore');
     explore.setAttribute('aria-label','Explore horror movies');

@@ -24,7 +24,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  await expect(page.locator('.fr-v5-front .fr-v5-rack')).toBeVisible();
  await expect(page.locator('.fr-v5-front .fr-v5-announced')).toBeVisible();
  await expect(page.locator('.fr-v5-front .fr-v5-trailer')).toBeVisible();
- await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(3);
+ await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(6);
  await expect(page.locator('.fr-v5-mobile-dock')).toBeVisible();
  await expect(page.locator('.hub-page-wordmark[src="/assets/page-title-indie-movies.png"]')).toBeVisible();
  await expect(page.locator('.hub-brand img[src="/assets/frightertainment-brand.png"]')).toBeVisible();
@@ -61,7 +61,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
 test('V5 desktop Movies pairs editorial pick with the chart above eight posters',async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto('/movies.html');
- await expect(page.locator('.fr-v5-front .fr-v5-feature-panels .fr-v5-panel')).toHaveCount(2);
+ await expect(page.locator('.fr-v5-front .fr-v5-feature-panels .fr-v5-panel')).toHaveCount(1);
  await expect(page.locator('.fr-v5-spotlight-row > .fr-v5-ranking')).toBeVisible();
  await expect(page.locator('.fr-v5-explore__tile')).toHaveCount(5);
  await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(8);
@@ -155,25 +155,24 @@ test('V5 owner-concept header is usable on mobile and keeps seven real tabs',asy
  await expect(page.locator('#archive-global-results')).toBeVisible();
 });
 
-test('V5 watchlist is real: adding, persisting and removing a sourced movie',async({page})=>{
+test('V5 watchlist is real: adding in Movies, persisting on Home and removing',async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto('/movies.html');
  const rack=page.locator('.fr-v5-rack');
  await expect(rack.locator('.fr-v5-poster')).toHaveCount(8);
- const watch=page.locator('.fr-v5-watchlist');
- await expect(watch).toContainText('Nothing saved yet');
+ await expect(page.locator('.fr-v5-watchlist')).toHaveCount(0);
  const save=rack.locator('.fr-v5-watch-toggle').first();
  await expect(save).toHaveAttribute('aria-pressed','false');
  await save.click();
  await expect(save).toHaveAttribute('aria-pressed','true');
- await expect(watch.locator('.fr-v5-watchlist__saved')).toHaveCount(1);
  const stored=await page.evaluate(()=>localStorage.getItem('frightertainment-v5-watchlist'));
  expect(JSON.parse(stored)).toHaveLength(1);
+ await page.goto('/');
+ await expect(page.locator('#my-watchlist [data-home-watch-count]')).toHaveText('1');
  await page.reload();
- await expect(page.locator('.fr-v5-watchlist__saved')).toHaveCount(1);
- await page.locator('.fr-v5-watchlist__saved .fr-v5-watch-toggle').click();
- await expect(page.locator('.fr-v5-watchlist__saved')).toHaveCount(0);
- await expect(page.locator('.fr-v5-watchlist')).toContainText('Nothing saved yet');
+ await expect(page.locator('#my-watchlist .fr-home-watch-shelf__item')).toHaveCount(1);
+ await page.locator('#my-watchlist .fr-home-watch-shelf__remove').click();
+ await expect(page.locator('#my-watchlist [data-home-watch-count]')).toHaveText('0');
 });
 
 test('V5 concept stays readable at 320px without site-wide horizontal scroll',async({page})=>{
