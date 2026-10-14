@@ -1442,3 +1442,43 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region p{max-width:36ch!impo
 @media(prefers-reduced-motion:reduce){
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{animation:none!important}
 }
+
+/* Landscape-format game art: the actual aspect ratio is 16:10 at every width.
+   Size lettering to fit the artwork rather than increasing its height. */
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ box-sizing:border-box!important;
+ width:min(100%,310px)!important;
+ max-width:310px!important;
+ min-width:0!important;
+ aspect-ratio:16/10!important;
+ min-height:0!important;
+ max-height:none!important;
+ height:auto!important;
+ padding:clamp(8px,1.1vw,16px)!important;
+ overflow:hidden!important;
+ display:flex!important;flex-direction:column!important;
+ justify-content:space-between!important;
+ gap:4px!important;
+}
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+ flex:1 1 auto!important;
+ font-size:clamp(13px,1.7vw,23px)!important;
+ line-height:1.08!important;
+ overflow-wrap:anywhere!important;
+ max-height:none!important;
+ text-align:center!important;
+}
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) :is(.editorial-pick__art-eyebrow,.editorial-pick__art-sub){
+ flex:0 0 auto!important;
+ font-size:clamp(7px,.72vw,10px)!important;
+ line-height:1.15!important;
+ text-align:center!important;
+}
+@media(min-width:701px) and (max-width:1024px){
+ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+   padding:7px!important;gap:2px!important;
+ }
+ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+   font-size:clamp(13px,1.5vw,19px)!important;
+ }
+}
