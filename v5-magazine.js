@@ -419,9 +419,10 @@
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-editorial-grid');p.append(grid);host.append(p);
   try{
-   const response=await fetch('/data/editorial.json');
-   if(!response.ok)throw Error('Editorial feed unavailable');
-   const data=await response.json();
+   const cached=window.FR_EDITORIAL_BOOTSTRAP?.schemaVersion===1
+     ?window.FR_EDITORIAL_BOOTSTRAP.editorial:null;
+   const data=cached || await fetch('/data/editorial.json')
+     .then(response=>{if(!response.ok)throw Error('Editorial feed unavailable');return response.json();});
    const entries=(Array.isArray(data[config.editorial])?data[config.editorial]:[]).filter(x=>typeof x.title==='string'&&/^https:\/\//.test(x.sourceUrl||'')).slice(0,6);
    if(!entries.length)return mockFreeState(grid,'No source-checked recommendations are available.');
    const backdrop=config.editorial==='games'?'/assets/worlds/games-control-room.webp':'/assets/worlds/podcast-studio.webp';
