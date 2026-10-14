@@ -1178,3 +1178,30 @@ body.fr-v5 .hub-page-intro .hub-page-title--wordmark::after{content:none!importa
   }
   body.fr-v5[data-theme='movies'] .hub-page-intro .hub-subtabs a::after{content:none!important}
 }
+
+/* Desktop header contract: seven navigation tabs and utility controls share
+   one track. Explicit grid placement prevents implicit second-row icons on
+   pages where supporting editorial styles set independent grid positions. */
+@media(min-width:801px){
+ body.fr-v5 .hub-header__inside{
+   display:grid!important;
+   grid-template-columns:minmax(175px,245px) minmax(0,1fr) max-content!important;
+   grid-template-rows:auto!important;
+   align-items:center!important;
+   gap:clamp(12px,1.5vw,24px)!important;
+ }
+ body.fr-v5 .hub-header__inside>.hub-brand {
+   grid-column:1!important;grid-row:1!important;
+   min-width:0!important;max-width:245px!important;
+ }
+ body.fr-v5 .hub-header__inside>.hub-tabs {
+   grid-column:2!important;grid-row:1!important;
+   width:100%!important;min-width:0!important;
+   flex-wrap:nowrap!important;
+ }
+ body.fr-v5 .hub-header__inside>.fr-v5-header-tools {
+   grid-column:3!important;grid-row:1!important;
+   justify-self:end!important;
+   position:relative!important;
+ }
+}
