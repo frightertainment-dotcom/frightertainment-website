@@ -153,6 +153,19 @@ export async function fetchStreamingAvailability(env,options) {
 // A strict, evidence-backed indie selection replaces open-ended TMDB 'low budget'
 // discovery. Any film not on the reviewed registry is excluded, even when TMDB
 // labels its production company as small. Ratings/art/trailers still come from TMDB.
+function sourcedIndieFallback(record) {
+  return {
+    id:'indie-source-'+record.year+'-'+normalizeTitle(record.title).replace(/\\s+/g,'-'),
+    tmdbId:null,mediaType:'movie',type:'movie',title:record.title,
+    overview:'Source-checked independent horror. Open the festival or filmmaker record for production details.',
+    voteAverage:null,voteCount:0,ratingKind:null,posterPath:null,trailer:null,
+    releaseDate:null,firstReleaseDate:null,releaseStatus:'unknown',
+    indieVerified:true,indieOriginalYear:record.year,
+    indieSourceUrl:record.sourceUrl,indieSourceName:record.sourceName,
+    indieReviewedAt:INDIE_REVIEW_DATE,indieClassification:'source-checked-independent-production',
+    tmdbPopularity:0
+  };
+}
 async function indieFilmFromSource(env, record, country) {
   let tmdbId = record.tmdbId;
   if (!tmdbId) {
@@ -211,8 +224,10 @@ async function fetchVerifiedIndieCatalogue(env, options) {
   const size = mode === 'top' ? 20 : mode === 'trending' ? 12 : 9;
   const chunk = mode === 'trending' || mode === 'top' ? records : records.slice((page-1)*size,page*size);
   const resolved = await mapBounded(chunk, async record => {
-    try { return await indieFilmFromSource(env,record,options.country || 'GB'); }
-    catch(error) { if(/TMDB access is not configured/.test(String(error))) throw error; return null; }
+    // Festival records remain discoverable even if TMDB is missing a match.
+    // Such source-only items have no invented poster, trailer, date or rating.
+    try { return await indieFilmFromSource(env,record,options.country || 'GB') || sourcedIndieFallback(record); }
+    catch { return sourcedIndieFallback(record); }
   });
   const now = today();
   let items = resolved.filter(Boolean);
