@@ -436,9 +436,10 @@
     const arrange=()=>{
       if(wide.matches){
         main.insertBefore(spotlight,explore);
-        spotlight.append(after,ranking);
+        spotlight.append(after,explore,ranking);
       }else{
-        main.insertBefore(after,explore);
+        main.insertBefore(after,showcase);
+        main.insertBefore(explore,showcase);
         upper.insertBefore(ranking,upper.children[1]||null);
         spotlight.remove();
       }
