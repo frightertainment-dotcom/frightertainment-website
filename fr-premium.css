@@ -1533,7 +1533,7 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    row-gap:14px!important;
    align-items:start!important;
    min-height:0!important;height:auto!important;block-size:auto!important;
-   padding:41px 11px 18px!important;
+   padding:41px 6px 18px!important;
  }
  body.fr-v5[data-theme]:not([data-theme='games']) .editorial-pick__art{
    grid-area:art!important;grid-column:1!important;grid-row:1!important;
