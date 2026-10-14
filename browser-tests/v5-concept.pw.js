@@ -37,7 +37,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
     hero:loc('.editorial-carousel').top,
     rack:loc('.fr-v5-rack').top,
     lower:loc('.fr-v5-secondary-panels').top,
-    artBottom:art.bottom,textTop:text.top,
+    artBottom:art.bottom,textTop:text.top,artRight:art.right,textLeft:text.left,
     pageWidth:document.documentElement.scrollWidth,
     viewport:innerWidth,
     legacyOpen:document.querySelector('.fr-v5-deeper').open
@@ -46,7 +46,9 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  expect(visual.hero).toBeGreaterThanOrEqual(visual.intro-8);
  expect(visual.rack).toBeGreaterThan(visual.hero);
  expect(visual.lower).toBeGreaterThan(visual.rack);
- expect(visual.artBottom).toBeLessThanOrEqual(visual.textTop+4);
+ // Premium editorial allows side-by-side poster and text, or a stacked
+ // composition where neither track covers the other at narrow widths.
+ expect(visual.artBottom<=visual.textTop+4 || visual.artRight<=visual.textLeft+4).toBe(true);
  expect(visual.pageWidth).toBeLessThanOrEqual(visual.viewport+2);
  expect(visual.legacyOpen).toBe(false);
 
@@ -193,7 +195,7 @@ test('V5 concept stays readable at 320px without site-wide horizontal scroll',as
 });
 
 
-test('Editorial Picks geometry stays fixed for every rotating film title and poster',async({page})=>{
+test('Editorial rotation keeps poster, full synopsis and controls legible without overlap',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/movies.html');
  const card=page.locator('.editorial-pick');
@@ -201,13 +203,14 @@ test('Editorial Picks geometry stays fixed for every rotating film title and pos
  const originalHeight=await card.evaluate(node=>node.getBoundingClientRect().height);
  expect(originalHeight).toBeGreaterThan(420);
  const stage=page.locator('.editorial-carousel__stage');
- const first=await stage.boundingBox();
  const next=page.locator('.editorial-carousel__nav[aria-label="Next editorial pick"]');
  for(let n=0;n<4;n++){
   await next.click();
   await expect(card).toBeVisible();
   const current=await stage.boundingBox();
-  expect(Math.abs(current.height-first.height)).toBeLessThanOrEqual(12);
+  // Longer source-backed plots can grow rather than being cut at two lines.
+  expect(current.height).toBeGreaterThan(340);
+  expect(current.height).toBeLessThan(1300);
   const contained=await page.evaluate(()=>{
    const host=document.querySelector('.editorial-pick').getBoundingClientRect();
    const img=document.querySelector('.editorial-pick__art-frame').getBoundingClientRect();
