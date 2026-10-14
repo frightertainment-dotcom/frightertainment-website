@@ -88,10 +88,10 @@ test('Home and Cinema never lose their first-party layout to the legacy-flash ga
     ['/','.hub-feature'],
     ['/cinema.html','.fr-cinema-concept__features']
   ]){
-    await page.route('**/api/**',async route=>{
-      await new Promise(resolve=>setTimeout(resolve,1000));
-      await route.fulfill({status:503,body:'Provider temporarily unavailable'});
-    });
+    // Deterministic failure without an async delay: a previous page's
+    // route may be cancelled during navigation, then double-fulfilled.
+    await page.route('**/api/**', route=>
+      route.fulfill({status:503,body:'Provider temporarily unavailable'}));
     for(const width of [320,390,1440]){
       await page.setViewportSize({width,height:850});
       await page.goto(path,{waitUntil:'domcontentloaded'});
