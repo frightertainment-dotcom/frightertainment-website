@@ -17,7 +17,7 @@ The additional `after/{movies,indie}-{390,980}-poster-controls.png` crops show t
 
 ## Visual review and corrections
 
-- Home: the watchlist now sits immediately under the feature; the chart shows its five rows in aligned tracks; the mobile Editorial Picks heading and link each stay on one line; Longlegs stays on one line at desktop-site width; category actions align across the row. No watchlist storage key or record format changed.
+- Home: the watchlist now sits immediately under the feature; the chart shows its five rows in aligned tracks; the mobile Editorial Picks heading and link each stay on one line, with the link below the heading through 460px so font differences cannot squeeze it; Longlegs stays on one line at desktop-site width; category actions align across the row. No watchlist storage key or record format changed.
 - Movies: the duplicate watchlist panel is removed, a five-entry chart uses the available width when a trailer is absent, and rating badges no longer escape the chart’s right edge. The eight film cards reserve poster dimensions before load.
 - Film, TV and Indie shelves: source, rated badge, verified trailer and watchlist toggle are independent controls. The media link and footer link are separate from controls. The overlay is anchored to the poster media wrapper, so an extra-long footer title cannot push a trailer below the artwork. At 320–700px the shelf uses two poster columns; through 400px the rating sits below the source to keep both labels readable. A missing verified trailer creates no fake Play action.
 - Indie: six real fetched picks can fill its shelf without a blank fourth column; fewer results remain truthful. The announcement and trailer sections preserve honest unavailable states.

@@ -340,9 +340,10 @@ body.fr-v5 .hub-footer { margin-top:clamp(38px,5vw,70px); background:linear-grad
 @media (max-width:400px) {
   body.fr-v5 .fr-v5-poster__rating { top:34px; }
 }
+@media (max-width:460px) {
+  body.fr-v5.hub-home .fr-home-dashboard-heading { display:grid; grid-template-columns:minmax(0,1fr); justify-items:start; gap:7px; }
+}
 @media (max-width:380px) {
-  body.fr-v5.hub-home .fr-home-dashboard-heading { display:grid; grid-template-columns:1fr; justify-items:start; gap:7px; }
-  body.fr-v5.hub-home .fr-home-dashboard-heading h2 { white-space:nowrap; }
   body.fr-v5 .hub-page-wordmark { max-height:68px; }
   body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-showcase__bottom { grid-template-columns:1fr; }
   body.fr-v5.hub-home .hub-showcase__bottom .hub-tile { min-height:240px; }

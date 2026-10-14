@@ -27,9 +27,10 @@ test('Home places saved films under the feature and keeps destination headings a
   await page.addInitScript(() => localStorage.setItem('frightertainment-v5-watchlist', JSON.stringify([
     { tmdbId: 1700001, title: 'Resident Evil', type: 'movie', posterPath: '', year: 2026 }
   ])));
-  for (const width of [320, 390, 980, 1440]) {
+  for (const width of [320, 360, 390, 430, 460, 480, 980, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
     await expect(page.locator('#hub-ranking .hub-chart-row')).toHaveCount(5);
     await expect(page.locator('#my-watchlist [data-home-watch-count]')).toHaveText('1');
     const boxes = await page.evaluate(() => {
@@ -55,7 +56,7 @@ test('Home places saved films under the feature and keeps destination headings a
     expect(boxes.watch.top - boxes.feature.bottom, `${width}px`).toBeLessThanOrEqual(26);
     expect(boxes.editorialTitle.height, `${width}px`).toBeLessThanOrEqual(boxes.editorialLineHeight + 1);
     expect(boxes.editorialLink.height, `${width}px`).toBeLessThan(21);
-    if (width <= 360) expect(boxes.editorialTitle.bottom).toBeLessThanOrEqual(boxes.editorialLink.top);
+    if (width <= 460) expect(boxes.editorialTitle.bottom).toBeLessThanOrEqual(boxes.editorialLink.top);
     else expect(boxes.editorialTitle.right).toBeLessThanOrEqual(boxes.editorialLink.left + 1);
     expect(boxes.longlegsLines, `${width}px`).toBe(1);
     for (const row of boxes.rows) {
