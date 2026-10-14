@@ -1305,3 +1305,140 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    max-width:260px!important;min-height:190px!important;
  }
 }
+
+
+/* THE PICTURE HOUSE: a single tungsten-lit cinema display. Source-verified
+   release lines remain real DOM text; lighting is a purely visual finish. */
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__features {
+ box-shadow:
+    0 28px 68px #000d,
+    inset 0 0 0 1px #a89c8b3a,
+    inset 0 0 0 9px #050505,
+    0 0 75px #9b2c2a1a!important;
+ background:linear-gradient(140deg,#24181b,#08080a 40%,#050507 88%)!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{
+ position:relative!important;
+ padding:40px 18px 21px!important;
+ background:
+   radial-gradient(ellipse at 50% 0%,#a628323d,transparent 64%),
+   linear-gradient(0deg,#070708,#14090d)!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head::before {
+ content:'';position:absolute;top:13px;left:30px;right:30px;height:8px;
+ background:radial-gradient(circle at 50% 50%,#fce6b4 0 1.3px,#b78b5b99 2px,transparent 4px) left center/34px 8px repeat-x;
+ opacity:.47;filter:drop-shadow(0 0 4px #e4b77b);
+ pointer-events:none;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-marquee__eyebrow{
+ display:block;margin:7px 0 15px;
+ color:#bcaaa5;letter-spacing:.24em;
+ font:700 9px/1.3 var(--premium-ui);
+ text-align:center;text-transform:uppercase;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{
+ font:600 clamp(38px,4vw,62px)/.99 var(--premium-heading)!important;
+ letter-spacing:.075em!important;color:#e65d69!important;
+ text-shadow:0 0 5px #ac1d2d77,0 0 29px #cd27383d!important;
+ text-align:center!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{
+ padding:15px clamp(20px,2.7vw,40px) 31px!important;
+ background:
+  radial-gradient(ellipse at 50% 25%,#45303637,transparent 72%),
+  #050506!important;
+ box-shadow:inset 0 0 0 1px #a3967334,inset 0 0 55px #000b!important;
+ gap:4px!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::before{
+ content:'TONIGHT’S COMING ATTRACTIONS'!important;
+ padding:8px 0 9px!important;margin:0 0 7px!important;
+ color:#cabbb6!important;
+ font:600 clamp(9px,1vw,12px)/1.4 var(--premium-ui)!important;
+ letter-spacing:.24em!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card{
+ min-height:79px!important;
+ border:0!important;
+ padding:11px clamp(12px,1.7vw,25px)!important;
+ background:
+    linear-gradient(110deg,#55505015,#fffdf667 20%,#fffefa44 67%,#7d78721b),
+    repeating-linear-gradient(0deg,transparent 0 14px,#5f4e4110 15px),
+    linear-gradient(180deg,#eeece4,#ede9df 47%,#d2cec4)!important;
+ box-shadow:
+   0 2px 1px #050505,
+   0 4px 13px #0007,
+   inset 0 1px 1px #fff,
+   inset 0 0 18px #fffbdca1,
+   inset 0 -4px 12px #817a6766!important;
+ transition:filter .25s ease!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card:hover{
+ filter:brightness(1.05)!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__order{
+ color:#872a38!important;
+ font:800 clamp(20px,1.8vw,28px)/1 var(--premium-ledger)!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__title{
+ color:#17171a!important;
+ font:800 clamp(22px,2vw,34px)/.99 var(--premium-ledger)!important;
+ letter-spacing:.035em!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__date{
+ color:#2b2628!important;
+ font:800 clamp(14px,1.23vw,20px)/1.1 var(--premium-ledger)!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__details,
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept a.fr-cinema-concept__source{
+ letter-spacing:.02em!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region{
+ background-image:
+  linear-gradient(92deg,#080608e3 0%,#060609b8 74%,#060609b0),
+  var(--fr-scene-current)!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region h2{
+ font-size:clamp(32px,3.1vw,48px)!important;
+ font-weight:500!important;
+ letter-spacing:-.036em!important;
+ line-height:1.05!important;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region p{max-width:36ch!important}
+@media(max-width:700px){
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{
+  padding:28px 15px 14px!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head::before {
+  left:18px;right:18px;top:8px;background-size:26px 8px;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-marquee__eyebrow{
+  font-size:8px;letter-spacing:.13em;margin:4px 0 9px;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{
+  font-size:clamp(30px,6.7vw,46px)!important;letter-spacing:.04em!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{
+  padding:10px 10px 20px!important;gap:4px!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card{
+  min-height:75px!important;padding:9px 7px!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__title{
+  font-size:clamp(17px,4.5vw,27px)!important;
+ }
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__date{font-size:clamp(12px,3vw,16px)!important}
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__details{font-size:8px!important}
+}
+@media(prefers-reduced-motion:no-preference){
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{
+  animation:fr-signage-breathe 8s ease-in-out infinite alternate;
+ }
+ @keyframes fr-signage-breathe{
+  from{text-shadow:0 0 5px #ac1d2d55,0 0 19px #cd273829}
+  to{text-shadow:0 0 7px #ac1d2d99,0 0 36px #cd27385c}
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{animation:none!important}
+}

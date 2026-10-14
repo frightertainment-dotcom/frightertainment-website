@@ -78,7 +78,19 @@
     setupMotionControl();
     const root = document.querySelector('main');
     if (root) {
-      const observer = new MutationObserver(enhance);
+      // Watch only for newly inserted slides/scenes, not every rating or image
+      // mutation. Avoid full-page rescans on busy editorial feeds.
+      let pending = false;
+      const observer = new MutationObserver(mutations => {
+        const newScene = mutations.some(mutation =>
+          [...mutation.addedNodes].some(node =>
+            node.nodeType === 1 && (
+              node.matches?.(scenes) || node.querySelector?.(scenes)
+            )));
+        if (!newScene || pending) return;
+        pending = true;
+        requestAnimationFrame(() => { pending = false; enhance(); });
+      });
       observer.observe(root, {childList:true,subtree:true});
       window.addEventListener('pagehide', () => observer.disconnect(), {once:true});
     }
