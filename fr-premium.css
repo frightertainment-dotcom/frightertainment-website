@@ -1075,3 +1075,45 @@ body.fr-v5 .hub-footer *{border-color:transparent!important}
    transform:none!important;
  }
 }
+
+/* Film composition: editorial shortcuts now occupy the lower-left track,
+   preserving useful content beside a longer Top 20 ranking ledger. */
+@media(min-width:1000px){
+ body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row {
+   grid-template-areas:'editorial ranking' 'explore ranking'!important;
+   grid-template-rows:auto auto!important;align-items:start!important;
+ }
+ body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row>.editorial-carousel {grid-area:editorial!important}
+ body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row>.fr-v5-ranking {grid-area:ranking!important;align-self:stretch!important}
+ body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row>.fr-v5-explore {
+   grid-area:explore!important;width:100%!important;min-width:0!important;
+   margin:2px 0 0!important;
+   grid-template-columns:repeat(3,minmax(0,1fr))!important;
+   grid-auto-rows:auto!important;gap:11px!important;
+ }
+ body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row>.fr-v5-explore h2 {
+   font-size:27px!important;margin:0!important;padding:0 0 5px!important;
+ }
+ body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row>.fr-v5-explore>.fr-v5-explore__tile {
+   min-height:118px!important;padding:13px!important;
+ }
+}
+/* Accessible pause for optional ambience. Visual content never depends on it. */
+body.fr-v5 .fr-motion-toggle {
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:33px;max-width:140px;margin:0;padding:6px 7px;
+ border:0!important;border-radius:0;color:#a9a0a4;
+ background:transparent!important;font:600 9px/1.4 var(--premium-ui);
+ letter-spacing:.06em;text-align:center;cursor:pointer;
+}
+body.fr-v5 .fr-motion-toggle:hover,body.fr-v5 .fr-motion-toggle:focus-visible{
+ color:#f2d8d9!important;text-decoration:underline;
+}
+body.fr-v5.fr-motion-paused .fr-atmosphere__veil,
+body.fr-v5.fr-motion-paused .fr-atmosphere__mist,
+body.fr-v5.fr-motion-paused .fr-atmosphere__beam,
+body.fr-v5.fr-motion-paused .fr-atmosphere__particles {
+ animation:none!important;transition:none!important;transform:none!important;
+}
+@media(max-width:800px){body.fr-v5 .fr-motion-toggle{font-size:8px;padding:5px;min-height:27px}}
+@media(prefers-reduced-motion:reduce){body.fr-v5 .fr-motion-toggle{display:none!important}}
