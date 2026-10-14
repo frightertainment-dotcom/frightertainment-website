@@ -1,0 +1,1604 @@
+{
+  "capturedAt": "2026-10-13T23:56:31.774Z",
+  "origin": "http://127.0.0.1:4173",
+  "captures": [
+    {
+      "slug": "home",
+      "requested": "http://127.0.0.1:4173/",
+      "final": "http://127.0.0.1:4173/",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": null,
+        "theme": "home",
+        "introBackground": "linear-gradient(0deg, rgb(16, 7, 10) 0%, rgba(5, 6, 7, 0.847) 23%, rgba(5, 6, 7, 0.345) 69%), linear-gradient(90deg, rgba(5, 6, 7, 0.66), rgba(5, 6, 7, 0.125)), url(\"http://127.0.0.1:4173/assets/themes/home-mobile.webp\")",
+        "intro": {
+          "x": 9,
+          "y": 144,
+          "width": 372,
+          "height": 360,
+          "clientHeight": 360,
+          "scrollHeight": 360
+        },
+        "editorial": null,
+        "synopsis": null,
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/home-mobile390-first.png",
+        "docs/evidence/after/home-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "home",
+      "requested": "http://127.0.0.1:4173/",
+      "final": "http://127.0.0.1:4173/",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": null,
+        "theme": "home",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.96) 0%, rgba(5, 6, 7, 0.84) 31%, rgba(5, 6, 7, 0.192) 76%), linear-gradient(0deg, rgb(16, 7, 10) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/home-wide.webp\")",
+        "intro": {
+          "x": 60,
+          "y": 94,
+          "width": 1320,
+          "height": 473.6875,
+          "clientHeight": 474,
+          "scrollHeight": 474
+        },
+        "editorial": null,
+        "synopsis": null,
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/home-desktop1440-first.png",
+        "docs/evidence/after/home-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "movies",
+      "requested": "http://127.0.0.1:4173/movies.html",
+      "final": "http://127.0.0.1:4173/movies.html",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/movies.html",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": null,
+        "theme": "movies",
+        "introBackground": "linear-gradient(0deg, rgb(7, 16, 12) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/movies-mobile.webp\")",
+        "intro": {
+          "x": 0,
+          "y": 136,
+          "width": 390,
+          "height": 270,
+          "clientHeight": 270,
+          "scrollHeight": 270
+        },
+        "editorial": {
+          "x": 0,
+          "y": 423,
+          "width": 390,
+          "height": 686,
+          "clientHeight": 686,
+          "scrollHeight": 686
+        },
+        "synopsis": {
+          "x": 16,
+          "y": 789.265625,
+          "width": 358,
+          "height": 87,
+          "clientHeight": 87,
+          "scrollHeight": 109
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/discovery",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/movies-mobile390-first.png",
+        "docs/evidence/after/movies-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "movies",
+      "requested": "http://127.0.0.1:4173/movies.html",
+      "final": "http://127.0.0.1:4173/movies.html",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/movies.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": null,
+        "theme": "movies",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(7, 16, 12) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/movies-wide.webp\")",
+        "intro": {
+          "x": 0,
+          "y": 76,
+          "width": 1440,
+          "height": 400,
+          "clientHeight": 400,
+          "scrollHeight": 400
+        },
+        "editorial": {
+          "x": 0,
+          "y": 504.796875,
+          "width": 1440,
+          "height": 555.1875,
+          "clientHeight": 555,
+          "scrollHeight": 555
+        },
+        "synopsis": {
+          "x": 438.3125,
+          "y": 671.40625,
+          "width": 778.265625,
+          "height": 86.296875,
+          "clientHeight": 86,
+          "scrollHeight": 86
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/discovery",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/movies-desktop1440-first.png",
+        "docs/evidence/after/movies-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "tv-shows",
+      "requested": "http://127.0.0.1:4173/tv-shows.html",
+      "final": "http://127.0.0.1:4173/tv-shows.html",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/tv-shows.html",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": null,
+        "theme": "tv",
+        "introBackground": "linear-gradient(0deg, rgb(8, 12, 23) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/tv-mobile.webp\")",
+        "intro": {
+          "x": 12,
+          "y": 136,
+          "width": 366,
+          "height": 270,
+          "clientHeight": 270,
+          "scrollHeight": 270
+        },
+        "editorial": {
+          "x": 12,
+          "y": 423,
+          "width": 366,
+          "height": 736,
+          "clientHeight": 736,
+          "scrollHeight": 736
+        },
+        "synopsis": {
+          "x": 28,
+          "y": 811.40625,
+          "width": 334,
+          "height": 43.5,
+          "clientHeight": 44,
+          "scrollHeight": 44
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/tv-shows-mobile390-first.png",
+        "docs/evidence/after/tv-shows-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "tv-shows",
+      "requested": "http://127.0.0.1:4173/tv-shows.html",
+      "final": "http://127.0.0.1:4173/tv-shows.html",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/tv-shows.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": null,
+        "theme": "tv",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(8, 12, 23) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/tv-wide.webp\")",
+        "intro": {
+          "x": 60,
+          "y": 76,
+          "width": 1320,
+          "height": 400,
+          "clientHeight": 400,
+          "scrollHeight": 400
+        },
+        "editorial": {
+          "x": 60,
+          "y": 504.796875,
+          "width": 1320,
+          "height": 588,
+          "clientHeight": 588,
+          "scrollHeight": 588
+        },
+        "synopsis": {
+          "x": 467.109375,
+          "y": 671.40625,
+          "width": 778.265625,
+          "height": 28.765625,
+          "clientHeight": 29,
+          "scrollHeight": 29
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/tv-shows-desktop1440-first.png",
+        "docs/evidence/after/tv-shows-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "cinema",
+      "requested": "http://127.0.0.1:4173/cinema.html",
+      "final": "http://127.0.0.1:4173/cinema.html",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/cinema.html",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": "cinema",
+        "theme": "cinema",
+        "introBackground": "linear-gradient(0deg, rgb(14, 9, 11) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/cinema-mobile.webp\")",
+        "intro": {
+          "x": 12,
+          "y": 136,
+          "width": 366,
+          "height": 270,
+          "clientHeight": 270,
+          "scrollHeight": 270
+        },
+        "editorial": null,
+        "synopsis": null,
+        "chart": null,
+        "country": {
+          "x": 27,
+          "y": 537.25,
+          "width": 265,
+          "height": 40,
+          "clientHeight": 38,
+          "scrollHeight": 38
+        }
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/cinema-mobile390-first.png",
+        "docs/evidence/after/cinema-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "cinema",
+      "requested": "http://127.0.0.1:4173/cinema.html",
+      "final": "http://127.0.0.1:4173/cinema.html",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/cinema.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": "cinema",
+        "theme": "cinema",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(14, 9, 11) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/cinema-wide.webp\")",
+        "intro": {
+          "x": 60,
+          "y": 76,
+          "width": 1320,
+          "height": 400,
+          "clientHeight": 400,
+          "scrollHeight": 400
+        },
+        "editorial": null,
+        "synopsis": null,
+        "chart": null,
+        "country": {
+          "x": 1091.28125,
+          "y": 622.234375,
+          "width": 146,
+          "height": 40,
+          "clientHeight": 38,
+          "scrollHeight": 38
+        }
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/cinema-desktop1440-first.png",
+        "docs/evidence/after/cinema-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "indie-movies",
+      "requested": "http://127.0.0.1:4173/indie-movies.html",
+      "final": "http://127.0.0.1:4173/indie-movies.html",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/indie-movies.html",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": null,
+        "theme": "indie",
+        "introBackground": "linear-gradient(0deg, rgb(18, 11, 8) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/indie-mobile.webp\")",
+        "intro": {
+          "x": 12,
+          "y": 136,
+          "width": 366,
+          "height": 270,
+          "clientHeight": 270,
+          "scrollHeight": 270
+        },
+        "editorial": {
+          "x": 12,
+          "y": 423,
+          "width": 366,
+          "height": 766,
+          "clientHeight": 766,
+          "scrollHeight": 766
+        },
+        "synopsis": {
+          "x": 28,
+          "y": 789.359375,
+          "width": 334,
+          "height": 87,
+          "clientHeight": 87,
+          "scrollHeight": 131
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/indie-movies-mobile390-first.png",
+        "docs/evidence/after/indie-movies-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "indie-movies",
+      "requested": "http://127.0.0.1:4173/indie-movies.html",
+      "final": "http://127.0.0.1:4173/indie-movies.html",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/indie-movies.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": null,
+        "theme": "indie",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(18, 11, 8) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/indie-wide.webp\")",
+        "intro": {
+          "x": 60,
+          "y": 76,
+          "width": 1320,
+          "height": 400,
+          "clientHeight": 400,
+          "scrollHeight": 400
+        },
+        "editorial": {
+          "x": 60,
+          "y": 504.796875,
+          "width": 1320,
+          "height": 622.390625,
+          "clientHeight": 622,
+          "scrollHeight": 622
+        },
+        "synopsis": {
+          "x": 467.109375,
+          "y": 671.40625,
+          "width": 778.265625,
+          "height": 115.0625,
+          "clientHeight": 115,
+          "scrollHeight": 115
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/indie-movies-desktop1440-first.png",
+        "docs/evidence/after/indie-movies-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "podcasts",
+      "requested": "http://127.0.0.1:4173/podcasts.html",
+      "final": "http://127.0.0.1:4173/podcasts.html",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/podcasts.html",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": null,
+        "theme": "podcasts",
+        "introBackground": "linear-gradient(0deg, rgb(13, 7, 19) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/podcasts-mobile.webp\")",
+        "intro": {
+          "x": 12,
+          "y": 136,
+          "width": 366,
+          "height": 270,
+          "clientHeight": 270,
+          "scrollHeight": 270
+        },
+        "editorial": {
+          "x": 12,
+          "y": 423,
+          "width": 366,
+          "height": 636,
+          "clientHeight": 636,
+          "scrollHeight": 636
+        },
+        "synopsis": {
+          "x": 28,
+          "y": 774.484375,
+          "width": 334,
+          "height": 43.5,
+          "clientHeight": 44,
+          "scrollHeight": 44
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        },
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/podcasts-mobile390-first.png",
+        "docs/evidence/after/podcasts-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "podcasts",
+      "requested": "http://127.0.0.1:4173/podcasts.html",
+      "final": "http://127.0.0.1:4173/podcasts.html",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/podcasts.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": null,
+        "theme": "podcasts",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(13, 7, 19) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/podcasts-wide.webp\")",
+        "intro": {
+          "x": 60,
+          "y": 76,
+          "width": 1320,
+          "height": 400,
+          "clientHeight": 400,
+          "scrollHeight": 400
+        },
+        "editorial": {
+          "x": 60,
+          "y": 504.796875,
+          "width": 1320,
+          "height": 490,
+          "clientHeight": 490,
+          "scrollHeight": 490
+        },
+        "synopsis": {
+          "x": 467.109375,
+          "y": 671.40625,
+          "width": 778.265625,
+          "height": 28.765625,
+          "clientHeight": 29,
+          "scrollHeight": 29
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        },
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/podcasts-desktop1440-first.png",
+        "docs/evidence/after/podcasts-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "games",
+      "requested": "http://127.0.0.1:4173/games.html",
+      "final": "http://127.0.0.1:4173/games.html",
+      "label": "mobile390",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/games.html",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 390,
+        "bodyPage": null,
+        "theme": "games",
+        "introBackground": "linear-gradient(0deg, rgb(7, 10, 22) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/games-mobile.webp\")",
+        "intro": {
+          "x": 12,
+          "y": 136,
+          "width": 366,
+          "height": 270,
+          "clientHeight": 270,
+          "scrollHeight": 270
+        },
+        "editorial": {
+          "x": 12,
+          "y": 423,
+          "width": 366,
+          "height": 636,
+          "clientHeight": 636,
+          "scrollHeight": 636
+        },
+        "synopsis": {
+          "x": 28,
+          "y": 791.984375,
+          "width": 334,
+          "height": 43.5,
+          "clientHeight": 44,
+          "scrollHeight": 44
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/games-mobile390-first.png",
+        "docs/evidence/after/games-mobile390-full.png"
+      ]
+    },
+    {
+      "slug": "games",
+      "requested": "http://127.0.0.1:4173/games.html",
+      "final": "http://127.0.0.1:4173/games.html",
+      "label": "desktop1440",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/games.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 1440,
+        "bodyPage": null,
+        "theme": "games",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(7, 10, 22) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/games-wide.webp\")",
+        "intro": {
+          "x": 60,
+          "y": 76,
+          "width": 1320,
+          "height": 400,
+          "clientHeight": 400,
+          "scrollHeight": 400
+        },
+        "editorial": {
+          "x": 60,
+          "y": 504.796875,
+          "width": 1320,
+          "height": 490,
+          "clientHeight": 490,
+          "scrollHeight": 490
+        },
+        "synopsis": {
+          "x": 467.109375,
+          "y": 671.40625,
+          "width": 778.265625,
+          "height": 28.765625,
+          "clientHeight": 29,
+          "scrollHeight": 29
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/games-desktop1440-first.png",
+        "docs/evidence/after/games-desktop1440-full.png"
+      ]
+    },
+    {
+      "slug": "movies",
+      "requested": "http://127.0.0.1:4173/movies.html",
+      "final": "http://127.0.0.1:4173/movies.html",
+      "label": "width320",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/movies.html",
+        "viewport": {
+          "width": 320,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 320,
+        "bodyPage": null,
+        "theme": "movies",
+        "introBackground": "linear-gradient(0deg, rgb(7, 16, 12) 0%, rgba(5, 6, 7, 0.863) 28%, rgba(5, 6, 7, 0.27) 78%), linear-gradient(90deg, rgba(5, 6, 7, 0.68), rgba(5, 6, 7, 0.1)), url(\"http://127.0.0.1:4173/assets/themes/movies-mobile.webp\")",
+        "intro": {
+          "x": 0,
+          "y": 136,
+          "width": 320,
+          "height": 279.890625,
+          "clientHeight": 280,
+          "scrollHeight": 280
+        },
+        "editorial": {
+          "x": 0,
+          "y": 432.890625,
+          "width": 320,
+          "height": 756,
+          "clientHeight": 756,
+          "scrollHeight": 756
+        },
+        "synopsis": {
+          "x": 16,
+          "y": 826.078125,
+          "width": 288,
+          "height": 87,
+          "clientHeight": 87,
+          "scrollHeight": 131
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/discovery",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/movies-width320-detail.png"
+      ]
+    },
+    {
+      "slug": "movies",
+      "requested": "http://127.0.0.1:4173/movies.html",
+      "final": "http://127.0.0.1:4173/movies.html",
+      "label": "width980",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/movies.html",
+        "viewport": {
+          "width": 980,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 980,
+        "bodyPage": null,
+        "theme": "movies",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(7, 16, 12) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/movies-wide.webp\")",
+        "intro": {
+          "x": 0,
+          "y": 76,
+          "width": 980,
+          "height": 315.5625,
+          "clientHeight": 316,
+          "scrollHeight": 316
+        },
+        "editorial": {
+          "x": 0,
+          "y": 411.15625,
+          "width": 980,
+          "height": 500,
+          "clientHeight": 500,
+          "scrollHeight": 500
+        },
+        "synopsis": {
+          "x": 325.921875,
+          "y": 551.28125,
+          "width": 624.6875,
+          "height": 75.46875,
+          "clientHeight": 75,
+          "scrollHeight": 75
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/discovery",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/movie-artwork",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/rankings",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/movies-width980-detail.png"
+      ]
+    },
+    {
+      "slug": "indie-movies",
+      "requested": "http://127.0.0.1:4173/indie-movies.html",
+      "final": "http://127.0.0.1:4173/indie-movies.html",
+      "label": "width768",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/indie-movies.html",
+        "viewport": {
+          "width": 768,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 768,
+        "bodyPage": null,
+        "theme": "indie",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(18, 11, 8) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/indie-wide.webp\")",
+        "intro": {
+          "x": 15.359375,
+          "y": 115,
+          "width": 737.265625,
+          "height": 310,
+          "clientHeight": 310,
+          "scrollHeight": 310
+        },
+        "editorial": {
+          "x": 15.359375,
+          "y": 443,
+          "width": 737.265625,
+          "height": 526,
+          "clientHeight": 526,
+          "scrollHeight": 526
+        },
+        "synopsis": {
+          "x": 262.828125,
+          "y": 579.765625,
+          "width": 466.765625,
+          "height": 100.625,
+          "clientHeight": 101,
+          "scrollHeight": 126
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/indie-movies-width768-detail.png"
+      ]
+    },
+    {
+      "slug": "indie-movies",
+      "requested": "http://127.0.0.1:4173/indie-movies.html",
+      "final": "http://127.0.0.1:4173/indie-movies.html",
+      "label": "width980",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/indie-movies.html",
+        "viewport": {
+          "width": 980,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 980,
+        "bodyPage": null,
+        "theme": "indie",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(18, 11, 8) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/indie-wide.webp\")",
+        "intro": {
+          "x": 19.59375,
+          "y": 76,
+          "width": 940.796875,
+          "height": 310,
+          "clientHeight": 310,
+          "scrollHeight": 310
+        },
+        "editorial": {
+          "x": 19.59375,
+          "y": 405.59375,
+          "width": 940.796875,
+          "height": 500,
+          "clientHeight": 500,
+          "scrollHeight": 500
+        },
+        "synopsis": {
+          "x": 334.15625,
+          "y": 545.71875,
+          "width": 596.84375,
+          "height": 100.625,
+          "clientHeight": 101,
+          "scrollHeight": 101
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/media",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        },
+        {
+          "path": "/api/catalogue",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/indie-movies-width980-detail.png"
+      ]
+    },
+    {
+      "slug": "podcasts",
+      "requested": "http://127.0.0.1:4173/podcasts.html",
+      "final": "http://127.0.0.1:4173/podcasts.html",
+      "label": "width768",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/podcasts.html",
+        "viewport": {
+          "width": 768,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 768,
+        "bodyPage": null,
+        "theme": "podcasts",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(13, 7, 19) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/podcasts-wide.webp\")",
+        "intro": {
+          "x": 15.359375,
+          "y": 115,
+          "width": 737.265625,
+          "height": 310,
+          "clientHeight": 310,
+          "scrollHeight": 310
+        },
+        "editorial": {
+          "x": 15.359375,
+          "y": 443,
+          "width": 737.265625,
+          "height": 446,
+          "clientHeight": 446,
+          "scrollHeight": 446
+        },
+        "synopsis": {
+          "x": 262.828125,
+          "y": 579.765625,
+          "width": 466.765625,
+          "height": 50.3125,
+          "clientHeight": 50,
+          "scrollHeight": 50
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        },
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/podcasts-width768-detail.png"
+      ]
+    },
+    {
+      "slug": "podcasts",
+      "requested": "http://127.0.0.1:4173/podcasts.html",
+      "final": "http://127.0.0.1:4173/podcasts.html",
+      "label": "width980",
+      "browser": "151.0.7922.173",
+      "metrics": {
+        "route": "/podcasts.html",
+        "viewport": {
+          "width": 980,
+          "height": 844
+        },
+        "visualScale": 1,
+        "dpr": 1,
+        "fontStatus": "loaded",
+        "fontDisplayLoaded": true,
+        "documentWidth": 980,
+        "bodyPage": null,
+        "theme": "podcasts",
+        "introBackground": "linear-gradient(90deg, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.835) 35%, rgba(5, 6, 7, 0.14) 78%), linear-gradient(0deg, rgb(13, 7, 19) 0%, rgba(0, 0, 0, 0) 28%), url(\"http://127.0.0.1:4173/assets/themes/podcasts-wide.webp\")",
+        "intro": {
+          "x": 19.59375,
+          "y": 76,
+          "width": 940.796875,
+          "height": 310,
+          "clientHeight": 310,
+          "scrollHeight": 310
+        },
+        "editorial": {
+          "x": 19.59375,
+          "y": 405.59375,
+          "width": 940.796875,
+          "height": 500,
+          "clientHeight": 500,
+          "scrollHeight": 500
+        },
+        "synopsis": {
+          "x": 334.15625,
+          "y": 545.71875,
+          "width": 596.84375,
+          "height": 25.15625,
+          "clientHeight": 25,
+          "scrollHeight": 25
+        },
+        "chart": null,
+        "country": null
+      },
+      "api": [
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        },
+        {
+          "path": "/api/podcasts",
+          "status": 404
+        }
+      ],
+      "errors": [],
+      "state": "Local static fallback; no /api/ backend and empty watchlist",
+      "files": [
+        "docs/evidence/after/podcasts-width980-detail.png"
+      ]
+    }
+  ]
+}

@@ -148,9 +148,16 @@ export async function refreshTheatricalReleases(env, db, country, now = new Date
 }
 
 function requireTmdb(env) {
-  requireTrue(env.TMDB_COMMERCIAL_LICENSE_APPROVED, 'TMDB commercial API licence is not approved');
-  requireTrue(env.TMDB_ATTRIBUTION_READY, 'TMDB attribution logo and non-endorsement notice must be ready before activation');
+  const noncommercial = env.TMDB_NONCOMMERCIAL_USE_APPROVED === 'true';
+  const commercial = env.TMDB_COMMERCIAL_LICENSE_APPROVED === 'true';
+  if (noncommercial === commercial) {
+    throw new Error('Set exactly one of TMDB_NONCOMMERCIAL_USE_APPROVED or TMDB_COMMERCIAL_LICENSE_APPROVED to true');
+  }
+  requireTrue(env.TMDB_ATTRIBUTION_READY, 'TMDB logo and non-endorsement attribution must be ready before activation');
   if (!env.TMDB_READ_ACCESS_TOKEN) throw new Error('TMDB read access token is not configured');
+}
+function tmdbPosterPath(path) {
+  return typeof path === 'string' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(path) ? path : null;
 }
 
 export async function refreshTrending(env, country) {
@@ -162,6 +169,7 @@ export async function refreshTrending(env, country) {
   const checkedAt = checkedToday();
   const items = (data.results || []).filter(film => film.genre_ids?.includes(27)).map(film => ({
     id: `tmdb:${film.id}`, title: film.title || film.original_title,
+    posterPath: tmdbPosterPath(film.poster_path),
     releaseYear: /^\d{4}/.test(film.release_date || '') ? Number(film.release_date.slice(0, 4)) : null,
     popularity: Number.isFinite(film.popularity) ? film.popularity : null,
     trendDefinition: 'Global TMDB weekly movie-trending list filtered to the Horror genre; selected country affects display language only',
@@ -190,6 +198,7 @@ export async function discoverHorrorCandidates(env, country, fromDate, toDate) {
   }
   return data.map(film => ({
     id: `tmdb:${film.id}`, title: film.title || film.original_title,
+    posterPath: tmdbPosterPath(film.poster_path),
     releaseDate: film.release_date || null, territory: country,
     sourceName: 'TMDB', sourceUrl: `https://www.themoviedb.org/movie/${film.id}`,
     note: 'Discovery candidate only; verify every public fact against a primary source before publication.'

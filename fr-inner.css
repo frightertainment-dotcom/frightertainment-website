@@ -1,0 +1,688 @@
+/* Frightertainment AFTER DARK · supporting pages, the Horror Vault and film
+   records. A quiet, source-first editorial reading layer.
+   No poster claims, released-score invention or brand image modifications. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+body.hub-body {
+  --inner-heading:'Cormorant Garamond',Georgia,serif;
+  --inner-ui:'DM Sans',Arial,sans-serif;
+  --inner-ledger:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --inner-ink:#f3ebe4;
+  --inner-soft:#c9c0bd;
+  --inner-red:#d45565;
+  --inner-base:#060609;
+  color:var(--inner-ink);
+  font-family:var(--inner-ui);
+  background:
+    radial-gradient(ellipse at 77% 4%,#8e323318,transparent 35%),
+    radial-gradient(ellipse at 7% 38%,#314b4615,transparent 39%),
+    linear-gradient(180deg,#07080a,#080708 59%,#040507) #060609;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:clip;
+}
+body.hub-body .hub-microbar{display:none}
+body.hub-body .red-thread{display:none}
+body.hub-body .hub-header {
+  z-index:40;position:relative;
+  border:0;box-shadow:0 15px 34px #0009;
+  background:linear-gradient(180deg,#030405f9,#08080af1);
+}
+body.hub-body .hub-header__inside {
+  display:grid;
+  grid-template-columns:minmax(165px,245px) minmax(0,1fr);
+  align-items:center;
+  gap:clamp(13px,2vw,30px);
+  width:min(1400px,calc(100% - 48px));
+  max-width:none;
+  min-height:76px;
+  padding:8px 0;
+}
+body.hub-body .hub-brand {
+  display:block;min-width:0;max-width:245px;
+  height:auto;
+}
+body.hub-body .hub-brand img {
+  display:block;width:100%;max-height:65px;height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 12px #000);
+}
+body.hub-body .hub-tabs {
+  display:flex;flex-wrap:nowrap;gap:clamp(6px,1vw,18px);
+  justify-content:center;align-items:center;
+  width:100%;min-width:0;background:none;border:0;
+}
+body.hub-body .hub-tabs a {
+  position:relative;display:inline-flex;flex:0 1 auto;
+  justify-content:center;align-items:center;
+  min-height:46px;padding:10px clamp(4px,.6vw,10px);
+  color:#cdc6c6;
+  font:700 clamp(10px,.85vw,12px)/1.22 var(--inner-ui);
+  letter-spacing:.11em;text-align:center;
+  text-decoration:none;
+  border:0;background:none;box-shadow:none;
+  white-space:nowrap;
+}
+body.hub-body .hub-tabs a::after{content:none;display:none}
+body.hub-body .hub-tabs a:is(:hover,[aria-current='page']) {
+  border:0;background:none;
+  color:#fff1e8;text-shadow:0 0 18px #dc868347;
+}
+body.hub-body .hub-tabs a[aria-current='page']::before {
+  content:'';position:absolute;left:21%;right:21%;bottom:3px;height:2px;
+  background:#c63b51;box-shadow:0 0 15px #b81b42a3;
+}
+body.hub-body :is(a,button,input,select,textarea,summary):focus-visible {
+  outline:2px solid #f0c5bd;outline-offset:3px;
+}
+body.hub-body :is(.shell,.film-page .film-page__inner){
+  max-width:1360px;
+}
+body.hub-body main.shell{width:min(1360px,calc(100% - 48px));margin-inline:auto}
+body.hub-body .hub-eyebrow,
+body.hub-body .eyebrow{
+  color:#e3bbb6;
+  font:700 11px/1.4 var(--inner-ui);
+  letter-spacing:.2em;text-transform:uppercase;
+}
+body.hub-body main h1,
+body.hub-body main h2,
+body.hub-body main h3{
+  text-wrap:balance;
+}
+body.hub-body main a {
+  color:#e6b7b5;
+  text-decoration-thickness:1px;
+  text-underline-offset:4px;
+}
+body.hub-body main a:hover{color:#fff1e8}
+body.hub-body :is(.button,.hub-tile__link){
+  border:0;border-radius:0;
+  box-shadow:none;
+  background:#8a2338;
+  color:#fff;
+  font:700 11px/1.3 var(--inner-ui);
+  letter-spacing:.07em;
+}
+body.hub-body :is(input,textarea,select){
+  box-sizing:border-box;
+  max-width:100%;
+  background:#0b0c10;
+  border:1px solid #71606655;
+  border-radius:0;
+  color:#f4ece6;
+  font-family:var(--inner-ui);
+}
+body.hub-body :is(input,textarea)::placeholder{color:#a19a9d;opacity:1}
+body.hub-body .hub-footer {
+  margin-top:60px;
+  border:0;
+  background:#040406;
+  box-shadow:inset 0 1px #ffffff16;
+}
+body.hub-body .hub-footer .footer__bottom{border:0;color:#9d9597}
+
+/* The archive begins with a photographed cinema vault, not a boxed web form. */
+body.hub-body.hub-archive .horror-archive{max-width:1400px}
+body.hub-body .horror-archive__hero{
+  position:relative;
+  isolation:isolate;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  min-height:clamp(340px,32vw,480px);
+  margin:0 0 30px;
+  padding:clamp(24px,4vw,58px);
+  overflow:hidden;
+  border:0;
+  background:
+    linear-gradient(90deg,#050609e8,#050609c5 40%,#0506093b 78%),
+    linear-gradient(0deg,#050609 0%,transparent 20%),
+    url('/assets/themes/movies-wide.webp') center/cover no-repeat;
+  box-shadow:none;
+}
+body.hub-body .horror-archive__hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:-1;
+  background:radial-gradient(ellipse at 75% 35%,#e6d6ae11,transparent 42%);
+}
+body.hub-body .horror-archive__hero .hub-page-wordmark{
+  display:block;
+  max-width:min(94%,640px);max-height:125px;
+  object-fit:contain;object-position:left center;
+  filter:drop-shadow(0 5px 20px #000e);
+}
+body.hub-body .horror-archive__hero .hub-page-title--wordmark{
+  margin:14px 0 18px;width:100%;
+}
+body.hub-body .horror-archive__hero>p{
+  max-width:66ch;
+  margin:4px 0 14px;
+  color:#e6e0db;
+  font:400 clamp(15px,1.27vw,18px)/1.65 var(--inner-ui);
+}
+body.hub-body .horror-archive__hero .hub-subtabs{
+  display:flex;flex-wrap:wrap;gap:10px 22px;
+  margin-top:12px;
+}
+body.hub-body .horror-archive__hero .hub-subtabs a{
+  min-height:34px;padding:7px 0;
+  border:0;background:none;
+  font:700 11px/1.3 var(--inner-ui);
+  letter-spacing:.075em;text-decoration:none;
+}
+body.hub-body .horror-archive__panel {
+  border:0;border-radius:0;
+  background:linear-gradient(155deg,#130e14,#08090c 65%);
+  box-shadow:0 23px 50px #0008,inset 0 1px #ffffff0d;
+  padding:clamp(18px,2.7vw,40px);
+}
+body.hub-body .horror-archive__top {
+  display:flex;flex-wrap:wrap;gap:24px;
+  justify-content:space-between;align-items:end;
+  padding:6px 0 22px;
+  border:0;
+}
+body.hub-body .horror-archive__top h2{
+  margin:7px 0 6px;
+  font:600 clamp(42px,4.5vw,70px)/.98 var(--inner-heading);
+  letter-spacing:-.04em;
+  color:var(--inner-ink);
+}
+body.hub-body .horror-archive__top h2 em {
+  color:#d8a29e;font-style:italic;
+}
+body.hub-body .horror-archive__top p,
+body.hub-body .horror-archive__source{
+  color:#c1b7b3;
+  font:400 13px/1.6 var(--inner-ui);
+}
+body.hub-body .horror-archive__jump,
+body.hub-body .horror-vault-search label {
+  display:grid;gap:8px;
+  font:700 10px/1.3 var(--inner-ui);
+  color:#d6b4b1;
+  letter-spacing:.13em;
+}
+body.hub-body #archive-jump{
+  min-width:140px;min-height:45px;padding:10px 13px;
+  background:#0a0a0f;border:1px solid #6d444d66;
+  color:#efe0d9;font:700 14px var(--inner-ui);
+}
+body.hub-body .horror-vault-search{
+  border:0;
+  background:#08090ddc;
+  padding:20px clamp(14px,2vw,24px);
+}
+body.hub-body .horror-vault-search__controls{
+  display:flex;gap:8px;min-width:0;
+  border:0;background:none;
+}
+body.hub-body #archive-global-search{
+  width:100%;max-width:none;min-width:0;min-height:54px;
+  padding:12px 16px;
+  border:1px solid #ffffff24;
+  background:#111015;
+  color:#fff;
+  font:400 clamp(13px,1.1vw,16px) var(--inner-ui);
+}
+body.hub-body .horror-vault-search__status{
+  color:#bfb5b5;font:400 13px/1.5 var(--inner-ui);
+  margin:12px 0 0;
+}
+body.hub-body .horror-archive__source{margin:18px 0 11px}
+body.hub-body .horror-archive__years {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:start;
+  gap:10px;
+  min-width:0;
+}
+body.hub-body .horror-archive__decade {
+  grid-column:1/-1;
+  margin:24px 0 2px;padding:8px 0 4px;
+  border:0;
+  color:#b9aead;
+  font:600 clamp(31px,3.1vw,48px)/1 var(--inner-heading);
+  letter-spacing:-.03em;
+}
+body.hub-body .horror-year {
+  grid-column:auto;
+  margin:0;padding:0;
+  border:0;background:#151117;
+  box-shadow:inset 0 1px #ffffff10;
+  min-width:0;overflow:clip;
+}
+body.hub-body .horror-year__header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:'year arrow' 'count count';
+  align-items:center;
+  gap:5px 10px;
+  min-width:0;
+  min-height:92px;
+  padding:15px 18px;
+  border:0;
+  background:linear-gradient(130deg,#20141b,#100f15);
+  cursor:pointer;
+}
+body.hub-body .horror-year__header:hover,
+body.hub-body .horror-year__header:focus-visible{
+  background:linear-gradient(135deg,#4d1d2c,#19121a);
+}
+body.hub-body .horror-year__year{
+  grid-area:year;
+  color:#f5e9e2;
+  font:600 clamp(27px,3vw,42px)/.93 var(--inner-heading);
+}
+body.hub-body .horror-year__count{
+  grid-area:count;
+  font:700 10px/1.4 var(--inner-ui);
+  letter-spacing:.07em;
+  color:#ada3a5;
+}
+body.hub-body .horror-year__chevron{
+  grid-area:arrow;
+  color:#d8a7a3;font:700 21px/1 var(--inner-ui);
+}
+body.hub-body .horror-year[open]{
+  grid-column:1/-1;
+  background:linear-gradient(140deg,#1b1118,#090a0e);
+  overflow:visible;
+  margin:8px 0 17px;
+  box-shadow:0 18px 42px #0009;
+}
+body.hub-body .horror-year[open] .horror-year__header{
+  min-height:80px;
+  background:linear-gradient(90deg,#632335,#1b0c15 75%);
+}
+body.hub-body .horror-year__search-label{
+  display:grid;gap:7px;padding:18px 18px 4px;
+  font:700 10px/1.35 var(--inner-ui);
+  color:#ddb9b2;letter-spacing:.09em;
+}
+body.hub-body .horror-year__search{
+  min-height:44px;padding:12px;
+  background:#0b0b11;color:#fff;
+  border:1px solid #ffffff2b;
+}
+body.hub-body .horror-year__panel{padding:8px 14px 22px}
+body.hub-body .horror-year__tally{color:#b9aead;font:400 12px/1.5 var(--inner-ui)}
+body.hub-body .horror-year__films{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  min-width:0;padding:0;margin:12px 0 0;
+  list-style:none;
+}
+body.hub-body .horror-year__film{
+  min-width:0;margin:0;padding:0;
+  border:0;
+  background:#111015;
+}
+body.hub-body .horror-year__film-link{
+  display:flex;align-items:center;
+  min-width:0;min-height:60px;padding:9px 12px;
+  gap:9px;
+  color:#e4d8d5;
+  font:600 12px/1.4 var(--inner-ui);
+  text-decoration:none;
+  overflow-wrap:anywhere;
+}
+body.hub-body .horror-year__film-link:hover{background:#341b29;color:#fff}
+body.hub-body .archive-media__poster{
+  flex:0 0 46px;max-width:46px;
+  aspect-ratio:2/3;object-fit:cover;
+}
+body.hub-body .horror-year__film-title{
+  color:#f0dfda;font:600 13px/1.3 var(--inner-ui);
+}
+body.hub-body .horror-year__film-type,
+body.hub-body .archive-media__rating{
+  color:#b2a5a6;font:400 10px/1.3 var(--inner-ui);
+}
+body.hub-body .horror-vault-search__result{
+  background:#181219;border:0;
+  padding:11px 14px;
+  box-shadow:none;
+}
+body.hub-body .horror-archive__notes{
+  margin:30px auto 10px;
+  padding:30px clamp(17px,3vw,42px);
+  border:0;
+  background:linear-gradient(130deg,#130d14,#0b0b0e);
+  box-shadow:none;
+}
+body.hub-body .horror-archive__notes h2{
+  color:#eee2db;
+  font:600 clamp(35px,3.8vw,53px)/1 var(--inner-heading);
+}
+body.hub-body .horror-archive__notes p{
+  color:#c9c0be;
+  max-width:92ch;
+  font:400 14px/1.75 var(--inner-ui);
+}
+
+/* Source-linked annual charts and film-file details are quiet cinema dossiers. */
+body.hub-body .film-page{
+  position:relative;isolation:isolate;
+  min-height:68vh;
+  margin:0 auto;padding:clamp(30px,4vw,63px) 0 35px;
+  border:0;
+  background:
+    linear-gradient(90deg,#07080aec,#09080bc8),
+    url('/assets/themes/movies-wide.webp') 78% top/cover no-repeat;
+}
+body.hub-body .film-page__inner{
+  width:min(100%,1160px);
+  margin-inline:auto;
+  color:#f0e8e4;
+}
+body.hub-body .film-page h1 {
+  max-width:20ch;
+  margin:15px 0 25px;
+  color:#f5e8de;
+  font:600 clamp(49px,6.5vw,96px)/.95 var(--inner-heading);
+  letter-spacing:-.04em;
+  text-shadow:0 8px 29px #000;
+}
+body.hub-body .film-page h1 em{
+  font-style:italic;color:#e5b4ab;
+}
+body.hub-body .film-page h2 {
+  color:#efe1d9;
+  font:600 clamp(29px,3.2vw,48px)/1 var(--inner-heading);
+  letter-spacing:-.02em;
+}
+body.hub-body .film-page__inner > p,
+body.hub-body .film-section > p{
+  max-width:90ch;color:#c7bec0;
+  font:400 14px/1.73 var(--inner-ui);
+}
+body.hub-body .film-status,
+body.hub-body .ranking-method,
+body.hub-body #unranked-films{
+  max-width:1100px;
+  margin:16px 0;
+  padding:20px clamp(14px,2vw,28px);
+  background:#0e1213eb;
+  border:0;box-shadow:inset 0 1px #ffffff1b;
+  color:#d6c7c2;
+  font:400 14px/1.6 var(--inner-ui);
+}
+body.hub-body #ranking-updated{
+  color:#a49da1;font:400 12px/1.5 var(--inner-ui);
+}
+body.hub-body .ranking-list{
+  max-width:1100px;
+  margin:20px 0;
+  border:0;
+}
+body.hub-body .source-list{
+  display:grid;gap:9px;
+  padding:0;margin:18px 0;
+  list-style:none;
+}
+body.hub-body .source-list li{
+  min-width:0;
+  margin:0;padding:15px 18px;
+  border:0;background:#111015d9;
+  box-shadow:inset 0 1px #ffffff12;
+}
+body.hub-body .source-list li:nth-child(even){background:#0c0c11dc}
+body.hub-body .source-list strong{
+  color:#f0e5df;
+  font:600 13px/1.45 var(--inner-ui);
+}
+body.hub-body .source-list small,
+body.hub-body .source-list span{
+  color:#afa4a4;
+  font:400 11px/1.55 var(--inner-ui);
+}
+body.hub-body .ranking-archive{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+body.hub-body .ranking-archive li{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;
+  min-height:104px;
+  padding:22px 25px;
+  background:linear-gradient(120deg,#1d111b,#0c1012);
+  box-shadow:0 14px 26px #0007;
+}
+body.hub-body .ranking-archive li a{
+  font:600 clamp(20px,2vw,30px)/1.06 var(--inner-heading);
+  color:#f2dad7;
+}
+body.hub-body .fr-movie-hero{
+  display:grid;
+  grid-template-columns:minmax(200px,29%) minmax(0,1fr);
+  align-items:start;gap:clamp(26px,4vw,60px);
+  padding:clamp(25px,3vw,46px);
+  border:0;
+  background:linear-gradient(130deg,#161019c9,#07090be5);
+  box-shadow:0 25px 38px #0009;
+}
+body.hub-body .fr-movie-hero__art{
+  border:0;
+  box-shadow:0 20px 34px #0009;
+}
+body.hub-body .fr-movie-hero__info h1{font-size:clamp(46px,5vw,79px)}
+body.hub-body .fr-movie-hero__synopsis{
+  max-width:76ch;color:#ded2cd;
+  font:400 clamp(14px,1.3vw,17px)/1.7 var(--inner-ui);
+}
+body.hub-body .film-section{
+  padding:24px 0 13px;
+  border:0;background:transparent;
+}
+body.hub-body .film-section h2{margin:0 0 14px}
+body.hub-body .film-claim{
+  display:flex;justify-content:space-between;
+  gap:20px;min-width:0;
+}
+body.hub-body .film-claim p{
+  color:#e2d7d3;font:400 14px/1.5 var(--inner-ui);
+}
+body.hub-body .film-claim a{flex:0 0 auto;align-self:center}
+
+/* Dynamic TMDB detail layout uses the same dossier styling without changing
+   source or poster handling. */
+body.hub-body .fr-media-detail,
+body.hub-body .archive-detail{
+  min-height:300px;
+  margin:35px 0;
+  padding:clamp(22px,3.3vw,49px);
+  border:0;
+  background:linear-gradient(115deg,#171018,#080b0f);
+  box-shadow:inset 0 1px #ffffff12,0 20px 36px #0008;
+}
+body.hub-body .fr-media-detail :is(h1,h2),
+body.hub-body .archive-detail :is(h1,h2){
+  color:#f6e7df;font:600 clamp(39px,4.4vw,73px)/1 var(--inner-heading);
+  letter-spacing:-.03em;
+}
+body.hub-body .archive-detail-main{padding-top:18px}
+body.hub-body .archive-detail__breadcrumbs{
+  display:flex;flex-wrap:wrap;gap:9px;
+  padding:12px 0;color:#aaa0a0;
+  font:600 11px/1.5 var(--inner-ui);
+  text-transform:uppercase;letter-spacing:.06em;
+}
+body.hub-body .archive-detail__explain{
+  padding:19px 28px;border:0;
+  background:#0e1015;box-shadow:none;
+}
+
+/* Contact, credits and privacy retain their legal text and functional forms. */
+body.hub-body .contact-intro{
+  min-height:320px;
+  margin:0 0 24px;
+  padding:clamp(24px,4vw,50px);
+  border:0;
+  background:
+    linear-gradient(90deg,#080608ed,#0b090ab0 72%),
+    url('/assets/themes/home-wide.webp') center/cover;
+  box-shadow:none;
+}
+body.hub-body .contact-intro h1,
+body.hub-body .credits-main>h1{
+  font:600 clamp(54px,6.5vw,94px)/.96 var(--inner-heading);
+  letter-spacing:-.05em;
+  color:#f1e9e2;
+}
+body.hub-body .contact-intro h1 em{color:#e4b4aa;font-style:italic}
+body.hub-body .contact-intro>p{
+  color:#ddd4d0;font:400 clamp(14px,1.15vw,17px)/1.7 var(--inner-ui);
+}
+body.hub-body .contact-jumps{display:flex;flex-wrap:wrap;gap:18px}
+body.hub-body .contact-jumps a{
+  padding:9px 0;border:0;
+  font:700 11px/1.4 var(--inner-ui);
+  text-decoration:none;letter-spacing:.06em;
+}
+body.hub-body .contact-methods{gap:clamp(16px,2vw,33px)}
+body.hub-body .contact-panel,
+body.hub-body .contact-direct{
+  border:0;
+  background:linear-gradient(145deg,#151019,#090b0f);
+  box-shadow:0 20px 38px #0008,inset 0 1px #ffffff12;
+  padding:clamp(20px,3vw,44px);
+}
+body.hub-body .contact-methods h2{
+  color:#f4e7df;
+  font:600 clamp(34px,3.5vw,57px)/1 var(--inner-heading);
+}
+body.hub-body .contact-methods p,
+body.hub-body .contact-privacy{
+  color:#cfc4c2;
+  font:400 13px/1.7 var(--inner-ui);
+}
+body.hub-body .contact-methods form label{
+  color:#e4c9c3;
+  font:700 11px/1.4 var(--inner-ui);
+  letter-spacing:.06em;
+}
+body.hub-body .contact-methods :is(input,textarea) {
+  min-height:46px;
+  padding:13px;
+  border:0;border-bottom:1px solid #c9b5b04d;
+  background:#07080b;
+  color:#fff;
+  font:400 15px/1.5 var(--inner-ui);
+}
+body.hub-body .contact-methods textarea{min-height:160px;resize:vertical}
+body.hub-body .contact-send,
+body.hub-body .contact-direct__button{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:48px;
+  padding:13px 20px;
+  border:0;border-radius:0;
+  background:#91263b;color:#fff;
+  font:700 11px/1.4 var(--inner-ui);
+  letter-spacing:.1em;
+  box-shadow:0 13px 24px #0007;
+}
+body.hub-body .credits-main,
+body.hub-body main.shell:has(>h1:first-child){
+  padding-block:clamp(30px,4vw,55px);
+}
+body.hub-body .credits-main>h1{max-width:15ch;margin:14px 0 30px}
+body.hub-body .credits-main section,
+body.hub-body main.shell > section:not(.hub-page-intro):not(.fr-media-detail):not(.archive-detail){
+  border-color:transparent;
+}
+body.hub-body .credits-main section h2{
+  font:600 clamp(30px,3vw,45px)/1 var(--inner-heading);
+}
+body.hub-body .credits-main p,
+body.hub-body main.shell > section p{
+  color:#d2c5c0;font:400 14px/1.7 var(--inner-ui);
+}
+@media(max-width:1000px){
+  body.hub-body .horror-archive__years{grid-template-columns:repeat(3,minmax(0,1fr))}
+  body.hub-body .horror-year__films{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  body.hub-body .hub-header__inside{
+    display:grid;
+    grid-template-columns:1fr;grid-template-rows:auto auto;
+    width:calc(100% - 20px);gap:0;
+    padding:7px 0 9px;
+  }
+  body.hub-body .hub-brand{
+    grid-column:1;grid-row:1;
+    justify-self:center;width:min(60vw,200px);
+    margin:0 auto 5px;
+  }
+  body.hub-body .hub-brand img{height:39px;max-height:39px;object-fit:contain}
+  body.hub-body .hub-tabs{
+    grid-column:1;grid-row:2;
+    display:grid;
+    grid-template-columns:repeat(12,minmax(0,1fr));
+    grid-template-rows:repeat(2,37px);
+    gap:0;width:100%;
+  }
+  body.hub-body .hub-tabs a {
+    grid-row:auto;grid-column:span 3;
+    min-width:0;width:100%;height:37px;min-height:37px;
+    padding:7px 2px;
+    font-size:9px;line-height:1.12;letter-spacing:.01em;
+    text-wrap:balance;white-space:normal;
+    overflow-wrap:normal;
+  }
+  body.hub-body .hub-tabs a:nth-child(n+5){grid-column:span 4;grid-row:2}
+  body.hub-body main.shell{width:calc(100% - 22px)}
+  body.hub-body .horror-archive__hero{
+    min-height:290px;
+    padding:28px 17px;
+    background-image:
+      linear-gradient(0deg,#050608f8,#050608b2 64%),
+      url('/assets/themes/movies-mobile.webp');
+    background-size:cover;
+    background-position:center;
+  }
+  body.hub-body .horror-archive__hero .hub-page-wordmark{
+    max-width:93%;max-height:90px;
+  }
+  body.hub-body .horror-archive__hero>p{
+    font-size:13px;line-height:1.55;
+  }
+  body.hub-body .horror-archive__hero .hub-subtabs{
+    gap:6px 11px;
+  }
+  body.hub-body .horror-archive__hero .hub-subtabs a{font-size:10px}
+  body.hub-body .horror-archive__panel{padding:17px 12px}
+  body.hub-body .horror-archive__top h2{font-size:47px}
+  body.hub-body .horror-archive__years{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  body.hub-body .horror-archive__decade{font-size:35px;margin:20px 0 2px}
+  body.hub-body .horror-year__header{min-height:78px;padding:12px 10px}
+  body.hub-body .horror-year__year{font-size:29px}
+  body.hub-body .horror-year__count{font-size:9px}
+  body.hub-body .horror-year__films{grid-template-columns:minmax(0,1fr)}
+  body.hub-body .horror-year[open] .horror-year__header{min-height:70px}
+  body.hub-body .horror-year__film-link{padding:9px 11px}
+  body.hub-body .film-page{padding:28px 0}
+  body.hub-body .film-page h1{font-size:clamp(45px,11vw,65px)}
+  body.hub-body .fr-movie-hero{grid-template-columns:1fr;gap:22px;padding:16px}
+  body.hub-body .fr-movie-hero__art{max-width:min(100%,230px);margin:auto}
+  body.hub-body .fr-movie-hero__info h1{font-size:clamp(39px,10vw,63px)}
+  body.hub-body .ranking-archive{grid-template-columns:1fr}
+  body.hub-body .film-claim{flex-direction:column;gap:7px}
+  body.hub-body .film-claim a{align-self:flex-start}
+  body.hub-body .contact-intro{
+    padding:24px 19px;min-height:270px;
+    background-image:linear-gradient(0deg,#060608f7,#060608b7 66%),url('/assets/themes/home-mobile.webp');
+  }
+  body.hub-body .contact-intro h1{font-size:61px}
+  body.hub-body .contact-methods{grid-template-columns:1fr}
+  body.hub-body .contact-panel,body.hub-body .contact-direct{padding:23px 16px}
+}
+@media(prefers-reduced-motion:no-preference){
+  body.hub-body .horror-archive__hero::before{
+    animation:fr-vault-light 22s ease-in-out infinite alternate;
+  }
+  @keyframes fr-vault-light {
+    to{opacity:.55;transform:translateX(-4%)}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.hub-body .horror-archive__hero::before{animation:none}
+  body.hub-body .horror-year__header{scroll-behavior:auto}
+}

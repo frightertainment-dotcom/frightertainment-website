@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-12",
+  "description": "Approved manual spotlight overrides only. Never infer asset permissions from an owner's request. Editorial notes are independently written, not official synopses.",
+  "overrides": {},
+  "notes": {
+    "tv": {
+      "tv-shows-0": "A novelist caught between written nightmares and lived horror makes an inviting choice for viewers who love supernatural fiction becoming painfully personal.",
+      "tv-shows-1": "For anyone drawn to mysterious recordings and stories within stories, its archival premise is an intriguing route into screen-based dread.",
+      "tv-shows-2": "The gothic family premise makes this an atmospheric choice when you want a horror story about power, history and consequences.",
+      "tv-shows-3": "A haunted estate and a story reaching across generations give this selection its old-fashioned ghost-story appeal.",
+      "tv-shows-4": "Period drama and a spreading plague collide in a distinctive blend of royal intrigue and relentless survival horror.",
+      "tv-shows-5": "An anthology is a great way to sample different strains of horror; this collection brings separate sinister visions together."
+    },
+    "indie": {
+      "indie-movies-0": "A case that crosses into occult territory is the sort of unnerving mystery that rewards viewers who enjoy dread building around an investigation.",
+      "indie-movies-1": "Sometimes the smallest object makes the largest threat. This cursed-toy premise gives everyday surroundings an unsettling edge.",
+      "indie-movies-2": "Body horror becomes especially disturbing when it turns a relationship into the centre of the nightmare.",
+      "indie-movies-3": "Psychological tension and faith are at the heart of this pick, making it well suited to viewers who like unsettling conversations and mounting peril.",
+      "indie-movies-4": "An occult secret discovered in a new home gives this film a deeply uneasy family-horror setup.",
+      "indie-movies-5": "For lovers of gothic atmosphere, the vampire legend remains a rich place to find obsession and dread."
+    },
+    "podcasts": {
+      "podcasts-0": "A folk-horror anthology for listeners who prefer their nightmares rooted in place, history and the things whispered about beneath the surface.",
+      "podcasts-1": "An unusual faith-driven journey provides the sort of immersive world and strange mythology that make audio fiction feel limitless.",
+      "podcasts-2": "Legends and unsettling history take centre stage here, ideal for a late-night listen with the lights turned low.",
+      "podcasts-3": "The boarding-house setting creates an inviting doorway into a larger mystery where seemingly ordinary lives conceal unease.",
+      "podcasts-4": "Surreal storytelling at its most disorienting: this is a pick for anyone who likes horror that refuses to explain itself too easily.",
+      "podcasts-5": "A remote research expedition and an unforgiving environment make isolation part of the fear, even before anything else goes wrong."
+    },
+    "games": {
+      "games-0": "Cooperative investigation puts a wonderfully social twist on dread: every sound and uncertain clue has the potential to unsettle the entire team.",
+      "games-1": "For players who want mystery threaded through a nightmare, this blends an investigation with a story about writing and fear.",
+      "games-2": "A deserted spacecraft is a classic survival-horror setting: the promise of isolation makes every corridor feel dangerous.",
+      "games-3": "Psychological horror thrives on uncertainty, and a fogbound town is an especially atmospheric place to lose your bearings.",
+      "games-4": "First-person exploration can make a haunted setting feel disturbingly close; the castle becomes part of the experience.",
+      "games-5": "A hostile journey and the search for answers provide a narrative-led doorway into survival horror."
+    }
+  }
+}

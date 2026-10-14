@@ -1,0 +1,84 @@
+[
+  {
+    "path": "/cinema.html",
+    "theme": "movies",
+    "mainHeadings": [
+      "\u2605 UPCOMING IN CINEMAS",
+      "\u2316 CINEMA RELEASES NEAR YOU",
+      "UK CINEMA RELEASE DIARY.",
+      "RECENTLY RELEASED."
+    ],
+    "moviesExplore": 0,
+    "moviesSpotlight": 0,
+    "cinemaConcept": 1,
+    "country": "GB",
+    "cinemaDiary": 1,
+    "width": 390,
+    "requestedPath": "/cinema.html",
+    "finalUrl": "http://127.0.0.1:4174/cinema.html"
+  },
+  {
+    "path": "/cinema",
+    "theme": "movies",
+    "mainHeadings": [
+      "EXPLORE MOVIES",
+      "MY WATCHLIST",
+      "TOP 20 HORROR",
+      "LATEST TRAILERS",
+      "FEATURED HORROR FILMS",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "moviesExplore": 1,
+    "moviesSpotlight": 0,
+    "cinemaConcept": 1,
+    "country": "GB",
+    "cinemaDiary": 1,
+    "width": 390,
+    "requestedPath": "/cinema",
+    "finalUrl": "http://127.0.0.1:4174/cinema"
+  },
+  {
+    "path": "/cinema.html",
+    "theme": "movies",
+    "mainHeadings": [
+      "\u2605 UPCOMING IN CINEMAS",
+      "\u2316 CINEMA RELEASES NEAR YOU",
+      "UK CINEMA RELEASE DIARY.",
+      "RECENTLY RELEASED."
+    ],
+    "moviesExplore": 0,
+    "moviesSpotlight": 0,
+    "cinemaConcept": 1,
+    "country": "GB",
+    "cinemaDiary": 1,
+    "width": 980,
+    "requestedPath": "/cinema.html",
+    "finalUrl": "http://127.0.0.1:4174/cinema.html"
+  },
+  {
+    "path": "/cinema",
+    "theme": "movies",
+    "mainHeadings": [
+      "EXPLORE MOVIES",
+      "MY WATCHLIST",
+      "TOP 20 HORROR",
+      "LATEST TRAILERS",
+      "FEATURED HORROR FILMS",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "moviesExplore": 1,
+    "moviesSpotlight": 0,
+    "cinemaConcept": 1,
+    "country": "GB",
+    "cinemaDiary": 1,
+    "width": 980,
+    "requestedPath": "/cinema",
+    "finalUrl": "http://127.0.0.1:4174/cinema"
+  }
+]

@@ -1,0 +1,101 @@
+name: V5 concept visual gate
+
+on:
+  pull_request:
+    paths:
+      - 'v5-magazine.*'
+      - 'fr-design-system.css'
+      - 'fr-page-themes.css'
+      - 'fr-rating-badge.*'
+      - 'assets/themes/**'
+      - 'browser-tests/v5-concept.pw.js'
+      - 'index.html'
+      - 'movies.html'
+      - 'tv-shows.html'
+      - 'indie-movies.html'
+      - 'cinema.html'
+      - 'cinema-concept.js'
+      - 'games.html'
+      - 'podcasts.html'
+      - 'styles.css'
+      - 'assets/frightertainment-f.png'
+      - 'scripts/build-preview.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:preview
+      - name: Save isolated preview bundle for offline responsive QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-preview-static
+          path: dist/
+          if-no-files-found: error
+          retention-days: 2
+      - name: Check original branding and seven page assets are in preview bundle
+        run: |
+          test -f dist/v5-magazine.css
+          test -f dist/v5-magazine.js
+          test -f dist/fr-design-system.css
+          test -f dist/fr-page-themes.css
+          test -f dist/fr-rating-badge.css
+          test -f dist/fr-rating-badge.js
+          test -f dist/assets/frightertainment-f.png
+          for theme in home movies tv cinema indie podcasts games; do test -f "dist/assets/themes/$theme-wide.webp"; test -f "dist/assets/themes/$theme-mobile.webp"; done
+          test -f dist/cinema-concept.js
+          test -f dist/assets/frightertainment-brand.png
+          test -f dist/assets/page-title-movies.png
+          test -f dist/assets/page-title-indie-movies.png
+          grep -q 'v5-magazine.css' dist/movies.html
+          grep -q 'v5-magazine.js' dist/indie-movies.html
+          grep -q 'fr-design-system.css' dist/index.html
+      - run: npx playwright install --with-deps chromium
+      - name: Check V5 mobile and desktop concept contracts
+        run: npx playwright test browser-tests/v5-concept.pw.js --reporter=list
+      - name: Preserve actual first-fold screenshots
+        if: always()
+        run: |
+          mkdir -p visual-evidence
+          for name in v5-indie-mobile v5-movies-desktop v5-home-mobile v5-cinema-mobile concept-home-mobile concept-movies-mobile concept-tv-mobile concept-cinema-mobile concept-indie-mobile concept-podcasts-mobile concept-games-mobile concept-home-desktop concept-movies-desktop concept-tv-desktop concept-cinema-desktop concept-indie-desktop concept-podcasts-desktop concept-games-desktop; do
+            if test -f "test-results/visual/$name.png"; then cp "test-results/visual/$name.png" visual-evidence/; fi
+            if test -f "test-results/visual/$name.jpg"; then cp "test-results/visual/$name.jpg" visual-evidence/; fi
+          done
+      - name: Verify poster logic, original catalogues and consent-gated embeds
+        run: npx playwright test browser-tests/catalogue.pw.js browser-tests/editorial-poster.pw.js browser-tests/embeds.pw.js --reporter=list
+      - name: Export compact first-fold fixture screenshots for visual inspection
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          for name in ('concept-home-mobile','concept-movies-mobile','concept-tv-mobile','concept-cinema-mobile','concept-indie-mobile','concept-podcasts-mobile','concept-games-mobile','concept-home-desktop','concept-movies-desktop','concept-tv-desktop','concept-cinema-desktop','concept-indie-desktop','concept-podcasts-desktop','concept-games-desktop'):
+              p = Path('visual-evidence') / (name + '.jpg')
+              if not p.is_file():
+                  continue
+              value = base64.b64encode(p.read_bytes()).decode('ascii')
+              print('V5_IMAGE_BEGIN ' + name)
+              for start in range(0, len(value), 4000):
+                  print('V5_IMAGE_PART ' + value[start:start+4000])
+              print('V5_IMAGE_END ' + name)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-visual-evidence
+          path: |
+            test-results/
+            visual-evidence/
+            playwright-report/
+          if-no-files-found: ignore

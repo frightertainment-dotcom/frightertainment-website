@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-12",
+  "description": "Original spoiler-light Frightertainment summaries paraphrased after checking the listed primary studio or distributor synopsis. These are original editorial text, not a licence to republish studio artwork, video or scores.",
+  "items": [
+    {
+      "id": "28-days-later",
+      "sourceUrl": "https://www.sonypictures.com/movies/28dayslater",
+      "description": "After a devastating outbreak, bicycle courier Jim wakes in an abandoned London hospital to discover a city emptied by the Rage virus. His search for other survivors takes him through deserted streets where an ordinary encounter can become a deadly threat."
+    },
+    {
+      "id": "28-weeks-later",
+      "sourceUrl": "https://www.20thcenturystudios.com/movies/28-weeks-later",
+      "description": "Six months after authorities declare Britain safe from the Rage virus, an ambitious plan to repopulate London begins. The fragile promise of normality soon collapses as another terrifying outbreak threatens everyone inside the supposedly secure zone."
+    },
+    {
+      "id": "28-years-later",
+      "sourceUrl": "https://www.sonypictures.co.uk/movies/28-years-later",
+      "description": "Nearly three decades after the Rage virus changed Britain, a small community survives on an isolated island linked to the mainland by a guarded causeway. A dangerous journey beyond that protection reveals how both the infected and the remaining survivors have changed."
+    },
+    {
+      "id": "28-years-later-bone-temple",
+      "sourceUrl": "https://www.sonypictures.com/movies/28yearslaterthebonetemple",
+      "description": "The world beyond the island grows more frightening as Dr. Kelson makes a potentially world-changing discovery and Spike becomes entangled with Jimmy Crystal. The infected remain dangerous, but other survivors may prove even more terrifying."
+    },
+    {
+      "id": "black-phone-2",
+      "sourceUrl": "https://www.universalpictures.com/movies/black-phone-2",
+      "description": "Years after escaping the Grabber, Finn is still haunted by what happened. When his sister Gwen begins receiving disturbing visions connected to a winter camp, the siblings confront a threat that refuses to stay buried in the past."
+    },
+    {
+      "id": "five-nights-at-freddys-2",
+      "sourceUrl": "https://www.universalpictures.com/movies/five-nights-at-freddys-2",
+      "description": "The nightmare surrounding Freddy Fazbear's Pizzeria is far from finished. In a new chapter inspired by the popular games, the haunted animatronics return with more secrets and another night of supernatural terror. Beneath the familiar children's-entertainment setting is a world where cheerful mascots, dark secrets and the possibility of another encounter make every moment feel uneasy."
+    },
+    {
+      "id": "longlegs",
+      "sourceUrl": "https://www.neonrated.com/film/longlegs-film",
+      "description": "An FBI agent pursuing a serial killer encounters a trail of occult clues that makes the case increasingly unsettling. Every discovery draws the investigation closer to something stranger than a conventional murder mystery."
+    },
+    {
+      "id": "the-monkey",
+      "sourceUrl": "https://www.neonrated.com/film/the-monkey",
+      "description": "Twin brothers discover a wind-up toy whose appearance seems linked to a series of grisly deaths. Decades later, the cursed monkey resurfaces, forcing the estranged siblings to confront their childhood terror before the killing begins again."
+    },
+    {
+      "id": "together",
+      "sourceUrl": "https://www.neonrated.com/film/together",
+      "description": "Tim and Millie leave behind familiar surroundings for a new life in the countryside, but their relationship is already under strain. An encounter with an unnatural force turns their emotional dependence into a disturbing threat to their bodies and their future."
+    },
+    {
+      "id": "heart-eyes",
+      "sourceUrl": "https://www.sonypictures.com/movies/hearteyes",
+      "description": "For years, a killer known as Heart Eyes has stalked romantic couples on Valentine's Day. When the holiday returns, ordinary romance becomes a deadly risk in a horror-comedy that twists the rituals of love into a nightmare."
+    },
+    {
+      "id": "heretic",
+      "sourceUrl": "https://a24films.com/films/heretic/",
+      "description": "Two young missionaries are welcomed into the home of Mr. Reed, only to find themselves trapped in a cruel test of belief. Polite conversation gives way to escalating psychological danger as their host turns questions of faith into a deadly game."
+    },
+    {
+      "id": "nosferatu",
+      "sourceUrl": "https://www.focusfeatures.com/nosferatu",
+      "description": "A haunted young woman becomes the focus of a terrifying vampire's obsession, casting a shadow across everyone around her. Robert Eggers' gothic vision makes forbidden desire and mounting dread inseparable from the story's supernatural horror."
+    },
+    {
+      "id": "bring-her-back",
+      "sourceUrl": "https://a24films.com/films/bring-her-back",
+      "description": "A brother and sister move into the secluded home of a new foster mother, hoping to find safety after upheaval. Instead, they discover signs of a frightening ritual that turns the house into a place of deepening suspicion and fear."
+    },
+    {
+      "id": "send-help",
+      "sourceUrl": "https://www.20thcenturystudios.com/movies/send-help",
+      "description": "Two colleagues survive a plane crash and become stranded together on an empty island. Their struggle against the environment is complicated by bitter disagreements and a battle of wills, turning a fight for rescue into something far darker."
+    },
+    {
+      "id": "ready-or-not-2",
+      "sourceUrl": "https://press.searchlightpictures.com/ready-or-not-2-here-i-come",
+      "description": "Grace has barely survived one deadly family game when she discovers a new and even more dangerous round awaits. With her estranged sister beside her, she faces rival families competing for power in another violent hunt."
+    },
+    {
+      "id": "scream-7",
+      "sourceUrl": "https://www.paramountpictures.com/movies/scream-7",
+      "description": "Sidney Prescott has built a new life away from the horrors of her past, but another Ghostface killer emerges to threaten her family. When her daughter becomes a target, Sidney is forced to confront the terror she hoped to leave behind."
+    }
+  ]
+}

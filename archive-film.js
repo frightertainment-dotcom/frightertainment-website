@@ -32,21 +32,56 @@
   const render=(film)=>{
     const card=make('div','archive-detail__content');
     const overline=make('span','hub-eyebrow','FRIGHTERTAINMENT · ALL HORROR MOVIES');
-    const label=make('p','archive-detail__label','HISTORICAL FILM RECORD · '+film.year);
+    const label=make('p','archive-detail__label',
+      (film.streaming?'STREAMING HORROR · ORIGINAL FILM YEAR ':'HISTORICAL FILM RECORD · ')+film.year);
     card.append(overline,heading(film.title),label);
+    const media=make('div','archive-detail__media');
+    media.dataset.mediaType='movie';media.dataset.mediaTitle=id==='manual:le-manoir-du-diable-1896'?'Le Manoir du diable':film.title;
+    media.dataset.mediaYear=String(film.year);media.dataset.mediaEager='true';
+    if(film.imdbId)media.dataset.mediaImdb=film.imdbId;
+    if(Number.isInteger(film.tmdbId)&&film.tmdbId>0)media.dataset.tmdbId=String(film.tmdbId);
+    const art=make('div','archive-detail__art');
+    const poster=make('img','archive-detail__poster');
+    poster.alt=film.title+' poster';poster.dataset.mediaField='poster';poster.hidden=true;poster.decoding='async';
+    const fallback=make('span','archive-detail__poster-fallback','Poster loading…');fallback.dataset.mediaField='poster-status';
+    art.append(poster,fallback);
+    const copy=make('div','archive-detail__media-copy');
+    const rating=make('p','archive-detail__rating','TMDB rating loading…');rating.dataset.mediaField='rating';
+    const date=make('p','archive-detail__release','Release date loading…');date.dataset.mediaField='date';
+    const overview=make('p','archive-detail__intro','Synopsis loading…');overview.dataset.mediaField='overview';
+    const trailer=make('button','archive-detail__link archive-detail__link--main','▶ PLAY TRAILER');
+    trailer.type='button';trailer.dataset.mediaField='trailer';trailer.hidden=true;
+    const trailerStatus=make('p','archive-detail__disclaimer','Trailer loading…');trailerStatus.dataset.mediaField='trailer-status';
+    copy.append(rating,date,overview,trailer,trailerStatus);media.append(art,copy);card.append(media);
     const info=make('div','archive-detail__facts');
     const year=make('div','archive-detail__fact');
     year.append(make('span','','ORIGINAL RELEASE YEAR'),make('strong','',String(film.year)));
     info.append(year);
     if(film.imdbId){
       const idFact=make('div','archive-detail__fact');
-      idFact.append(make('span','','IMDb IDENTIFIER IN WIKIDATA'),make('strong','',film.imdbId));
+      idFact.append(make('span','','IMDb'),make('strong','',film.imdbId));
       info.append(idFact);
     }
+    if(film.streaming){
+      const platform=make('div','archive-detail__fact');
+      platform.append(make('span','','STREAMING / DIGITAL SERVICE'),make('strong','',film.platform));
+      const access=make('div','archive-detail__fact');
+      access.append(make('span','','VIEWING OPTION'),make('strong','',
+        film.access==='free'?'Free to watch (adverts possible)':
+        film.access==='rent-buy'?'Digital rent or purchase':'Included with paid subscription'));
+      const date=make('div','archive-detail__fact');
+      const pretty=new Intl.DateTimeFormat('en-GB',{dateStyle:'long',timeZone:'UTC'})
+        .format(new Date(film.streamDate+'T12:00:00Z'));
+      date.append(make('span','',
+        film.dateBasis==='listed-by'?'PROVIDER AVAILABILITY CHECKED BY':'SOURCE-LINKED PLATFORM RELEASE'),
+        make('strong','',pretty));
+      info.append(platform,access,date);
+      const text=make('p','archive-detail__intro',film.synopsis||
+        'This horror film has a source-linked streaming or digital release. Availability may change; check the provider.');
+      card.append(text);
+    }
     card.append(info);
-    const explanation=make('p','archive-detail__intro',
-      'Explore this horror film using the available catalogue links. Its entry is stored in the Frightertainment archive and will remain there when new titles are added.');
-    card.append(explanation);
+
     const buttons=make('div','archive-detail__actions');
     if(film.imdbId){
       buttons.append(link('OPEN IMDb TITLE →','https://www.imdb.com/title/'+film.imdbId+'/', 'archive-detail__link archive-detail__link--main'));
@@ -54,11 +89,10 @@
     buttons.append(link('FIND MOVIE ON IMDb →',imdbSearch(film.title,film.year),
       film.imdbId?'archive-detail__link':'archive-detail__link archive-detail__link--main'));
     if(film.qid) buttons.append(link('WIKIDATA SOURCE →',sourceUrl(film.qid)));
-    if(film.sourceUrl)buttons.append(link('FILM SOURCE →',film.sourceUrl));
+    if(film.sourceUrl)buttons.append(link(film.streaming?'PLATFORM RELEASE SOURCE →':'FILM SOURCE →',film.sourceUrl));
+    if(film.streaming&&film.watchUrl)buttons.append(link('CHECK WATCHING OPTIONS →',film.watchUrl));
     card.append(buttons);
-    const note=make('p','archive-detail__disclaimer',
-      'IMDb link not working? Try the title search or source link.');
-    card.append(note);
+
     const bottom=make('div','archive-detail__footer');
     bottom.append(link('← ALL HORROR MOVIES','/all-horror-movies.html?year='+film.year,
       'archive-detail__return',false));
@@ -69,7 +103,7 @@
     // Source-driven discoveries, never a claimed review, recommendation or
     // release-platform availability. Shows older film pages are not dead ends.
     const other=(Array.isArray(archiveData.films)?archiveData.films:[])
-      .filter(x=>x.year===film.year && x.qid!==film.qid &&
+      .filter(x=>!x.excludedFromMovieArchive && x.year===film.year && x.qid!==film.qid &&
         typeof x.title==='string' && /^Q[1-9]\d*$/.test(x.qid||''))
       .sort((a,b)=>a.title.localeCompare(b.title,'en',{numeric:true,sensitivity:'base'}))
       .slice(0,6);
@@ -78,14 +112,22 @@
     related.append(sub);
     if(other.length){
       const list=make('div','archive-detail__related-list');
+      const imdbCounts=new Map();
+      for(const item of (archiveData.films||[]))if(item.imdbId)imdbCounts.set(item.imdbId,(imdbCounts.get(item.imdbId)||0)+1);
       for(const item of other){
         const filmLink=link(item.title,'/archive-film.html?id='+encodeURIComponent(item.qid),
           'archive-detail__related-link',false);
-        list.append(filmLink);
+        filmLink.dataset.mediaType='movie';filmLink.dataset.mediaTitle=item.title;filmLink.dataset.mediaYear=String(item.year);
+        if(safeImdb(item.imdbId)&&imdbCounts.get(item.imdbId)===1)filmLink.dataset.mediaImdb=item.imdbId;
+        filmLink.replaceChildren();
+        const poster=make('img','archive-media__poster');poster.alt=item.title+' poster';poster.loading='lazy';poster.hidden=true;poster.dataset.mediaField='poster';
+        const copy=make('span','archive-media__copy');
+        const rating=make('span','archive-media__rating','TMDB rating loading…');rating.dataset.mediaField='rating';
+        copy.append(make('strong','',item.title),rating);filmLink.append(poster,copy);list.append(filmLink);
       }
       related.append(list);
     }else{
-      related.append(make('p','','This year has no other indexed titles yet. The archive will grow with verified imports.'));
+      related.append(make('p','','Browse another year to discover more horror films.'));
     }
     const seeAll=link('BROWSE ALL '+film.year+' HORROR →','/all-horror-movies.html?year='+film.year,
       'archive-detail__return',false);
@@ -99,11 +141,11 @@
         const profile=data?.records?.[film.qid];
         if(!profile || profile.qid!==film.qid)return;
         const section=make('section','archive-detail__metadata');
-        section.append(make('span','hub-eyebrow','CC0 SOURCE-LINKED FILM DATA'),
+        section.append(make('span','hub-eyebrow','CAST & CREDITS'),
           make('h2','','BEHIND THE FEAR.'));
         if(profile.description){
           const line=make('p','archive-detail__description',
-            'Wikidata description: '+profile.description);
+            profile.description);
           section.append(line);
         }
         const fields=[
@@ -132,8 +174,7 @@
         }
         if(grid.children.length)section.append(grid);
         const check=make('p','archive-detail__metadata-credit',
-          'Wikidata CC0 · source checked '+profile.checkedAt+
-          ' · credits and descriptors may be incomplete');
+          'Film credits: Wikidata');
         section.append(check,link('OPEN ORIGINAL WIKIDATA FILM RECORD →',
           'https://www.wikidata.org/wiki/'+film.qid));
         related.before(section);
@@ -150,12 +191,39 @@
     error('That film identifier is invalid. Browse the archive and choose a title.');
     return;
   }
-  fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
-    .then(async response=>{
-      if(!response.ok)throw new Error('The film reference catalogue is temporarily unavailable');
-      return response.json();
-    })
-    .then(data=>{
+  Promise.all([
+    fetch('/data/archive/horror-films.json',{headers:{accept:'application/json'}})
+      .then(async response=>{
+        if(!response.ok)throw new Error('The film reference catalogue is temporarily unavailable');
+        return response.json();
+      }),
+    id.startsWith('manual:stream-')
+      ? fetch('/data/streaming-discovery.json',{headers:{accept:'application/json'}})
+          .then(async r=>r.ok?r.json():null).catch(()=>null)
+      : Promise.resolve(null)
+  ])
+    .then(([data,streaming])=>{
+      if(id.startsWith('manual:stream-')){
+        const wanted=id.slice('manual:stream-'.length);
+        const entry=streaming?.schemaVersion===1&&Array.isArray(streaming.entries)
+          ?streaming.entries.find(x=>x.id===wanted):null;
+        if(!entry||typeof entry.title!=='string'||!Number.isInteger(entry.filmYear)||
+           entry.filmYear<1896||entry.filmYear>new Date().getUTCFullYear()+2||
+           !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(entry.streamDate||'')||
+           !/^https:\/\/[^/\s]+/.test(entry.sourceUrl||'')){
+          error('That streaming film is not in the current source-checked inventory.');return;
+        }
+        const page={
+          title:entry.title,year:entry.filmYear,sourceUrl:entry.sourceUrl,
+          imdbId:/^tt[0-9]{7,10}$/.test(entry.imdbId||'')?entry.imdbId:null,
+          watchUrl:/^https:\/\/[^/\s]+/.test(entry.watchUrl||'')?entry.watchUrl:null,
+          platform:entry.platform,access:entry.access,streamDate:entry.streamDate,dateBasis:entry.dateBasis,
+          synopsis:entry.synopsis,tmdbId:entry.tmdbId,streaming:true
+        };
+        render(page);
+        addExtras(data,page);
+        return;
+      }
       // Wikidata can occasionally give two different films the same IMDb ID.
       // Such identifiers cannot safely be presented as exact links.
       const imdbCounts=new Map();
@@ -165,7 +233,7 @@
       }
       const reliableImdb=id=>id && imdbCounts.get(id)===1?id:null;
       if(id.startsWith('Q')){
-        const row=(Array.isArray(data.films)?data.films:[]).find(x=>x.qid===id);
+        const row=(Array.isArray(data.films)?data.films:[]).find(x=>x.qid===id && !x.excludedFromMovieArchive);
         if(!row || typeof row.title!=='string' || !Number.isInteger(row.year)){
           error('This record is not in the current archive. It might have been corrected. Try searching by year again.');return;
         }

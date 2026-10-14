@@ -46,7 +46,7 @@
       item.service+' · release '+fmt(item.date);
   };
   function paint(root,items,checked){
-    const selected={value:'streaming'};
+    const selected={value:root.dataset.releaseMode==='cinema'?'cinema':'streaming'};
     const head=make('div','release-brief__head');
     head.append(make('div','release-brief__heading','THE HORROR DROP'));
     const asof=make('span','release-brief__checked','UK · '+(checked?'checked '+fmt(checked):'edition unavailable'));
@@ -57,7 +57,7 @@
     const buttons=[];
     for(const mode of modes){
       const btn=make('button','release-brief__tab',mode.text);btn.type='button';
-      btn.dataset.mode=mode.id;btn.setAttribute('aria-pressed',String(mode.id==='streaming'));
+      btn.dataset.mode=mode.id;btn.setAttribute('aria-pressed',String(mode.id===selected.value));
       btn.addEventListener('click',()=>{selected.value=mode.id;render();});
       tabs.append(btn);buttons.push(btn);
     }
@@ -66,13 +66,16 @@
       const rows=summarise(items,selected.value).slice(0,4);
       content.replaceChildren();
       for(const item of rows){
-        const row=make('article','release-brief__item');
+        const row=make('article','release-brief__item');row.dataset.mediaType='movie';row.dataset.mediaTitle=item.title;if(Number.isInteger(item.year))row.dataset.mediaYear=String(item.year);if(Number.isInteger(item.tmdbId)&&item.tmdbId>0)row.dataset.tmdbId=String(item.tmdbId);
+        const frame=make('div','release-brief__art');const poster=make('img','release-brief__poster');poster.dataset.mediaField='poster';poster.hidden=true;poster.alt='Poster for '+item.title;frame.append(poster,make('span','release-brief__poster-fallback',item.title));row.append(frame);
         const main=make('div','release-brief__item-main');
         const href=item.filmId&&/^[a-z0-9-]+$/.test(item.filmId)?
           '/films/'+encodeURIComponent(item.filmId)+'/':null;
         const title=make(href?'a':'strong','release-brief__title',item.title);
         if(href)title.href=href;
         main.append(title,make('span','release-brief__subtitle',detailMessage(item,selected.value)));
+        const rating=make('span','archive-media__rating');rating.dataset.mediaField='rating';
+        const trailer=make('button','fr-trailer-button','▶ PLAY TRAILER');trailer.type='button';trailer.dataset.mediaField='trailer';trailer.hidden=true;main.append(rating,trailer);
         const src=make('a','release-brief__source','SOURCE →');src.href=item.sourceUrl;src.target='_blank';src.rel='noopener noreferrer';
         src.setAttribute('aria-label','Read original source for '+item.title);
         row.append(main,src);content.append(row);
@@ -81,6 +84,7 @@
       const stale=checked&&daysAgo(checked)>14;
       note.textContent=stale?
         'Last verified '+checked+'. New arrivals are awaiting the next editorial check.':
+        selected.value==='cinema'?'Source-linked UK cinema announcements · verify local showtimes before travelling.':
         'Source-linked announcements · streaming catalogues may change · check the provider before watching.';
     }
     root.replaceChildren(head,tabs,content,note);render();

@@ -45,6 +45,7 @@ test('verified 2026 film records remain separate from the critic ranking', () =>
 test('staging 2026 release-year identities are not promoted without a separate film-year source', async () => {
   const migration = await readFile(new URL('worker/migrations/0003_explicit_film_year_and_review_provenance.sql', root), 'utf8');
   const operations = await readFile(new URL('STAGING_AUTOMATION.md', root), 'utf8');
+  const migrationPlan = await readFile(new URL('STAGING_MIGRATION_0003_PLAN.md', root), 'utf8');
   assert.match(operations, /including 10 with `release_year=2026`/);
   assert.match(operations, /Seven identities agree exactly/);
   assert.match(operations, /their 2026 dates are territory-specific release dates/);
@@ -54,6 +55,12 @@ test('staging 2026 release-year identities are not promoted without a separate f
   ];
   for (const id of sourcedFilmYearIds) assert.match(migration, new RegExp(`film_id\\s*=\\s*['"]${id}['"]`));
   for (const id of ['clayface', 'crawlers', 'werwulf']) assert.doesNotMatch(migration, new RegExp(`film_id\\s*=\\s*['"]${id}['"]`));
+  assert.match(migrationPlan, /2024 \| 3 \| `heretic`, `longlegs`, `nosferatu`/);
+  assert.match(migrationPlan, /2025 \| 7 \| `28-years-later`, `black-phone-2`, `bring-her-back`/);
+  assert.match(migrationPlan, /2026 \| 7 \| `28-years-later-bone-temple`, `backrooms`/);
+  assert.match(migrationPlan, /no `d1_migrations` table/);
+  assert.match(migrationPlan, /all three migration files/);
+  for (const id of ['clayface', 'crawlers', 'werwulf']) assert.match(migrationPlan, new RegExp(`\\b${id}\\b`));
 });
 
 test('public homepage, chart, and film clients contain no publisher-preview scoring path', async () => {

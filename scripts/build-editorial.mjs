@@ -20,9 +20,18 @@ for (const category of collections) {
     const variant=arts[(index++)%arts.length];
     const external=item.sourceUrl.startsWith('https://');
     const longTitle=item.title.length>24?' hub-tile--long-title':'';
-    return '<article class="hub-tile '+variant+longTitle+'"><div class="hub-tile__wash" aria-hidden="true"></div>'+
+    const media=(category==='tv-shows'||category==='indie-movies')?' data-media-type="'+(category==='tv-shows'?'tv':'movie')+'" data-media-title="'+esc(item.title)+'"':'';
+    const mediaArt=media?'<img class="hub-editorial-poster" data-media-field="poster" alt="'+esc(item.title)+' poster" hidden>':'';
+    const gameArt=category==='games' && Number.isInteger(item.steamId)?
+      `<div class="fr-player-gate fr-player-gate--steam" data-player-provider="steam" data-player-url="https://store.steampowered.com/widget/${item.steamId}/" data-player-title="Official Steam artwork and store information for ${esc(item.title)}">`+
+      `<div class="fr-player-gate__content"><span class="fr-player-gate__eyebrow">EXTERNAL STEAM PLAYER</span>`+
+      `<div class="fr-player-gate__description">Explore the official Steam game widget.</div>`+
+      `<button class="fr-player-gate__button" type="button" aria-label="Load STEAM player: Official Steam artwork and store information for ${esc(item.title)}">LOAD STEAM PLAYER <span aria-hidden="true">↗</span></button>`+
+      `<div class="fr-player-gate__note">Only connects to Steam after you click. They may use cookies. <a href="/privacy.html">PRIVACY</a></div></div></div>`:'';
+    const gameTrailer=category==='games' && /^[A-Za-z0-9_-]{11}$/.test(item.trailerVideoId||'')?'<button type="button" class="fr-trailer-button" data-trailer-video="'+item.trailerVideoId+'" data-trailer-title="'+esc(item.title)+'">▶ PLAY TRAILER</button>':'';
+    return '<article class="hub-tile '+variant+longTitle+'"'+media+'>'+mediaArt+'<div class="hub-tile__wash" aria-hidden="true"></div>'+
       '<div class="hub-tile__content"><span class="hub-kicker">'+esc(item.category)+'</span><h3>'+esc(item.title)+'</h3>'+
-      '<p>'+esc(item.description)+'</p><a class="hub-tile__link" href="'+esc(item.sourceUrl)+'"'+
+      '<p>'+esc(item.description)+'</p>'+gameArt+gameTrailer+(media?'<span class="hub-feature__rating" data-media-field="rating"></span><button type="button" class="fr-trailer-button" data-media-field="trailer" hidden>▶ PLAY TRAILER</button>':'')+'<a class="hub-tile__link" href="'+esc(item.sourceUrl)+'"'+
       (external?' target="_blank" rel="noopener noreferrer"':'')+'>SOURCE: '+esc(item.sourceName)+'</a></div></article>';
   }).join('\n');
   const destination={
@@ -49,3 +58,23 @@ for (const category of collections) {
   await writeFile(file,html);
   console.log('Editorial '+category+': '+entries.length+' additional sourced entries');
 }
+
+
+// First-paint editorial: publish exactly the same previously approved data
+// already exposed through /data/*.json as a tiny local script. Rendering no
+// longer waits on multiple HTTP requests after DOMContentLoaded. No external
+// media, score, ticket or private Worker data is inserted here.
+const overrides=JSON.parse(await readFile(new URL('data/editorial-spotlight-overrides.json',root),'utf8'));
+const overviews=JSON.parse(await readFile(new URL('data/movie-editorial-overviews.json',root),'utf8'));
+if(overrides.schemaVersion!==1 || overviews.schemaVersion!==1) {
+  // Preserve the source's schema, but refuse to ship malformed collections.
+  if(!overrides.overrides || !Array.isArray(overviews.items))throw Error('Editorial bootstrap source schema invalid');
+}
+const initial={schemaVersion:1,editorial:source,settings:overrides,overviews};
+const encoded=JSON.stringify(initial).replace(/</g,'\\u003c').replace(/\\u2028/g,'\\u2028').replace(/\\u2029/g,'\\u2029');
+const bootstrapCode=[
+  '/* Source-backed first paint; generated from the same public editorial files. */',
+  'window.FR_EDITORIAL_BOOTSTRAP=Object.freeze('+encoded+');'
+].join(String.fromCharCode(10));
+await writeFile(new URL('editorial-bootstrap.js',root),bootstrapCode+String.fromCharCode(10));
+console.log('Editorial bootstrap prepared using only public, approved source data.');

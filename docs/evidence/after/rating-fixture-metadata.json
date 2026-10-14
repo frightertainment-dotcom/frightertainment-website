@@ -1,0 +1,12 @@
+{
+  "capturedAt": "2026-10-13T22:35:55.069Z",
+  "status": "fixture-only",
+  "sourceAsset": "assets/frightertainment-f.png",
+  "values": [
+    "7.2/10",
+    "0.0/10",
+    "10.0/10",
+    "unavailable"
+  ],
+  "warning": "Values and TMDB URL are controlled test fixtures, not editorial or live preview data."
+}

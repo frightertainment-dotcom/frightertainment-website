@@ -1,6 +1,6 @@
 # Staging D1 migration 0003: verified preflight, application and recovery plan
 
-**Status:** Review draft only; not ready for migration approval. No remote migration, Worker deployment, database write, Cron edit, binding change, merge or public deployment was performed.
+**Status:** Review draft only; not ready for migration approval. No complete SQL backup or restored full copy is available yet. No remote migration, Worker deployment, Cron edit, binding change, merge or public deployment was performed.
 
 ## Verified target and current state
 
@@ -8,14 +8,14 @@ Read-only Cloudflare checks on 9 October 2026 confirmed:
 
 - The private Pages preview and Worker `frightertainment-staging-daily` both bind `DB` to the same staging D1 ID for `frightertainment-staging-discovery`.
 - The separate Worker currently runs `0 4 * * *` (04:00 UTC). Its deployed source still groups by territory `release_year` and writes `rank_history`; it does not read `film_year` or write `annual_ranking_snapshots`.
-- Read-only `sqlite_master` inspection found the nine expected application tables from `0001`/`0002` and their six named indexes. The table DDL, including primary/foreign keys, unique constraints and `CHECK` constraints, matches those migration files. Cloudflare's internal `_cf_KV` table is also present and must be preserved. There are no `film_year` columns, `annual_ranking_snapshots` or `critic_review_revisions` tables.
+- Read-only `sqlite_master` inspection found the nine expected application tables from `0001`/`0002` and their six named indexes. The table DDL, including primary/foreign keys, unique constraints and `CHECK` constraints, matches those migration files. Cloudflare's reserved `_cf_KV` internal table is also present; it is platform-managed, not application data. There are no `film_year` columns, `annual_ranking_snapshots` or `critic_review_revisions` tables.
 - There is no `d1_migrations` table in the remote database. The remote migration ledger therefore cannot confirm which migration files were applied.
 - The application-data inventory has 20 canonical films, no critic review rows, no rank history, no dataset snapshots and one prior scheduled-run record. That recorded run was an empty `published` calculation at `2026-10-09T04:00:48.518Z`.
 - D1 SELECT metadata reported `changed_db=false` and `rows_written=0` during the checks.
 
 This confirms that the absent ledger does **not** mean an empty database. The current schema is the existing 0001/0002 schema, with its data intact; the ledger is simply unavailable to prove how it was originally applied. The Cloudflare database metadata reports 9 application tables and 139,264 bytes. Read-only queries returned 20 canonical films and 0 critic reviews.
 
-Cloudflare documents `_cf_KV` as a reserved internal storage table that cannot be queried. The required SQL export/restore covers the complete exportable application database, not unsupported manual restoration of Cloudflare's internal table. Preserve the original exported SQL byte-for-byte for checksum verification. See https://developers.cloudflare.com/d1/best-practices/import-export-data/ .\n\nThe remote application table names are `dataset_snapshots`, `current_datasets`, `update_runs`, `review_queue`, `canonical_films`, `critic_reviews`, `rank_history`, `manual_film_versions` and `cinema_rate_limits`. The named indexes are `dataset_snapshots_lookup`, `update_runs_recent`, `review_queue_pending`, `critic_reviews_ranking`, `rank_history_latest` and `manual_film_versions_latest`; SQLite's automatic indexes implement declared primary-key and unique constraints. These match the definitions in the local 0001/0002 files. `_cf_KV` is separate from those nine application tables.
+The remote application table names are `dataset_snapshots`, `current_datasets`, `update_runs`, `review_queue`, `canonical_films`, `critic_reviews`, `rank_history`, `manual_film_versions` and `cinema_rate_limits`. The named indexes are `dataset_snapshots_lookup`, `update_runs_recent`, `review_queue_pending`, `critic_reviews_ranking`, `rank_history_latest` and `manual_film_versions_latest`; SQLite's automatic indexes implement declared primary-key and unique constraints. These match the definitions in the local 0001/0002 files. `_cf_KV` is separate from those nine application tables and is managed by D1.
 
 The repository's `wrangler.jsonc` is a separate local Worker config with an all-zero D1 ID. It is not a staging config and must not be used for remote commands. No D1 rebind or Cron change is needed: the existing staging binding and schedule are already correct.
 
@@ -91,9 +91,212 @@ The earlier local restore and Wrangler Cron test used temporary D1 IDs `11111111
 
 ## Current full-backup attempt and stop condition
 
-On 9 October 2026, with owner authorization, a fresh full D1 SQL export was started through Cloudflare's export API and completed as one artifact. Downloading its one-hour signed URL with `curl` returned HTTP `403` from the outbound proxy. The SQL file is absent, so there is no checksum, no completed full restore, and no verified full-backup integrity result. The partial/empty local output was not treated as a backup. **No migration rehearsal against a full restored backup has been completed, and migration approval is not being requested.** The earlier logical-reconstruction rehearsal remains only prior code-path evidence and does not satisfy the full-copy gate. In accordance with the owner's stop condition, no further migration rehearsal was performed after the proxy failure.
+On 9 October 2026, with owner authorization, a fresh full D1 SQL export was started through Cloudflare's export API and completed as one artifact. Downloading its one-hour signed URL with `curl` returned HTTP `403` from the outbound proxy. Direct no-proxy DNS lookup is also blocked in this environment, and Wrangler is not authenticated here. The SQL file is absent, so there is no checksum, no completed full restore, and no verified full-backup integrity result. The partial/empty local output was not treated as a backup. **No migration rehearsal against a full restored backup has been completed, and migration approval is not being requested.** The earlier logical-reconstruction rehearsal remains only prior code-path evidence and does not satisfy the full-copy gate. In accordance with the owner's stop condition, no further migration rehearsal was performed after the proxy failure.
 
-To unblock the required rehearsal, perform the export and download from an owner-approved environment with direct access to Cloudflare's signed R2 export URL. Store the SQL outside the checkout with restrictive permissions, calculate its SHA-256, restore the exact file into a new isolated D1, and compare the restored application tables, indexes, constraints and record counts, plus a local D1/SQLite integrity check. Cloudflare's reserved `_cf_KV` is managed internally; check for its presence through schema inspection, but do not require its internal rows to appear in a supported SQL export or manually restore it. If any part is incomplete or inconsistent, stop before migration rehearsal.
+## Owner-controlled backup setup and `_cf_KV` handling
+
+Use Wrangler from the owner's workstation or another owner-controlled host with direct HTTPS access to Cloudflare's API and `*.r2.cloudflarestorage.com`. Wrangler requests the D1 export and downloads the short-lived signed URL itself. Do not copy the signed URL into chat, shell history, tickets or logs. Keep the SQL and checksum in the encrypted private directory; never commit or upload the backup to GitHub. If a network proxy blocks the R2 download, use an owner-approved network route that permits it; do not share credentials with this workspace.
+
+Run the ordered commands below in one Bash session so the private path, restore path and `umask 077` remain in effect. This config pins D1 commands to the verified staging account/database. It contains resource IDs, not credentials. Create it outside the checkout on an encrypted owner-controlled volume. Replace only `FT_REPO_DIR` and `FT_PRIVATE_DIR` with local paths; do not replace the account or database IDs with production values. Run from the repository root and use the repository's locked Wrangler version.
+
+```sh
+set -euo pipefail
+FT_REPO_DIR="/path/to/frightertainment-website"
+FT_PRIVATE_DIR="/encrypted/private/path/frightertainment-staging-backup"
+umask 077
+mkdir -p "$FT_PRIVATE_DIR"
+chmod 700 "$FT_PRIVATE_DIR"
+FT_REPO_DIR="$(cd "$FT_REPO_DIR" && pwd -P)"
+FT_PRIVATE_DIR="$(cd "$FT_PRIVATE_DIR" && pwd -P)"
+case "$FT_PRIVATE_DIR/" in "$FT_REPO_DIR/"*) echo "Backup path must be outside the checkout"; exit 1 ;; esac
+test -z "$(find "$FT_PRIVATE_DIR" -mindepth 1 -maxdepth 1 -print -quit)" || { echo "Choose a new empty private backup directory; do not overwrite an earlier backup"; exit 1; }
+cd "$FT_REPO_DIR"
+npm ci
+test "$(./node_modules/.bin/wrangler --version)" = "4.149.0"
+cat > "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc" <<EOF
+{
+  "name": "frightertainment-staging-backup",
+  "account_id": "d8d87c1d0acbf0fb3c5e892c94f9d813",
+  "compatibility_date": "2026-10-08",
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "frightertainment-staging-discovery",
+    "database_id": "77907109-46bb-4854-9c1e-cccc882b077c",
+    "migrations_dir": "$FT_REPO_DIR/worker/migrations"
+  }]
+}
+EOF
+chmod 600 "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc"
+```
+
+Authenticate interactively in that owner-controlled terminal; do not put a token in the config or repository:
+
+```sh
+./node_modules/.bin/wrangler login
+./node_modules/.bin/wrangler whoami
+./node_modules/.bin/wrangler d1 info frightertainment-staging-discovery \
+  --config "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc"
+```
+
+Proceed only when the selected Cloudflare account is the staging account and `d1 info` shows UUID `77907109-46bb-4854-9c1e-cccc882b077c`. The config does not declare a Worker entrypoint, Cron or deploy binding; these commands cannot change the deployed scheduler or its binding.
+
+Before export, capture a read-only JSON baseline of every application table into the same private directory. This allows the isolated restore to be compared against the exact row contents immediately before export, not just row counts:
+
+```sh
+cat > "$FT_PRIVATE_DIR/application-baseline.sql" <<'SQL'
+SELECT type, name, sql FROM sqlite_master
+WHERE type IN ('table', 'index') AND name NOT LIKE 'sqlite_%' AND name <> '_cf_KV'
+ORDER BY type, name;
+SELECT * FROM dataset_snapshots ORDER BY snapshot_id;
+SELECT * FROM current_datasets ORDER BY kind, country_code;
+SELECT * FROM update_runs ORDER BY run_id;
+SELECT * FROM review_queue ORDER BY item_id;
+SELECT * FROM canonical_films ORDER BY film_id;
+SELECT * FROM critic_reviews ORDER BY review_id;
+SELECT * FROM rank_history ORDER BY release_year, film_id, ranked_at;
+SELECT * FROM manual_film_versions ORDER BY film_id, source_hash;
+SELECT * FROM cinema_rate_limits ORDER BY client_digest;
+SQL
+chmod 600 "$FT_PRIVATE_DIR/application-baseline.sql"
+./node_modules/.bin/wrangler d1 execute frightertainment-staging-discovery \
+  --remote \
+  --config "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc" \
+  --json \
+  --file "$FT_PRIVATE_DIR/application-baseline.sql" \
+  > "$FT_PRIVATE_DIR/application-before-export.json"
+chmod 600 "$FT_PRIVATE_DIR/application-before-export.json"
+```
+
+This is a read-only `SELECT` capture. Keep it private with the SQL export; it contains the same application data and must not be committed or uploaded to GitHub.
+
+Export the whole database (no `--table`, `--no-data` or `--no-schema`) in a quiet window after the existing 04:00 UTC run. Keep Wrangler's interactive confirmation enabled because D1 can be unavailable while exporting:
+
+```sh
+./node_modules/.bin/wrangler d1 export frightertainment-staging-discovery \
+  --remote \
+  --config "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc" \
+  --output "$FT_PRIVATE_DIR/staging-before-0003.sql"
+test -s "$FT_PRIVATE_DIR/staging-before-0003.sql"
+chmod 600 "$FT_PRIVATE_DIR/staging-before-0003.sql"
+python3 - "$FT_PRIVATE_DIR/staging-before-0003.sql" "$FT_PRIVATE_DIR/staging-before-0003.sha256" <<'PY'
+import hashlib, os, sys
+digest = hashlib.sha256()
+with open(sys.argv[1], "rb") as backup:
+    for chunk in iter(lambda: backup.read(1024 * 1024), b""):
+        digest.update(chunk)
+with open(sys.argv[2], "w", encoding="ascii") as checksum:
+    checksum.write(f"{digest.hexdigest()}  {os.path.basename(sys.argv[1])}\n")
+print(f"sha256={digest.hexdigest()}")
+PY
+python3 - "$FT_PRIVATE_DIR/staging-before-0003.sql" <<'PY'
+import os, stat, sys
+metadata = os.stat(sys.argv[1])
+print(f"bytes={metadata.st_size} mode={stat.S_IMODE(metadata.st_mode):04o}")
+PY
+```
+
+Cloudflare documents `_cf_KV` as a reserved table used by D1's underlying storage; it cannot be queried and is not application data. Use Wrangler's supported D1 export/import flow for the application schema and data. D1 manages the isolated local database's own internal state; a local restore is not a byte-for-byte clone of Cloudflare's internal storage. Cloudflare's raw SQLite conversion guidance says to remove a `CREATE TABLE _cf_KV` statement if present, but that is not a reason to edit the original Wrangler export preemptively. Preserve the original export unchanged. If Wrangler's local import rejects an internal-table statement in the exact export, stop and follow the current Cloudflare guidance before making a derived import copy. See [Cloudflare D1 import and export](https://developers.cloudflare.com/d1/best-practices/import-export-data/) and [Wrangler D1 commands](https://developers.cloudflare.com/d1/wrangler-commands/).
+
+After download, restore the exact file into a new local D1 state directory. The explicit `--local` and private `--persist-to` path are required; do not add `--remote`:
+
+```sh
+python3 - "$FT_PRIVATE_DIR/staging-before-0003.sql" "$FT_PRIVATE_DIR/staging-before-0003.sha256" <<'PY'
+import hashlib, sys
+digest = hashlib.sha256()
+with open(sys.argv[1], "rb") as backup:
+    for chunk in iter(lambda: backup.read(1024 * 1024), b""):
+        digest.update(chunk)
+expected = open(sys.argv[2], encoding="ascii").read().split()[0]
+if digest.hexdigest() != expected:
+    raise SystemExit("SHA-256 verification failed")
+print(f"sha256_verified={expected}")
+PY
+FT_RESTORE_DIR="$FT_PRIVATE_DIR/isolated-restore-0003"
+mkdir -m 700 "$FT_RESTORE_DIR"
+./node_modules/.bin/wrangler d1 execute frightertainment-staging-discovery \
+  --local \
+  --config "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc" \
+  --persist-to "$FT_RESTORE_DIR" \
+  --file "$FT_PRIVATE_DIR/staging-before-0003.sql"
+```
+
+After restore, run the identical read-only baseline query against the isolated local D1 and compare all ten result sets to the pre-export JSON. This verifies all row values, including every original canonical film, not just table counts:
+
+```sh
+./node_modules/.bin/wrangler d1 execute frightertainment-staging-discovery \
+  --local \
+  --config "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc" \
+  --persist-to "$FT_RESTORE_DIR" \
+  --json \
+  --file "$FT_PRIVATE_DIR/application-baseline.sql" \
+  > "$FT_PRIVATE_DIR/application-after-restore.json"
+chmod 600 "$FT_PRIVATE_DIR/application-after-restore.json"
+python3 - "$FT_PRIVATE_DIR/application-before-export.json" \
+  "$FT_PRIVATE_DIR/application-after-restore.json" <<'PY'
+import json, sys
+
+def result_sets(value):
+    if isinstance(value, dict):
+        if isinstance(value.get("results"), list):
+            return [value["results"]]
+        return [items for child in value.values() for items in result_sets(child)]
+    if isinstance(value, list):
+        return [items for child in value for items in result_sets(child)]
+    return []
+
+with open(sys.argv[1], encoding="utf-8") as source:
+    before = result_sets(json.load(source))
+with open(sys.argv[2], encoding="utf-8") as source:
+    restored = result_sets(json.load(source))
+expected_counts = [15, 0, 0, 1, 0, 20, 0, 0, 0, 0]
+if len(before) != 10 or len(restored) != 10:
+    raise SystemExit(f"Expected 10 application schema/data result sets; got {len(before)} before and {len(restored)} restored")
+if [len(rows) for rows in before] != expected_counts:
+    raise SystemExit(f"Remote baseline schema/data counts drifted: {[len(rows) for rows in before]!r}")
+if before != restored:
+    raise SystemExit("Restored application schema or rows do not exactly match the pre-export baseline")
+print("application_schema=9 tables, 6 named indexes; rows=20 canonical, 1 update_run, 0 others; exact match")
+PY
+```
+
+Do not query or compare `_cf_KV` rows; local D1 owns its internal state. After Wrangler exits, find exactly one `.sqlite` persistence file under `$FT_RESTORE_DIR`, then run SQLite's integrity check read-only against that file (D1's SQL endpoint rejects this SQLite maintenance pragma):
+
+```sh
+FT_SQLITE_FILE="$(python3 - "$FT_RESTORE_DIR" <<'PY'
+from pathlib import Path
+import sys
+files = list(Path(sys.argv[1]).rglob("*.sqlite"))
+if len(files) != 1:
+    raise SystemExit(f"Expected exactly one local D1 SQLite file; found {len(files)}")
+print(files[0])
+PY
+)"
+python3 - "$FT_SQLITE_FILE" <<'PY'
+import sqlite3, sys
+from pathlib import Path
+with sqlite3.connect(Path(sys.argv[1]).resolve().as_uri() + "?mode=ro", uri=True) as db:
+    result = db.execute("PRAGMA integrity_check").fetchone()
+    foreign_key_issues = db.execute("PRAGMA foreign_key_check").fetchall()
+if result != ("ok",):
+    raise SystemExit(f"integrity_check failed: {result!r}")
+if foreign_key_issues:
+    raise SystemExit(f"foreign_key_check failed: {foreign_key_issues!r}")
+print("integrity_check=ok; foreign_key_check=ok")
+PY
+```
+
+If the dump is incomplete, the restore errors, any application baseline differs, the `.sqlite` file is missing/ambiguous, or integrity/foreign-key check is not `ok`, stop before migration rehearsal.
+
+Only after that exact restore passes should the local-only migration rehearsal run, against the same `FT_RESTORE_DIR`:
+
+```sh
+./node_modules/.bin/wrangler d1 migrations apply frightertainment-staging-discovery \
+  --local \
+  --config "$FT_PRIVATE_DIR/wrangler-staging-backup.jsonc" \
+  --persist-to "$FT_RESTORE_DIR"
+```
+
+Require all three migration files in order in the local migration ledger; all 20 original films; 3 / 7 / 7 backfills for 2024 / 2025 / 2026; all 17 provenance fields; and `film_year IS NULL` for `clayface`, `crawlers` and `werwulf`. Keep this local operation separate from any remote migration approval.
 
 ## Required backup, migration and recovery sequence
 
@@ -105,24 +308,9 @@ Before migration:
 
 1. Re-read the remote `sqlite_master`, row counts, latest `update_runs`, binding and Cron schedule. Stop on any schema or count drift from this plan.
 2. Do not use `wrangler d1 migrations list --remote` as a read-only preflight. Wrangler initializes the migration table with `CREATE TABLE IF NOT EXISTS` before listing, which would write to staging when the table is absent. The absence was instead verified through read-only `sqlite_master` inspection. The local rehearsal showed all three migration files pending against that starting state. If the remote schema or counts differ from this plan, stop and revise it.
-3. Export a full SQL backup to owner-controlled encrypted storage, outside the Git checkout, with restrictive permissions. Record UTC time, file size and SHA-256. Restore that exact dump into a new isolated D1 and confirm the nine application tables, indexes, constraints and all application records. `_cf_KV` is Cloudflare-managed: check only that local D1 supplies the internal table, not that its internal rows are serialized in the SQL export. If export, download, restore, integrity checks or checksum validation fail, stop; do not migrate or rehearse migrations against a row-level reconstruction.
+3. Export a full SQL backup to owner-controlled encrypted storage, outside the Git checkout, with restrictive permissions. Record UTC time, file size and SHA-256. Restore that exact dump into a new isolated local D1 and confirm the application tables, indexes, constraints, all canonical film IDs, row counts and SQLite integrity before proceeding. D1 owns its separate internal `_cf_KV` state; do not query or copy it. If export, download, restore, integrity checks or checksum validation fail, stop; do not migrate or rehearse migrations against a row-level reconstruction.
 
-Example commands, after substituting the owner-designated config and private backup directory:
-
-```sh
-umask 077
-mkdir -p "$BACKUP_DIR"
-wrangler d1 export frightertainment-staging-discovery \
-  --remote --config "$STAGING_WRANGLER_CONFIG" \
-  --output "$BACKUP_DIR/staging-before-0003.sql"
-test -s "$BACKUP_DIR/staging-before-0003.sql"
-sha256sum "$BACKUP_DIR/staging-before-0003.sql" \
-  > "$BACKUP_DIR/staging-before-0003.sha256"
-wrangler d1 execute frightertainment-staging-discovery \
-  --local --config "$STAGING_WRANGLER_CONFIG" \
-  --persist-to "$RESTORE_STATE_DIR" \
-  --file "$BACKUP_DIR/staging-before-0003.sql"
-```
+Use the complete owner-controlled backup and isolated-restore procedure above; do not substitute a partial export, table-only export or logical row reconstruction for the full SQL backup gate.
 
 Wrangler's remote D1 migration/export commands can make the database unavailable while operating. Schedule them after the existing 04:00 UTC run has completed. Do not pause or reschedule Cron without separate approval.
 
@@ -143,7 +331,7 @@ Verify the migration ledger, exact film-year mapping, source provenance, unchang
 
 ### 4. Failure recovery
 
-- If the backup cannot be restored and validated, stop before migration.
+- If the backup cannot be restored and validated, stop before migration. The export was not obtained in this environment because its signed download was blocked; the owner-controlled workflow above is the outstanding prerequisite.
 - If migration reports an error, stop, inspect the schema and migration ledger, retain logs and the original database, and do not blindly rerun.
 - If post-migration validation fails, preserve the full pre-migration export and current database. Restore the export to a **new isolated D1 database**, verify its schema/data and request separate approval before changing any Cloudflare binding to it. Rebinding is a separate owner-approved operation; do not drop or overwrite the original staging DB as an improvised rollback.
 - Retain the original export and the migrated database until the owner accepts recovery or post-migration validation.

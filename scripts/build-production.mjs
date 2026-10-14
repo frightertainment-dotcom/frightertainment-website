@@ -1,20 +1,21 @@
 // Production-only release bundle: intentionally distinct from the Access-protected preview.
 // Ship only public website files. Never copy source code, fixtures, Worker code, keys or reviews.
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { injectWebAnalytics } from './web-analytics-beacon.mjs';
 
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
 const publicFiles = [
-  'index.html', 'movies.html', 'all-horror-movies.html', 'archive-film.html',
+  'index.html', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html',
   'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html',
   'film.html',
-  'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
-  'hub.js', 'release-calendar.js', 'release-brief.js',
-  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'sitemap.xml'
+  'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
+  'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'cinema-concept.js', 'straight-to-stream.js', 'streaming-watch.js',
+  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-premium.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
-  'data/movies.js', 'data/editorial-releases.json',
+  'data/movies.js', 'data/editorial-releases.json', 'data/editorial.json', 'data/editorial-spotlight-overrides.json', 'data/movie-editorial-overviews.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 
@@ -54,6 +55,23 @@ if (/criticReferenceSnapshots|frightertainment-private-preview|TEST_FIXTURE_RANK
 }
 await validateHtml(destination);
 
+// Explicit production instrumentation. Preview remains untracked so editorial QA
+// and owner-only checks never inflate public visitor analytics.
+const publicWebAnalyticsSiteToken = 'f8adaba13e524ed7ab5d523a2fe2120f';
+async function instrumentPublicHtml(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const current = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
+    if (entry.isDirectory()) { await instrumentPublicHtml(current); continue; }
+    if (!entry.name.endsWith('.html')) continue;
+    let html = await readFile(current, 'utf8');
+    if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
+      html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
+    await writeFile(current, injectWebAnalytics(html, publicWebAnalyticsSiteToken));
+  }
+}
+await instrumentPublicHtml(destination);
+
+
 const robots = await readFile(new URL('robots.txt', root), 'utf8');
 if (!/^User-agent:\s*\*/im.test(robots) ||
     /Disallow:\s*\//i.test(robots) ||
@@ -69,8 +87,8 @@ if (!headers.startsWith('/*') || !headers.includes('Content-Security-Policy:') |
 }
 await writeFile(new URL('_headers', destination), headers);
 
-// Pages Functions are available only at /api/* (the production project initially
-// has no D1 binding, so unlicensed/provider-dependent APIs must fail safely).
+// Pages Functions are available only at /api/* and use environment-specific
+// approved D1 and API secret bindings. No provider credentials enter dist/.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version: 1, include: ['/api/*'], exclude: []
 }));
