@@ -104,7 +104,7 @@
    if(!response.ok)throw new Error('Catalogue unavailable');
    const data=await response.json();
    if(!Array.isArray(data.items))throw new Error('Catalogue response invalid');
-   return data.items.filter(valid);
+   return data.items.filter(item => valid(item) && (type !== 'indie' || item.indieVerified === true));
   } finally {clearTimeout(timeout);}})();
   catalogueRequests.set(key,promise);
   return promise;
