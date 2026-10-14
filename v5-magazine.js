@@ -229,6 +229,72 @@
   });
  };
 
+ /* An offline provider should never turn a premium editorial destination into
+    a stack of retry boxes. Keep the live-feed limitation explicit, but use
+    existing approved, source-linked editorial work for a real discovery shelf.
+    This is not a substitute for live regional availability or rankings. */
+ const curatedLink=value=>{
+   if(/^\/films\/[a-z0-9-]+\/$/.test(String(value||'')))return value;
+   try{
+     const url=new URL(value);
+     return url.protocol==='https:'&&!url.username&&!url.password?url.href:'';
+   }catch{return '';}
+ };
+ const getCuratedFallback=async(type)=>{
+   if(type==='movie'){
+     return (Array.isArray(window.FR_MOVIES)?window.FR_MOVIES:[])
+       .filter(x=>x&&x.editorialStatus==='approved'&&/^[a-z0-9-]+$/.test(x.id||'')
+         &&typeof x.title==='string'&&x.claims?.some(claim=>claim.field==='title'&&curatedLink(claim.source)))
+       .slice(0,6).map(x=>({
+         title:x.title,
+         category:x.claims?.find(c=>c.field==='genre')?.value||'SOURCE-CHECKED HORROR',
+         description:x.claims?.find(c=>c.field==='synopsis')?.value||'Explore the verified film file and original studio sources.',
+         sourceName:x.claims?.find(c=>c.field==='title')?.sourceName||'Official film source',
+         sourceUrl:'/films/'+x.id+'/'
+       }));
+   }
+   const key=type==='tv'?'tv-shows':type==='indie'?'indie-movies':'';
+   if(!key)return [];
+   const response=await fetch('/data/editorial.json',{headers:{accept:'application/json'}});
+   if(!response.ok)throw Error('Curated recommendations unavailable');
+   const data=await response.json();
+   return (Array.isArray(data[key])?data[key]:[])
+     .filter(x=>x&&typeof x.title==='string'&&x.title.trim().length>0&&
+       typeof x.description==='string'&&curatedLink(x.sourceUrl))
+     .slice(0,6);
+ };
+ const showCuratedFallback=async(panelNode,type)=>{
+   try{
+     const entries=await getCuratedFallback(type);
+     if(!entries.length||!panelNode.isConnected)return;
+     const gallery=el('div','fr-v5-curated-grid');
+     gallery.setAttribute('aria-label','Verified Frightertainment editorial selections');
+     const themeClass=type==='tv'?'series':type==='indie'?'independent':'film';
+     gallery.dataset.kind=themeClass;
+     const cards=entries.map((entry,index)=>{
+       const href=curatedLink(entry.sourceUrl);
+       const anchor=link('',href,'fr-v5-curated-card');
+       anchor.dataset.curatedIndex=String(index+1);
+       if(href.startsWith('https://')){anchor.target='_blank';anchor.rel='noopener noreferrer';}
+       anchor.setAttribute('aria-label','Explore '+entry.title+' via '+(entry.sourceName||'verified source'));
+       const number=el('span','fr-v5-curated-card__number',String(index+1).padStart(2,'0'));
+       number.setAttribute('aria-hidden','true');
+       const copy=el('span','fr-v5-curated-card__copy');
+       copy.append(
+         el('small','fr-v5-curated-card__kind',entry.category||'CURATED HORROR'),
+         el('strong','fr-v5-curated-card__title',entry.title),
+         el('span','fr-v5-curated-card__synopsis',String(entry.description).slice(0,180)),
+         el('span','fr-v5-curated-card__action',href.startsWith('/')?'EXPLORE FILM FILE  ↗':'OFFICIAL SOURCE  ↗')
+       );
+       anchor.append(number,copy);
+       return anchor;
+     });
+     gallery.append(...cards);
+     const intro=el('p','fr-v5-curated-intro','FRIGHTERTAINMENT SELECTS · VERIFIED EDITORIAL DISCOVERY');
+     panelNode.append(intro,gallery);
+   }catch{/* No unverified placeholders or fabricated posters on fetch failure. */}
+ };
+
  const showPosterRack=async(config,host)=>{
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-poster-grid');
@@ -237,9 +303,9 @@
   p.append(grid);host.append(p);
   try{
    const data=await fetchList(config.type,config.mode);
-   if(!data.length) return mockFreeState(grid,'No verified titles are available in this selection yet. Explore the complete catalogue below.');
+   if(!data.length){mockFreeState(grid,'Live catalogue has no qualifying titles yet. Explore our sourced editorial selections below.');await showCuratedFallback(p,config.type);return;}
    grid.replaceChildren(...data.slice(0,config.type==='indie'?6:8).map(x=>poster(x,config.type)));
-  }catch{mockFreeState(grid,'The live catalogue is unavailable right now. The full catalogue and archive remain below.');}
+  }catch{mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');await showCuratedFallback(p,config.type);}
  };
  const addNotices=async(parent)=>{
   const p=panel('fr-v5-notices','LATEST HORROR DROPS','Source-checked UK release notices.','#straight-to-stream');
@@ -291,14 +357,14 @@
   try{
    const data=await fetchList(type,'trending');
    const featured=data.find(x=>/^[A-Za-z0-9_-]{11}$/.test(mediaKey(x)));
-   if(!featured){if(hideWhenUnavailable)p.remove();else mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
+   if(!featured){p.remove();return;}
    const a=link('',filmHref(featured,type),'fr-v5-trailer__film');
    a.append(image(featured,type),el('strong','',featured.title));
    const play=link('▶','#','fr-v5-trailer__play');
    play.setAttribute('aria-label','Watch official trailer for '+featured.title);
    if(!guard(play,mediaKey(featured))){mockFreeState(node,'No verified video available.');return;}
    node.replaceChildren(a,play);
-  }catch{if(hideWhenUnavailable)p.remove();else mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
+  }catch{p.remove();}
  };
  const addUpcoming=async(parent,type)=>{
   const p=panel('fr-v5-announced','NEWLY ANNOUNCED','Upcoming horror worth watching.',type==='indie'?'#upcoming':'#upcoming');
@@ -306,7 +372,7 @@
   try{
    const data=await fetchList(type,'upcoming');
    const film=data.find(x=>x&&valid(x));
-   if(!film){mockFreeState(node,'No confirmed upcoming entry is available at the moment.');return;}
+   if(!film){p.remove();return;}
    const a=link('',filmHref(film,type),'fr-v5-announced__row');
    a.append(image(film,type));
    const copy=el('div','fr-v5-announced__copy');
@@ -315,7 +381,7 @@
    if(/^\d{4}-\d{2}-\d{2}$/.test(released||''))copy.append(el('small','',released+' · Release details'));
    copy.append(el('span','',String(film.overview||'Explore the title and its source-linked release details.').slice(0,150)));
    a.append(copy,el('span','fr-v5-announced__arrow','›'));node.replaceChildren(a);
-  }catch{mockFreeState(node,'New release information could not be loaded. Check the catalogue below.');}
+  }catch{p.remove();}
  };
  const addEditorialList=async(config,host)=>{
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
