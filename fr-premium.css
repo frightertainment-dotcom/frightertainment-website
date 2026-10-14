@@ -1302,7 +1302,7 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
 @media(max-width:430px) {
  body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
    width:min(100%,260px)!important;
-   max-width:260px!important;min-height:190px!important;
+   max-width:260px!important;min-height:165px!important;
  }
 }
 
