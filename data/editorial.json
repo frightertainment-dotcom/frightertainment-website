@@ -250,84 +250,84 @@
   "indie-movies": [
     {
       "id": "indie-movies-0",
-      "title": "Longlegs",
-      "category": "INDEPENDENT DISTRIBUTION · OCCULT HORROR",
-      "description": "An FBI investigation becomes entangled with the occult.",
-      "sourceName": "NEON",
-      "sourceUrl": "/films/longlegs/",
-      "checkedAt": "2026-10-08"
+      "title": "Buddy",
+      "category": "SOURCE-CHECKED INDIE · 2026",
+      "description": "A children's TV world becomes a surreal nightmare.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-1",
-      "title": "The Monkey",
-      "category": "INDEPENDENT DISTRIBUTION · CURSED OBJECT",
-      "description": "A wind-up toy brings a string of dreadful deaths.",
-      "sourceName": "NEON",
-      "sourceUrl": "/films/the-monkey/",
-      "checkedAt": "2026-10-08"
+      "title": "The Ugly Stepsister",
+      "category": "INDEPENDENT · BODY HORROR",
+      "description": "A savage fairy-tale nightmare about beauty and obsession.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-2",
-      "title": "Together",
-      "category": "INDEPENDENT DISTRIBUTION · BODY HORROR",
-      "description": "A couple encounters a nightmarish force in the countryside.",
-      "sourceName": "NEON",
-      "sourceUrl": "/films/together/",
-      "checkedAt": "2026-10-08"
+      "title": "In a Violent Nature",
+      "category": "INDEPENDENT · SLASHER",
+      "description": "A wilderness killer returns in an unsettling new perspective.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2024-sundance-film-festival-announces-91-projects-selected-for-the-feature-films-episodic-and-new-frontier-lineup-for-40th-edition/",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-3",
-      "title": "Heretic",
-      "category": "INDEPENDENT DISTRIBUTION · PSYCHOLOGICAL",
-      "description": "Two visitors become trapped in a dangerous test of faith.",
-      "sourceName": "A24",
-      "sourceUrl": "/films/heretic/",
-      "checkedAt": "2026-10-08"
+      "title": "Rabbit Trap",
+      "category": "INDEPENDENT · FOLK HORROR",
+      "description": "A couple's sound recordings disturb something ancient in Wales.",
+      "sourceName": "Filmmaker",
+      "sourceUrl": "https://brynchainey.com/rabbit-trap",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-4",
-      "title": "Bring Her Back",
-      "category": "INDEPENDENT DISTRIBUTION · OCCULT HORROR",
-      "description": "Siblings uncover a terrifying ritual at their foster home.",
-      "sourceName": "A24",
-      "sourceUrl": "/films/bring-her-back/",
-      "checkedAt": "2026-10-08"
+      "title": "Deadstream",
+      "category": "INDEPENDENT · FOUND FOOTAGE",
+      "description": "A disgraced livestreamer enters the wrong haunted house.",
+      "sourceName": "SXSW",
+      "sourceUrl": "https://sxsw.com/wp-content/uploads/2022/02/SXSW-2022-Festival-Slate-Release-FINAL.pdf",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-5",
-      "title": "Nosferatu",
-      "category": "SPECIALTY DISTRIBUTION · GOTHIC HORROR",
-      "description": "A new gothic interpretation of the vampire legend.",
-      "sourceName": "Focus Features",
-      "sourceUrl": "/films/nosferatu/",
-      "checkedAt": "2026-10-08"
+      "title": "Together",
+      "category": "INDEPENDENT · BODY HORROR",
+      "description": "A couple's rural move triggers a terrifying transformation.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-expanded-6",
       "title": "Talk to Me",
-      "category": "INDEPENDENT · SUPERNATURAL HORROR",
-      "description": "Friends unleash something dreadful through a ritual involving an embalmed hand.",
-      "sourceName": "A24",
-      "sourceUrl": "https://a24films.com/films/talk-to-me",
-      "checkedAt": "2026-10-09"
+      "category": "INDEPENDENT · SUPERNATURAL",
+      "description": "An embalmed hand becomes a dangerous invitation to the dead.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2023-sundance-film-festival-announces-lineup-of-99-feature-films/",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-expanded-7",
-      "title": "Hereditary",
-      "category": "INDEPENDENT · OCCULT HORROR",
-      "description": "A bereaved family unravels a terrifying inheritance.",
-      "sourceName": "A24",
-      "sourceUrl": "https://a24films.com/films/hereditary",
-      "checkedAt": "2026-10-09"
+      "title": "Horror in the High Desert",
+      "category": "INDEPENDENT · FOUND FOOTAGE",
+      "description": "A Nevada disappearance becomes a chilling mockumentary mystery.",
+      "sourceName": "Indie Rights",
+      "sourceUrl": "https://www.thefilmcatalogue.com/films/horror-in-the-high-desert",
+      "checkedAt": "2026-10-14"
     },
     {
       "id": "indie-movies-expanded-8",
-      "title": "Saint Maud",
-      "category": "INDEPENDENT · PSYCHOLOGICAL HORROR",
-      "description": "A deeply religious nurse becomes obsessed with saving her patient's soul.",
-      "sourceName": "A24",
-      "sourceUrl": "https://a24films.com/films/saint-maud",
-      "checkedAt": "2026-10-09"
+      "title": "Relic",
+      "category": "INDEPENDENT · PSYCHOLOGICAL",
+      "description": "Three generations confront a presence inside a family home.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2020-sundance-film-festival-118-feature-films-announced-3/",
+      "checkedAt": "2026-10-14"
     }
   ]
 }
