@@ -39,7 +39,7 @@ test('Cinema release marquee stays country-specific, source-linked and legible a
   await page.goto('/cinema.html');
   await page.locator('#cinema-country').selectOption('US');
   await expect(page.locator('.fr-cinema-concept__card')).toHaveCount(4);
-  const expected = ['The Devils', 'Clayface', 'Godzilla Minus Zero', 'Victorian Psycho'];
+  const expected = ['Clayface', 'The Devils', 'Godzilla Minus Zero', 'Victorian Psycho'];
   await expect(page.locator('.fr-cinema-concept__title')).toHaveText(expected);
   for (const width of [320, 375, 390, 768, 1024, 1440]) {
     await page.setViewportSize({width,height:900});
