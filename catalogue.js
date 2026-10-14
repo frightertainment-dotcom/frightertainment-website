@@ -3,7 +3,7 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const mediaType = item => item.mediaType === 'tv' || item.type === 'tv' ? 'tv' : 'movie';
   const id = item => Number(item.tmdbId || (/^\d+$/.test(String(item.id)) ? item.id : 0));
-  const indieEvidence = item => /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com)\//i.test(item?.indieSourceUrl || '') ? item.indieSourceUrl : '';
+  const indieEvidence = item => /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com|thefilmcatalogue\.com)\//i.test(item?.indieSourceUrl || '') ? item.indieSourceUrl : '';
   const href = item => !id(item) && item.indieVerified && indieEvidence(item) ? indieEvidence(item) : '/media.html?type=' + mediaType(item) + '&id=' + id(item) + (document.body.dataset.catalogueType === 'indie' ? '&section=indie' : '');
   const poster = item => /^\/[A-Za-z0-9_/-]+\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? 'https://image.tmdb.org/t/p/w500' + item.posterPath : '';
   const prettyDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat('en-GB', {dateStyle:'medium',timeZone:'UTC'}).format(new Date(value + 'T12:00:00Z')) : '';
