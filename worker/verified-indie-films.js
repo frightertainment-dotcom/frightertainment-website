@@ -15,7 +15,9 @@ const sources = Object.freeze({
   classic:'https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/',
   s14:'https://www.sundance.org/festival-history/',
   fantasia25:'https://fantasiafestival.com/uploads/Fantasia2025-Program-Web-F3.pdf',
-  rabbit:'https://brynchainey.com/rabbit-trap'
+  rabbit:'https://brynchainey.com/rabbit-trap',
+  desert:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert',
+  desert2:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert-2-minerva'
 });
 const records = [
   ['Buddy',2026,'s26',1514026],
@@ -40,6 +42,8 @@ const records = [
   ['Run Rabbit Run',2023,'s23'],
   ['Infinity Pool',2023,'s23'],
   ['birth/rebirth',2023,'s23'],
+  ['Horror in the High Desert 2: Minerva',2023,'desert2'],
+  ['Horror in the High Desert',2021,'desert'],
   ['Deadstream',2022,'sx22'],
   ['Hypochondriac',2022,'sx22'],
   ['Sissy',2022,'sx22'],
@@ -55,7 +59,7 @@ const records = [
   ['What We Do in the Shadows',2014,'s14']
 ];
 export const VERIFIED_INDIE_FILMS = Object.freeze(records.map(([title, year, key, tmdbId]) =>
-  Object.freeze({title,year,sourceName:key==='sx22'?'SXSW':key==='fantasia25'?'Fantasia':key==='rabbit'?'Filmmaker':'Sundance',
+  Object.freeze({title,year,sourceName:key==='sx22'?'SXSW':key==='fantasia25'?'Fantasia':key==='rabbit'?'Filmmaker':key.startsWith('desert')?'Indie Rights':'Sundance',
     sourceUrl:sources[key],...Number.isInteger(tmdbId)?{tmdbId}:{}})));
 export const INDIE_YEARS = Object.freeze([...new Set(VERIFIED_INDIE_FILMS.map(x=>x.year))].sort((a,b)=>b-a));
 export const INDIE_EDITORIAL_POLICY =
