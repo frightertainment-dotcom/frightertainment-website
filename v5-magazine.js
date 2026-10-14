@@ -509,6 +509,9 @@
         upper.insertBefore(ranking,upper.children[1]||null);
         spotlight.remove();
       }
+      // The editorial renderer owns stable-height measurement. Notify it
+      // synchronously when the *container* changes, even without viewport resize.
+      after.dispatchEvent(new Event('fr:editorial-layout-change'));
     };
     arrange();wide.addEventListener('change',arrange);
    }
