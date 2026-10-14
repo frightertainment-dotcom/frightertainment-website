@@ -1652,3 +1652,33 @@ for (const route of noShopPromoRoutes) {
     await page.close();
   });
 }
+
+test('mobile Top 20 titles share a left edge and normal-length names stay on one line', async ({page}) => {
+  const titles = ['Obsession','Colony',"Lee Cronin's The Mummy",'Buddy','Insidious: Out of the Further'];
+  const items = titles.map((title,index) => ({
+    filmId:'tmdb-'+(1400400+index),tmdbId:1400400+index,title,
+    position:index+1,averageScore:82-index,voteCount:200
+  }));
+  await page.route('**/api/rankings?year=*',route=>route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({status:'ranked',ratingKind:'tmdb-community',
+      updatedAt:'2026-10-14T03:26:00Z',items})
+  }));
+  await page.setViewportSize({width:390,height:844});
+  await navigateLegacy(page,'/');
+  const rows=page.locator('#hub-ranking .hub-chart-row');
+  await expect(rows).toHaveCount(5);
+  const checks=await rows.evaluateAll(nodes=>nodes.map(row=>{
+    const title=row.querySelector('a');
+    const score=row.querySelector('.score');
+    const rect=title.getBoundingClientRect();
+    const style=getComputedStyle(title);
+    return {left:rect.left,right:rect.right,scoreLeft:score.getBoundingClientRect().left,
+      titleHeight:rect.height,lineHeight:parseFloat(style.lineHeight),
+      align:style.textAlign};
+  }));
+  expect(Math.max(...checks.map(x=>x.left))-Math.min(...checks.map(x=>x.left))).toBeLessThan(2);
+  expect(checks.every(x=>x.align==='left')).toBe(true);
+  expect(checks.every(x=>x.right<=x.scoreLeft+1)).toBe(true);
+  expect(checks[4].titleHeight).toBeLessThanOrEqual(checks[4].lineHeight*1.2);
+});
