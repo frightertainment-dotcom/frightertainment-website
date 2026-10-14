@@ -1715,7 +1715,7 @@ body.fr-v5 .editorial-pick__synopsis{
  body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile>.hub-tile__content{
    display:grid!important;
    grid-template-columns:minmax(0,1fr)!important;
-   grid-template-rows:16px 65px 46px 30px 34px 35px!important;
+   grid-template-rows:16px 65px 46px 40px 34px 35px!important;
    gap:5px!important;
    align-content:end!important;
    align-items:start!important;
