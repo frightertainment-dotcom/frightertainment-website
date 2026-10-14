@@ -88,3 +88,21 @@ test('indie chart continues past studio-heavy pages, deduplicates and stops at 2
  await expect(page.locator('#chart h3').first()).toHaveText('Independent Film 1');
  await expect(page.locator('#chart .fr-catalogue-status')).toContainText('20 films');
 });
+
+test('indie rejects unverified studio and franchise listings in both catalogue and premium rack',async({page})=>{
+  const mixed=[
+    {...film,tmdbId:5001,title:'Halloween',indieVerified:false},
+    {...film,tmdbId:5002,title:'Insidious: Chapter 2',indieVerified:false},
+    {...film,tmdbId:5003,title:'Deadstream',indieVerified:true}
+  ];
+  await page.route('**/api/catalogue?**',route=>{
+    const type=new URL(route.request().url()).searchParams.get('type');
+    return route.fulfill({json:{items:type==='indie'?mixed:[],page:1,totalPages:1,status:'ready'}});
+  });
+  await navigateLegacy(page,'/indie-movies.html');
+  await expect(page.locator('#chart .fr-media-card')).toHaveCount(1);
+  await expect(page.locator('#chart .fr-media-card h3')).toHaveText('Deadstream');
+  await expect(page.locator('.fr-v5-rack .fr-v5-poster-card')).toHaveCount(1);
+  await expect(page.locator('main')).not.toContainText('Insidious: Chapter 2');
+  await expect(page.locator('main')).not.toContainText('Halloween');
+});
