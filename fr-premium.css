@@ -48,7 +48,7 @@ body.fr-v5 .fr-atmosphere { position:absolute;inset:0;z-index:0;pointer-events:n
 body.fr-v5 .fr-atmosphere__veil {
   position:absolute;inset:-20% -15%;
   background:
-    radial-gradient(ellipse at 85% 56%,#d7d2c22c,transparent 38%),
+    radial-gradient(ellipse at var(--fr-light-x,85%) var(--fr-light-y,56%),#d7d2c22c,transparent 38%),
     radial-gradient(ellipse at 66% 84%,#a8b2aa18,transparent 33%),
     radial-gradient(ellipse at 32% 12%,#99374015,transparent 34%);
   opacity:.3;
