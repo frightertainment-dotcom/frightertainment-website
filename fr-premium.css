@@ -7,7 +7,7 @@
  * Layer order: foundation > section design > AFTER DARK. Changes are
  * scoped to body.fr-v5 to keep sourced data, privacy and other routes intact.
  */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap');
+/* Font stylesheet is linked early in document head for parallel discovery. */
 
 body.fr-v5 {
   --premium-accent:#d63e52;
