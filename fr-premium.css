@@ -1740,3 +1740,171 @@ body.fr-v5 .editorial-pick__synopsis{
    margin:0!important;max-width:100%!important;
  }
 }
+
+
+/* Verified editorial is a real discovery experience when the live provider is
+   unavailable. First-party scene photography only: never substitute imagery
+   implying a movie poster, permission, venue booking or streaming availability. */
+body.fr-v5 .fr-v5-rack .fr-v5-curated-intro {
+  margin:16px 0 12px;
+  color:#c4a9a9;
+  font:700 10px/1.5 var(--premium-ui);
+  letter-spacing:.17em;
+}
+body.fr-v5 .fr-v5-curated-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:stretch;
+  gap:clamp(11px,1.5vw,20px);
+  min-width:0;
+  margin:0 0 24px;
+}
+body.fr-v5 .fr-v5-curated-card {
+  position:relative;
+  isolation:isolate;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  min-width:0;
+  min-height:295px;
+  padding:clamp(19px,2.1vw,31px);
+  overflow:clip;
+  border:0;
+  border-radius:0;
+  background:
+    linear-gradient(0deg,#040507f7 0%,#08090ddc 35%,#07080bab 67%,#0b0c0d65 100%),
+    url('/assets/worlds/movies-vault.webp') center/cover no-repeat;
+  color:#f2e9e4;
+  text-decoration:none;
+  box-shadow:0 20px 32px #0007;
+  transition:transform .35s ease,filter .35s ease;
+}
+body.fr-v5 .fr-v5-curated-grid[data-kind='series'] .fr-v5-curated-card{
+  background-image:linear-gradient(0deg,#05070af7,#080c13bc 57%,#080a0b75),
+    url('/assets/worlds/tv-broadcast.webp');
+}
+body.fr-v5 .fr-v5-curated-grid[data-kind='independent'] .fr-v5-curated-card{
+  background-image:linear-gradient(0deg,#080707f8,#13080cbf 57%,#0b080b62),
+    url('/assets/worlds/indie-projection.webp');
+}
+body.fr-v5 .fr-v5-curated-card:nth-child(3n+1){background-position:center,18% center}
+body.fr-v5 .fr-v5-curated-card:nth-child(3n+2){background-position:center,57% center}
+body.fr-v5 .fr-v5-curated-card:nth-child(3n+3){background-position:center,86% center}
+body.fr-v5 .fr-v5-curated-card::before {
+  content:'';
+  position:absolute;
+  inset:0 0 auto;
+  height:40%;
+  background:linear-gradient(180deg,#d8cbc313,transparent);
+  pointer-events:none;
+}
+body.fr-v5 .fr-v5-curated-card__number {
+  position:absolute;right:17px;top:13px;
+  font:500 clamp(33px,3.2vw,46px)/1 var(--premium-heading);
+  color:#f0ded555;
+  pointer-events:none;
+}
+body.fr-v5 .fr-v5-curated-card__copy {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:flex-start;
+  min-width:0;
+  flex:1;
+  gap:9px;
+  padding-top:28px;
+}
+body.fr-v5 .fr-v5-curated-card__kind {
+  max-width:90%;
+  color:#e3b9b8;
+  font:700 10px/1.4 var(--premium-ui);
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+body.fr-v5 .fr-v5-curated-card__title {
+  color:#f9f0e9;
+  font:600 clamp(28px,2.8vw,43px)/1.03 var(--premium-heading);
+  letter-spacing:-.045em;
+  overflow-wrap:break-word;
+  text-wrap:balance;
+}
+body.fr-v5 .fr-v5-curated-card__synopsis {
+  display:block;
+  max-width:52ch;
+  color:#d3cbca;
+  font:400 clamp(12px,1vw,14px)/1.52 var(--premium-ui);
+  text-wrap:pretty;
+  overflow-wrap:break-word;
+}
+body.fr-v5 .fr-v5-curated-card__action {
+  display:block;
+  margin-top:8px;
+  color:#f4d1c6;
+  font:700 10px/1.4 var(--premium-ui);
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+body.fr-v5 .fr-v5-curated-card:is(:hover,:focus-visible) {
+  transform:translateY(-3px);
+  filter:brightness(1.14);
+  outline:2px solid #b78f8f;
+  outline-offset:3px;
+}
+/* Existing source-error text becomes compact metadata, not a whole empty panel. */
+body.fr-v5 .fr-v5-rack:has(.fr-v5-curated-grid) .fr-v5-poster-grid:has(>.fr-v5-empty){
+  display:block!important;
+  min-height:0!important;
+  padding:0!important;
+  margin:0;
+}
+body.fr-v5 .fr-v5-rack:has(.fr-v5-curated-grid) .fr-v5-poster-grid>.fr-v5-empty{
+  margin:0!important;
+  padding:8px 0 4px!important;
+  min-height:0!important;
+  color:#b3abab!important;
+  background:transparent!important;
+  font:400 12px/1.5 var(--premium-ui)!important;
+}
+@media(min-width:701px) and (max-width:1100px) {
+  body.fr-v5 .fr-v5-curated-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px) {
+  body.fr-v5 .fr-v5-curated-grid{
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+    margin-bottom:20px;
+  }
+  body.fr-v5 .fr-v5-curated-card{
+    min-height:220px;
+    padding:20px;
+  }
+  body.fr-v5 .fr-v5-curated-card__title{font-size:clamp(31px,9vw,42px)}
+  body.fr-v5 .fr-v5-curated-card__synopsis{font-size:12px;line-height:1.52}
+}
+/* Image overlays must never increase a small tile's scrollable width. The
+   content remains available and real controls are checked for overflow. */
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{
+  overflow:clip!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__content{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile :is(.hub-tile__link,.fr-trailer-button){
+  box-sizing:border-box!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+  white-space:normal!important;
+}
+@media(prefers-reduced-motion:reduce){
+  body.fr-v5 .fr-v5-curated-card{transition:none!important;transform:none!important}
+  body.fr-v5 .fr-v5-curated-card:is(:hover,:focus-visible){transform:none!important}
+}
