@@ -56,8 +56,21 @@ const sharedHeaders = await readFile(new URL('_headers', root), 'utf8');
 if (!sharedHeaders.startsWith('/*')) throw new Error('Shared security headers are missing the Pages _headers rule');
 const previewHeaders = sharedHeaders.replace('  Cache-Control: no-cache, must-revalidate', '  Cache-Control: no-store');
 if (!previewHeaders.includes('Cache-Control: no-store')) throw new Error('Protected preview must use no-store');
+// HTML, API responses and private preview documents still do not cache.
+// Versioned JS/CSS and public decorative assets are safe for browser-private
+// caching, which avoids re-downloading the entire visual skin on every tap.
+// Cloudflare Access remains required; this is NOT an Access bypass.
+const safeBrowserCache=[
+  '/*.css',
+  '  Cache-Control: private, max-age=86400',
+  '/*.js',
+  '  Cache-Control: private, max-age=86400',
+  '/assets/*',
+  '  Cache-Control: private, max-age=86400'
+].join('\n');
 await writeFile(new URL('_headers', destination),
-  previewHeaders.replace('/*', '/*\n  X-Robots-Tag: noindex, nofollow, noarchive'));
+  previewHeaders.replace('/*', '/*\n  X-Robots-Tag: noindex, nofollow, noarchive')+
+  '\n\n'+safeBrowserCache+'\n');
 // Keep static pages free of Functions invocation charges.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]
