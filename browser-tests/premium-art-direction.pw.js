@@ -142,3 +142,47 @@ test('Capture premium-design visual evidence for human review, not pixel auto-ap
     }
   }
 });
+
+
+test('Cinema prioritises real coming-attractions rows above the desktop fold', async ({ page }) => {
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto('/cinema.html');
+  await expect(page.locator('.fr-cinema-concept__card').first()).toBeVisible();
+  const visual = await page.evaluate(() => {
+    const intro=document.querySelector('.hub-page-intro').getBoundingClientRect();
+    const first=document.querySelector('.fr-cinema-concept__card').getBoundingClientRect();
+    const board=document.querySelector('.fr-cinema-concept__features').getBoundingClientRect();
+    return {introHeight:intro.height,boardTop:board.top,firstTop:first.top,
+      firstHeight:first.height,windowHeight:innerHeight,
+      horizontalOverflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(visual.introHeight).toBeLessThan(405);
+  expect(visual.boardTop).toBeLessThan(500);
+  expect(visual.firstTop).toBeLessThan(790);
+  expect(visual.firstHeight).toBeGreaterThan(62);
+  expect(visual.horizontalOverflow).toBeLessThanOrEqual(2);
+});
+
+test('Mobile editorial story starts alongside the actual poster, not in a dead band', async ({ page }) => {
+  await page.setViewportSize({width:390,height:900});
+  for (const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html']) {
+    await page.goto(route);
+    await expect(page.locator('.editorial-pick__synopsis')).toBeVisible();
+    const layout = await page.evaluate(() => {
+      const bounds=selector=>document.querySelector(selector).getBoundingClientRect();
+      const host=document.querySelector('.editorial-pick');
+      const grid=getComputedStyle(host).gridTemplateColumns.split(' ').filter(Boolean).length;
+      return {grid,poster:bounds('.editorial-pick__art-frame'),
+        content:bounds('.editorial-pick__content'),
+        synopsis:bounds('.editorial-pick__synopsis'),
+        article:host.getBoundingClientRect(),
+        viewport:innerWidth,overflow:document.documentElement.scrollWidth};
+    });
+    expect(layout.grid, route).toBe(2);
+    expect(layout.poster.width, route).toBeGreaterThan(115);
+    expect(layout.content.top, route).toBeLessThan(layout.poster.bottom);
+    expect(layout.synopsis.top, route).toBeLessThan(layout.poster.bottom + 55);
+    expect(layout.synopsis.right, route).toBeLessThanOrEqual(layout.article.right + 1);
+    expect(layout.overflow, route).toBeLessThanOrEqual(layout.viewport + 2);
+  }
+});
