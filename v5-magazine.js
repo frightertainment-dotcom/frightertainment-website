@@ -419,11 +419,11 @@
     explore.setAttribute('aria-label','Explore horror movies');
     explore.append(el('h2','','EXPLORE MOVIES'));
     for(const [label,href,art] of [
-      ['ALL MOVIES','/all-horror-movies.html','all'],
+      ['2026 HORROR','/all-horror-movies.html?year=2026','all'],
       ['NEW RELEASES','/movies.html#straight-to-stream','new'],
       ['INDIE','/indie-movies.html','indie'],
       ['CULT CLASSICS','/all-horror-movies.html?year=1980','classics'],
-      ['TOP 20','/top-20/','top']
+      ['1978 HORROR','/all-horror-movies.html?year=1978','top']
     ]){
      const a=link(label+'  ›',href,'fr-v5-explore__tile');a.dataset.art=art;explore.append(a);
     }
