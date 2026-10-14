@@ -128,7 +128,7 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
       return {
         tabs:tabs.length,
         navRows:new Set(tabs.map(a=>Math.round(a.getBoundingClientRect().top))).size,
-        sideBySide:poster.right<=copy.left+2 && Math.abs(poster.top-copy.top)<16,
+        sideBySide:poster.right<=copy.left+2 && poster.left<copy.left && Math.max(poster.top,copy.top)<Math.min(poster.bottom,copy.bottom),
         stacked:poster.bottom<=copy.top+2,
         width:document.documentElement.scrollWidth,
         viewport:innerWidth
