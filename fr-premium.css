@@ -1686,23 +1686,9 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
  }
 }
 
-/* Cinematic finishing pass: atmosphere adds depth but never obscures film
-   posters, dates, sources, captions, controls or keyboard focus. */
-body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile){
-  isolation:isolate!important;
-}
-body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile)::after{
-  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(125deg,transparent 25%,#fff5 49%,transparent 65%);
-  opacity:0;transform:translateX(-34%);
-  transition:opacity .65s ease,transform 1.15s cubic-bezier(.19,.8,.2,1);
-}
-body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile):hover::after{
-  opacity:.16;transform:translateX(35%);
-}
-body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile)>*{
-  position:relative;z-index:2;
-}
+/* Keep the original card overlays and poster positioning intact. Decorating
+   the full tile with a translated pseudo-element created mobile scroll overflow
+   and relative positioning on poster/wash layers. */
 body.fr-v5 :is(.hub-tabs a,.fr-v5-explore__tile,.editorial-pick__cta,.fr-v5-ranking__movie):focus-visible{
   outline:2px solid #e8c6bb!important;
   outline-offset:3px!important;
@@ -1721,8 +1707,36 @@ body.fr-v5 .editorial-pick__synopsis{
   hanging-punctuation:first!important;
   text-wrap:pretty;
 }
-@media(prefers-reduced-motion:reduce){
- body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile)::after{
-   transition:none!important;transform:none!important;opacity:0!important;
+
+
+/* Keep editorial destinations aligned on one consistent grid system while
+   preserving the poster image, full titles and source/trailer controls. */
+@media(min-width:901px){
+ body.fr-v5.hub-home .hub-showcase__bottom>.hub-tile>.hub-tile__content{
+   display:grid!important;
+   grid-template-columns:minmax(0,1fr)!important;
+   grid-template-rows:16px 65px 46px 30px 34px 35px!important;
+   gap:5px!important;
+   align-content:end!important;
+   align-items:start!important;
+   justify-items:stretch!important;
+   height:100%!important;min-height:100%!important;
+   width:100%!important;min-width:0!important;
+   box-sizing:border-box!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .fr-home-category{grid-row:1!important;}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile h3{
+   grid-row:2!important;align-self:start!important;
+   margin:0!important;min-width:0!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile p{
+   grid-row:3!important;align-self:start!important;
+   margin:0!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-feature__rating{grid-row:4!important;}
+ body.fr-v5.hub-home .hub-showcase__bottom .fr-trailer-button{grid-row:5!important;}
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile__link{
+   grid-row:6!important;align-self:start!important;
+   margin:0!important;max-width:100%!important;
  }
 }
