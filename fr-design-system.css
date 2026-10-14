@@ -355,13 +355,21 @@ body.fr-v5 .hub-footer { margin-top:clamp(38px,5vw,70px); background:linear-grad
    Scoped to the existing fr-v5 mobile layout; desktop remains unchanged. */
 @media (max-width: 700px) {
   body.fr-v5 {
-    padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px));
-    scroll-padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
   body.fr-v5 .hub-footer {
-    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 24px;
   }
   body.fr-v5 :is(#home-showcase, #my-watchlist, #hub-ranking, .hub-charts, .hub-showcase__bottom) {
-    scroll-margin-bottom: calc(118px + env(safe-area-inset-bottom, 0px));
+    scroll-margin-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Mobile dock polish: opaque surface keeps scrolling text from showing through. */
+@media (max-width: 700px) {
+  body.fr-v5 .fr-v5-mobile-dock {
+    background: #09080b;
+    box-shadow: 0 -7px 22px #000d;
   }
 }
