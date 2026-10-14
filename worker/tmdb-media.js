@@ -1,3 +1,4 @@
+import { VERIFIED_INDIE_FILMS, INDIE_YEARS, INDIE_EDITORIAL_POLICY, INDIE_REVIEW_DATE } from './verified-indie-films.js';
 const BASE = 'https://api.themoviedb.org/3';
 const today = () => new Date().toISOString().slice(0, 10);
 const date = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') ? value : null;
@@ -149,7 +150,94 @@ export async function fetchStreamingAvailability(env,options) {
     methodology:'Regional watching offers from TMDB powered by JustWatch. These do not establish first premiere or theatrical history. Free/ad-supported, subscription and digital rent/buy are distinct; check providers for current rights and prices.'};
 }
 
+// A strict, evidence-backed indie selection replaces open-ended TMDB 'low budget'
+// discovery. Any film not on the reviewed registry is excluded, even when TMDB
+// labels its production company as small. Ratings/art/trailers still come from TMDB.
+async function indieFilmFromSource(env, record, country) {
+  let tmdbId = record.tmdbId;
+  if (!tmdbId) {
+    const found = await tmdbRequest(env, '/search/movie', {
+      query: record.title, language: 'en-US', include_adult: false, page: 1
+    });
+    const target = normalizeTitle(record.title);
+    const matches = (found.results || []).filter(item => {
+      const sameTitle = [item.title, item.original_title].some(t => normalizeTitle(t) === target);
+      const releaseYear = Number(String(item.release_date || '').slice(0, 4));
+      // A festival world premiere may predate ordinary theatrical release by a year.
+      return sameTitle && releaseYear >= record.year && releaseYear <= record.year + 1;
+    });
+    if (matches.length !== 1) return null;
+    tmdbId = matches[0].id;
+  }
+  if (!Number.isInteger(tmdbId) || tmdbId < 1) return null;
+  const raw = await tmdbRequest(env, '/movie/' + tmdbId, {
+    language: 'en-US', append_to_response: 'videos,release_dates'
+  });
+  if (![raw.title, raw.original_title].some(title => normalizeTitle(title) === normalizeTitle(record.title))) return null;
+  // Protect the editorial list if a film's database identity gets reused or changes.
+  const movieYear = Number(String(raw.release_date || '').slice(0, 4));
+  if (!(movieYear >= record.year && movieYear <= record.year + 1)) return null;
+  const companies = (raw.production_companies || []).map(c => String(c.name || ''));
+  const massStudio = companies.some(name =>
+    MAJOR_PRODUCERS.test(name.replace(/[^a-z0-9]+/gi, ' ')) ||
+    /\b(blumhouse|trancas|miramax|film ?district|stage ?6 films|platinum dunes|atomic monster)\b/i.test(name));
+  if (massStudio || Number(raw.budget || 0) >= 30_000_000) return null;
+  const item = sanitizeMedia(raw, 'movie', country);
+  if (!item) return null;
+  return { ...item, indieVerified:true, indieOriginalYear:record.year,
+    indieSourceUrl:record.sourceUrl, indieSourceName:record.sourceName,
+    indieReviewedAt:INDIE_REVIEW_DATE, indieClassification:'source-checked-independent-production',
+    tmdbPopularity:Number.isFinite(raw.popularity)?raw.popularity:0 };
+}
+async function fetchVerifiedIndieCatalogue(env, options) {
+  const mode = options.mode === 'chart' ? 'top' : options.mode;
+  const year = Number(options.year) || new Date().getUTCFullYear();
+  const page = Math.max(1,Number(options.page)||1);
+  const query = normalizeTitle(options.query || '');
+  let records;
+  if (mode === 'top' || mode === 'archive') {
+    records = VERIFIED_INDIE_FILMS.filter(item => item.year === year &&
+      (!query || normalizeTitle(item.title).includes(query)));
+  } else if (mode === 'upcoming') {
+    records = VERIFIED_INDIE_FILMS.filter(item => item.year >= new Date().getUTCFullYear() - 1);
+  } else {
+    // Show a representative recent selection, not an unverified global popularity chart.
+    records = VERIFIED_INDIE_FILMS.filter(item => item.year >= new Date().getUTCFullYear() - 3);
+  }
+  const count = records.length;
+  // 12 genuine selections at a time, not 40 unverified candidates per request.
+  // The current indie chart has fewer than 20 verified film-year identities;
+  // do not fill missing places with unrelated studio productions.
+  const size = mode === 'top' ? 20 : mode === 'trending' ? 12 : 9;
+  const chunk = mode === 'trending' || mode === 'top' ? records : records.slice((page-1)*size,page*size);
+  const resolved = await mapBounded(chunk, async record => {
+    try { return await indieFilmFromSource(env,record,options.country || 'GB'); }
+    catch(error) { if(/TMDB access is not configured/.test(String(error))) throw error; return null; }
+  });
+  const now = today();
+  let items = resolved.filter(Boolean);
+  if(mode === 'upcoming') items = items.filter(item => item.releaseDate && item.releaseDate > now)
+    .sort((a,b) => a.releaseDate.localeCompare(b.releaseDate));
+  if(mode === 'trending') items = items.filter(item => item.releaseDate && item.releaseDate <= now)
+    .sort((a,b) => b.tmdbPopularity-a.tmdbPopularity || b.voteCount-a.voteCount).slice(0,12);
+  if(mode === 'top') items = items.filter(item => item.voteCount >= 50 && item.voteAverage !== null &&
+    item.releaseDate && item.releaseDate <= now)
+    .sort((a,b) => b.voteAverage-a.voteAverage || b.voteCount-a.voteCount)
+    .slice(0,20).map((item,index) => ({
+      ...item,position:index+1,averageScore:Math.round(item.voteAverage*10)
+    }));
+  const totalPages = Math.max(1,Math.ceil(count/size));
+  return {items,page,totalPages,nextPage:page<totalPages?page+1:null,screeningComplete:true,
+    totalResults:count,filteredResults:items.length,countIsCandidateTotal:true,
+    firstYear:Math.min(...INDIE_YEARS),availableYears:INDIE_YEARS,
+    year,type:'indie',mode:options.mode,ratingKind:'tmdb-community',
+    minimumVotes:mode==='top'?50:null,classification:'source-checked-independent-films',
+    methodology:INDIE_EDITORIAL_POLICY,
+    sourceReviewedAt:INDIE_REVIEW_DATE,screeningLimit:count};
+}
+
 export async function fetchCatalogue(env, options) {
+  if (options.type === 'indie') return fetchVerifiedIndieCatalogue(env,options);
   if(options.mode==='streaming-watch')return fetchStreamingAvailability(env,options);
   const kind = options.type; const type = kind === 'tv' ? 'tv' : 'movie';
   const mode = options.mode === 'chart' ? 'top' : options.mode;
