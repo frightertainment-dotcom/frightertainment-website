@@ -337,9 +337,12 @@ body.fr-v5 .fr-v5-poster__bottom strong{
 }
 body.fr-v5 .fr-v5-poster__bottom small{font:500 10px var(--premium-ui)!important;color:#a5a3a3}
 body.fr-v5 .fr-v5-poster__source{
-  top:auto!important;bottom:9px!important;left:8px!important;
-  background:#0c0d11c7!important;color:#fbf5e9!important;
-  font:700 9px/1.2 var(--premium-ui)!important;
+  /* Preserve independent corners: source top-left, score top-right,
+     watchlist bottom-left, trailer bottom-right. */
+  top:8px!important;bottom:auto!important;left:8px!important;
+  padding:3px 4px!important;max-width:42%!important;
+  background:#0c0d11d9!important;color:#fbf5e9!important;
+  font:700 8px/1.2 var(--premium-ui)!important;
 }
 body.fr-v5 .fr-v5-poster__rating{
   top:7px!important;right:7px!important;
