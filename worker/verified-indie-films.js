@@ -14,7 +14,7 @@ const sources = Object.freeze({
   s19:'https://www.sundance.org/blogs/2019-sundance-film-festival-112-features-announced-3/',
   classic:'https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/',
   s14:'https://www.sundance.org/festival-history/',
-  fantasia25:'https://fantasiafestival.com/uploads/Fantasia2025-Program-Web-F3.pdf',
+  fantasia25:'https://fantasiafestival.com/en/news/fantasia-2025-third-wave',
   rabbit:'https://brynchainey.com/rabbit-trap',
   desert:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert',
   desert2:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert-2-minerva',
