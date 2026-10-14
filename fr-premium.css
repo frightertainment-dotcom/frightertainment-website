@@ -2034,3 +2034,13 @@ body.fr-v5 .fr-v5-ranking__skeleton-score{width:78px;max-width:100%}
     column-gap: 9px !important;
   }
 }
+
+/* Phase 2 typography finish: consistent compact titles in the mobile Top 20. */
+@media (max-width: 700px) {
+  body.fr-v5.hub-home .hub-chart-row > a {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+  }
+}
