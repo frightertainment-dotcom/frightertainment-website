@@ -1145,3 +1145,36 @@ body.fr-v5 .hub-page-intro .hub-page-title--wordmark::after{content:none!importa
    max-height:78px!important;
  }
 }
+
+/* First-fold QA: no artificially empty phone masthead, and no chopped
+   third tab at 320–430px. The logo and editorial art remain responsive. */
+@media(max-width:700px){
+  body.fr-v5.hub-section[data-theme] .hub-page-intro{
+    min-height:clamp(245px,59vw,330px)!important;
+    padding-block:18px 18px!important;
+  }
+  body.fr-v5.hub-section[data-theme] .hub-page-intro .hub-page-title--wordmark{
+    margin:7px 0 11px!important;
+  }
+  body.fr-v5.hub-section[data-theme] .hub-page-intro :is(.hub-subtabs,.hub-section-jumps){
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    overflow:visible!important;overflow-x:visible!important;
+    flex-wrap:wrap!important;
+    gap:2px 9px!important;
+  }
+  body.fr-v5.hub-section[data-theme] .hub-page-intro :is(.hub-subtabs,.hub-section-jumps) a{
+    flex:0 1 auto!important;max-width:100%!important;
+    white-space:normal!important;overflow-wrap:normal!important;
+    word-break:normal!important;text-wrap:balance;
+    padding-inline:0!important;
+    font-size:9px!important;line-height:1.3!important;
+  }
+  body.fr-v5[data-theme='movies'] .hub-page-intro .hub-subtabs{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    align-items:start!important;gap:6px!important;
+  }
+  body.fr-v5[data-theme='movies'] .hub-page-intro .hub-subtabs a{
+    text-align:left!important;min-width:0!important;
+  }
+  body.fr-v5[data-theme='movies'] .hub-page-intro .hub-subtabs a::after{content:none!important}
+}
