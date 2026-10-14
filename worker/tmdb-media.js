@@ -155,7 +155,7 @@ export async function fetchStreamingAvailability(env,options) {
 // labels its production company as small. Ratings/art/trailers still come from TMDB.
 function sourcedIndieFallback(record) {
   return {
-    id:'indie-source-'+record.year+'-'+normalizeTitle(record.title).replace(/\\s+/g,'-'),
+    id:'indie-source-'+record.year+'-'+normalizeTitle(record.title).split(' ').join('-'),
     tmdbId:null,mediaType:'movie',type:'movie',title:record.title,
     overview:'Source-checked independent horror. Open the festival or filmmaker record for production details.',
     voteAverage:null,voteCount:0,ratingKind:null,posterPath:null,trailer:null,
