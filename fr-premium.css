@@ -708,7 +708,7 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{
   display:flex!important;flex-direction:column!important;
   align-items:center!important;justify-content:center!important;
   gap:0!important;
-  padding:38px 24px 26px!important;margin:0!important;
+  padding:22px 24px 11px!important;margin:0!important;
   border:0!important;
   background:
     radial-gradient(ellipse at 50% 15%,#8e17263a,transparent 60%),
@@ -716,9 +716,9 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{
 }
 body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{
   color:#ec4f5f!important;
-  font:600 clamp(32px,3.3vw,57px)/.93 var(--premium-heading)!important;
+  font:600 clamp(32px,3.2vw,52px)/.99 var(--premium-heading)!important;
   text-transform:uppercase!important;
-  letter-spacing:.17em!important;text-align:center!important;
+  letter-spacing:.09em!important;text-align:center!important;
   text-shadow:0 0 5px #e92e48b5,0 0 22px #ed183985,0 0 46px #8f0e2966;
 }
 body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head>a{
@@ -726,14 +726,14 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head>a{
   letter-spacing:.16em!important;
   text-transform:uppercase!important;
   color:#d4aa9f!important;
-  margin:16px 0 0!important;
+  margin:8px 0 0!important;
   text-decoration:none!important;
 }
 body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{
   position:relative;z-index:2;
   display:grid!important;grid-template-columns:minmax(0,1fr)!important;
   grid-auto-rows:auto!important;gap:4px!important;
-  padding:13px clamp(16px,2.6vw,35px) 28px!important;
+  padding:8px clamp(16px,2.6vw,35px) 24px!important;
   min-height:0!important;
   background:
     radial-gradient(ellipse at center,#261c20,#070708 74%)!important;
@@ -741,8 +741,8 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{
 }
 body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::before{
   content:'THE MIDNIGHT PROGRAMME';
-  display:block;margin:0 0 12px!important;
-  padding:10px!important;
+  display:block;margin:0 0 7px!important;
+  padding:6px!important;
   color:#cab5b3!important;
   font:600 12px/1.4 var(--premium-ui)!important;
   text-align:center;letter-spacing:.3em!important;
@@ -1037,9 +1037,9 @@ body.fr-v5 .hub-footer *{border-color:transparent!important}
  body.fr-v5 .fr-v5-ranking__entry{grid-template-columns:23px minmax(0,1fr) minmax(81px,max-content)!important;min-height:49px!important;gap:5px!important}
  body.fr-v5 .fr-v5-ranking__movie{font-size:12px!important}
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept{margin:3px auto 25px!important;padding-top:0!important}
- body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{padding:31px 11px 16px!important}
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head{padding:17px 11px 10px!important}
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2{font-size:clamp(29px,7vw,42px)!important}
- body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{padding:9px 10px 20px!important;gap:3px!important}
+ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards{padding:7px 10px 17px!important;gap:3px!important}
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::before{font-size:10px!important;letter-spacing:.16em!important}
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::after{font-size:8px!important}
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card{
