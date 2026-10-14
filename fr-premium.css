@@ -1685,3 +1685,44 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    margin-top:0!important;padding-top:9px!important;
  }
 }
+
+/* Cinematic finishing pass: atmosphere adds depth but never obscures film
+   posters, dates, sources, captions, controls or keyboard focus. */
+body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile){
+  isolation:isolate!important;
+}
+body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile)::after{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(125deg,transparent 25%,#fff5 49%,transparent 65%);
+  opacity:0;transform:translateX(-34%);
+  transition:opacity .65s ease,transform 1.15s cubic-bezier(.19,.8,.2,1);
+}
+body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile):hover::after{
+  opacity:.16;transform:translateX(35%);
+}
+body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile)>*{
+  position:relative;z-index:2;
+}
+body.fr-v5 :is(.hub-tabs a,.fr-v5-explore__tile,.editorial-pick__cta,.fr-v5-ranking__movie):focus-visible{
+  outline:2px solid #e8c6bb!important;
+  outline-offset:3px!important;
+}
+body.fr-v5 .fr-v5-ranking__entry{
+  transition:background .22s ease!important;
+}
+body.fr-v5 .fr-v5-ranking__entry:hover,
+body.fr-v5 .fr-v5-ranking__entry:focus-within{
+  background:linear-gradient(90deg,#4b1b2b2b,transparent)!important;
+}
+body.fr-v5 .fr-v5-ranking__entry:nth-child(-n+3) .fr-v5-ranking__position{
+  color:#f3c2b6!important;
+}
+body.fr-v5 .editorial-pick__synopsis{
+  hanging-punctuation:first!important;
+  text-wrap:pretty;
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 :is(.hub-feature,.fr-v5-explore__tile,.fr-v5-editorial-tile,.hub-showcase__bottom .hub-tile)::after{
+   transition:none!important;transform:none!important;opacity:0!important;
+ }
+}
