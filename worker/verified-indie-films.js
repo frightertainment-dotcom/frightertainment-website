@@ -17,7 +17,9 @@ const sources = Object.freeze({
   fantasia25:'https://fantasiafestival.com/uploads/Fantasia2025-Program-Web-F3.pdf',
   rabbit:'https://brynchainey.com/rabbit-trap',
   desert:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert',
-  desert2:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert-2-minerva'
+  desert2:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert-2-minerva',
+  glass:'https://glasseyepix.com/projects/chronological/',
+  habit:'https://www.ifccenter.com/films/habit-2/'
 });
 const records = [
   ['Buddy',2026,'s26',1514026],
@@ -51,6 +53,16 @@ const records = [
   ['Scare Me',2020,'s20'],
   ['Amulet',2020,'s20'],
   ['The Hole in the Ground',2019,'s19'],
+  ['Depraved',2019,'glass'],
+  ['The Innkeepers',2010,'glass'],
+  ['Stake Land',2010,'glass'],
+  ['Bitter Feast',2010,'glass'],
+  ['The House of the Devil',2009,'glass'],
+  ['I Sell the Dead',2008,'glass'],
+  ['I Can See You',2008,'glass'],
+  ['The Last Winter',2006,'glass'],
+  ['The Roost',2005,'glass'],
+  ['Habit',1995,'habit'],
   ['Hereditary',2018,'classic'],
   ['Mandy',2018,'classic'],
   ['The Witch',2015,'classic'],
@@ -59,7 +71,7 @@ const records = [
   ['What We Do in the Shadows',2014,'s14']
 ];
 export const VERIFIED_INDIE_FILMS = Object.freeze(records.map(([title, year, key, tmdbId]) =>
-  Object.freeze({title,year,sourceName:key==='sx22'?'SXSW':key==='fantasia25'?'Fantasia':key==='rabbit'?'Filmmaker':key.startsWith('desert')?'Indie Rights':'Sundance',
+  Object.freeze({title,year,sourceName:key==='sx22'?'SXSW':key==='fantasia25'?'Fantasia':key==='rabbit'?'Filmmaker':key.startsWith('desert')?'Indie Rights':key==='glass'?'Glass Eye Pix':key==='habit'?'IFC Center':'Sundance',
     sourceUrl:sources[key],...Number.isInteger(tmdbId)?{tmdbId}:{}})));
 export const INDIE_YEARS = Object.freeze([...new Set(VERIFIED_INDIE_FILMS.map(x=>x.year))].sort((a,b)=>b-a));
 export const INDIE_EDITORIAL_POLICY =
