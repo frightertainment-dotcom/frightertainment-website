@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-12",
+  "updatedAt": "2026-10-14",
   "description": "Approved manual spotlight overrides only. Never infer asset permissions from an owner's request. Editorial notes are independently written, not official synopses.",
   "overrides": {},
   "notes": {
@@ -13,12 +13,12 @@
       "tv-shows-5": "An anthology is a great way to sample different strains of horror; this collection brings separate sinister visions together."
     },
     "indie": {
-      "indie-movies-0": "A case that crosses into occult territory is the sort of unnerving mystery that rewards viewers who enjoy dread building around an investigation.",
-      "indie-movies-1": "Sometimes the smallest object makes the largest threat. This cursed-toy premise gives everyday surroundings an unsettling edge.",
-      "indie-movies-2": "Body horror becomes especially disturbing when it turns a relationship into the centre of the nightmare.",
-      "indie-movies-3": "Psychological tension and faith are at the heart of this pick, making it well suited to viewers who like unsettling conversations and mounting peril.",
-      "indie-movies-4": "An occult secret discovered in a new home gives this film a deeply uneasy family-horror setup.",
-      "indie-movies-5": "For lovers of gothic atmosphere, the vampire legend remains a rich place to find obsession and dread."
+      "indie-movies-0": "A nightmare dressed as a children's television programme makes Buddy a striking example of imaginative independent genre filmmaking.",
+      "indie-movies-1": "The Ugly Stepsister turns familiar fairy-tale imagery into an unsettling look at beauty, pressure and bodily transformation.",
+      "indie-movies-2": "In a Violent Nature follows its undead killer through the wilderness, giving slasher horror an unusually relentless viewpoint.",
+      "indie-movies-3": "Rabbit Trap draws on eerie sound recordings and rural folklore, creating dread through atmosphere rather than spectacle.",
+      "indie-movies-4": "Deadstream twists found-footage horror into a disastrous livestream, balancing haunted-house scares and dark humour.",
+      "indie-movies-5": "Together takes relationship anxiety into physical horror, using a couple's shared experiences to explore terrifying change."
     },
     "podcasts": {
       "podcasts-0": "A folk-horror anthology for listeners who prefer their nightmares rooted in place, history and the things whispered about beneath the surface.",
