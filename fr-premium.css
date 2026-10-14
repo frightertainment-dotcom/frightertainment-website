@@ -1619,3 +1619,16 @@ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__a
    padding:clamp(26px,3.5vw,40px)!important;
  }
 }
+
+
+/* Keep long single-word titles intact inside the narrower mobile poster. */
+@media(min-width:360px) and (max-width:430px){
+ body.fr-v5[data-theme='tv'] .editorial-pick__art-frame[data-art-identity='tv-shows-expanded-6'] .editorial-pick__art-title{
+   display:block!important;
+   white-space:nowrap!important;
+   overflow-wrap:normal!important;word-break:keep-all!important;
+   hyphens:none!important;
+   font-size:clamp(12px,3.2vw,14px)!important;
+   letter-spacing:-.045em!important;
+ }
+}
