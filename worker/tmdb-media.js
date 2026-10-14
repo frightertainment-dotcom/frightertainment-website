@@ -194,7 +194,7 @@ async function indieFilmFromSource(env, record, country) {
   const massStudio = companies.some(name =>
     MAJOR_PRODUCERS.test(name.replace(/[^a-z0-9]+/gi, ' ')) ||
     /\b(blumhouse|trancas|miramax|film ?district|stage ?6 films|platinum dunes|atomic monster)\b/i.test(name));
-  if (massStudio || Number(raw.budget || 0) >= 30_000_000) return null;
+  if (massStudio || Number(raw.budget || 0) >= 30_000_000) return false; // Explicit disqualification: never fall back to a festival-only card.
   const item = sanitizeMedia(raw, 'movie', country);
   if (!item) return null;
   return { ...item, indieVerified:true, indieOriginalYear:record.year,
@@ -240,7 +240,7 @@ async function fetchVerifiedIndieCatalogue(env, options) {
   const resolved = await mapBounded(chunk, async record => {
     // Festival records remain discoverable even if TMDB is missing a match.
     // Such source-only items have no invented poster, trailer, date or rating.
-    try { return await indieFilmCached(env,record,options.country || 'GB') || sourcedIndieFallback(record); }
+    try { const verdict = await indieFilmCached(env,record,options.country || 'GB'); return verdict === false ? null : verdict || sourcedIndieFallback(record); }
     catch { return sourcedIndieFallback(record); }
   });
   const now = today();
