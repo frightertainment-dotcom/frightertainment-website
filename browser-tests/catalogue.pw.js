@@ -73,7 +73,7 @@ test('375px catalogue layouts keep posters, readable long titles and all feature
 });
 
 test('indie chart continues past studio-heavy pages, deduplicates and stops at 20',async({page})=>{
- const candidates=Array.from({length:20},(_,index)=>({...film,tmdbId:index+1,title:'Independent Film '+(index+1),voteAverage:9-index/10}));
+ const candidates=Array.from({length:20},(_,index)=>({...film,indieVerified:true,tmdbId:index+1,title:'Independent Film '+(index+1),voteAverage:9-index/10}));
  const requested=[];
  await page.route('**/api/catalogue?**',route=>{
   const query=new URL(route.request().url()).searchParams;
