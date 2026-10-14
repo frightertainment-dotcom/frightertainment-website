@@ -490,8 +490,10 @@
   // Do not reveal legacy sections before the premium DOM composition is assembled.
   mobileDock();
   // Cinema stays in document order: never flash or relocate its diary after load.
-  if(theme==='home'){mountHomeWatchlist();return;}
-  if(theme==='cinema')return;
+  // These pages already contain their final premium structure in HTML.
+  // They must never be held behind the async editorial-layout gate.
+  if(theme==='home'){mountHomeWatchlist();main.dataset.frV5Ready='true';return;}
+  if(theme==='cinema'){main.dataset.frV5Ready='true';return;}
   decorateHero();
   const config=configs[theme];if(!config)return;
   const showcase=el('div','fr-v5-front');
