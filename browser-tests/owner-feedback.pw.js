@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const titles = ['Resident Evil', 'Insidious: Out of the Further', 'Resident Dead',
   'Resident Evil: Welcome to Raccoon City', "Don’t Leave the Kids Alone", 'Other Mommy',
   'Pinocchio: Unstrung', 'Obsession'];
-const items = titles.map((title, index) => ({ tmdbId: 1700001 + index, type: 'movie',
+const items = titles.map((title, index) => ({ indieVerified:true,tmdbId: 1700001 + index, type: 'movie',
   mediaType: 'movie', title, posterPath: '/fixture.jpg', ratingKind: 'tmdb-community',
   voteAverage: 7.8 - index * .1, voteCount: 500 + index * 31,
   trailer: { key: 'abcdefghijk' }, firstReleaseDate: '2026-10-05' }));
