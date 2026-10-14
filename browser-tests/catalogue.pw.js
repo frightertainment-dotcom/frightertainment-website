@@ -1,6 +1,6 @@
 import { navigateLegacy,openCompleteDiscovery } from './helpers/open-full-discovery.mjs';
 import {test,expect} from '@playwright/test';
-const film = {tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,ratingKind:'tmdb-community',sourceUrl:'https://www.themoviedb.org/movie/123',trailer:{key:'abcdefghijk',name:'Official trailer'}};
+const film = {indieVerified:true,tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,ratingKind:'tmdb-community',sourceUrl:'https://www.themoviedb.org/movie/123',trailer:{key:'abcdefghijk',name:'Official trailer'}};
 const series = {...film,tmdbId:456,mediaType:'tv',title:'Haunted Series',sourceUrl:'https://www.themoviedb.org/tv/456'};
 test('indie charts and paged archive use TMDB metadata and year changes',async({page})=>{
  await page.route('**/api/catalogue?**',route=>{const query=new URL(route.request().url()).searchParams;route.fulfill({json:{items:[film],page:Number(query.get('page')),totalPages:query.get('mode')==='archive'?2:1,totalResults:2,status:'ready'}});});
