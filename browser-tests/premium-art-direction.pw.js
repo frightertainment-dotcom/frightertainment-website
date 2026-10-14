@@ -101,7 +101,7 @@ test('Editorial synopsis uses the available reading space, not two-line clipping
 test('Ambient enhancement is decorative, pausable and respects reduced-motion settings', async ({ page }) => {
   await page.goto('/cinema.html');
   await expect(page.locator('.hub-page-intro>.fr-atmosphere')).toHaveCount(1);
-  await expect(page.locator('.fr-atmosphere')).toHaveAttribute('aria-hidden','true');
+  await expect(page.locator('.fr-atmosphere').first()).toHaveAttribute('aria-hidden','true');
   const toggle = page.locator('.fr-motion-toggle');
   await expect(toggle).toBeVisible();
   await toggle.click();

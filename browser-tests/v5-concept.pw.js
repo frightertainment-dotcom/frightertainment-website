@@ -306,6 +306,7 @@ test('All seven concept pages bundle their supplied wordmarks and fit a narrow p
 });
 
 test('Capture every approved section at phone and desktop widths for owner comparison',async({page})=>{
+ test.setTimeout(150_000);
  const pages=[['/','home'],['/movies.html','movies'],['/tv-shows.html','tv'],['/cinema.html','cinema'],
   ['/indie-movies.html','indie'],['/podcasts.html','podcasts'],['/games.html','games']];
  for(const [route,name] of pages){

@@ -132,7 +132,7 @@ body.fr-v5 :is(.hub-page-intro,.hub-intro.fr-home-intro){
   background-image:
     linear-gradient(90deg,#050507ec 0%,#050507d5 29%,#05050754 70%,#0505071f),
     linear-gradient(0deg,#050507 0%,transparent 28%),
-    var(--fr-scene-wide)!important;
+    var(--fr-scene-current)!important;
   background-size:cover!important;
   background-position:center,center,center 47%!important;
 }
@@ -143,7 +143,7 @@ body.fr-v5.hub-section[data-theme] .hub-page-intro{
   background-image:
     linear-gradient(90deg,#050507eb 0%,#050507bc 37%,#05050733 77%,#05050711),
     linear-gradient(0deg,#050507 0%,transparent 27%),
-    var(--fr-scene-wide)!important;
+    var(--fr-scene-current)!important;
   background-size:cover!important;
   background-position:center,center,center 47%!important;
 }
@@ -799,7 +799,7 @@ body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region{
   border:0!important;
   background:
     linear-gradient(180deg,#11090d44,#07080be0),
-    var(--fr-scene-wide) 68% center/cover no-repeat!important;
+    var(--fr-scene-current) 68% center/cover no-repeat!important;
   box-shadow:inset 60px 0 60px #05050775!important;
 }
 body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region h2{
@@ -880,7 +880,7 @@ body.fr-v5 .hub-catalog .hub-tile{
 body.fr-v5 .fr-home-updates>summary,
 body.fr-v5 .home-discovery-wrap__summary {
   border:0!important;
-  background-image:linear-gradient(90deg,#08090df0,#08090e50),var(--fr-scene-wide)!important;
+  background-image:linear-gradient(90deg,#08090df0,#08090e50),var(--fr-scene-current)!important;
 }
 body.fr-v5 :is(.fr-v5-deeper,.fr-home-updates,.home-discovery-wrap) summary :is(strong,.fr-v5-deeper__heading){
   font-family:var(--premium-heading)!important;
@@ -914,7 +914,7 @@ body.fr-v5 .hub-footer *{border-color:transparent!important}
  body.fr-v5.hub-home .hub-showcase__bottom{grid-template-columns:repeat(3,minmax(0,1fr))!important}
  body.fr-v5[data-theme='cinema'] .fr-cinema-concept{grid-template-columns:minmax(0,1.6fr) minmax(200px,.75fr)!important;gap:20px!important}
 }
-@media(max-width:999px){
+@media(max-width:900px){
  body.fr-v5[data-theme='movies'] .fr-v5-spotlight-row{display:contents!important}
  body.fr-v5.hub-home .hub-dashboard.hub-showcase{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:'lead' 'chart' 'tiles'!important}
  body.fr-v5.hub-home .hub-showcase__bottom{grid-template-columns:repeat(3,minmax(0,1fr))!important}
@@ -1210,5 +1210,98 @@ body.fr-v5 .hub-page-intro .hub-page-title--wordmark::after{content:none!importa
  }
  body.fr-v5 .editorial-pick__art-frame[data-art-identity='longlegs'] .editorial-pick__art-title{
    white-space:nowrap!important;font-size:clamp(18px,5vw,27px)!important;
+ }
+}
+
+
+/* RELEASE QA · prevent old 2-column/off-canvas behaviour on narrow screens. */
+@media(min-width:901px) and (max-width:1100px) {
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase{
+   display:grid!important;
+   grid-template-columns:minmax(0,1.17fr) minmax(300px,.83fr)!important;
+   grid-template-areas:'lead chart' 'tiles tiles'!important;
+   align-items:start!important;
+ }
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-charts{
+   grid-area:chart!important;align-self:stretch!important;
+   min-width:0!important;margin:0!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__lead{grid-area:lead!important;margin:0!important}
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-showcase__bottom{grid-area:tiles!important}
+}
+@media(min-width:461px) and (max-width:700px) {
+ body.fr-v5.hub-home .fr-home-dashboard-heading{gap:6px!important;flex-wrap:nowrap!important}
+ body.fr-v5.hub-home .fr-home-dashboard-heading h2{
+   font-size:clamp(26px,6vw,32px)!important;
+   white-space:nowrap!important;letter-spacing:-.055em!important;
+ }
+ body.fr-v5.hub-home .fr-home-dashboard-heading>a{
+   font-size:8.5px!important;letter-spacing:0!important;
+   white-space:nowrap!important;min-width:0!important;
+ }
+}
+@media(max-width:460px) {
+ body.fr-v5.hub-home .fr-home-dashboard-heading{
+   display:flex!important;flex-direction:column!important;
+   align-items:flex-start!important;gap:6px!important;
+ }
+ body.fr-v5.hub-home .fr-home-dashboard-heading h2{
+   white-space:nowrap!important;font-size:clamp(27px,7vw,32px)!important;
+   letter-spacing:-.04em!important;
+ }
+ body.fr-v5.hub-home .fr-home-dashboard-heading>a{align-self:flex-start!important}
+}
+/* Overlay controls have different purposes. Keep the rating and the source
+   in separate corners even on 320px screens; all controls stay usable. */
+@media(max-width:430px) {
+ body.fr-v5 .fr-v5-poster__source{
+   top:7px!important;left:6px!important;right:auto!important;bottom:auto!important;
+   display:grid!important;place-items:center!important;
+   width:24px!important;height:26px!important;min-width:24px!important;
+   max-width:24px!important;padding:0!important;
+   font-size:0!important;overflow:hidden!important;
+   border-radius:0!important;background:#08080be6!important;
+ }
+ body.fr-v5 .fr-v5-poster__source::after {
+   content:'↗';font:800 15px/1 var(--premium-ui)!important;
+   color:#fff!important;display:block;
+ }
+ body.fr-v5 .fr-v5-poster__rating{
+   top:6px!important;right:5px!important;left:auto!important;
+   width:auto!important;max-width:calc(100% - 39px)!important;
+   padding:1px!important;
+ }
+ body.fr-v5 .fr-v5-poster__rating .fr-rating-badge{
+   --fr-rating-seal:.92rem;--fr-rating-value:.87rem;
+   gap:2px!important;
+ }
+ body.fr-v5 .fr-v5-poster__rating .fr-rating-badge__source{font-size:7px!important}
+ body.fr-v5 .fr-v5-poster__rating .fr-rating-badge__votes{display:none!important}
+ body.fr-v5 .fr-v5-poster__trailer{max-width:56%!important;right:5px!important;bottom:5px!important}
+ body.fr-v5 .fr-v5-watch-toggle{max-width:30px;min-width:28px}
+}
+/* Fallback game artwork remains landscape without clipping title or credit. */
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ box-sizing:border-box!important;
+ aspect-ratio:auto!important;min-height:202px!important;
+ height:auto!important;max-height:none!important;
+ padding:16px 13px 17px!important;
+ display:flex!important;flex-direction:column!important;
+ justify-content:space-between!important;gap:15px!important;
+ overflow:visible!important;
+}
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{
+ display:block!important;max-height:none!important;-webkit-line-clamp:unset!important;
+ overflow-wrap:anywhere!important;overflow:visible!important;
+ font-size:clamp(17px,2vw,28px)!important;line-height:1.13!important;
+}
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-sub{
+ display:block!important;flex-shrink:0!important;
+ font-size:8px!important;line-height:1.4!important;
+}
+@media(max-width:430px) {
+ body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+   width:min(100%,260px)!important;
+   max-width:260px!important;min-height:190px!important;
  }
 }
