@@ -9,7 +9,26 @@ const identities = {
 };
 const override = id => ({schemaVersion:1,overrides:{movies:{id,approved:true,starts:'2026-01-01',ends:'2027-01-01'},indie:{id:id==='longlegs'?'indie-movies-0':'indie-movies-1',approved:true,starts:'2026-01-01',ends:'2027-01-01'}},notes:{}});
 async function pin(page,id) {
-  await page.route('**/data/editorial-spotlight-overrides.json',route=>route.fulfill({json:override(id)}));
+  const selection=override(id);
+  // Owner approvals now ship inside the source-backed first-paint bootstrap.
+  // Override exactly that public release payload, instead of waiting for a
+  // separate JSON request that the fast startup no longer needs.
+  await page.addInitScript(fixture => {
+    let value;
+    Object.defineProperty(window,'FR_EDITORIAL_BOOTSTRAP',{
+      configurable:true,enumerable:true,
+      get(){return value;},
+      set(payload){
+        value=Object.freeze({...payload,settings:{
+          ...payload.settings,
+          overrides:{...payload.settings.overrides,...fixture.overrides},
+          notes:{...payload.settings.notes,...fixture.notes}
+        }});
+      }
+    });
+  }, selection);
+  // This also checks the former fetch route for non-built local development.
+  await page.route('**/data/editorial-spotlight-overrides.json',route=>route.fulfill({json:selection}));
 }
 function media(id, title, year, posterPath='/sample.jpg') {
   return {item:{type:'movie',tmdbId:Number(id),title,firstReleaseDate:year+'-01-01',sourceUrl:'https://www.themoviedb.org/movie/'+id,posterPath,voteAverage:7.2,voteCount:123,ratingKind:'tmdb-community',trailer:{source:'TMDB official video listing',url:'https://www.youtube.com/watch?v=abcdefghijk'}}};
