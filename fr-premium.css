@@ -1205,3 +1205,39 @@ body.fr-v5 .hub-page-intro .hub-page-title--wordmark::after{content:none!importa
    position:relative!important;
  }
 }
+
+/* Small phones deserve full-size artwork and a real synopsis, not the
+   unreadable 87px poster / 2-line caption shown by the old design. */
+@media(max-width:430px){
+ body.fr-v5 .editorial-pick{
+   grid-template-columns:minmax(0,1fr)!important;
+   grid-template-areas:'art' 'copy' 'facts'!important;
+   grid-template-rows:auto auto auto!important;
+   row-gap:17px!important;
+   padding:43px 17px 20px!important;
+ }
+ body.fr-v5 .editorial-pick__art{
+   grid-area:art!important;
+   grid-column:1!important;grid-row:1!important;
+   align-self:start!important;justify-content:flex-start!important;
+   width:100%!important;
+ }
+ body.fr-v5 .editorial-pick__art-frame{
+   width:min(61%,218px)!important;max-width:218px!important;
+   padding:12px!important;min-width:120px!important;
+ }
+ body.fr-v5 .editorial-pick__art-frame--poster{padding:0!important}
+ body.fr-v5 .editorial-pick__content{
+   grid-area:copy!important;grid-column:1!important;grid-row:2!important;
+   max-width:100%!important;
+ }
+ body.fr-v5 .editorial-pick__title{font-size:clamp(32px,8vw,43px)!important}
+ body.fr-v5 .editorial-pick__synopsis{font-size:14px!important;line-height:1.62!important}
+ body.fr-v5 .editorial-pick__why{font-size:15px!important}
+ body.fr-v5 .editorial-pick__facts{
+   grid-area:facts!important;grid-column:1!important;grid-row:3!important;
+ }
+ body.fr-v5 .editorial-pick__art-frame[data-art-identity='longlegs'] .editorial-pick__art-title{
+   white-space:nowrap!important;font-size:clamp(18px,5vw,27px)!important;
+ }
+}
