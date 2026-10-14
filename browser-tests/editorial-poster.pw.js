@@ -117,7 +117,7 @@ for(const [room,path,wordmark] of [
 test('Seven tabs and editorial art/copy remain in their responsive tracks', async ({page}) => {
   await pin(page,'longlegs');
   await page.route('**/api/media?**',route=>route.fulfill({status:503}));
-  for(const width of [390,1440]) {
+  for(const width of [320,390,1440]) {
     await page.setViewportSize({width,height:900});
     await page.goto('/movies.html');
     await expect(page.locator('.editorial-pick')).toBeVisible();
@@ -136,7 +136,10 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
     });
     expect(result.tabs).toBe(7);
     if(width===1440) expect(result.navRows).toBe(1);
-    if(width===390) { expect(result.navRows).toBe(2); expect(result.stacked).toBe(true); }
+    // Updated owner requirement: 360–430px should USE the space beside
+    // the poster; only the narrowest 320px layout needs a vertical stack.
+    if(width===320) { expect(result.navRows).toBe(2); expect(result.stacked).toBe(true); }
+    else if(width===390) { expect(result.navRows).toBe(2); expect(result.sideBySide).toBe(true); }
     else expect(result.sideBySide).toBe(true);
     expect(result.width).toBeLessThanOrEqual(result.viewport+2);
   }
