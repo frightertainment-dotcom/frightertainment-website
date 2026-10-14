@@ -18,7 +18,7 @@ for (const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/game
       return {
         initialized: main.dataset.frV5Ready==='true',
         leaking:original.filter(node=>getComputedStyle(node).display!=='none'),
-        skinLoaded:!!document.querySelector('style#fr-flash-prevention'),
+        skinLoaded:!!document.querySelector('link[rel="stylesheet"][href^="/fr-first-paint.css"]'),
         theme:document.body.dataset.theme
       };
     });
@@ -38,7 +38,7 @@ test('Priority assets are discoverable from document head without blocking font 
       const css=head.querySelector('link[href="/fr-premium.css"]');
       return {scene:head.querySelectorAll('link[rel="preload"][as="image"]').length,
         fonts:head.querySelectorAll('link[href*="Cormorant+Garamond"]').length,
-        earlyStyle:!!head.querySelector('#fr-flash-prevention'),
+        earlyStyle:!!head.querySelector('link[rel="stylesheet"][href^="/fr-first-paint.css"]'),
         css:!!css,theme};
     });
     expect(state.scene).toBe(2);
@@ -81,4 +81,42 @@ test('Verified editorial bootstraps on first paint without three blocking JSON f
     }
     await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
   }
+});
+
+test('Home and Cinema never lose their first-party layout to the legacy-flash gate',async({page})=>{
+  for(const [path,selector] of [
+    ['/','.hub-feature'],
+    ['/cinema.html','.fr-cinema-concept__features']
+  ]){
+    // Deterministic failure without an async delay: a previous page's
+    // route may be cancelled during navigation, then double-fulfilled.
+    await page.route('**/api/**', route=>
+      route.fulfill({status:503,body:'Provider temporarily unavailable'}));
+    for(const width of [320,390,1440]){
+      await page.setViewportSize({width,height:850});
+      await page.goto(path,{waitUntil:'domcontentloaded'});
+      await expect(page.locator(selector),path+' '+width).toBeVisible();
+      await expect(page.locator('main')).toHaveAttribute('data-fr-v5-ready','true');
+      await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+    }
+    await page.unroute('**/api/**');
+  }
+});
+
+test('First-paint protection is enforced as CSP-compatible blocking CSS', async ({page})=>{
+  // Local server supplies no CSP by default; add the actual strict style
+  // policy to expose failures masked by tests that allow inline <style>.
+  await page.route('**/tv-shows.html', async route=>{
+    const response=await route.fetch();
+    await route.fulfill({response,headers:{
+      ...response.headers(),
+      'content-security-policy':"default-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'none'; script-src 'self'; img-src 'self' https://image.tmdb.org data:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self';"
+    }});
+  });
+  await page.goto('/tv-shows.html',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('link[href^="/fr-first-paint.css"]')).toHaveCount(1);
+  await expect(page.locator('#fr-flash-prevention')).toHaveCount(0);
+  await expect(page.locator('main')).toHaveAttribute('data-fr-v5-ready','true');
+  await expect(page.locator('.editorial-carousel')).toBeVisible();
+  await expect(page.locator('.fr-v5-front')).toBeVisible();
 });
