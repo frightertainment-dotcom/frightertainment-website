@@ -487,7 +487,7 @@
  async function build(){
   if(main.dataset.frV5Ready)return;
   installHeader();
-  main.dataset.frV5Ready='true';
+  // Do not reveal legacy sections before the premium DOM composition is assembled.
   mobileDock();
   // Cinema stays in document order: never flash or relocate its diary after load.
   if(theme==='home'){mountHomeWatchlist();return;}
@@ -585,6 +585,7 @@
    }
   }
 
+  main.dataset.frV5Ready='true';
   await Promise.allSettled(jobs);
  }
  // Keep editorial-spotlight.mjs as the carousel owner: place our page sections
