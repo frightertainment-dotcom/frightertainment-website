@@ -83,29 +83,37 @@ body.fr-v5[data-theme='indie'] #archive .fr-catalogue-pagination {
   }
   body.fr-v5[data-theme='indie'] .hub-header .hub-tabs {
     grid-column:1/-1!important;grid-row:2!important;
-    display:flex!important;
-    flex-wrap:nowrap!important;
-    grid-template-columns:none!important;
-    grid-template-rows:none!important;
-    justify-content:flex-start!important;
-    align-items:center!important;
-    gap:5px!important;
-    overflow-x:auto!important;
-    overscroll-behavior-inline:contain;
-    scrollbar-width:thin;
-    padding:3px 0 6px!important;
+    display:grid!important;
+    /* Keep the owner's two visible rows of seven navigation destinations,
+       but give the second row (with Indie Movies) more horizontal space. */
+    grid-template-columns:repeat(12,minmax(0,1fr))!important;
+    grid-template-rows:repeat(2,minmax(45px,auto))!important;
+    grid-auto-flow:row!important;
+    justify-content:stretch!important;
+    align-items:stretch!important;
+    gap:3px 0!important;
+    overflow:visible!important;
+    padding:4px 0 6px!important;
     width:100%!important;max-width:100%!important;
-    -webkit-overflow-scrolling:touch;
   }
   body.fr-v5[data-theme='indie'] .hub-header .hub-tabs a {
-    flex:0 0 auto!important;
-    width:auto!important;
-    min-width:max-content!important;
-    min-height:43px!important;
-    padding:12px 11px!important;
-    white-space:nowrap!important;
-    font:700 12px/1.25 var(--premium-ui,system-ui,sans-serif)!important;
-    letter-spacing:.02em!important;
+    grid-column:span 3!important;
+    grid-row:auto!important;
+    flex:initial!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:45px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:9px 4px!important;
+    text-align:center!important;
+    white-space:normal!important;
+    font:700 clamp(10.5px,2.8vw,12px)/1.25 var(--premium-ui,system-ui,sans-serif)!important;
+    letter-spacing:.01em!important;
+  }
+  body.fr-v5[data-theme='indie'] .hub-header .hub-tabs a:nth-child(n+5) {
+    grid-column:span 4!important;
   }
   body.fr-v5[data-theme='indie'] main[data-catalogue-type='indie'] .fr-v5-rack .fr-v5-poster-grid,
   body.fr-v5[data-theme='indie'] main[data-catalogue-type='indie'] :is(#chart,#trending,#upcoming,#archive) .fr-catalogue-grid {
@@ -218,7 +226,7 @@ body.fr-v5[data-theme='indie'] #archive .fr-catalogue-pagination {
   body.fr-v5[data-theme='indie'] main[data-catalogue-type='indie'] :is(#chart,#trending,#upcoming,#archive) .fr-catalogue-grid {
     gap:19px 11px!important;
   }
-  body.fr-v5[data-theme='indie'] .hub-header .hub-tabs a {font-size:11px!important;padding-inline:9px!important;}
+  body.fr-v5[data-theme='indie'] .hub-header .hub-tabs a {font-size:10.5px!important;padding-inline:2px!important;}
   body.fr-v5[data-theme='indie'] .fr-v5-poster__rating .fr-rating-badge__source {font-size:7.5px!important;}
   body.fr-v5[data-theme='indie'] .fr-v5-poster-card > .fr-v5-poster__bottom strong {font-size:12px!important;}
 }
