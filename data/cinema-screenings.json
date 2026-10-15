@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "checkedAt": "2026-10-11",
-  "coverage": "Country-specific, evidence-backed horror cinema release and screening diary; a venue or distributor listing does not guarantee showtimes at every cinema.",
+  "checkedAt": "2026-10-15",
+  "coverage": "Country-specific, evidence-backed horror cinema release and screening diary; a venue or distributor listing does not guarantee showtimes at every cinema. Territory date conflicts are explicitly flagged; unconfirmed reach is never described as a general release.",
   "priorityPolicy": "Group by month first; within a month source-confirmed major studio/general releases first, special re-screenings next and select independent cinema events last. Months always remain in chronological order.",
   "territories": {
     "GB": {
@@ -12,15 +12,17 @@
           "id": "clayface-2026-uk",
           "title": "Clayface",
           "filmYear": 2026,
-          "date": "2026-10-23",
+          "date": "2026-10-19",
           "edition": "new",
           "reach": "general",
           "tier": "studio",
           "distributor": "Warner Bros / DC Studios",
           "genre": "Body horror / supernatural thriller",
-          "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+          "sourceUrl": "https://www.dcm.co.uk/film-calendar?film=clayface",
           "tmdbId": 1400940,
-          "note": "UK distributor's dated 23 October release on Screen's calendar; international launch begins 21 October."
+          "note": "UK cinema advertising calendar (DCM) lists 19 October; Screen Daily listed 23 October. Conflicting source dates: confirm current ticket date with your cinema before travelling; 19 October may include previews.",
+          "checkedAt": "2026-10-15",
+          "dateConfidence": "disputed"
         },
         {
           "id": "dracula-1958-cineworld",
@@ -101,11 +103,11 @@
           "filmYear": 2026,
           "date": "2026-10-30",
           "edition": "new",
-          "reach": "general",
+          "reach": "unconfirmed",
           "tier": "independent",
           "distributor": "Picturehouse",
           "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-          "note": "Picturehouse-distributed UK cinema release; venue reach not independently established."
+          "note": "UK release date listed by Screen Daily; breadth of UK cinema bookings has not been independently confirmed."
         },
         {
           "id": "godzilla-minus-zero-uk",
@@ -140,8 +142,9 @@
           "reach": "limited",
           "tier": "independent",
           "distributor": "British Horror Studio / Amicus Productions",
-          "sourceUrl": "https://amicushorror.co.uk/in-the-grip-of-terror-uk-cinema-dates/",
-          "note": "Peckhamplex screening 2 November, 8:30pm; Southport Bijou 19 November. Selected venues, not wide release."
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Peckhamplex, London: 2 November at 8:30pm. Separate Southport event on 19 November appears as its own listing.",
+          "venue": "Peckhamplex, London"
         },
         {
           "id": "onslaught-2026-uk",
@@ -167,6 +170,131 @@
           "distributor": "Phoenix Picturehouse, Oxford",
           "sourceUrl": "https://www.picturehouses.com/cinema/phoenix-picturehouse",
           "note": "Select Phoenix Picturehouse Oxford screening on 30 October; not a nationwide re-release."
+        },
+        {
+          "id": "spoiling-you-romford-20261016",
+          "title": "Spoiling You",
+          "filmYear": 2026,
+          "date": "2026-10-16",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Lumière Cinema, Romford",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Lumière Cinema, Romford. Advertised run 16–22 October; confirm screening time and tickets with venue.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "spoiling-you-peckham-20261110",
+          "title": "Spoiling You",
+          "filmYear": 2026,
+          "date": "2026-11-10",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Peckhamplex, London",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Peckhamplex, London. Advertised 8:30pm screening; check venue.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "mr-whispers-romford-20261023",
+          "title": "Mr Whispers",
+          "filmYear": 2026,
+          "date": "2026-10-23",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Lumière Cinema, Romford",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Lumière Cinema, Romford. Advertised 23–29 October screenings; booking options vary.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "mr-whispers-peckham-20261124",
+          "title": "Mr Whispers",
+          "filmYear": 2026,
+          "date": "2026-11-24",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Peckhamplex, London",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Peckhamplex, London. Advertised 8:30pm screening.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "black-chariot-romford-20261030",
+          "title": "Black Chariot",
+          "filmYear": 2026,
+          "date": "2026-10-30",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Lumière Cinema, Romford",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Lumière Cinema, Romford. Advertised run 30 October–5 November; confirm venue tickets.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "black-chariot-peckham-20261116",
+          "title": "Black Chariot",
+          "filmYear": 2026,
+          "date": "2026-11-16",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Peckhamplex, London",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Peckhamplex, London. Advertised 8:30pm screening.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "grip-terror-southport-20261119",
+          "title": "In the Grip of Terror",
+          "filmYear": 2026,
+          "date": "2026-11-19",
+          "edition": "new",
+          "reach": "limited",
+          "tier": "independent",
+          "distributor": "BHS Picture House / British Horror Studio",
+          "venue": "Southport Bijou Cinema",
+          "sourceUrl": "https://www.bhspicturehouse.com/",
+          "note": "Southport Bijou Cinema. Advertised 7:30pm screening; not a nationwide opening.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "werwulf-gb-20270101",
+          "title": "Werwulf",
+          "filmYear": 2026,
+          "date": "2027-01-01",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Focus Features / Universal",
+          "sourceUrl": "https://www.the-numbers.com/movie/Werwulf-%282026%29",
+          "dateConfidence": "disputed",
+          "note": "The Numbers and Flicks list 1 January 2027 for UK; IMDb lists 25 December 2026. UK date remains disputed: verify distributor and local cinemas. US opening confirmed separately as 25 December 2026.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "exorcist-martyrs-gb-20270312",
+          "title": "The Exorcist: Martyrs",
+          "filmYear": 2027,
+          "date": "2027-03-12",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Universal Pictures UK",
+          "sourceUrl": "https://www.universalpictures.co.uk/movies/unt-mike-flanagan-exorcist-film/",
+          "note": "Universal Pictures UK lists a 12 March 2027 opening under the working title 'Unt. Mike Flanagan Exorcist Film'; widely announced title The Exorcist: Martyrs.",
+          "checkedAt": "2026-10-15"
         }
       ]
     },
@@ -222,6 +350,32 @@
           "distributor": "Bleecker Street / Cinemark",
           "sourceUrl": "https://www.cinemark.com/movies/victorian-psycho",
           "note": "Cinemark's US listing confirms a 13 November theatrical date; check local screening schedules."
+        },
+        {
+          "id": "werwulf-us-20261225",
+          "title": "Werwulf",
+          "filmYear": 2026,
+          "date": "2026-12-25",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Focus Features",
+          "sourceUrl": "https://www.focusfeatures.com/werwulf",
+          "note": "Focus Features' official US theatrical date; do not reuse for UK.",
+          "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "exorcist-martyrs-us-20270312",
+          "title": "The Exorcist: Martyrs",
+          "filmYear": 2027,
+          "date": "2027-03-12",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Universal Pictures US",
+          "sourceUrl": "https://www.universalpictures.com/movies/unt-mike-flanagan-exorcist-film/",
+          "note": "Universal US studio release date under working title 'Unt. Mike Flanagan Exorcist Film'.",
+          "checkedAt": "2026-10-15"
         }
       ]
     },
@@ -309,6 +463,19 @@
           "distributor": "TOHO / Event Cinemas",
           "sourceUrl": "https://www.eventcinemas.com.au/movie/godzilla-minus-zero",
           "note": "Australian Event Cinemas lists 5 November; selected IMAX previews start 3 November."
+        },
+        {
+          "id": "werwulf-au-20270101",
+          "title": "Werwulf",
+          "filmYear": 2026,
+          "date": "2027-01-01",
+          "edition": "new",
+          "reach": "general",
+          "tier": "studio",
+          "distributor": "Focus Features / Universal",
+          "sourceUrl": "https://www.the-numbers.com/movie/Werwulf-%282026%29",
+          "note": "Regional Australia date from The Numbers; check individual cinema bookings.",
+          "checkedAt": "2026-10-15"
         }
       ]
     },
