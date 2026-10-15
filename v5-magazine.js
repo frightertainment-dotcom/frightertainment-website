@@ -40,7 +40,21 @@
  };
  const posterPath=x=>/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(x||'')?x:'';
  const itemId=x=>Number(x?.tmdbId||( /^\d+$/.test(String(x?.id||''))?x.id:0));
- const filmHref=(x,type)=>'/media.html?type='+(type==='tv'?'tv':'movie')+'&id='+itemId(x)+(type==='indie'?'&section=indie':'');
+ // Source-only archive entries link to their verified festival/production record;
+ // they must never link to /media.html?id=0 or be labelled TMDB posters.
+ const indieSource=x=>{
+  if(!x?.indieVerified||typeof x.indieSourceUrl!=='string')return '';
+  try{
+   const u=new URL(x.indieSourceUrl);
+   const hosts=['sundance.org','sxsw.com','fantasiafestival.com','brynchainey.com',
+    'thefilmcatalogue.com','glasseyepix.com','ifccenter.com','bfi.org.uk',
+    'criterion.com','tshaonline.org','catalog.afi.com'];
+   if(u.protocol==='https:'&&!u.username&&!u.password&&hosts.some(h=>u.hostname===h||u.hostname==='www.'+h))return u.href;
+  }catch{}
+  return '';
+ };
+ const filmHref=(x,type)=>type==='indie'&&!itemId(x)&&indieSource(x)
+  ?indieSource(x):'/media.html?type='+(type==='tv'?'tv':'movie')+'&id='+itemId(x)+(type==='indie'?'&section=indie':'');
  const image=(x,type)=>{
   const frame=el('div','fr-v5-poster__art');
   const safe=posterPath(x.posterPath);
@@ -56,9 +70,12 @@
   return frame;
  };
  const poster=(x,type)=>{
+  const external=type==='indie'&&!itemId(x)&&Boolean(indieSource(x));
   const a=link('',filmHref(x,type),'fr-v5-poster');
+  if(external){a.target='_blank';a.rel='noopener noreferrer';}
   const art=image(x,type);
   const foot=link('',filmHref(x,type),'fr-v5-poster__bottom');
+  if(external){foot.target='_blank';foot.rel='noopener noreferrer';}
   foot.append(el('strong','',x.title));
   const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
@@ -68,8 +85,9 @@
   const media=el('div','fr-v5-poster__media');
   media.append(a);
   box.append(media,foot);
-  const source=link('SOURCE',`https://www.themoviedb.org/${type==='tv'?'tv':'movie'}/${itemId(x)}`,'fr-v5-poster__source');
-  source.setAttribute('aria-label','TMDB source for '+x.title);
+  const source=link('SOURCE',external?indieSource(x):
+   `https://www.themoviedb.org/${type==='tv'?'tv':'movie'}/${itemId(x)}`,'fr-v5-poster__source');
+  source.setAttribute('aria-label',(external?'Verified source':'TMDB source')+' for '+x.title);
   source.target='_blank';source.rel='noopener noreferrer';
   media.append(source);
   if(x.ratingKind==='tmdb-community'&&Number.isFinite(x.voteAverage)&&Number.isInteger(x.voteCount)&&x.voteCount>0){
@@ -84,10 +102,11 @@
    play.setAttribute('aria-label','Play official trailer for '+x.title);
    media.append(play);
   }
-  if(type==='movie' || type==='indie'){
+  if((type==='movie' || type==='indie') && itemId(x)){
    const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
    media.append(watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
   }
+  if(external)box.classList.add('fr-v5-poster-card--source-only');
   return box;
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
@@ -325,24 +344,57 @@
    }
    let selections=data.slice(0,count);
    if(config.type==='indie' && selections.length<count){
-    // Supplement recent films with real, editorially verified catalogue
-    // records from earlier film years. Never invent film identities or art.
-    const seen=new Set(selections.map(x=>itemId(x)));
-    const currentYear=new Date().getFullYear();
-    for(const year of [currentYear,currentYear-1,currentYear-2,currentYear-3,currentYear-4]){
-     if(selections.length>=count)break;
-     try{
-      const archive=await fetchList('indie','archive',year);
-      for(const item of archive){
-       const filmId=itemId(item);
-       if(!filmId||seen.has(filmId)||!item.indieVerified)continue;
-       seen.add(filmId);selections.push(item);
-       if(selections.length>=count)break;
-      }
-     }catch{/* Keep all successfully loaded verified posters. */}
-    }
+    // Use the published film-by-film verified indie index, not a chain of
+    // multi-year API calls which may time out, return partial data or leave
+    // a single poster stranded in an otherwise empty row.
+    try{
+     const response=await fetch('/data/indie-archive.json',{headers:{accept:'application/json'}});
+     if(!response.ok)throw Error('Verified Indie archive unavailable');
+     const ledger=await response.json();
+     if(!Array.isArray(ledger.items))throw Error('Invalid Indie archive');
+     const key=x=>String(x.title||'').normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'')+
+      '|'+(x.indieOriginalYear||x.originalYear||String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+     const seen=new Set(selections.map(key));
+     const preferred=['I Saw the TV Glow','In a Violent Nature','Talk to Me','Deadstream',
+      'Relic','Horror in the High Desert','The Babadook','The Witch',
+      'The House of the Devil','Hereditary','The Innkeepers'];
+     const choices=[...ledger.items].filter(x=>typeof x.title==='string' &&
+      Number.isInteger(x.originalYear) && indieSource({...x,indieVerified:true}))
+      .sort((a,b)=>{
+       const ap=preferred.indexOf(a.title),bp=preferred.indexOf(b.title);
+       return (ap<0?1000:ap)-(bp<0?1000:bp)||b.originalYear-a.originalYear;
+      });
+     for(const x of choices){
+      if(selections.length>=count)break;
+      const item={title:x.title,indieOriginalYear:x.originalYear,indieVerified:true,
+       indieSourceUrl:x.indieSourceUrl,indieSourceName:x.indieSourceName,
+       posterPath:null,tmdbId:null};
+      const identity=key(item);
+      if(seen.has(identity))continue;
+      seen.add(identity);selections.push(item);
+     }
+    }catch{/* A missing static index must not imply invented movies. */}
    }
    grid.replaceChildren(...selections.slice(0,count).map(x=>poster(x,config.type)));
+   // Upgrade editorial title-art to verified TMDB posters if independently
+   // matched historical listings become available. The rows remain fixed.
+   if(config.type==='indie' && selections.some(x=>!itemId(x))){
+    Promise.allSettled([2025,2024,2023,2022].map(year=>fetchList('indie','archive',year)))
+     .then(results=>{
+      if(!grid.isConnected)return;
+      const normal=x=>String(x?.title||'').normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'');
+      const candidates=results.flatMap(r=>r.status==='fulfilled'?r.value:[])
+       .filter(x=>valid(x)&&x.indieVerified&&posterPath(x.posterPath));
+      selections.forEach((original,index)=>{
+       if(itemId(original))return;
+       const matched=candidates.find(x=>normal(x)===normal(original) &&
+        Number(x.indieOriginalYear)===Number(original.indieOriginalYear));
+       if(matched&&grid.children[index]){
+        grid.children[index].replaceWith(poster(matched,'indie'));
+       }
+      });
+     }).catch(()=>{});
+   }
   }catch{
    mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');
    await showCuratedFallback(p,config.type);
