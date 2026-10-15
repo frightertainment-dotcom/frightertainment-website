@@ -3,7 +3,7 @@
 // does NOT automatically qualify a franchise film.  Only source-checked titles enter
 // this collection; expand it through documented editorial reviews.
 // Original feature / festival year is separate from later regional theatrical dates.
-export const INDIE_REVIEW_DATE = '2026-10-14';
+export const INDIE_REVIEW_DATE = '2026-10-15';
 const sources = Object.freeze({
   s26:'https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/',
   s25:'https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/',
@@ -19,7 +19,23 @@ const sources = Object.freeze({
   desert:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert',
   desert2:'https://www.thefilmcatalogue.com/films/horror-in-the-high-desert-2-minerva',
   glass:'https://glasseyepix.com/projects/chronological/',
-  habit:'https://www.ifccenter.com/films/habit-2/'
+  habit:'https://www.ifccenter.com/films/habit-2/',
+  // Production histories / curated historical film records, not poster licences.
+  criterionSouls:'https://www.criterion.com/films/607-carnival-of-souls',
+  criterionLiving:'https://www.criterion.com/films/29331-night-of-the-living-dead',
+  texas:'https://www.tshaonline.org/handbook/entries/the-texas-chain-saw-massacre-1974',
+  criterionEraser:'https://www.criterion.com/films/28382-eraserhead',
+  bfiEvil:'https://www.bfi.org.uk/features/where-begin-with-sam-raimi',
+  bfiBasket:'https://www.bfi.org.uk/lists/10-great-films-about-brothers',
+  bfiDIY:'https://www.bfi.org.uk/lists/10-great-films-with-diy-special-effects',
+  bfiBroadcast:'https://www.bfi.org.uk/film/5241124d-a426-5fd7-95c6-18dddf32469c/the-last-broadcast',
+  bfiGinger:'https://www.bfi.org.uk/film/eda9a40a-508c-5dcb-9f0b-27883b2be2f9/ginger-snaps',
+  bfiSession:'https://www.bfi.org.uk/film/c5cfb9ab-7b49-56fb-9032-c1ba549dc641/session-9',
+  bfiDescent:'https://www.bfi.org.uk/film/be5b05dd-16a6-5175-bdf9-7f04bf3b1a62/the-descent',
+  bfiHaute:'https://www.bfi.org.uk/features/where-begin-with-alexandre-aja',
+  bfiDiary:'https://www.bfi.org.uk/film/9c9338a0-ec55-58e5-8bdb-be4cf12cc772/george-a-romeros-diary-of-the-dead',
+  bfiHost:'https://www.bfi.org.uk/film/118e678a-5a29-5b2b-8c71-4f4ded6c2b26/host',
+  bfiSkin:'https://www.bfi.org.uk/lists/10-great-horror-films-decade-so-far'
 });
 const records = [
   ['Buddy',2026,'s26',1514026],
@@ -68,10 +84,54 @@ const records = [
   ['The Witch',2015,'classic'],
   ['The Babadook',2014,'s14'],
   ['A Girl Walks Home Alone at Night',2014,'s14'],
-  ['What We Do in the Shadows',2014,'s14']
+  ['What We Do in the Shadows',2014,'s14'],
+  ["Carnival of Souls",1962,'criterionSouls'],
+  ["Night of the Living Dead",1968,'criterionLiving'],
+  ["The Texas Chain Saw Massacre",1974,'texas'],
+  ["Eraserhead",1977,'criterionEraser'],
+  ["Halloween",1978,'classic'],
+  ["The Evil Dead",1981,'bfiEvil'],
+  ["Basket Case",1982,'bfiBasket'],
+  ["Bad Taste",1987,'bfiDIY'],
+  ["Braindead",1992,'bfiDIY'],
+  ["Cube",1997,'classic'],
+  ["The Last Broadcast",1998,'bfiBroadcast'],
+  ["The Blair Witch Project",1999,'classic'],
+  ["Ginger Snaps",2000,'bfiGinger'],
+  ["Psycho Beach Party",2000,'classic'],
+  ["Session 9",2001,'bfiSession'],
+  ["May",2002,'classic'],
+  ["High Tension",2003,'bfiHaute'],
+  ["Saw",2004,'classic'],
+  ["The Descent",2005,'bfiDescent'],
+  ["Fido",2006,'classic'],
+  ["Diary of the Dead",2007,'bfiDiary'],
+  ["Frozen",2010,'classic'],
+  ["Tucker and Dale vs Evil",2010,'classic'],
+  ["Black Rock",2012,'classic'],
+  ["It Follows",2014,'classic'],
+  ["The Greasy Strangler",2016,'classic'],
+  ["Under the Shadow",2016,'classic'],
+  ["XX",2017,'classic'],
+  ["Little Monsters",2019,'classic'],
+  ["The Lodge",2019,'classic'],
+  ["Sweetheart",2019,'classic'],
+  ["Bad Hair",2020,'classic'],
+  ["His House",2020,'classic'],
+  ["Host",2020,'bfiHost'],
+  ["Skinamarink",2022,'bfiSkin']
 ];
-export const VERIFIED_INDIE_FILMS = Object.freeze(records.map(([title, year, key, tmdbId]) =>
-  Object.freeze({title,year,sourceName:key==='sx22'?'SXSW':key==='fantasia25'?'Fantasia':key==='rabbit'?'Filmmaker':key.startsWith('desert')?'Indie Rights':key==='glass'?'Glass Eye Pix':key==='habit'?'IFC Center':'Sundance',
+const sourceNames = Object.freeze({
+  criterionSouls:'Criterion Collection',criterionLiving:'Criterion Collection',
+  criterionEraser:'Criterion Collection',texas:'Texas State Historical Association',
+  bfiEvil:'BFI',bfiBasket:'BFI',bfiDIY:'BFI',bfiBroadcast:'BFI',
+  bfiGinger:'BFI',bfiSession:'BFI',bfiDescent:'BFI',bfiHaute:'BFI',
+  bfiDiary:'BFI',bfiHost:'BFI',bfiSkin:'BFI'
+});
+export const VERIFIED_INDIE_FILMS = Object.freeze(records
+  .sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))
+  .map(([title, year, key, tmdbId]) =>
+  Object.freeze({title,year,sourceName:sourceNames[key] || (key==='sx22'?'SXSW':key==='fantasia25'?'Fantasia':key==='rabbit'?'Filmmaker':key.startsWith('desert')?'Indie Rights':key==='glass'?'Glass Eye Pix':key==='habit'?'IFC Center':'Sundance'),
     sourceUrl:sources[key],...Number.isInteger(tmdbId)?{tmdbId}:{}})));
 export const INDIE_YEARS = Object.freeze([...new Set(VERIFIED_INDIE_FILMS.map(x=>x.year))].sort((a,b)=>b-a));
 export const INDIE_EDITORIAL_POLICY =
