@@ -206,6 +206,11 @@ async function indieFilmFromSource(env, record, country) {
 // reuse without requiring a new database, external cache service or added secrets.
 const indieLookupCache = new Map();
 function indieFilmCached(env, record, country) {
+  // The historical archive remains usable without commercial TMDB access.
+  // Source-only entries never claim a TMDB poster, date, trailer or rating.
+  if (env.TMDB_NONCOMMERCIAL_USE_APPROVED !== 'true' ||
+      env.TMDB_ATTRIBUTION_READY !== 'true' || !env.TMDB_READ_ACCESS_TOKEN)
+    return Promise.resolve(sourcedIndieFallback(record));
   const key = country+'|'+record.year+'|'+record.title;
   const cached = indieLookupCache.get(key);
   if (cached && cached.expires > Date.now()) return cached.promise;
@@ -216,12 +221,14 @@ function indieFilmCached(env, record, country) {
 }
 async function fetchVerifiedIndieCatalogue(env, options) {
   const mode = options.mode === 'chart' ? 'top' : options.mode;
-  const year = Number(options.year) || new Date().getUTCFullYear();
+  const year = options.year === null ? null : Number(options.year) || new Date().getUTCFullYear();
   const page = Math.max(1,Number(options.page)||1);
   const query = normalizeTitle(options.query || '');
   let records;
   if (mode === 'top' || mode === 'archive') {
-    records = VERIFIED_INDIE_FILMS.filter(item => item.year === year &&
+    records = VERIFIED_INDIE_FILMS.filter(item =>
+      (year === null || item.year === year) &&
+      (!Number.isInteger(options.decade) || (item.year >= options.decade && item.year < options.decade + 10)) &&
       (!query || normalizeTitle(item.title).includes(query)));
   } else if (mode === 'upcoming') {
     // A festival premiere from months ago is NOT evidence of an upcoming opening.
@@ -259,7 +266,8 @@ async function fetchVerifiedIndieCatalogue(env, options) {
   return {items,page,totalPages,nextPage:page<totalPages?page+1:null,screeningComplete:true,
     totalResults:count,filteredResults:items.length,countIsCandidateTotal:true,
     firstYear:Math.min(...INDIE_YEARS),availableYears:INDIE_YEARS,
-    year,type:'indie',mode:options.mode,ratingKind:'tmdb-community',
+    year,decade:Number.isInteger(options.decade)?options.decade:null,
+    type:'indie',mode:options.mode,ratingKind:'tmdb-community',
     minimumVotes:mode==='top'?50:null,classification:'source-checked-independent-films',
     methodology:INDIE_EDITORIAL_POLICY,
     sourceReviewedAt:INDIE_REVIEW_DATE,screeningLimit:count};
