@@ -102,7 +102,9 @@ test('indie rejects unverified studio and franchise listings in both catalogue a
   await navigateLegacy(page,'/indie-movies.html');
   await expect(page.locator('#chart .fr-media-card')).toHaveCount(1);
   await expect(page.locator('#chart .fr-media-card h3')).toHaveText('Deadstream');
-  await expect(page.locator('.fr-v5-rack .fr-v5-poster-card')).toHaveCount(1);
+  // Premium rack intentionally fills the sourced 12-film indie shelf; it is not a
+  // mirror of the API's one-item chart fixture.
+  await expect(page.locator('.fr-v5-rack .fr-v5-poster-card')).toHaveCount(12);
   await expect(page.locator('main')).not.toContainText('Insidious: Chapter 2');
   await expect(page.locator('main')).not.toContainText('Halloween');
 });

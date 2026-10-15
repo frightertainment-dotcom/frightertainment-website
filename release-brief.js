@@ -19,37 +19,50 @@
   const now=new Date().toISOString().slice(0,10);
   const daysAgo=iso=>(Date.parse(now+'T00:00:00Z')-Date.parse(iso+'T00:00:00Z'))/86400000;
   const fmt=iso=>new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',day:'numeric',month:'short'}).format(new Date(iso+'T12:00:00Z'));
+  const realDate=iso=>/^20\d{2}-\d{2}-\d{2}$/.test(iso||'')&&
+    !Number.isNaN(Date.parse(iso+'T00:00:00Z'))&&
+    new Date(iso+'T00:00:00Z').toISOString().slice(0,10)===iso;
   const make=(name,cls,txt)=>{const el=document.createElement(name);if(cls)el.className=cls;if(txt!==undefined)el.textContent=txt;return el;};
   const modes=[
     {id:'streaming',text:'NEW ON STREAMING'},
-    {id:'cinema',text:'IN CINEMAS'},
+    {id:'cinema',text:'UK CINEMA DATES'},
     {id:'vod',text:'BUY OR RENT'},
     {id:'coming',text:'COMING NEXT'}
   ];
   const valid=x=>x && ['cinema','streaming','vod'].includes(x.category) &&
     typeof x.title==='string' && x.title.length>1 && x.title.length<180 &&
-    x.country==='GB' && /^20\d{2}-\d{2}-\d{2}$/.test(x.date||'') &&
-    /^20\d{2}-\d{2}-\d{2}$/.test(x.checkedAt||'') &&
+    x.country==='GB' && realDate(x.date) && realDate(x.checkedAt) &&
     /^https:\/\//.test(x.sourceUrl||'');
   const summarise=(items,mode)=>{
-    if(mode==='coming')return items.filter(x=>x.category==='streaming'&&x.date>now && daysAgo(x.date)>=-30)
-      .sort((a,b)=>a.date.localeCompare(b.date));
+    if(mode==='coming')return items.filter(x=>['cinema','streaming'].includes(x.category)&&
+      x.date>now&&daysAgo(x.date)>=-365).sort((a,b)=>a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
     if(mode==='streaming')return items.filter(x=>x.category==='streaming'&&x.date<=now&&daysAgo(x.date)<=28)
       .sort((a,b)=>b.date.localeCompare(a.date)||a.title.localeCompare(b.title));
+    if(mode==='cinema'){
+      const dates=items.filter(x=>x.category==='cinema');
+      const coming=dates.filter(x=>x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
+      const recent=dates.filter(x=>x.date<now&&daysAgo(x.date)<=14).sort((a,b)=>b.date.localeCompare(a.date));
+      return [...coming,...recent];
+    }
     return items.filter(x=>x.category===mode&&x.date<=now&&daysAgo(x.checkedAt)<=14)
       .sort((a,b)=>b.checkedAt.localeCompare(a.checkedAt));
   };
   const detailMessage=(item,mode)=>{
+    if(item.category==='cinema'){
+      const kind=item.edition==='re-release'?'re-screening':'cinema release';
+      const note=item.dateConfidence==='disputed'?' · DATE CONFLICT — CHECK CINEMA':'';
+      return 'UK '+kind+' '+fmt(item.date)+(item.venue?' · '+item.venue:'')+note;
+    }
     if(mode==='streaming')return 'Added '+fmt(item.date)+' · '+item.service+' UK';
     if(mode==='coming')return 'Announced for '+fmt(item.date)+' · '+item.service+' UK';
     return item.dateIsSourceCheck ? item.service+' · source checked '+fmt(item.checkedAt) :
       item.service+' · release '+fmt(item.date);
   };
-  function paint(root,items,checked){
+  function paint(root,items,checks){
     const selected={value:root.dataset.releaseMode==='cinema'?'cinema':'streaming'};
     const head=make('div','release-brief__head');
     head.append(make('div','release-brief__heading','THE HORROR DROP'));
-    const asof=make('span','release-brief__checked','UK · '+(checked?'checked '+fmt(checked):'edition unavailable'));
+    const asof=make('span','release-brief__checked','UK · source dates vary');
     head.append(asof);
     const tabs=make('div','release-brief__tabs');tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Filter verified horror releases');
     const content=make('div','release-brief__items');content.setAttribute('aria-live','polite');
@@ -64,6 +77,8 @@
     function render(){
       for(const btn of buttons){const active=btn.dataset.mode===selected.value;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
       const rows=summarise(items,selected.value).slice(0,4);
+      const checked=selected.value==='cinema'?checks.cinema:checks.bulletin;
+      asof.textContent='UK · '+(checked?'latest source review '+fmt(checked):'edition unavailable');
       content.replaceChildren();
       for(const item of rows){
         const row=make('article','release-brief__item');row.dataset.mediaType='movie';row.dataset.mediaTitle=item.title;if(Number.isInteger(item.year))row.dataset.mediaYear=String(item.year);if(Number.isInteger(item.tmdbId)&&item.tmdbId>0)row.dataset.tmdbId=String(item.tmdbId);
@@ -84,18 +99,31 @@
       const stale=checked&&daysAgo(checked)>14;
       note.textContent=stale?
         'Last verified '+checked+'. New arrivals are awaiting the next editorial check.':
-        selected.value==='cinema'?'Source-linked UK cinema announcements · verify local showtimes before travelling.':
+        selected.value==='cinema'?'Source-linked UK cinema dates, not proof of current showtimes · check venue before travelling.':
         'Source-linked announcements · streaming catalogues may change · check the provider before watching.';
     }
     root.replaceChildren(head,tabs,content,note);render();
   }
-  fetch('/data/editorial-releases.json',{headers:{accept:'application/json'}})
-    .then(async r=>r.ok?await r.json():null)
-    .then(data=>{
+  // Cinema uses the same reviewed country ledger as /cinema.html.
+  // Independent fetches allow the streaming bulletin to survive a cinema-data outage.
+  const load=path=>fetch(path,{headers:{accept:'application/json'}}).then(r=>r.ok?r.json():null).catch(()=>null);
+  Promise.all([load('/data/editorial-releases.json'),load('/data/cinema-screenings.json')])
+    .then(([data,diary])=>{
       const items=Array.isArray(data?.items)?data.items.filter(valid):[];
-      const checked=typeof data?.updatedAt==='string'?data.updatedAt.slice(0,10):null;
-      for(const root of panels)paint(root,items,checked);
-    }).catch(()=>{
-      for(const root of panels)paint(root,[],null);
+      const country=diary?.schemaVersion===2?diary.territories?.GB:null;
+      for(const entry of country?.screenings||[]){
+        const event={id:entry.id,category:'cinema',title:entry.title,year:entry.filmYear,country:'GB',
+          service:'UK cinemas',date:entry.date,sourceName:'UK verified screening source',
+          sourceUrl:entry.sourceUrl,checkedAt:entry.checkedAt||diary.checkedAt,
+          edition:entry.edition,dateConfidence:entry.dateConfidence,venue:entry.venue};
+        if(valid(event)&&!items.some(x=>x.category==='cinema'&&x.date===event.date&&x.title===event.title))
+          items.push(event);
+      }
+      const checks={bulletin:realDate(data?.updatedAt?.slice(0,10))?data.updatedAt.slice(0,10):null,
+        cinema:realDate(diary?.checkedAt)?diary.checkedAt:null};
+      for(const root of panels)paint(root,items,checks);
+    })
+    .catch(()=>{
+      for(const root of panels)paint(root,[],{bulletin:null,cinema:null});
     });
 })();

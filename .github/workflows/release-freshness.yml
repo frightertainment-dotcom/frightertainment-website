@@ -1,0 +1,47 @@
+name: Frightertainment release data freshness
+
+on:
+  schedule:
+    - cron: '30 7 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'data/cinema-screenings.json'
+      - 'data/editorial-releases.json'
+      - 'cinema-diary.js'
+      - 'release-brief.js'
+      - 'scripts/audit-release-freshness.mjs'
+      - '.github/workflows/release-freshness.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  editorial-freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Audit territory dates and source freshness
+        id: audit
+        continue-on-error: true
+        run: node scripts/audit-release-freshness.mjs --strict
+      - name: Open editorial issue if daily audit failed
+        if: steps.audit.outcome == 'failure' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Release-data freshness requires editorial review"
+          existing="$(gh issue list --state open --json number,title --jq '.[] | select(.title == "Release-data freshness requires editorial review") | .number' | head -n 1)"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Daily source review is still overdue or inconsistent. Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          else
+            gh issue create --title "$title" --body "The daily read-only audit found outdated/inconsistent horror releases. Verify primary sources before updating published data. Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          fi
+      - name: Fail job on invalid/stale data
+        if: steps.audit.outcome == 'failure'
+        run: exit 1

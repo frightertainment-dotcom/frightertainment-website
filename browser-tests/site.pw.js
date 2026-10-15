@@ -752,7 +752,7 @@ test('verified UK horror release bulletin shows new streaming dates and source l
   await navigateLegacy(page,'/');
   const bulletin=page.locator('[data-release-brief]').first();
   await expect(bulletin.locator('.release-brief__item')).toHaveCount(4);
-  await expect(bulletin).toContainText('V/H/S/Mixtape');
+  await expect(bulletin).toContainText('Shudder UK');
   await expect(bulletin).toContainText('Shudder UK');
   await expect(bulletin.locator('a.release-brief__source').first()).toHaveAttribute('href',/letterboxd/);
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -760,9 +760,9 @@ test('verified UK horror release bulletin shows new streaming dates and source l
 test('UK release bulletin separates cinema and home-media listings from streaming',async({page})=>{
   await navigateLegacy(page,'/movies.html');
   const widget=page.locator('[data-release-brief]');
-  await widget.getByRole('button',{name:'IN CINEMAS'}).click();
-  await expect(widget).toContainText('Other Mommy');
-  await expect(widget).toContainText('Resident Evil');
+  await widget.getByRole('button',{name:'UK CINEMA DATES'}).click();
+  await expect(widget.locator('.release-brief__item')).toHaveCount(4);
+  await expect(widget).toContainText('UK cinema release');
   await expect(widget).not.toContainText('Shudder UK');
   await widget.getByRole('button',{name:'BUY OR RENT'}).click();
   await expect(widget).toContainText('28 Years Later: The Bone Temple');

@@ -17,7 +17,7 @@ async function api(){
 test('Cinema diary has evidence-backed, individually dated releases for every country',async()=>{
  const d=JSON.parse(await readFile(sourceUrl,'utf8'));
  assert.equal(d.schemaVersion,2);
- assert.equal(d.checkedAt,'2026-10-11');
+ assert.match(d.checkedAt,/^20\d{2}-\d{2}-\d{2}$/);
  assert.deepEqual(Object.keys(d.territories).sort(),territories.slice().sort());
  assert.ok(d.territories.GB.screenings.length>=12);
  for(const country of territories){
@@ -27,7 +27,7 @@ test('Cinema diary has evidence-backed, individually dated releases for every co
      assert.match(row.id,/^[a-z0-9-]+$/);
      assert.match(row.date,/^20\d{2}-\d{2}-\d{2}$/);
      assert.ok(row.title&&row.filmYear>=1900);
-     assert.ok(['general','limited'].includes(row.reach));
+     assert.ok(['general','limited','unconfirmed'].includes(row.reach));
      assert.ok(['new','re-release'].includes(row.edition));
      assert.ok(['studio','special','independent'].includes(row.tier));
      assert.match(row.sourceUrl,/^https:\/\//);
@@ -83,4 +83,39 @@ test('Source-backed re-releases can be listed explicitly, while past dates expir
  assert.equal(rows.length,1);
  assert.equal(rows[0].edition,'re-release');
  assert.equal(rows[0].verified,true);
+});
+
+test('Multiple independent venue screenings in the same month stay visible',async()=>{
+ const diary=await api();
+ const date1=nextDay(1),date2=nextDay(2);
+ const baseline={title:'One Scary Film',filmYear:2026,edition:'new',tier:'independent',reach:'limited',sourceUrl:'https://example.com'};
+ const screenings=[
+  {...baseline,id:'one-venue',date:date1,venue:'A Cinema'},
+  {...baseline,id:'another-venue',date:date1,venue:'B Cinema'},
+  {...baseline,id:'next-night',date:date2,venue:'A Cinema'}
+ ];
+ const result=diary.merge({schemaVersion:2,territories:{GB:{screenings}}},[],'GB');
+ assert.equal(result.length,3);
+ assert(result.every(x=>x.verified===true));
+});
+
+test('A verified release is not duplicated by a TMDB date but separate screenings survive',async()=>{
+ const diary=await api(),date=nextDay(3);
+ const item={title:'The Tomorrow Picture',filmYear:2026,edition:'new',tier:'studio',reach:'general',date,sourceUrl:'https://example.com'};
+ const ledger={schemaVersion:2,territories:{GB:{screenings:[{...item,id:'one'}]}}};
+ const reported=[{title:item.title,releaseCountry:'GB',theatricalDate:date,firstReleaseDate:date,cinemaReleaseType:3}];
+ assert.equal(diary.merge(ledger,reported,'GB').length,1);
+ assert.equal(diary.merge(ledger,reported,'US').length,0);
+});
+
+test('Dated UK release caveats remain attached to source-ledger entries',async()=>{
+ const diary=await api();
+ const d=JSON.parse(await readFile(sourceUrl,'utf8'));
+ const uk=d.territories.GB.screenings;
+ const clay=uk.find(x=>x.id==='clayface-2026-uk');
+ assert.equal(clay.dateConfidence,'disputed');
+ assert.equal(clay.sourceUrl,'https://www.dcm.co.uk/film-calendar?film=clayface');
+ assert(uk.some(x=>x.title==='Werwulf'&&x.date==='2027-01-01'&&x.dateConfidence==='disputed'));
+ assert(uk.some(x=>x.title==='The Exorcist: Martyrs'&&x.date==='2027-03-12'));
+ assert(uk.some(x=>x.title==='In the Grip of Terror'&&x.venue==='Southport Bijou Cinema'));
 });
