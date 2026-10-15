@@ -339,7 +339,7 @@
     const response=await fetch('/data/indie-archive.json',{headers:{accept:'application/json'}});
     if(!response.ok)throw Error('Verified indie index unavailable');
     const index=await response.json();
-    const years=[1962,1974,1981,1999,2005,2022];
+    const years=[1922,1932,1958,1962,1974,1999,2022];
     const records=years.map(year=>index.items?.find(x=>x.originalYear===year)).filter(x=>
       x&&typeof x.title==='string'&&/^https:\/\//.test(x.indieSourceUrl||''));
     if(!records.length){shelf.remove();return;}
