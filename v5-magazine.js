@@ -607,7 +607,13 @@
     main.append(details);
     const reveal=()=>{
      const hash=location.hash.slice(1);
-     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){details.open=true;}
+     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){
+      details.open=true;
+      // Follow first-party decade links into the open archive.
+      if(theme==='indie' && hash==='archive' && new URL(location.href).searchParams.has('archiveYear')){
+       requestAnimationFrame(()=>details.querySelector('#archive')?.scrollIntoView({block:'start'}));
+      }
+     }
     };
     window.addEventListener('hashchange',reveal);
     document.addEventListener('click',event=>{
