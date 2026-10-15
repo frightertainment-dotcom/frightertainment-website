@@ -24,7 +24,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  await expect(page.locator('.fr-v5-front .fr-v5-rack')).toBeVisible();
  await expect(page.locator('.fr-v5-front .fr-v5-announced')).toBeVisible();
  await expect(page.locator('.fr-v5-front .fr-v5-trailer')).toBeVisible();
- await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(6);
+ await expect(page.locator('.fr-v5-rack .fr-v5-poster')).toHaveCount(12);
  await expect(page.locator('.fr-v5-mobile-dock')).toBeVisible();
  await expect(page.locator('.hub-page-wordmark[src="/assets/page-title-indie-movies.png"]')).toBeVisible();
  await expect(page.locator('.hub-brand img[src="/assets/frightertainment-brand.png"]')).toBeVisible();
