@@ -35,7 +35,8 @@ const sources = Object.freeze({
   bfiHaute:'https://www.bfi.org.uk/features/where-begin-with-alexandre-aja',
   bfiDiary:'https://www.bfi.org.uk/film/9c9338a0-ec55-58e5-8bdb-be4cf12cc772/george-a-romeros-diary-of-the-dead',
   bfiHost:'https://www.bfi.org.uk/film/118e678a-5a29-5b2b-8c71-4f4ded6c2b26/host',
-  bfiSkin:'https://www.bfi.org.uk/lists/10-great-horror-films-decade-so-far'
+  bfiSkin:'https://www.bfi.org.uk/lists/10-great-horror-films-decade-so-far',
+  bfiShout:'https://www.bfi.org.uk/film/c52089c5-0918-57f5-9ae8-664bc72c3709/the-shout'
 });
 const records = [
   ['Buddy',2026,'s26',1514026],
@@ -89,7 +90,7 @@ const records = [
   ["Night of the Living Dead",1968,'criterionLiving'],
   ["The Texas Chain Saw Massacre",1974,'texas'],
   ["Eraserhead",1977,'criterionEraser'],
-  ["Halloween",1978,'classic'],
+  ["The Shout",1978,'bfiShout'],
   ["The Evil Dead",1981,'bfiEvil'],
   ["Basket Case",1982,'bfiBasket'],
   ["Bad Taste",1987,'bfiDIY'],
@@ -126,7 +127,7 @@ const sourceNames = Object.freeze({
   criterionEraser:'Criterion Collection',texas:'Texas State Historical Association',
   bfiEvil:'BFI',bfiBasket:'BFI',bfiDIY:'BFI',bfiBroadcast:'BFI',
   bfiGinger:'BFI',bfiSession:'BFI',bfiDescent:'BFI',bfiHaute:'BFI',
-  bfiDiary:'BFI',bfiHost:'BFI',bfiSkin:'BFI'
+  bfiDiary:'BFI',bfiHost:'BFI',bfiSkin:'BFI',bfiShout:'BFI'
 });
 export const VERIFIED_INDIE_FILMS = Object.freeze(records
   .sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))
