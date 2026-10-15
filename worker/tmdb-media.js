@@ -247,7 +247,7 @@ async function fetchVerifiedIndieCatalogue(env, options) {
   const resolved = await mapBounded(chunk, async record => {
     // Festival records remain discoverable even if TMDB is missing a match.
     // Such source-only items have no invented poster, trailer, date or rating.
-    try { const verdict = await indieFilmCached(env,record,options.country || 'GB'); return verdict === false ? null : verdict || sourcedIndieFallback(record); }
+    try { const verdict = options.sourceOnly ? sourcedIndieFallback(record) : await indieFilmCached(env,record,options.country || 'GB'); return verdict === false ? null : verdict || sourcedIndieFallback(record); }
     catch { return sourcedIndieFallback(record); }
   });
   const now = today();
