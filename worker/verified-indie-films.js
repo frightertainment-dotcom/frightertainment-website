@@ -3,6 +3,8 @@
 // does NOT automatically qualify a franchise film.  Only source-checked titles enter
 // this collection; expand it through documented editorial reviews.
 // Original feature / festival year is separate from later regional theatrical dates.
+// For pre-studio-era horror, historical independent production means a documented
+// original small/private production company, not a claim of modern festival status.
 export const INDIE_REVIEW_DATE = '2026-10-15';
 const sources = Object.freeze({
   s26:'https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/',
@@ -36,7 +38,11 @@ const sources = Object.freeze({
   bfiDiary:'https://www.bfi.org.uk/film/9c9338a0-ec55-58e5-8bdb-be4cf12cc772/george-a-romeros-diary-of-the-dead',
   bfiHost:'https://www.bfi.org.uk/film/118e678a-5a29-5b2b-8c71-4f4ded6c2b26/host',
   bfiSkin:'https://www.bfi.org.uk/lists/10-great-horror-films-decade-so-far',
-  bfiShout:'https://www.bfi.org.uk/film/c52089c5-0918-57f5-9ae8-664bc72c3709/the-shout'
+  bfiShout:'https://www.bfi.org.uk/film/c52089c5-0918-57f5-9ae8-664bc72c3709/the-shout',
+  bfiNosferatu:'https://www.bfi.org.uk/resources-events-teachers/resources-teachers/gothic-classroom/film-2-nosferatu-1922',
+  afiZombie:'https://catalog.afi.com/Film/7222-WHITE-ZOMBIE',
+  criterionVampyr:'https://www.criterion.com/films/661-vampyr',
+  bfiBlob:'https://www.bfi.org.uk/film/cd638744-5241-5f02-b5cc-9c59afd51f12/the-blob'
 });
 const records = [
   ['Buddy',2026,'s26',1514026],
@@ -86,6 +92,10 @@ const records = [
   ['The Babadook',2014,'s14'],
   ['A Girl Walks Home Alone at Night',2014,'s14'],
   ['What We Do in the Shadows',2014,'s14'],
+  ["Nosferatu",1922,'bfiNosferatu'],
+  ["White Zombie",1932,'afiZombie'],
+  ["Vampyr",1932,'criterionVampyr'],
+  ["The Blob",1958,'bfiBlob'],
   ["Carnival of Souls",1962,'criterionSouls'],
   ["Night of the Living Dead",1968,'criterionLiving'],
   ["The Texas Chain Saw Massacre",1974,'texas'],
@@ -127,7 +137,8 @@ const sourceNames = Object.freeze({
   criterionEraser:'Criterion Collection',texas:'Texas State Historical Association',
   bfiEvil:'BFI',bfiBasket:'BFI',bfiDIY:'BFI',bfiBroadcast:'BFI',
   bfiGinger:'BFI',bfiSession:'BFI',bfiDescent:'BFI',bfiHaute:'BFI',
-  bfiDiary:'BFI',bfiHost:'BFI',bfiSkin:'BFI',bfiShout:'BFI'
+  bfiDiary:'BFI',bfiHost:'BFI',bfiSkin:'BFI',bfiShout:'BFI',
+  bfiNosferatu:'BFI',afiZombie:'AFI Catalog',criterionVampyr:'Criterion Collection',bfiBlob:'BFI'
 });
 export const VERIFIED_INDIE_FILMS = Object.freeze(records
   .sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))
