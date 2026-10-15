@@ -82,7 +82,7 @@ test('Indie mobile fills empty poster rows with actual verified film-source entr
   const cards=[...node.querySelectorAll('.fr-v5-poster-card')];
   const boxes=cards.slice(0,3).map(x=>x.getBoundingClientRect());
   return {
-   gridColumns:getComputedStyle(node).gridTemplateColumns.trim().split(/\\s+/).length,
+   gridColumns:getComputedStyle(node).gridTemplateColumns.trim().split(/\s+/).length,
    widths:boxes.map(x=>x.width),
    rowGap:boxes[2].top-boxes[0].bottom,
    horizontalOverflow:document.documentElement.scrollWidth-innerWidth
