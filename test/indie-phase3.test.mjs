@@ -13,8 +13,8 @@ test('published fallback and source-reviewed registry stay in agreement', () => 
   assert.equal(staticIndex.schemaVersion,1);
   assert.equal(staticIndex.items.length,VERIFIED_INDIE_FILMS.length);
   assert.deepEqual(staticIndex.availableYears,INDIE_YEARS);
-  assert.equal(VERIFIED_INDIE_FILMS.length,82);
-  assert.equal(INDIE_YEARS.at(-1),1962);
+  assert.equal(VERIFIED_INDIE_FILMS.length,86);
+  assert.equal(INDIE_YEARS.at(-1),1922);
   assert.equal(INDIE_YEARS[0],2026);
   assert.ok(staticIndex.items.every((film,index) => film.title===VERIFIED_INDIE_FILMS[index].title &&
     film.originalYear===VERIFIED_INDIE_FILMS[index].year &&
@@ -25,7 +25,7 @@ test('published fallback and source-reviewed registry stay in agreement', () => 
 
 test('all-year indie archive paginates, with no invented poster or viewer ratings',async()=>{
   const result=await query(null);
-  assert.equal(result.totalResults,82);
+  assert.equal(result.totalResults,86);
   assert.equal(result.items.length,9);
   assert.equal(result.nextPage,2);
   assert.equal(result.totalPages,10);
@@ -40,10 +40,16 @@ test('historical original years, decades and cross-year search work', async()=>{
     query(null,{query:'Blair'}),query(2020),query(1962)
   ]);
   assert.deepEqual(sixties.items.map(x=>x.title).sort(),['Carnival of Souls','Night of the Living Dead']);
+  const [twenties,thirties,fifties] = await Promise.all([
+    query(null,{decade:1920}),query(null,{decade:1930}),query(null,{decade:1950})
+  ]);
+  assert.deepEqual(twenties.items.map(x=>x.title),['Nosferatu']);
+  assert.deepEqual(thirties.items.map(x=>x.title).sort(),['Vampyr','White Zombie']);
+  assert.deepEqual(fifties.items.map(x=>x.title),['The Blob']);
   assert.equal(seventies.totalResults,3);
   assert.deepEqual(blair.items.map(x=>x.title),['The Blair Witch Project']);
   assert.ok(twentyTwenty.items.some(x=>x.title==='Host'));
-  assert.equal(firstFilm.items[0].indieOriginalYear,1962);
+  assert.equal(firstFilm.items[0].indieOriginalYear,1922);
 });
 
 test('source-only mode refuses to fabricate annual ratings or upcoming premieres',async()=>{
