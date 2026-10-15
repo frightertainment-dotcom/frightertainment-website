@@ -37,7 +37,7 @@ test('all-year indie archive paginates, with no invented poster or viewer rating
 test('historical original years, decades and cross-year search work', async()=>{
   const [sixties,seventies,blair,twentyTwenty,firstFilm]=await Promise.all([
     query(null,{decade:1960}),query(null,{decade:1970}),
-    query(null,{query:'Blair'}),query(2020),query(1962)
+    query(null,{query:'Blair'}),query(2020),query(1922)
   ]);
   assert.deepEqual(sixties.items.map(x=>x.title).sort(),['Carnival of Souls','Night of the Living Dead']);
   const [twenties,thirties,fifties] = await Promise.all([
