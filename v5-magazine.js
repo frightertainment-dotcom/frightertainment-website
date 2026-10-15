@@ -92,10 +92,11 @@
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
  const catalogueRequests=new Map();
- const fetchList=(type,mode)=>{
-  const key=type+':'+mode;
+ const fetchList=(type,mode,year=null)=>{
+  const key=type+':'+mode+':'+(year??'current');
   if(catalogueRequests.has(key))return catalogueRequests.get(key);
   const query=new URLSearchParams({type,mode,page:'1'});if(mode==='cinema')query.set('country','GB');
+  if(year!==null)query.set('year',String(year));
   const url='/api/catalogue?'+query;
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),10000);
@@ -305,7 +306,7 @@
   grid.setAttribute('aria-live','polite');
   // Image-sized reserved slots keep the exact final shelf geometry. Do not
   // switch a visible editorial layout into a differently sized poster grid.
-  const count=config.type==='indie'?6:8;
+  const count=config.type==='indie'?12:8;
   const slots=Array.from({length:count},()=>{
    const card=el('div','fr-v5-poster-skeleton');
    card.setAttribute('aria-hidden','true');
@@ -322,7 +323,26 @@
     await showCuratedFallback(p,config.type);
     return;
    }
-   grid.replaceChildren(...data.slice(0,count).map(x=>poster(x,config.type)));
+   let selections=data.slice(0,count);
+   if(config.type==='indie' && selections.length<count){
+    // Supplement recent films with real, editorially verified catalogue
+    // records from earlier film years. Never invent film identities or art.
+    const seen=new Set(selections.map(x=>itemId(x)));
+    const currentYear=new Date().getFullYear();
+    for(const year of [currentYear,currentYear-1,currentYear-2,currentYear-3,currentYear-4]){
+     if(selections.length>=count)break;
+     try{
+      const archive=await fetchList('indie','archive',year);
+      for(const item of archive){
+       const filmId=itemId(item);
+       if(!filmId||seen.has(filmId)||!item.indieVerified)continue;
+       seen.add(filmId);selections.push(item);
+       if(selections.length>=count)break;
+      }
+     }catch{/* Keep all successfully loaded verified posters. */}
+    }
+   }
+   grid.replaceChildren(...selections.slice(0,count).map(x=>poster(x,config.type)));
   }catch{
    mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');
    await showCuratedFallback(p,config.type);
