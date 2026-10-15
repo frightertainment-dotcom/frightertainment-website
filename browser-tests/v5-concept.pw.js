@@ -60,6 +60,43 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  await page.screenshot({path:'test-results/visual/v5-indie-mobile.png',fullPage:false});
 });
 
+test('Indie mobile fills empty poster rows with actual verified film-source entries',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ // Exercise the production failure mode: the real API returns only six
+ // eligible recent posters, while the static verified catalogue has more.
+ await page.route('**/api/catalogue?**',route=>{
+  const url=new URL(route.request().url());
+  if(url.searchParams.get('type')!=='indie')
+   return route.fallback();
+  const mode=url.searchParams.get('mode');
+  return route.fulfill({json:{
+   items:mode==='trending'?items.slice(0,6):[],
+   page:1,totalPages:1,status:'ready'
+  }});
+ });
+ await page.goto('/indie-movies.html');
+ const grid=page.locator('.fr-v5-rack .fr-v5-poster-grid');
+ await expect(grid.locator('.fr-v5-poster-card')).toHaveCount(12);
+ await expect(grid.locator('.fr-v5-poster-card--source-only')).toHaveCount(6);
+ const rects=await grid.evaluate(node=>{
+  const cards=[...node.querySelectorAll('.fr-v5-poster-card')];
+  const boxes=cards.slice(0,3).map(x=>x.getBoundingClientRect());
+  return {
+   gridColumns:getComputedStyle(node).gridTemplateColumns.trim().split(/\\s+/).length,
+   widths:boxes.map(x=>x.width),
+   rowGap:boxes[2].top-boxes[0].bottom,
+   horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+  };
+ });
+ expect(rects.gridColumns).toBe(2);
+ expect(Math.min(...rects.widths)).toBeGreaterThan(125);
+ expect(rects.rowGap).toBeGreaterThanOrEqual(9);
+ expect(rects.horizontalOverflow).toBeLessThanOrEqual(2);
+ await expect(page.locator('.fr-v5-rack .fr-v5-poster-card--source-only .fr-v5-poster__source').first())
+   .toHaveAttribute('href',/^https:\/\//);
+ await page.screenshot({path:'test-results/visual/indie-dense-390.png',fullPage:true});
+});
+
 test('V5 desktop Movies pairs editorial pick with the chart above eight posters',async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto('/movies.html');
