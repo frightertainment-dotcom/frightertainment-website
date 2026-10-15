@@ -41,6 +41,7 @@ test('UK source diary populates, marks disputed dates, and preserves distinct ve
 
 test('homepage release brief shares vetted cinema dates and retains streaming announcements',async({page})=>{
  await page.goto('/movies.html',{waitUntil:'domcontentloaded'});
+ await page.locator('#advanced-discovery').evaluate(el=>{el.open=true});
  const panel=page.locator('[data-release-brief]').first();
  await expect(panel.locator('button[data-mode="cinema"]')).toBeVisible({timeout:15000});
  await panel.locator('button[data-mode="cinema"]').click();
