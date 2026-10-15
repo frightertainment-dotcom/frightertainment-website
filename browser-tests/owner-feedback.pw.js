@@ -99,7 +99,7 @@ test('Poster actions occupy separate corners and the Movies watchlist lives on H
       expect(places.trailer.right, `${path} ${width}px`).toBeLessThanOrEqual(places.art.right + 1);
       expect(places.trailer.bottom, `${path} ${width}px`).toBeLessThanOrEqual(places.art.bottom + 1);
       if (path === '/movies.html') await expect(page.locator('.fr-v5-watchlist')).toHaveCount(0);
-      if (path === '/indie-movies.html') await expect(page.locator('.fr-v5-rack .fr-v5-poster-card')).toHaveCount(6);
+      if (path === '/indie-movies.html') await expect(page.locator('.fr-v5-rack .fr-v5-poster-card')).toHaveCount(12);
     }
   }
 });
