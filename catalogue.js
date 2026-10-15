@@ -3,7 +3,7 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const mediaType = item => item.mediaType === 'tv' || item.type === 'tv' ? 'tv' : 'movie';
   const id = item => Number(item.tmdbId || (/^\d+$/.test(String(item.id)) ? item.id : 0));
-  const indieEvidence = item => /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com|thefilmcatalogue\.com|glasseyepix\.com|ifccenter\.com)\//i.test(item?.indieSourceUrl || '') ? item.indieSourceUrl : '';
+  const indieEvidence = item => /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com|thefilmcatalogue\.com|glasseyepix\.com|ifccenter\.com|bfi\.org\.uk|criterion\.com|tshaonline\.org)\//i.test(item?.indieSourceUrl || '') ? item.indieSourceUrl : '';
   const href = item => !id(item) && item.indieVerified && indieEvidence(item) ? indieEvidence(item) : '/media.html?type=' + mediaType(item) + '&id=' + id(item) + (document.body.dataset.catalogueType === 'indie' ? '&section=indie' : '');
   const poster = item => /^\/[A-Za-z0-9_/-]+\.(?:jpg|png|webp)$/i.test(item.posterPath || '') ? 'https://image.tmdb.org/t/p/w500' + item.posterPath : '';
   const prettyDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat('en-GB', {dateStyle:'medium',timeZone:'UTC'}).format(new Date(value + 'T12:00:00Z')) : '';
@@ -65,6 +65,7 @@
       const mode = section.dataset.catalogueMode;
       const yearSelect = section.querySelector('[data-catalogue-year]');
       const form = section.querySelector('[data-catalogue-search]');
+      const decadeNav = type === 'indie' && mode === 'archive' ? section.querySelector('[data-indie-decades]') : null;
       const list = section.querySelector('[data-catalogue-list]');
       const status = section.querySelector('.fr-catalogue-status');
       const pagination = section.querySelector('[data-catalogue-pagination]');
@@ -72,16 +73,39 @@
       let history = [];
       let request = 0;
       let controller;
-      let year = requestedYear >= 1888 && requestedYear <= thisYear ? requestedYear : thisYear;
+      const archiveYear = Number(url.searchParams.get('archiveYear'));
+      let year = type === 'indie' && mode === 'archive'
+        ? (archiveYear >= 1888 && archiveYear <= thisYear ? archiveYear : 'all')
+        : requestedYear >= 1888 && requestedYear <= thisYear ? requestedYear : thisYear;
+      let decade = null;
       let query = '';
+      const syncDecades = () => decadeNav?.querySelectorAll('[data-indie-decade]').forEach(button => {
+        const selected = decade === null ? button.dataset.indieDecade === 'all' && year === 'all'
+          : Number(button.dataset.indieDecade) === decade;
+        button.setAttribute('aria-pressed', String(selected));
+      });
       if (yearSelect) {
         const firstYear = type === 'tv' ? 1940 : 1888;
-        yearSelect.innerHTML = Array.from({length:thisYear - firstYear + 1}, (_, index) => `<option value="${thisYear - index}">${thisYear - index}</option>`).join('');
+        yearSelect.innerHTML = (type === 'indie' && mode === 'archive' ? '<option value="all">ALL YEARS</option>' : '') +
+          Array.from({length:thisYear - firstYear + 1}, (_, index) => `<option value="${thisYear - index}">${thisYear - index}</option>`).join('');
         yearSelect.value = String(year);
         const headingYear=section.querySelector('[data-catalogue-chart-year]');
         if(headingYear)headingYear.textContent=String(year);
-        yearSelect.addEventListener('change', () => { year = Number(yearSelect.value); const headingYear=section.querySelector('[data-catalogue-chart-year]');if(headingYear)headingYear.textContent=String(year); page = 1; history = []; load(); });
+        yearSelect.addEventListener('change', () => {
+          year = yearSelect.value === 'all' ? 'all' : Number(yearSelect.value);
+          decade = null; syncDecades();
+          const headingYear = section.querySelector('[data-catalogue-chart-year]');
+          if (headingYear) headingYear.textContent = String(year);
+          page = 1; history = []; load();
+        });
       }
+      decadeNav?.querySelectorAll('[data-indie-decade]').forEach(button => button.addEventListener('click', () => {
+        decade = button.dataset.indieDecade === 'all' ? null : Number(button.dataset.indieDecade);
+        year = 'all';
+        if (yearSelect) yearSelect.value = 'all';
+        syncDecades(); page = 1; history = []; load();
+      }));
+      syncDecades();
       if((mode==='cinema'||mode==='cinema-recent') && cinemaPicker) cinemaPicker.addEventListener('change',()=>{
         if(!Object.hasOwn(cinemaCountryNames,cinemaPicker.value))return;
         cinemaCountry=cinemaPicker.value;
@@ -106,6 +130,7 @@
         const params = new URLSearchParams({type, mode, page:String(page)});
         if(mode==='cinema'||mode==='cinema-recent')params.set('country',cinemaCountry);
         if (yearSelect) params.set('year', String(year));
+        if (decade !== null && mode === 'archive') params.set('decade', String(decade));
         if (query) params.set('query', query);
         try {
           const response = await fetch('/api/catalogue?' + params, {headers:{accept:'application/json'}, signal});
@@ -116,9 +141,13 @@
           let items = data.items.filter(item => item.title && (type === 'indie' ? item.indieVerified === true && (id(item) > 0 || indieEvidence(item)) : id(item) > 0));
           if (type === 'indie' && Array.isArray(data.availableYears) && yearSelect) {
             const verifiedYears = data.availableYears.filter(y => Number.isInteger(y) && y >= 1888 && y <= thisYear);
-            if (verifiedYears.length && yearSelect.options.length !== verifiedYears.length) {
-              yearSelect.innerHTML = verifiedYears.map(y => `<option value="${y}">${y}</option>`).join('');
-              yearSelect.value = String(year);
+            if (verifiedYears.length) {
+              const values = [...new Set(verifiedYears)].sort((a,b) => b-a);
+              const nextOptions = (mode === 'archive' ? '<option value="all">ALL YEARS</option>' : '') +
+                values.map(y => `<option value="${y}">${y}</option>`).join('');
+              if (yearSelect.innerHTML !== nextOptions) yearSelect.innerHTML = nextOptions;
+              if ([...yearSelect.options].some(option => option.value === String(year)))
+                yearSelect.value = String(year);
             }
           }
           if (type === 'indie' && mode === 'chart') {
@@ -187,6 +216,69 @@
                 return;
               }
             } catch {/* Fall back to transparent provider-unavailable state. */}
+          }
+          // Indie is an editorial archive first; loss of the enrichment API
+          // must not make decades of verified source records disappear.
+          if (type === 'indie') {
+            try {
+              const response = await fetch('/data/indie-archive.json', {
+                headers:{accept:'application/json'}, signal
+              });
+              if (!response.ok) throw new Error('Indie source index unavailable');
+              const ledger = await response.json();
+              if (request !== requestNumber) return;
+              if (!Array.isArray(ledger.items)) throw new Error('Invalid source index');
+              const needle = String(query || '').trim().toLowerCase();
+              const verified = ledger.items.filter(entry =>
+                entry && typeof entry.title === 'string' && entry.title &&
+                Number.isInteger(entry.originalYear) &&
+                indieEvidence({indieSourceUrl:entry.indieSourceUrl}));
+              const all = verified.filter(entry =>
+                (!needle || entry.title.toLowerCase().includes(needle)) &&
+                (mode !== 'archive' || (
+                  (year === 'all' || entry.originalYear === year) &&
+                  (decade === null || (entry.originalYear >= decade && entry.originalYear < decade + 10))
+                )));
+              if (yearSelect && Array.isArray(ledger.availableYears)) {
+                const years = ledger.availableYears.filter(y => Number.isInteger(y) && y >= 1888 && y <= thisYear);
+                yearSelect.innerHTML = (mode === 'archive' ? '<option value="all">ALL YEARS</option>' : '') +
+                  years.map(y => `<option value="${y}">${y}</option>`).join('');
+                yearSelect.value = String(year);
+              }
+              if (mode === 'archive') {
+                const perPage = 9, pages = Math.max(1,Math.ceil(all.length/perPage));
+                page = Math.min(page,pages);
+                const entries = all.slice((page-1)*perPage,page*perPage).map(entry => ({
+                  id:'indie-source-'+entry.originalYear+'-'+entry.title.toLowerCase().replace(/[^a-z0-9]+/g,'-'),
+                  title:entry.title, indieVerified:true,indieOriginalYear:entry.originalYear,
+                  indieSourceName:entry.indieSourceName,indieSourceUrl:entry.indieSourceUrl,
+                  overview:'Independently sourced horror film. Follow the credited source for original film information.',
+                  posterPath:null,tmdbId:null,ratingKind:null,releaseDate:null
+                }));
+                list.innerHTML = entries.map(item => card(item,null)).join('');
+                status.textContent = `${all.length} source-checked films · ${decade !== null ? decade + 's' : year === 'all' ? 'all available original years' : year} · film database temporarily unavailable; original sources remain available.`;
+                if (pages > 1) {
+                  const prev=document.createElement('button');prev.type='button';prev.className='button button--outline';
+                  prev.textContent='← PREVIOUS';prev.disabled=page===1;
+                  prev.addEventListener('click',()=>{page--;load();section.scrollIntoView({block:'start'});});
+                  const middle=document.createElement('span');middle.textContent=`Page ${page} of ${pages}`;
+                  const next=document.createElement('button');next.type='button';next.className='button button--outline';
+                  next.textContent='NEXT →';next.disabled=page>=pages;
+                  next.addEventListener('click',()=>{page++;load();section.scrollIntoView({block:'start'});});
+                  pagination.append(prev,middle,next);
+                }
+                if(entries.length) window.dispatchEvent(new CustomEvent('fr:media-rendered',{detail:{root:list}}));
+                return;
+              }
+              list.replaceChildren();
+              status.textContent = mode === 'chart' ? 'TMDB viewer ratings are currently unavailable. Browse the source-checked indie archive instead.'
+                : mode === 'trending' ? 'Live indie popularity data is currently unavailable. Browse the independent film archive by year.'
+                : 'Future indie premieres will appear once independently confirmed; no dates are being guessed.';
+              return;
+            } catch {
+              if (request !== requestNumber) return;
+              // If both services fail, leave a transparent recoverable state.
+            }
           }
           list.replaceChildren();
           status.textContent = 'Live listings are temporarily unavailable. Please try again.';
