@@ -9,7 +9,7 @@ await mkdir(destination, { recursive: true });
 const publicFiles = [
   'index.html', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
   'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'cinema-concept.js', 'straight-to-stream.js', 'streaming-watch.js', 'horror-archive.js', 'archive-film.js',
-  'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
+  'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'indie-phase3.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
   await cp(new URL(file, root), new URL(file, destination));
@@ -25,6 +25,7 @@ await cp(new URL('data/editorial-spotlight-overrides.json', root), new URL('data
 await cp(new URL('data/movie-editorial-overviews.json', root), new URL('data/movie-editorial-overviews.json', destination));
 await cp(new URL('data/cinema-screenings.json', root), new URL('data/cinema-screenings.json', destination));
 await cp(new URL('data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
+await cp(new URL('data/indie-archive.json', root), new URL('data/indie-archive.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
 await cp(new URL('data/archive/profiles.json', root), new URL('data/archive/profiles.json', destination));
