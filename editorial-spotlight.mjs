@@ -356,9 +356,12 @@ async function start() {
         const filmId = theme === 'indie' ? indieFilmIds[x.id] : '';
         const identity = theme === 'tv' && tvEditorialYears[x.id] ? {type:'tv',year:tvEditorialYears[x.id]} : filmMediaIdentities[filmId];
         const overview = primaryOverviews[filmId];
+        // Indie synopsis must always follow that exact source-checked Indie
+        // title. A recycled mainstream-movie overview (e.g. Heretic text on
+        // Rabbit Trap) is never allowed to override the independent record.
         return identity ? {...x, year: identity.year, mediaIdentity: identity,
-          description: overview?.description || x.description,
-          overviewSource: overview?.sourceUrl || ''} : x;
+          description: theme === 'indie' ? x.description : overview?.description || x.description,
+          overviewSource: theme === 'indie' ? x.sourceUrl : overview?.sourceUrl || ''} : x;
       }).filter(x => theme !== 'indie' || x.mediaIdentity);
     const override = settings.overrides?.[theme] || {};
     // Overrides are a publisher-controlled feature and must be dated and explicitly approved.
