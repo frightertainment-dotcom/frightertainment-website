@@ -60,7 +60,7 @@
   const art=image(x,type);
   const foot=link('',filmHref(x,type),'fr-v5-poster__bottom');
   foot.append(el('strong','',x.title));
-  const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+  const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
   a.append(art);
   a.setAttribute('aria-label','Explore '+x.title+' details');
@@ -85,7 +85,7 @@
    media.append(play);
   }
   if(type==='movie' || type==='indie'){
-   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+   const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
    media.append(watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
   }
   return box;
