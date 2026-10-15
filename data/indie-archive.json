@@ -41,7 +41,10 @@
     1977,
     1974,
     1968,
-    1962
+    1962,
+    1958,
+    1932,
+    1922
   ],
   "items": [
     {
@@ -535,6 +538,30 @@
       "originalYear": 1962,
       "indieSourceName": "Criterion Collection",
       "indieSourceUrl": "https://www.criterion.com/films/607-carnival-of-souls"
+    },
+    {
+      "title": "The Blob",
+      "originalYear": 1958,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/cd638744-5241-5f02-b5cc-9c59afd51f12/the-blob"
+    },
+    {
+      "title": "Vampyr",
+      "originalYear": 1932,
+      "indieSourceName": "Criterion Collection",
+      "indieSourceUrl": "https://www.criterion.com/films/661-vampyr"
+    },
+    {
+      "title": "White Zombie",
+      "originalYear": 1932,
+      "indieSourceName": "AFI Catalog",
+      "indieSourceUrl": "https://catalog.afi.com/Film/7222-WHITE-ZOMBIE"
+    },
+    {
+      "title": "Nosferatu",
+      "originalYear": 1922,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/resources-events-teachers/resources-teachers/gothic-classroom/film-2-nosferatu-1922"
     }
   ]
 }
