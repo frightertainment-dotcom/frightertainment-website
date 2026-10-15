@@ -63,6 +63,13 @@ const filmSource = movie => claim(movie, 'title')?.source || claim(movie, 'synop
 // IMDb identifiers (or the corresponding TMDB title page). Never search artwork by title.
 export const filmMediaIdentities = Object.freeze({
   'longlegs': { id: 1226578, year: 2024 },
+  // Exact independently verified film identities; never borrow artwork or
+  // original film years from unrelated mainstream editorial selections.
+  'buddy': { id: 1514026, year: 2026 },
+  'the-ugly-stepsister': { id: 1284120, year: 2025 },
+  'in-a-violent-nature': { id: 1214509, year: 2024 },
+  'rabbit-trap': { id: 1193824, year: 2025 },
+  'deadstream': { id: 886083, year: 2022 },
   'heart-eyes': { id: 1302916, year: 2025 },
   'heretic': { id: 1138194, year: 2024 },
   'nosferatu': { id: 426063, year: 2024 },
@@ -89,9 +96,9 @@ const tvEditorialYears = Object.freeze({
   'tv-shows-expanded-7': 2019 // Evil
 });
 const indieFilmIds = Object.freeze({
-  'indie-movies-0':'longlegs', 'indie-movies-1':'the-monkey',
-  'indie-movies-2':'together', 'indie-movies-3':'heretic',
-  'indie-movies-4':'bring-her-back', 'indie-movies-5':'nosferatu'
+  'indie-movies-0':'buddy', 'indie-movies-1':'the-ugly-stepsister',
+  'indie-movies-2':'in-a-violent-nature', 'indie-movies-3':'rabbit-trap',
+  'indie-movies-4':'deadstream', 'indie-movies-5':'together'
 });
 export function matchedMedia(item, media) {
   const identity = item.mediaIdentity;

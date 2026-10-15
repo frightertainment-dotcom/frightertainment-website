@@ -60,7 +60,7 @@
   const art=image(x,type);
   const foot=link('',filmHref(x,type),'fr-v5-poster__bottom');
   foot.append(el('strong','',x.title));
-  const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+  const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
   a.append(art);
   a.setAttribute('aria-label','Explore '+x.title+' details');
@@ -85,7 +85,7 @@
    media.append(play);
   }
   if(type==='movie' || type==='indie'){
-   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+   const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
    media.append(watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
   }
   return box;
@@ -328,6 +328,38 @@
    await showCuratedFallback(p,config.type);
   }
  };
+ const addIndieHeritage=async(host)=>{
+  const shelf=panel('fr-indie-heritage','FROM THE INDEPENDENT VAULT',
+    'Source-checked horror history, from the 1960s to today.','#archive');
+  shelf.setAttribute('aria-label','Independent horror through the decades');
+  const grid=el('div','fr-indie-heritage__grid');
+  grid.setAttribute('aria-live','polite');
+  shelf.append(grid);host.append(shelf);
+  try{
+    const response=await fetch('/data/indie-archive.json',{headers:{accept:'application/json'}});
+    if(!response.ok)throw Error('Verified indie index unavailable');
+    const index=await response.json();
+    const years=[1922,1932,1958,1962,1974,1999,2022];
+    const records=years.map(year=>index.items?.find(x=>x.originalYear===year)).filter(x=>
+      x&&typeof x.title==='string'&&/^https:\/\//.test(x.indieSourceUrl||''));
+    if(!records.length){shelf.remove();return;}
+    const cards=records.map((entry,index)=>{
+      const card=el('article','fr-indie-heritage__card');
+      const film=link('', '/indie-movies.html?archiveYear='+entry.originalYear+'#archive',
+        'fr-indie-heritage__film');
+      film.append(el('small','fr-indie-heritage__era',
+          String(entry.originalYear).slice(0,3)+'0s · '+String(index+1).padStart(2,'0')),
+        el('strong','fr-indie-heritage__title',entry.title),
+        el('span','fr-indie-heritage__year','ORIGINAL FILM YEAR · '+entry.originalYear));
+      film.setAttribute('aria-label','Explore '+entry.title+' in the '+entry.originalYear+' indie archive');
+      const source=link('VERIFIED SOURCE ↗',entry.indieSourceUrl,'fr-indie-heritage__source');
+      source.rel='noopener noreferrer';source.target='_blank';
+      card.append(film,source);
+      return card;
+    });
+    grid.replaceChildren(...cards);
+  }catch{shelf.remove();}
+ };
  const addNotices=async(parent)=>{
   const p=panel('fr-v5-notices','LATEST HORROR DROPS','Source-checked UK release notices.','#straight-to-stream');
   const list=el('div','fr-v5-notices__list','Loading verified notices…');p.append(list);parent.append(p);
@@ -551,6 +583,7 @@
     arrange();wide.addEventListener('change',arrange);
    }
    jobs.push(showPosterRack(config,showcase));
+   if(theme==='indie')jobs.push(addIndieHeritage(showcase));
    if(theme==='indie'||theme==='tv'){
     const lower=el('div','fr-v5-secondary-panels');
     jobs.push(addUpcoming(lower,config.type));
@@ -574,7 +607,13 @@
     main.append(details);
     const reveal=()=>{
      const hash=location.hash.slice(1);
-     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){details.open=true;}
+     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){
+      details.open=true;
+      // Follow first-party decade links into the open archive.
+      if(theme==='indie' && hash==='archive' && new URL(location.href).searchParams.has('archiveYear')){
+       requestAnimationFrame(()=>details.querySelector('#archive')?.scrollIntoView({block:'start'}));
+      }
+     }
     };
     window.addEventListener('hashchange',reveal);
     document.addEventListener('click',event=>{
