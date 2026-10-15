@@ -304,6 +304,17 @@
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-poster-grid');
   grid.setAttribute('aria-live','polite');
+  if(config.type==='indie'){
+   grid.classList.add('fr-indie-compact-grid');
+   const updateColumns=()=>{
+    // Hard layout contract also works when stale shared stylesheet rules exist.
+    const w=window.innerWidth;
+    grid.style.setProperty('grid-template-columns',w<=700?'repeat(2,minmax(0,1fr))':w<=1100?'repeat(3,minmax(0,1fr))':'repeat(4,minmax(0,1fr))','important');
+    grid.style.setProperty('display','grid','important');
+   };
+   updateColumns();
+   window.addEventListener('resize',updateColumns,{passive:true});
+  }
   // Image-sized reserved slots keep the exact final shelf geometry. Do not
   // switch a visible editorial layout into a differently sized poster grid.
   const count=config.type==='indie'?12:8;
@@ -342,7 +353,44 @@
      }catch{/* Keep all successfully loaded verified posters. */}
     }
    }
-   grid.replaceChildren(...selections.slice(0,count).map(x=>poster(x,config.type)));
+   if(config.type==='indie' && selections.length<count){
+    // Source-only films fill the remaining spaces with original house artwork,
+    // NOT borrowed third-party posters or fabricated audience scores.
+    try{
+     const response=await fetch('/data/indie-archive.json',{headers:{accept:'application/json'}});
+     if(response.ok){
+      const index=await response.json();
+      const names=new Set(selections.map(x=>x.title.toLowerCase()));
+      for(const item of index.items||[]){
+       if(selections.length>=count)break;
+       if(!item.title||!/^https:\/\//.test(item.indieSourceUrl||'')||names.has(item.title.toLowerCase()))continue;
+       names.add(item.title.toLowerCase());
+       selections.push({title:item.title,indieOriginalYear:item.originalYear,
+        indieVerified:true,indieSourceName:item.indieSourceName,
+        indieSourceUrl:item.indieSourceUrl,sourceOnly:true});
+      }
+     }
+    }catch{/* Keep verified titles already found. */}
+   }
+   grid.replaceChildren(...selections.slice(0,count).map(x=>{
+    if(!x.sourceOnly)return poster(x,config.type);
+    const box=el('article','fr-v5-poster-card fr-indie-source-card');
+    const media=el('div','fr-v5-poster__media');
+    const a=link('',x.indieSourceUrl,'fr-v5-poster');
+    a.target='_blank';a.rel='noopener noreferrer';
+    a.setAttribute('aria-label','Source record for '+x.title);
+    const art=el('div','fr-v5-poster__art fr-indie-source-art');
+    art.append(el('span','fr-indie-source-art__category','INDEPENDENT HORROR'),
+      el('strong','fr-indie-source-art__title',x.title),
+      el('small','fr-indie-source-art__year',String(x.indieOriginalYear)));
+    a.append(art);media.append(a);
+    const source=link('SOURCE ↗',x.indieSourceUrl,'fr-v5-poster__source');
+    source.target='_blank';source.rel='noopener noreferrer';media.append(source);
+    const foot=link('',x.indieSourceUrl,'fr-v5-poster__bottom');
+    foot.target='_blank';foot.rel='noopener noreferrer';
+    foot.append(el('strong','',x.title),el('small','',String(x.indieOriginalYear)));
+    box.append(media,foot);return box;
+   }));
   }catch{
    mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');
    await showCuratedFallback(p,config.type);
@@ -456,7 +504,7 @@
   try{
    const data=await fetchList(type,'upcoming');
    const film=data.find(x=>x&&valid(x));
-   if(!film){if(type==='indie')mockFreeState(node,'Upcoming independent horror releases will appear here when their dates are confirmed.');else p.remove();return;}
+   if(!film){p.remove();return;}
    const a=link('',filmHref(film,type),'fr-v5-announced__row');
    a.append(image(film,type));
    const copy=el('div','fr-v5-announced__copy');
