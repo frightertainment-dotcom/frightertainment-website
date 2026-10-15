@@ -336,8 +336,10 @@
   grid.replaceChildren(...slots);
   p.append(grid);host.append(p);
   try{
-   const data=await fetchList(config.type,config.mode);
-   if(!data.length){
+   let data=[];
+   try{data=await fetchList(config.type,config.mode);}
+   catch(error){if(config.type!=='indie')throw error;}
+   if(!data.length && config.type!=='indie'){
     mockFreeState(grid,'Live catalogue has no qualifying titles yet. Explore our sourced editorial selections below.');
     await showCuratedFallback(p,config.type);
     return;
@@ -374,6 +376,11 @@
       seen.add(identity);selections.push(item);
      }
     }catch{/* A missing static index must not imply invented movies. */}
+   }
+   if(!selections.length){
+    mockFreeState(grid,'No source-checked Indie film records are available right now.');
+    await showCuratedFallback(p,'indie');
+    return;
    }
    grid.replaceChildren(...selections.slice(0,count).map(x=>poster(x,config.type)));
    // Upgrade editorial title-art to verified TMDB posters if independently
