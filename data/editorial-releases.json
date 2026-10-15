@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-09T03:30:00Z",
+  "updatedAt": "2026-10-15T20:00:00Z",
   "country": "GB",
   "coverage": "Source-checked editorial release notices, not a licensed real-time availability feed or proof of remaining on platform",
   "items": [
@@ -404,12 +404,11 @@
       "year": 2026,
       "country": "GB",
       "service": "UK cinemas",
-      "date": "2026-10-09",
-      "sourceName": "Sony Pictures UK",
-      "sourceUrl": "https://www.sonypictures.co.uk/",
-      "checkedAt": "2026-10-09",
-      "availability": "listed-now",
-      "dateIsSourceCheck": true
+      "date": "2026-09-18",
+      "sourceName": "Sony Pictures United Kingdom",
+      "sourceUrl": "https://www.sonypictures.co.uk/index.php/movies/resident-evil",
+      "checkedAt": "2026-10-15",
+      "availability": "release-listing"
     },
     {
       "id": "vod-bone-temple-2026",
