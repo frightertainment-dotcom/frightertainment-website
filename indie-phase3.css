@@ -222,3 +222,87 @@ body.fr-v5[data-theme='indie'] #archive .fr-catalogue-pagination {
   body.fr-v5[data-theme='indie'] .fr-v5-poster__rating .fr-rating-badge__source {font-size:7.5px!important;}
   body.fr-v5[data-theme='indie'] .fr-v5-poster-card > .fr-v5-poster__bottom strong {font-size:12px!important;}
 }
+
+/* A compact horizontal heritage shelf, not a long second page of miniature posters.
+   Decorative first-party cinema textures are not passed off as official film posters. */
+body.fr-v5[data-theme='indie'] .fr-indie-heritage {
+  margin:22px 0 34px;
+  min-width:0;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__grid {
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:12px;
+  margin:15px 0 0;
+  min-width:0;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__card {
+  min-width:0;
+  min-height:180px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  border:1px solid #604137;
+  background:linear-gradient(180deg,#090809be,#120b09f2),
+    url('/assets/worlds/indie-projection.webp') center/cover no-repeat;
+  box-shadow:0 12px 26px #0009, inset 0 1px #ffffff0b;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__film {
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  min-width:0;
+  flex:1;
+  padding:16px 13px 8px;
+  text-decoration:none;
+  color:#f4e8de;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__era {
+  margin-bottom:auto;
+  color:#d5a08a;
+  font:700 10px/1.3 var(--premium-ui,system-ui,sans-serif);
+  letter-spacing:.09em;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__title {
+  font:600 clamp(17px,1.5vw,23px)/1.03 var(--premium-heading,Georgia,serif);
+  overflow-wrap:break-word;
+  margin-top:20px;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__year {
+  margin-top:12px;
+  font:700 9px/1.35 var(--premium-ui,system-ui,sans-serif);
+  letter-spacing:.035em;
+  color:#d3c0b6;
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage__source {
+  display:block;
+  padding:10px 13px 13px;
+  color:#ecc0a5;
+  text-decoration:none;
+  font:700 10px/1.3 var(--premium-ui,system-ui,sans-serif);
+}
+body.fr-v5[data-theme='indie'] .fr-indie-heritage :is(a:hover,a:focus-visible) {
+  color:#fff8e6;
+}
+@media (max-width:1100px) {
+  body.fr-v5[data-theme='indie'] .fr-indie-heritage__grid {
+    grid-auto-flow:column;
+    grid-auto-columns:minmax(182px,26%);
+    grid-template-columns:none;
+    overflow-x:auto;
+    overscroll-behavior-inline:contain;
+    scroll-snap-type:x proximity;
+    padding:3px 3px 15px;
+    scrollbar-width:thin;
+  }
+  body.fr-v5[data-theme='indie'] .fr-indie-heritage__card {scroll-snap-align:start;}
+}
+@media (max-width:700px) {
+  body.fr-v5[data-theme='indie'] .fr-indie-heritage__grid {
+    grid-auto-columns:minmax(175px,61%);
+    gap:11px;
+    margin-top:11px;
+  }
+  body.fr-v5[data-theme='indie'] .fr-indie-heritage__card {min-height:164px;}
+  body.fr-v5[data-theme='indie'] .fr-indie-heritage__title {font-size:22px;}
+}
