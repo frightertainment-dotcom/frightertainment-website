@@ -8,7 +8,7 @@ test('indie horror registry is film-specific, cited, and excludes unrelated stud
   for (const film of VERIFIED_INDIE_FILMS) {
     assert.equal(typeof film.title, 'string');
     assert(Number.isInteger(film.year) && film.year >= 1888 && film.year <= new Date().getUTCFullYear());
-    assert.match(film.sourceUrl, /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com|thefilmcatalogue\.com|glasseyepix\.com|ifccenter\.com)\//i);
+    assert.match(film.sourceUrl, /^https:\/\/(?:www\.)?(?:sundance\.org|sxsw\.com|fantasiafestival\.com|brynchainey\.com|thefilmcatalogue\.com|glasseyepix\.com|ifccenter\.com|bfi\.org\.uk|criterion\.com|tshaonline\.org)\//i);
     assert.equal(typeof film.sourceName, 'string');
     const identity = film.year + '|' + film.title.toLowerCase();
     assert(!keys.has(identity), 'duplicate independent film: '+identity);
