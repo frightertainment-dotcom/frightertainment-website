@@ -34,9 +34,9 @@ test('UK source diary populates, marks disputed dates, and preserves distinct ve
  const list=page.locator('#upcoming-cinema [data-catalogue-list]');
  await expect(list).toContainText('Spoiling You',{timeout:15000});
  await expect(list).toContainText('Mr Whispers');
- await expect(list).toContainText('THE EXORCIST',{timeout:15000});
+ await expect(list).toContainText('The Exorcist: Martyrs',{timeout:15000});
  await page.locator('#cinema-country').selectOption('US');
- await expect(diary).toContainText('Werwulf',{timeout:15000});
+ await expect(list).toContainText('Werwulf',{timeout:15000});
 });
 
 test('homepage release brief shares vetted cinema dates and retains streaming announcements',async({page})=>{
