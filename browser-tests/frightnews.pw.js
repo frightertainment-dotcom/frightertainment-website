@@ -23,6 +23,20 @@ for (const width of [320,390,1280]) {
     await page.goto('/');
     const rail = page.locator('[data-frightnews="home"]');
     await expect(rail.locator('.frightnews__row')).toHaveCount(40);
+    // FrightNews must not replace, cover, or lock away the existing homepage.
+    await expect(page.locator('#editorial-picks')).toBeVisible();
+    await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
+    await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
+    await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(5);
+    await expect(page.locator('#latest-horror')).toBeAttached();
+    await expect(page.locator('#live-discovery')).toBeAttached();
+    const thumbnails = await rail.locator('.frightnews__thumb img').count();
+    expect(thumbnails).toBe(40);
+    await expect(rail.locator('.frightnews__thumb img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds)\//);
+    const scrollBehaviour = await rail.locator('[data-frightnews-viewport]').evaluate(node => getComputedStyle(node).overscrollBehaviorY);
+    expect(scrollBehaviour).not.toBe('contain');
+    await rail.locator('.frightnews__continue').click();
+    await expect(page.locator('#editorial-picks')).toBeInViewport();
     await expect(page.locator('.fr-v5-header-news-icon')).toBeVisible();
     const metrics = await rail.locator('[data-frightnews-viewport]').evaluate(viewport => ({
       clientHeight:viewport.clientHeight,scrollHeight:viewport.scrollHeight,
@@ -34,6 +48,7 @@ for (const width of [320,390,1280]) {
     expect(metrics.boxWidth).toBeLessThanOrEqual(width);
     await rail.locator('[data-frightnews-viewport]').evaluate(node => node.scrollTop = node.scrollHeight);
     await expect(rail.locator('a.frightnews__all-link')).toBeVisible();
+    await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
     await page.locator('.fr-v5-header-news-icon').click();
     await expect(page).toHaveURL(/\/frightnews\.html$/);
     await expect(page.locator('[data-frightnews="page"] .frightnews__row')).toHaveCount(40);
