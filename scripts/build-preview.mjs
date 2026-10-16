@@ -7,6 +7,7 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const publicFiles = [
+  'frightwatch.html', 'frightwatch.css', 'frightwatch.js', 'frightwatch-banner.css', 'frightwatch-banner.js',
   'index.html', 'frightnews.html', 'frightnews.js', 'frightnews.css', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
   'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'homepage-features.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-radar.js', 'horror-radar.css', 'cinema-diary.js', 'cinema-concept.js', 'straight-to-stream.js', 'streaming-watch.js', 'horror-archive.js', 'archive-film.js',
   'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'indie-phase3.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
@@ -27,6 +28,7 @@ await cp(new URL('data/editorial-spotlight-overrides.json', root), new URL('data
 await cp(new URL('data/movie-editorial-overviews.json', root), new URL('data/movie-editorial-overviews.json', destination));
 await cp(new URL('data/cinema-screenings.json', root), new URL('data/cinema-screenings.json', destination));
 await cp(new URL('data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
+await cp(new URL('data/frightwatch-catalogue.json', root), new URL('data/frightwatch-catalogue.json', destination));
 await cp(new URL('data/indie-archive.json', root), new URL('data/indie-archive.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
@@ -46,6 +48,11 @@ async function markHtmlNoIndex(directory) {
       // their source claims or accidentally overriding the seven V5 landings.
       if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
         html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
+      // Only the isolated private preview gets the FrightWatch sitewide promo.
+      // Never modify source HTML, production bundle, or FrightWatch's own page.
+      if (entry.name !== 'frightwatch.html') {
+        html = html.replace('</head>', '<link rel="stylesheet" href="/frightwatch-banner.css"><script defer src="/frightwatch-banner.js"></script></head>');
+      }
       await writeFile(file, html.replace(/<head(\s[^>]*)?>/i,
         match => match + '<meta name="robots" content="noindex,nofollow,noarchive">'));
     }
