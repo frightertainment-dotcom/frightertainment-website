@@ -1,0 +1,39 @@
+name: FrightNews daily preservation
+
+on:
+  schedule:
+    # 06:20 UTC every day; user-facing pages can also refresh if this is delayed.
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  save-new-headlines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Refresh source-linked news in persistent D1 storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The public Pages Function handles deduplication and safe daily upserts.
+          curl --fail --silent --show-error --location \
+            --retry 2 --retry-delay 10 --max-time 35 \
+            --header 'Accept: application/json' \
+            'https://www.frightertainment.com/api/frightnews' > /tmp/frightnews.json
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const info = JSON.parse(fs.readFileSync('/tmp/frightnews.json', 'utf8'));
+          if (info.storageMode !== 'persistent' || info.status !== 'ok' || !info.updatedAt) {
+            throw Error('Daily FrightNews persistence unavailable; no success claimed.');
+          }
+          const last = Date.parse(info.updatedAt);
+          if (!Number.isFinite(last) || Date.now() - last > 26 * 3600000) {
+            throw Error('FrightNews has not completed a successful recent refresh.');
+          }
+          console.log('FrightNews saved articles:', info.total);
+          console.log('Preserved archive articles:', info.archiveTotal);
+          console.log('Last successful source refresh:', info.updatedAt);
+          NODE
