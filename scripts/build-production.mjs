@@ -55,19 +55,44 @@ if (/criticReferenceSnapshots|frightertainment-private-preview|TEST_FIXTURE_RANK
 }
 await validateHtml(destination);
 
-// Preserve the homepage's exact CSS cascade while cutting six blocking
-// same-origin stylesheet requests down to one. Only the production output is
-// bundled; source CSS stays editable and every interior page remains intact.
+// Keep the approved cascade byte-for-byte, including its final theme layers.
+// Self-host the identical licensed fonts to remove the blocking Google CSS
+// connection. Subsets remain demand-loaded by the browser's unicode ranges.
 const homeCoreCss = ['styles.css','hub.css','v5-magazine.css','fr-design-system.css','fr-page-themes.css','fr-rating-badge.css'];
+const homeFinalCss = ['fr-premium.css','horror-radar.css','frightnews.css'];
 const homeFile = new URL('index.html', destination);
 let home = await readFile(homeFile, 'utf8');
 const originalLinks = homeCoreCss.map(file => '<link rel="stylesheet" href="/' + file + '">').join('');
 if (!home.includes(originalLinks)) throw new Error('Homepage core CSS links unexpectedly changed');
-const homeCssContents = await Promise.all(homeCoreCss.map(file => readFile(new URL(file, destination), 'utf8')));
+const allHomeCss = [...homeCoreCss, ...homeFinalCss];
+const homeCssContents = await Promise.all(allHomeCss.map(file => readFile(new URL(file, destination), 'utf8')));
+const fontCss = await readFile(new URL('assets/fonts/fr-fonts.css', destination), 'utf8');
 await writeFile(new URL('fr-home-core.css', destination),
-  homeCssContents.map((css, index) => '/* '+homeCoreCss[index]+' */\n' + css).join('\n\n'));
+  fontCss + '\n' + homeCssContents.map((css, index) => '/* '+allHomeCss[index]+' */\n' + css).join('\n\n'));
 home = home.replace(originalLinks, '<link rel="stylesheet" href="/fr-home-core.css">');
+for (const file of homeFinalCss) {
+  const link = '<link rel="stylesheet" href="/' + file + '">';
+  if (!home.includes(link)) throw new Error('Homepage final CSS link unexpectedly changed: ' + file);
+  home = home.replace(link, '');
+}
+home = home.replace(/<link\b[^>]*href="https:\/\/fonts\.(?:googleapis|gstatic)\.com[^>]*>/g, '');
+home = home.replace('<script src="/fr-rating-badge.js"></script>', '<script src="/fr-rating-badge.js" defer></script>');
+// Serve smaller lossless encodings of the original logo at the sizes actually
+// painted by the browser. Keep the original PNG as the fallback and social art.
+const logoSet = '/assets/frightertainment-brand-640.webp 640w, /assets/frightertainment-brand-1280.webp 1280w';
+const logoSizes = '(max-width:700px) 320px, 540px';
+home = home.replace('href="/assets/frightertainment-brand.png" fetchpriority="high"',
+  'href="/assets/frightertainment-brand.png" fetchpriority="high" imagesrcset="'+logoSet+'" imagesizes="'+logoSizes+'"');
+home = home.replaceAll('src="/assets/frightertainment-brand.png"',
+  'src="/assets/frightertainment-brand.png" srcset="'+logoSet+'" sizes="'+logoSizes+'"');
 await writeFile(homeFile, home);
+
+// News thumbnails used to download entire 940–1400px scene files. Only the
+// news script uses these 320px derivatives; full scene artwork stays intact.
+const newsFile = new URL('frightnews.js', destination);
+const news = await readFile(newsFile, 'utf8');
+await writeFile(newsFile, news.replace(/\/assets\/(?:themes|worlds)\/([a-z0-9-]+\.webp)/g,
+  '/assets/news-thumbs/$1'));
 
 // Explicit production instrumentation. Preview remains untracked so editorial QA
 // and owner-only checks never inflate public visitor analytics.

@@ -1,0 +1,139 @@
+name: Production loading verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build-production.mjs'
+      - 'assets/fonts/**'
+      - 'assets/news-thumbs/**'
+      - 'assets/frightertainment-brand-*.webp'
+      - '.github/workflows/production-loading.yml'
+  pull_request:
+    paths:
+      - 'scripts/build-production.mjs'
+      - 'scripts/verify-production-loading.mjs'
+      - 'scripts/serve-loading-preview.mjs'
+      - 'assets/news-thumbs/**'
+      - 'assets/frightertainment-brand-*.webp'
+      - 'assets/fonts/**'
+      - 'test/production-loading.test.js'
+      - '.github/workflows/production-loading.yml'
+permissions:
+  contents: read
+jobs:
+  compare-production:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          path: baseline
+          ref: ${{ github.event.pull_request.base.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci && npm run build:production
+        working-directory: candidate
+      - run: npm run build:production
+        working-directory: baseline
+      - run: npx playwright install --with-deps chromium
+        working-directory: candidate
+      - name: Start isolated production previews
+        run: |
+          node candidate/scripts/serve-loading-preview.mjs baseline/dist 4180 > /tmp/fr-before-server.log 2>&1 &
+          node candidate/scripts/serve-loading-preview.mjs candidate/dist 4181 > /tmp/fr-after-server.log 2>&1 &
+      - name: Verify actual fonts, geometry, images and browser errors
+        run: node scripts/verify-production-loading.mjs
+        working-directory: candidate
+      - name: Measure live mobile baseline and both controlled previews
+        if: always()
+        working-directory: candidate
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          npx --yes lighthouse@13.5.0 https://www.frightertainment.com/ --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=loading-evidence/live-before.json --quiet
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:4180/ --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=loading-evidence/before.json --quiet
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:4181/ --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=loading-evidence/after.json --quiet
+      - name: Print measured results
+        working-directory: candidate
+        if: always()
+        run: |
+          node --input-type=module - <<'JS'
+          import {readFile} from 'node:fs/promises';
+          for(const label of ['live-before','before','after']) {
+            try {
+              const r=JSON.parse(await readFile('loading-evidence/'+label+'.json'));
+              console.log(JSON.stringify({label,score:r.categories.performance.score*100,
+                FCP:r.audits['first-contentful-paint'].numericValue,
+                LCP:r.audits['largest-contentful-paint'].numericValue,
+                TBT:r.audits['total-blocking-time'].numericValue,
+                CLS:r.audits['cumulative-layout-shift'].numericValue,
+                error:r.runtimeError}));
+            } catch(error) { console.log(label+': '+error.message); }
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-loading-evidence
+          path: candidate/loading-evidence/
+          retention-days: 7
+  measure-live-release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci && npm run build:production
+      - name: Wait for the exact production CSS fingerprint
+        run: |
+          node --input-type=module - <<'JS'
+          import {readFile} from 'node:fs/promises';
+          import {createHash} from 'node:crypto';
+          const css=await readFile('dist/fr-home-core.css');
+          const tag='fr-home-core.css?v='+createHash('sha256').update(css).digest('hex').slice(0,12);
+          let matched=false;
+          for(let attempt=0;attempt<24;attempt++) {
+            const r=await fetch('https://www.frightertainment.com/',{cache:'no-store'});
+            if(r.ok&&(await r.text()).includes(tag)){matched=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
+          if(!matched)throw new Error('Production does not yet serve this release');
+          console.log('Verified deployed CSS '+tag);
+          JS
+      - name: Measure three live mobile runs and desktop
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          mkdir -p live-speed-evidence
+          for run in 1 2 3; do
+            npx --yes lighthouse@13.5.0 https://www.frightertainment.com/ --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path="live-speed-evidence/mobile-$run.json" --quiet
+          done
+          npx --yes lighthouse@13.5.0 https://www.frightertainment.com/ --preset=desktop --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=live-speed-evidence/desktop.json --quiet
+      - name: Print live measurements
+        if: always()
+        run: |
+          node --input-type=module - <<'JS'
+          import {readdir,readFile} from 'node:fs/promises';
+          for(const file of await readdir('live-speed-evidence')) {
+            const r=JSON.parse(await readFile('live-speed-evidence/'+file));
+            console.log(JSON.stringify({file,score:r.categories.performance.score*100,
+              FCP:r.audits['first-contentful-paint'].numericValue,
+              LCP:r.audits['largest-contentful-paint'].numericValue,
+              TBT:r.audits['total-blocking-time'].numericValue,
+              CLS:r.audits['cumulative-layout-shift'].numericValue,error:r.runtimeError}));
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-speed-evidence
+          path: live-speed-evidence/
+          retention-days: 7
