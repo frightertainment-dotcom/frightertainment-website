@@ -236,3 +236,23 @@ body.fr-v5 .frightnews__row .frightnews__excerpt{
     font-size:12.5px!important;
   }
 }
+
+/* Permanent FrightNews article archive navigation. */
+body.fr-v5 .frightnews__browse-nav{
+ display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+ margin:17px 0 18px;padding:0 0 9px;
+ border-bottom:1px solid #54303a;
+}
+body.fr-v5 .frightnews__browse-nav a{
+ display:inline-flex;align-items:center;min-height:43px;padding:9px 14px;
+ font:700 11px/1.35 'DM Sans',sans-serif;letter-spacing:.1em;
+ text-decoration:none;color:#e9c0c7;border:1px solid #843847;
+}
+body.fr-v5 .frightnews__browse-nav a:hover,
+body.fr-v5 .frightnews__browse-nav a[aria-current="page"]{
+ color:#fff;background:#80263c;border-color:#ba596e;
+}
+@media(max-width:700px){
+ body.fr-v5 .frightnews__browse-nav{gap:8px}
+ body.fr-v5 .frightnews__browse-nav a{flex:1;justify-content:center;min-width:0;padding:9px 6px;font-size:10px}
+}
