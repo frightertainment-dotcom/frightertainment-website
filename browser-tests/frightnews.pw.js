@@ -58,3 +58,21 @@ for (const width of [320,390,1280]) {
     if(width<701) await expect(page.locator('.fr-v5-mobile-dock a')).toHaveCount(7);
   });
 }
+
+test('FrightNews stays useful when publisher RSS is down without inventing publish times', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.route('**/api/frightnews', route => route.fulfill({
+    status:503,contentType:'application/json',
+    body:JSON.stringify({status:'unavailable',items:[]})
+  }));
+  await page.goto('/');
+  const rail = page.locator('[data-frightnews="home"]');
+  await expect(rail.locator('.frightnews__row')).toHaveCount(40);
+  await expect(rail.locator('[data-frightnews-state]')).toContainText('SOURCE-CHECKED');
+  await expect(rail.locator('.frightnews__time').first()).toContainText('SOURCE CHECKED');
+  await expect(rail.locator('.frightnews__thumb-img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds)\//);
+  await expect(page.locator('#editorial-picks')).toBeVisible();
+  await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
+  await rail.locator('.frightnews__continue').click();
+  await expect(page.locator('#editorial-picks')).toBeInViewport();
+});
