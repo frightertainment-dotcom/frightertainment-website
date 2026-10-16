@@ -887,7 +887,11 @@ test('homepage composition stays ordered and usable across the approved viewport
       expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(3);
     }
     if (width === 390) {
-      expect(layout.featureTop).toBeLessThanOrEqual(1100);
+      // Four compact FrightNews stories now precede Editorial Picks. Keep
+      // the original film feature reachable without a giant homepage rail.
+      await expect(page.locator('[data-frightnews="home"] .frightnews__row:visible')).toHaveCount(4);
+      await expect(page.locator('[data-frightnews="home"] .frightnews__headline').first()).toBeVisible();
+      expect(layout.featureTop).toBeLessThanOrEqual(1450);
     }
     await page.close();
   }
