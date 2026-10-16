@@ -567,6 +567,15 @@ test('cinematic surfaces are borderless but remain structured and keyboard navig
     await expect(chart).toBeVisible();
     const chartBorder=await chart.evaluate(el=>getComputedStyle(el).borderTopWidth);
     expect(chartBorder).toBe('0px');
+    // Mobile destination images now load on approach. Exercise each real
+    // card before validating its artwork, instead of forcing eager downloads.
+    if (width===390) {
+      const cards=page.locator('.hub-showcase__bottom .hub-tile');
+      for (let i=0;i<await cards.count();i++) {
+        await cards.nth(i).scrollIntoViewIfNeeded();
+        await expect(cards.nth(i)).toHaveClass(/fr-image-visible/);
+      }
+    }
     const tiles=await page.locator('.hub-showcase__bottom .hub-tile').evaluateAll(xs=>xs.map(x=>({
       border:getComputedStyle(x).borderTopWidth,
       art:getComputedStyle(x,'::before').backgroundImage
