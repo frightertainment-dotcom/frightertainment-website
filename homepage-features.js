@@ -19,7 +19,7 @@
     const title=article.querySelector('h3'),description=article.querySelector('.hub-tile__content p');
     const link=article.querySelector('.hub-tile__link');
     if(!title||!description||!link)return;
-    title.textContent=feature.title;
+    title.textContent=feature.title.toLocaleUpperCase('en-GB');
     description.textContent=feature.description;
     link.href=href;
     link.replaceChildren(document.createTextNode(cta[key]+'  '),document.createTextNode('→'));
