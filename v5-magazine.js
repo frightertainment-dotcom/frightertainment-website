@@ -561,6 +561,14 @@
   }catch{mockFreeState(grid,'Recommendations are unavailable. Explore the editorial selections below.');}
  };
  function mobileDock(){
+  // Override older responsive rules that forcibly re-display the header tabs.
+  const topNav=document.querySelector('.hub-header .hub-tabs');
+  if(topNav){
+   const mq=window.matchMedia('(max-width:700px)');
+   const sync=()=>{if(mq.matches)topNav.style.setProperty('display','none','important');
+     else topNav.style.removeProperty('display');};
+   sync();mq.addEventListener('change',sync);
+  }
   if(document.querySelector('.fr-v5-mobile-dock'))return;
   const nav=el('nav','fr-v5-mobile-dock');
   nav.setAttribute('aria-label','Frightertainment mobile section navigation');
