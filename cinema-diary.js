@@ -74,7 +74,7 @@
      const label=el('div','fr-cinema-flags');
      label.append(el('span','fr-cinema-pill',row.edition==='re-release'?'RE-RELEASE SCREENINGS':'NEW CINEMA RELEASE'));
      label.append(el('span','fr-cinema-pill fr-cinema-pill--reach',row.reach==='limited'?'LIMITED CINEMAS':row.reach==='unconfirmed'?'VENUES NOT YET CONFIRMED':'GENERAL RELEASE · VENUES VARY'));
-     if(row.dateConfidence==='disputed')label.append(el('span','fr-cinema-pill fr-cinema-pill--unverified','UK RELEASE DATE DISPUTED · CHECK VENUE'));
+     if(row.dateConfidence==='disputed'||row.dateConfidence==='provisional')label.append(el('span','fr-cinema-pill fr-cinema-pill--unverified',row.dateConfidence==='provisional'?'PROVISIONAL RELEASE · CHECK VENUES':'UK RELEASE DATE DISPUTED · CHECK VENUE'));
      const credits=el('p','fr-cinema-diary__credit',row.distributor||(countryNames[country]||'Regional')+' release listing');
      const note=el('p','fr-cinema-diary__note',row.note||'Check the screening source for confirmed venues.');
      const sourceLink=el('a','fr-cinema-diary__source','VIEW VERIFIED SCREENING SOURCE ↗');
