@@ -77,7 +77,22 @@ for (const file of homeFinalCss) {
 }
 home = home.replace(/<link\b[^>]*href="https:\/\/fonts\.(?:googleapis|gstatic)\.com[^>]*>/g, '');
 home = home.replace('<script src="/fr-rating-badge.js"></script>', '<script src="/fr-rating-badge.js" defer></script>');
+// Serve smaller lossless encodings of the original logo at the sizes actually
+// painted by the browser. Keep the original PNG as the fallback and social art.
+const logoSet = '/assets/frightertainment-brand-640.webp 640w, /assets/frightertainment-brand-1280.webp 1280w';
+const logoSizes = '(max-width:700px) 320px, 540px';
+home = home.replace('href="/assets/frightertainment-brand.png" fetchpriority="high"',
+  'href="/assets/frightertainment-brand.png" fetchpriority="high" imagesrcset="'+logoSet+'" imagesizes="'+logoSizes+'"');
+home = home.replaceAll('src="/assets/frightertainment-brand.png"',
+  'src="/assets/frightertainment-brand.png" srcset="'+logoSet+'" sizes="'+logoSizes+'"');
 await writeFile(homeFile, home);
+
+// News thumbnails used to download entire 940–1400px scene files. Only the
+// news script uses these 320px derivatives; full scene artwork stays intact.
+const newsFile = new URL('frightnews.js', destination);
+const news = await readFile(newsFile, 'utf8');
+await writeFile(newsFile, news.replace(/\/assets\/(?:themes|worlds)\/([a-z0-9-]+\.webp)/g,
+  '/assets/news-thumbs/$1'));
 
 // Explicit production instrumentation. Preview remains untracked so editorial QA
 // and owner-only checks never inflate public visitor analytics.
