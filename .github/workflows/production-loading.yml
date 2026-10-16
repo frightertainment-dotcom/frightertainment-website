@@ -1,5 +1,13 @@
 name: Production loading verification
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build-production.mjs'
+      - 'assets/fonts/**'
+      - 'assets/news-thumbs/**'
+      - 'assets/frightertainment-brand-*.webp'
+      - '.github/workflows/production-loading.yml'
   pull_request:
     paths:
       - 'scripts/build-production.mjs'
@@ -14,6 +22,7 @@ permissions:
   contents: read
 jobs:
   compare-production:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -72,4 +81,59 @@ jobs:
         with:
           name: production-loading-evidence
           path: candidate/loading-evidence/
+          retention-days: 7
+  measure-live-release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci && npm run build:production
+      - name: Wait for the exact production CSS fingerprint
+        run: |
+          node --input-type=module - <<'JS'
+          import {readFile} from 'node:fs/promises';
+          import {createHash} from 'node:crypto';
+          const css=await readFile('dist/fr-home-core.css');
+          const tag='fr-home-core.css?v='+createHash('sha256').update(css).digest('hex').slice(0,12);
+          let matched=false;
+          for(let attempt=0;attempt<24;attempt++) {
+            const r=await fetch('https://www.frightertainment.com/',{cache:'no-store'});
+            if(r.ok&&(await r.text()).includes(tag)){matched=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
+          if(!matched)throw new Error('Production does not yet serve this release');
+          console.log('Verified deployed CSS '+tag);
+          JS
+      - name: Measure three live mobile runs and desktop
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          mkdir -p live-speed-evidence
+          for run in 1 2 3; do
+            npx --yes lighthouse@13.5.0 https://www.frightertainment.com/ --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path="live-speed-evidence/mobile-$run.json" --quiet
+          done
+          npx --yes lighthouse@13.5.0 https://www.frightertainment.com/ --preset=desktop --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=live-speed-evidence/desktop.json --quiet
+      - name: Print live measurements
+        if: always()
+        run: |
+          node --input-type=module - <<'JS'
+          import {readdir,readFile} from 'node:fs/promises';
+          for(const file of await readdir('live-speed-evidence')) {
+            const r=JSON.parse(await readFile('live-speed-evidence/'+file));
+            console.log(JSON.stringify({file,score:r.categories.performance.score*100,
+              FCP:r.audits['first-contentful-paint'].numericValue,
+              LCP:r.audits['largest-contentful-paint'].numericValue,
+              TBT:r.audits['total-blocking-time'].numericValue,
+              CLS:r.audits['cumulative-layout-shift'].numericValue,error:r.runtimeError}));
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-speed-evidence
+          path: live-speed-evidence/
           retention-days: 7
