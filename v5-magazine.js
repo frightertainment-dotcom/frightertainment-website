@@ -7,7 +7,7 @@
  // Cinema's movie catalogue into the Movies magazine layout. Other pages still
  // use their existing theme value until their markup declares data-page.
  const theme=document.body?.dataset.page||document.body?.dataset.theme;
- if (!['movies','indie','tv','podcasts','games','home','cinema'].includes(theme)) return;
+ if (!['movies','indie','tv','podcasts','games','home','cinema','news'].includes(theme)) return;
  const main=document.querySelector('main');
  const intro=main?.querySelector('.hub-page-intro');
  if (!main) return;
@@ -221,9 +221,24 @@
   form.append(label,input,submit);search.append(searchButton,form);
   search.addEventListener('toggle',()=>{if(search.open){menu.open=false;input.focus();}});
   menu.addEventListener('toggle',()=>{if(menu.open)search.open=false;});
+  const news=link('','/frightnews.html','fr-v5-header-news-icon');
+  news.setAttribute('aria-label','Open FrightNews horror headlines');
+  news.title='FrightNews';
+  const paper=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  paper.setAttribute('viewBox','0 0 24 24');paper.setAttribute('aria-hidden','true');
+  paper.setAttribute('fill','none');paper.setAttribute('stroke','currentColor');
+  paper.setAttribute('stroke-width','1.7');paper.setAttribute('stroke-linecap','round');
+  paper.setAttribute('stroke-linejoin','round');
+  for(const d of ['M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a3 3 0 0 1-3-3V7',
+    'M3 7v11a3 3 0 0 0 3 3','M8 8h10','M8 11h10','M8 14h4','M15 14h3','M8 17h10']){
+    const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+    line.setAttribute('d',d);paper.append(line);
+  }
+  news.append(paper);
+  if(theme==='news')news.setAttribute('aria-current','page');
   const contact=link('☠','/contact.html','fr-v5-contact-icon');
   contact.setAttribute('aria-label','Contact Frightertainment');
-  actions.append(menu,search,contact);
+  actions.append(menu,search,news,contact);
   head.append(actions);
   document.addEventListener('keydown',event=>{
    if(event.key==='Escape'){menu.open=false;search.open=false;}
@@ -606,6 +621,7 @@
   // These pages already contain their final premium structure in HTML.
   // They must never be held behind the async editorial-layout gate.
   if(theme==='home'){mountHomeWatchlist();main.dataset.frV5Ready='true';return;}
+  if(theme==='news'){main.dataset.frV5Ready='true';return;}
   if(theme==='cinema'){main.dataset.frV5Ready='true';return;}
   decorateHero();
   const config=configs[theme];if(!config)return;
@@ -712,7 +728,7 @@
  }
  // Keep editorial-spotlight.mjs as the carousel owner: place our page sections
  // only after its async insertion; preserve the original accessible catalogue.
- if(theme==='home'||theme==='cinema'){build();return;}
+ if(theme==='home'||theme==='cinema'||theme==='news'){build();return;}
  if(main.querySelector('.editorial-carousel')){build();return;}
  const observer=new MutationObserver(()=>{
   if(main.querySelector('.editorial-carousel')){
