@@ -243,3 +243,23 @@
     })
     .finally(finish);
 })();
+
+/* Only mobile home cards outside the viewport defer their decorative CSS art.
+   The editorial copy remains fully functional without IntersectionObserver. */
+(function loadDestinationArtworkNearViewport() {
+  if (document.body?.dataset.theme !== 'home') return;
+  const targets = [...document.querySelectorAll('.hub-showcase__bottom .hub-tile')];
+  if (!targets.length) return;
+  if (!('IntersectionObserver' in window) || !window.matchMedia('(max-width:700px)').matches) {
+    targets.forEach(card => card.classList.add('fr-image-visible'));
+    return;
+  }
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('fr-image-visible');
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '300px 0px' });
+  targets.forEach(card => observer.observe(card));
+})();
