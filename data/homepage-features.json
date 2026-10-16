@@ -22,13 +22,13 @@
       "checkedAt": "2026-10-16"
     },
     "indie": {
-      "title": "Longlegs",
-      "year": 2024,
-      "description": "A chilling FBI investigation spirals into a disturbing occult mystery.",
-      "href": "/films/longlegs/",
-      "sourceUrl": "https://neonrated.com/films/longlegs",
-      "sourceName": "NEON",
-      "checkedAt": "2026-10-16"
+      "title": "Rabbit Trap",
+      "year": 2025,
+      "description": "When a couple begin recording mysterious sounds in the Welsh countryside, they awaken something ancient.",
+      "href": "/indie-movies.html",
+      "sourceUrl": "https://brynchainey.com/rabbit-trap",
+      "sourceName": "Bryn Chainey, filmmaker",
+      "checkedAt": "2026-10-14"
     },
     "podcast": {
       "title": "Old Gods of Appalachia",
@@ -49,12 +49,13 @@
     "cinema": {
       "title": "Clayface",
       "year": 2026,
-      "description": "A forthcoming horror-led DC film. Check confirmed local cinema listings for showtimes and release dates.",
+      "description": "UK cinemas from 23 October 2026. A body-horror transformation emerges from Gotham's shadows; check local showtimes.",
       "href": "/films/clayface/",
-      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
-      "sourceName": "Screen Daily UK release diary",
-      "checkedAt": "2026-10-11",
-      "territory": "GB"
+      "sourceUrl": "https://www.bbfc.co.uk/release/clayface-q29sbgvjdglvbjpwwc0xmte2ndmx",
+      "sourceName": "BBFC UK release classification",
+      "checkedAt": "2026-10-16",
+      "territory": "GB",
+      "ukDate": "2026-10-23"
     }
   }
 }
