@@ -157,6 +157,11 @@ function sourcedIndieFallback(record) {
   return {
     id:'indie-source-'+record.year+'-'+normalizeTitle(record.title).split(' ').join('-'),
     tmdbId:null,mediaType:'movie',type:'movie',title:record.title,
+    // Carry the real editorial source through to immutable D1 snapshots.
+    // Without these fields, validateDataset rejects source-only Indie pages
+    // and the public catalogue returns a 503 despite having verified records.
+    sourceName:record.sourceName,sourceUrl:record.sourceUrl,
+    territory:'Global',checkedAt:INDIE_REVIEW_DATE,
     overview:'Source-checked independent horror. Open the festival or filmmaker record for production details.',
     voteAverage:null,voteCount:0,ratingKind:null,posterPath:null,trailer:null,
     releaseDate:null,firstReleaseDate:null,releaseStatus:'unknown',

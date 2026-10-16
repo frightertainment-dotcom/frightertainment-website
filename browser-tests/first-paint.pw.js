@@ -41,7 +41,8 @@ test('Priority assets are discoverable from document head without blocking font 
         earlyStyle:!!head.querySelector('link[rel="stylesheet"][href^="/fr-first-paint.css"]'),
         css:!!css,theme};
     });
-    expect(state.scene).toBe(2);
+    // Home also prioritizes the shared logo PNG before its hero scene renders.
+    expect(state.scene).toBe(route === '/' ? 3 : 2);
     expect(state.fonts).toBe(1);
     expect(state.earlyStyle).toBe(true);
     expect(state.css).toBe(true);

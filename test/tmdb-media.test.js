@@ -301,3 +301,17 @@ test('Cinema API excludes old releases and repeated regional theatrical dates in
     }
   }finally{globalThis.fetch=previous;}
 });
+
+test('source-backed indie fallback has valid public provenance, even without TMDB', async () => {
+  const { validateDataset } = await import('../src/core.js');
+  const catalogue = await fetchCatalogue({}, {
+    type: 'indie', mode: 'archive', year: 1922, page: 1, country: 'GB', sourceOnly: true
+  });
+  assert.ok(catalogue.items.length > 0);
+  assert.ok(catalogue.items.every(item => item.tmdbId === null && item.voteAverage === null));
+  assert.doesNotThrow(() => validateDataset({
+    kind: 'tmdb-list-source-only-test', sourceName: 'TMDB',
+    sourceUrl: 'https://www.themoviedb.org', territory: 'Global',
+    checkedAt: '2026-10-16', items: catalogue.items
+  }));
+});
