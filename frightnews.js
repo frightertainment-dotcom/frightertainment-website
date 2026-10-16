@@ -68,7 +68,7 @@
         matchedPosters = data.items.filter(item => item && typeof item.title === 'string' &&
           /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || ''))
           .map(item => ({title:item.title,normal:normalTitle(item.title),posterPath:item.posterPath}))
-          .filter(item => item.normal.length >= 7 && item.normal.split(' ').length > 1)
+          .filter(item => item.normal.length >= 8)
           .sort((a,b)=>b.normal.length-a.normal.length);
         roots.forEach(setVerifiedArtwork);
       }).catch(() => { /* Keep real, first-party horror artwork when a poster is unavailable. */ });
