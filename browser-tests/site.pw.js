@@ -59,7 +59,7 @@ for (const [path, heading] of pages) {
     const sections = page.locator('.hub-tabs a');
     await expect(sections).toHaveCount(7);
     await expect(page.locator('.menu-toggle')).toHaveCount(0);
-    await expect(page.locator('.hub-tabs a[href="/cinema.html"]')).toBeVisible();
+    await expect(visibleSection(page,'/cinema.html')).toBeVisible();
     await page.screenshot({ path: `test-results/visual/mobile-${path.replace(/[^a-z0-9]+/gi, '-') || 'home'}.png`, fullPage: true });
     await page.close();
   });
@@ -141,7 +141,7 @@ test('homepage recommendations do not advertise unannounced productions', async 
   await navigateLegacy(page,'/');
   await expect(page.locator('.hub-showcase .hub-tv')).toBeVisible();
   await expect(page.locator('#hub-ranking')).toBeVisible();
-  await expect(page.locator('.hub-tabs a[href="/podcasts.html"]')).toBeVisible();
+  await expect(visibleSection(page,'/podcasts.html')).toBeVisible();
   await expect(page.locator('#originals')).toHaveCount(0);
   await expect(page.locator('.hub-podcast .hub-tile__link')).toHaveAttribute('href', /^https:\/\/www\.oldgodsofappalachia\.com\//);
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
@@ -206,7 +206,7 @@ test('all seven section themes and navigation fit the requested viewport widths'
       await page.setViewportSize({ width, height: 844 });
       const fits = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
       expect(fits, `${route} overflows at ${width}px`).toBe(true);
-      await expect(page.locator('.hub-tabs a[href="/games.html"]')).toBeVisible();
+      await expect(visibleSection(page,'/games.html')).toBeVisible();
     }
   }
   await page.close();
