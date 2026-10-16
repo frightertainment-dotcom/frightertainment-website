@@ -101,6 +101,12 @@ body.fr-v5 .fr-v5-header-news-icon:focus-visible{outline:2px solid #ffb3bd;outli
  body.fr-v5 .fr-v5-header-search .fr-v5-icon-control{width:35px!important;height:38px!important}
  body.fr-v5 .hub-brand{width:min(40vw,155px)!important}
 }
+@media(max-width:370px){
+ body.fr-v5 .frightnews__heading{flex-direction:column;align-items:stretch;gap:5px}
+ body.fr-v5 .frightnews__heading>div{min-width:0;max-width:100%}
+ body.fr-v5 .frightnews__heading h2,body.fr-v5 .frightnews__heading h1{font-size:39px;max-width:100%}
+ body.fr-v5 .frightnews__head-link{max-width:100%;text-align:left;white-space:nowrap;align-self:flex-start}
+}
 @media(max-width:360px){
  body.fr-v5 .hub-brand{width:112px!important;transform:translateX(-12px)}
  body.fr-v5 .frightnews__row{grid-template-columns:75px minmax(0,1fr);gap:9px;padding-inline:7px}
