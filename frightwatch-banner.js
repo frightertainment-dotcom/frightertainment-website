@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 if(/(?:^|\/)frightwatch(?:\.html|\/|$)/i.test(location.pathname))return;
-const header=document.querySelector('header.hub-header');
+const header=document.querySelector('header.hub-header') || document.querySelector('header.header') || document.querySelector('body > header');
 if(!header||document.querySelector('.fr-watch-promo'))return;
 const link=document.createElement('a');link.className='fr-watch-promo';link.href='/frightwatch.html';
 link.setAttribute('aria-label','FrightWatch — explore the upcoming free independent horror streaming showcase');
