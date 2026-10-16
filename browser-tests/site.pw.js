@@ -10,6 +10,8 @@ test.beforeEach(async ({page}) => {
   await page.route('**/api/catalogue?**',route=>{const type=new URL(route.request().url()).searchParams.get('type');return route.fulfill({json:{items:catalogueFixture(type),page:1,totalPages:1,status:'ready'}});});
 });
 
+const visibleSection = (page,href) => page.locator('.fr-v5-mobile-dock a[href="'+href+'"]:visible, .hub-tabs a[href="'+href+'"]:visible').first();
+
 const pages = [
   ['/', 'Frightertainment'],
   ['/movies.html','HORROR'],
@@ -141,7 +143,7 @@ test('homepage recommendations do not advertise unannounced productions', async 
   await expect(page.locator('#hub-ranking')).toBeVisible();
   await expect(page.locator('.hub-tabs a[href="/podcasts.html"]')).toBeVisible();
   await expect(page.locator('#originals')).toHaveCount(0);
-  await expect(page.locator('.hub-podcast a[href="/podcasts.html"]')).toBeVisible();
+  await expect(page.locator('.hub-podcast .hub-tile__link')).toHaveAttribute('href', /^https:\/\/www\.oldgodsofappalachia\.com\//);
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
   await expect(page.locator('body')).not.toContainText('DETAILS TO BE ANNOUNCED');
 });
@@ -159,7 +161,7 @@ test('homepage is compact, branded and links into distinct pages', async ({page}
 
 test('navigation works between all main sections and official movie source', async ({ page }) => {
   await navigateLegacy(page,'/');
-  await page.locator('.hub-tabs a[href="/movies.html"]').click();
+  await visibleSection(page,'/movies.html').click();
   await expect(page).toHaveURL(/movies\.html$/);
   await openCompleteDiscovery(page);
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(8);
@@ -167,11 +169,11 @@ test('navigation works between all main sections and official movie source', asy
   await expect(page.locator('#movie-grid .movie-card')).toHaveCount(11);
   const official = page.locator('.movie-card__actions a[target="_blank"]').first();
   await expect(official).toHaveAttribute('href', /^https:\/\//);
-  await page.locator('.hub-tabs a[href="/podcasts.html"]').click();
+  await visibleSection(page,'/podcasts.html').click();
   await expect(page).toHaveURL(/podcasts\.html$/);
   await openCompleteDiscovery(page);
   await expect(page.locator('main .hub-tile')).toHaveCount(12);
-  await page.locator('.hub-tabs a[href="/indie-movies.html"]').click();
+  await visibleSection(page,'/indie-movies.html').click();
   await openCompleteDiscovery(page);
   await expect(page.locator('#chart .fr-media-card')).toHaveCount(3);
   await expect(page.locator('#archive [data-catalogue-search]')).toBeVisible();
@@ -833,7 +835,9 @@ test('homepage composition stays ordered and usable across the approved viewport
     const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
     await navigateLegacy(page,'/');
     await expect(page.locator('.hub-tabs a')).toHaveCount(7);
-    for (let index = 0; index < 7; index++) await expect(page.locator('.hub-tabs a').nth(index)).toBeVisible();
+    const sections=width<=700?page.locator('.fr-v5-mobile-dock a'):page.locator('.hub-tabs a');
+    await expect(sections).toHaveCount(7);
+    for (let index = 0; index < 7; index++) await expect(sections.nth(index)).toBeVisible();
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const layout = await page.evaluate(() => {
       const feature = document.querySelector('.hub-feature').getBoundingClientRect();
@@ -1190,20 +1194,20 @@ test('all seven main tabs remain readable and reachable at every navigation widt
       await navigateLegacy(page,path);
       await expect(page.locator('.hub-tabs a')).toHaveCount(7);
       await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-      if(width<=640){
-        const values=await page.locator('.hub-tabs').evaluate(nav=>{
+      if(width<=700){
+        const values=await page.locator('.fr-v5-mobile-dock').evaluate(nav=>{
           const links=[...nav.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
           return {rows:new Set(links.map(x=>Math.round(x.top))).size,
             allHaveWidth:links.every(x=>x.width>=36),
             navigable:nav.scrollWidth>=nav.clientWidth,
             pageWidth:document.documentElement.scrollWidth,viewport:innerWidth};
         });
-        expect(values.rows).toBe(2);
+        expect(values.rows).toBe(1);
         expect(values.allHaveWidth).toBe(true);
         expect(values.navigable).toBe(true);
         expect(values.pageWidth).toBeLessThanOrEqual(values.viewport+2);
-        await page.locator('.hub-tabs a[href="/games.html"]').scrollIntoViewIfNeeded();
-        await expect(page.locator('.hub-tabs a[href="/games.html"]')).toBeVisible();
+        await visibleSection(page,'/games.html').scrollIntoViewIfNeeded();
+        await expect(visibleSection(page,'/games.html')).toBeVisible();
 
       }
     }
@@ -1526,9 +1530,9 @@ test('live region provider discovery is clearly separate from historically sourc
 test('homepage indie showcase features a real sourced film, not a generic placeholder', async ({page}) => {
   await navigateLegacy(page,'/');
   const indie = page.locator('.hub-showcase__bottom .hub-indie');
-  await expect(indie).toContainText('LONGLEGS');
-  await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/films/longlegs/');
-  await expect(indie).toHaveAttribute('data-media-title', 'Longlegs');
+  await expect(indie).toContainText('RABBIT TRAP');
+  await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/indie-movies.html');
+  await expect(indie).toHaveAttribute('data-media-title', 'Rabbit Trap');
   await expect(indie.locator('[data-media-field="poster"]')).toHaveCount(1);
   await expect(page.locator('head link[rel="stylesheet"][href*="fonts.googleapis.com"]')).toHaveCount(1);
   await expect(page.locator('head link[rel="preconnect"][href="https://fonts.gstatic.com"]')).toHaveCount(1);
@@ -1614,19 +1618,19 @@ test('rotating film feature CTA always agrees with its actual destination', asyn
   }));
   await navigateLegacy(page,'/');
   const feature=page.locator('.hub-feature');
-  await expect(feature).toHaveAttribute('data-film-id','qa-current-horror');
+  // Weekly owner-curated features take priority over the rotating release
+  // fallback, even when a verified recent film exists in the catalogue.
+  await expect(feature).toHaveAttribute('data-editorial-curated','true');
+  await expect(feature.locator('h3')).toHaveText('HERETIC');
   const cta=feature.locator('a.hub-tile__link');
-  await expect(cta).toHaveAttribute('href','/films/qa-current-horror/');
-  await expect(cta).toContainText('VIEW FILM DETAILS');
-  await expect(cta).toHaveAttribute('aria-label','Explore QA Current Horror film details');
-  await expect(cta).not.toContainText('OPEN THE COMPLETE HORROR VAULT');
+  await expect(cta).toHaveAttribute('href','/films/heretic/');
+  await expect(cta).toContainText('EXPLORE FILM');
 
-  // When there is no verified recent/upcoming release, the default Horror
-  // Vault feature and its original destination must remain truthful.
+  // A temporarily empty provider feed must not replace curated cinema picks.
   records=[];
   await page.reload();
-  await expect(page.locator('.hub-feature a.hub-tile__link')).toHaveAttribute('href','/all-horror-movies.html');
-  await expect(page.locator('.hub-feature a.hub-tile__link')).toContainText('OPEN THE COMPLETE HORROR VAULT');
+  await expect(page.locator('.hub-feature h3')).toHaveText('HERETIC');
+  await expect(page.locator('.hub-feature a.hub-tile__link')).toHaveAttribute('href','/films/heretic/');
 });
 
 
