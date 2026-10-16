@@ -44,7 +44,7 @@
     if(section==='home'){
       const ordered=['game','tv','podcast','streaming','vod'];
       return ordered.flatMap(category=>all.filter(x=>x.category===category)
-        .sort((a,b)=>Number(current(b.date))-Number(current(a.date))||sort(a,b)).slice(0,2)).slice(0,8);
+        .sort((a,b)=>Number(current(b.date))-Number(current(a.date))||sort(a,b)).slice(0,1)).slice(0,4);
     }
     return all.filter(x=>x.category===section).sort((a,b)=>
       Number(current(b.date))-Number(current(a.date))||sort(a,b)).slice(0,8);
