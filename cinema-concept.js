@@ -40,7 +40,7 @@
    const title=make('strong','fr-cinema-concept__title',row.title);
    const date=make('time','fr-cinema-concept__date',new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(row.date+'T12:00:00Z')));
    date.dateTime=row.date;
-   const details=make('span','fr-cinema-concept__details',(row.edition==='re-release'?'RE-RELEASE':'NEW RELEASE')+' · '+(row.reach==='limited'?'LIMITED CINEMAS':row.reach==='unconfirmed'?'VENUES UNCONFIRMED':'GENERAL RELEASE')+(row.dateConfidence==='disputed'?' · DATE UNDER REVIEW':''));
+   const details=make('span','fr-cinema-concept__details',(row.edition==='re-release'?'RE-RELEASE':'NEW RELEASE')+' · '+(row.reach==='limited'?'LIMITED CINEMAS':row.reach==='unconfirmed'?'VENUES UNCONFIRMED':'GENERAL RELEASE')+((row.dateConfidence==='disputed'||row.dateConfidence==='provisional')?' · DATE UNDER REVIEW':''));
    const source=make('a','fr-cinema-concept__source','SOURCE');
    source.href=row.sourceUrl;source.target='_blank';source.rel='noopener noreferrer';
    source.setAttribute('aria-label','Verified screening source for '+row.title+' on '+date.textContent);

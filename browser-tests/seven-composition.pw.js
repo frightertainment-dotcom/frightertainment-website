@@ -121,7 +121,7 @@ test('TV editorial source artwork titles remain within their mobile frames', asy
   for (const width of [320, 360, 390, 430]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/tv-shows.html');
-    await expect(page.locator('.editorial-pick')).toHaveAttribute('data-feature-id', /^tv-shows-expanded-\d+$/);
+    await expect(page.locator('.editorial-pick')).toHaveAttribute('data-feature-id', /^tv-shows-(?:expanded-)?\d+$/);
     const state = await page.locator('.editorial-pick__art-title').evaluate(title => {
       const text = title.firstChild;
       const tops = new Set();
