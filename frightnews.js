@@ -171,6 +171,11 @@
   }
   const viewingArchive = roots.some(root => root.dataset.frightnews === 'page') &&
     new URLSearchParams(location.search).get('archive') === '1';
+  const newsNavigation = document.querySelectorAll('.frightnews__browse-nav a');
+  for (const a of newsNavigation) {
+    if ((a.getAttribute('href')||'').includes('?archive=1') === viewingArchive)
+      a.setAttribute('aria-current','page');
+  }
   if (viewingArchive) {
     const description = document.querySelector('.frightnews--page .frightnews__heading p');
     if (description) description.textContent = 'The FrightNews archive preserves older horror headlines and links once the active news library reaches 500 stories.';
