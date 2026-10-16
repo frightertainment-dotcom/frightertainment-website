@@ -641,7 +641,7 @@ test('Friday homepage features show all six source-backed selections, with no st
  const expected=[
   ['.hub-feature','HERETIC'],
   ['.hub-tv','MARIANNE'],
-  ['.hub-indie','LONGLEGS'],
+  ['.hub-indie','RABBIT TRAP'],
   ['.hub-podcast','OLD GODS OF APPALACHIA'],
   ['.hub-games','PHASMOPHOBIA'],
   ['.hub-cinema','CLAYFACE']
