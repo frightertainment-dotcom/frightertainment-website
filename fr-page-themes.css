@@ -105,6 +105,15 @@ body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-indie::before { backgro
 body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-games::before { background-image:url('/assets/themes/games-wide.webp'); }
 body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-cinema::before { background-image:url('/assets/themes/cinema-wide.webp'); }
 
+/* Mobile homepage destination scenes are decorative, below the fold.
+   Hold their network requests until the associated card approaches view.
+   All gradients, text and links remain visible during the lazy phase. */
+@media(max-width:700px) {
+  body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-tile:not(.fr-image-visible)::before {
+    background-image:none;
+  }
+}
+
 /* Source podcast covers are square, clear of text and actions. */
 body.fr-v5[data-theme='podcasts'] .editorial-pick__art-frame { aspect-ratio:1; }
 body.fr-v5[data-theme='podcasts'] .editorial-pick__poster { object-fit:contain; }
