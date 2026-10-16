@@ -61,7 +61,7 @@ function decorateHubLayout(html) {
     .replace('<a class="brand"','<a class="brand hub-brand"')
     .replace(/<button class="menu-toggle"[^>]*>[\s\S]*?<\/button>/, '')
     .replace(/<a class="header__action"[^>]*>[\s\S]*?<\/a>/,'')
-    .replace('</head>', '<link rel="stylesheet" href="/hub.css"></head>')
+    .replace('</head>', '<link rel="stylesheet" href="/hub.css"><link rel="stylesheet" href="/fr-inner.css"></head>')
     .replace('</div></footer>', '<a href="/contact.html">CONTACT US</a><a href="/privacy.html">PRIVACY</a></div></footer>')
     .replace('</body>', '<script src="/media-ui.js" defer></script></body>');
 }

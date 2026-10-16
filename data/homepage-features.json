@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "weekOf": "2026-10-16",
+  "editorialPolicy": "Each Friday select factual, source-backed horror recommendations in all six homepage slots. A pick is an editorial recommendation, not a claim of streaming availability, live showtimes, paid partnership, licensed artwork or a newly announced release. Update this document only after checking primary sources and prior selections.",
+  "features": {
+    "movie": {
+      "title": "Heretic",
+      "year": 2024,
+      "description": "Two visitors enter a secluded house, where a conversation about faith turns into a terrifying test of belief.",
+      "href": "/films/heretic/",
+      "sourceName": "A24 / Frightertainment verified film file",
+      "sourceUrl": "/films/heretic/",
+      "checkedAt": "2026-10-08"
+    },
+    "tv": {
+      "title": "Marianne",
+      "year": 2019,
+      "description": "A horror writer returns home to find that the nightmare she invented may have escaped her books.",
+      "href": "/tv-shows.html",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/80217779",
+      "checkedAt": "2026-10-08"
+    },
+    "indie": {
+      "title": "Longlegs",
+      "year": 2024,
+      "description": "An FBI investigation descends into a disturbing occult mystery.",
+      "href": "/films/longlegs/",
+      "sourceName": "NEON / Frightertainment verified film file",
+      "sourceUrl": "/films/longlegs/",
+      "checkedAt": "2026-10-08"
+    },
+    "podcast": {
+      "title": "Old Gods of Appalachia",
+      "description": "A folk-horror anthology of ancient darkness buried beneath the Appalachian mountains.",
+      "href": "https://podcasts.apple.com/gb/podcast/old-gods-of-appalachia/id1485435369",
+      "sourceName": "DeepNerd Media",
+      "sourceUrl": "https://podcasts.apple.com/gb/podcast/old-gods-of-appalachia/id1485435369",
+      "checkedAt": "2026-10-08"
+    },
+    "games": {
+      "title": "Phasmophobia",
+      "description": "Investigate haunted locations, gather evidence and try to make it out alive.",
+      "href": "https://www.kineticgames.co.uk/phasmophobia",
+      "sourceName": "Kinetic Games",
+      "sourceUrl": "https://www.kineticgames.co.uk/phasmophobia",
+      "checkedAt": "2026-10-08"
+    },
+    "cinema": {
+      "title": "Clayface",
+      "year": 2026,
+      "description": "Listed for a UK cinema release on 23 October 2026. Check local listings before planning a visit.",
+      "href": "/films/clayface/",
+      "sourceName": "Screen Daily UK and Ireland release diary",
+      "sourceUrl": "https://www.screendaily.com/news/uk-ireland-film-cinema-release-dates-latest-updates-for-2026/5211864.article",
+      "checkedAt": "2026-10-11",
+      "territory": "GB",
+      "ukDate": "2026-10-23"
+    }
+  }
+}

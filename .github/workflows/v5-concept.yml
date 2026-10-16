@@ -37,6 +37,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:preview
+      - name: Save isolated preview bundle for offline responsive QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-preview-static
+          path: dist/
+          if-no-files-found: error
+          retention-days: 2
       - name: Check original branding and seven page assets are in preview bundle
         run: |
           test -f dist/v5-magazine.css

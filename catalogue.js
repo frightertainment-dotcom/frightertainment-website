@@ -160,8 +160,26 @@
           if (items.length) window.dispatchEvent(new CustomEvent('fr:media-rendered', {detail:{root:list}}));
         } catch {
           if (request !== requestNumber) return;
+          // A failed live provider must not erase independently sourced
+          // theatrical dates. The cinema diary ledger is territorial, dated,
+          // and explicitly NOT a live showtimes/tickets guarantee.
+          if (mode === 'cinema' && page === 1 && window.FR_CINEMA_DIARY) {
+            try {
+              const ledger = await window.FR_CINEMA_DIARY.load();
+              if (request !== requestNumber) return;
+              const shown = window.FR_CINEMA_DIARY.render(list, ledger, [], card, cinemaCountry);
+              if (shown.curated > 0) {
+                pagination.replaceChildren();
+                status.textContent = cinemaCountryNames[cinemaCountry] + ' · ' +
+                  shown.curated + ' source-checked upcoming cinema dates · ' +
+                  'Live catalogue temporarily unavailable. Check individual screening sources and venues.';
+                window.dispatchEvent(new CustomEvent('fr:media-rendered', {detail:{root:list}}));
+                return;
+              }
+            } catch {/* Fall back to transparent provider-unavailable state. */}
+          }
           list.replaceChildren();
-          status.textContent = 'Titles could not load. Please try again.';
+          status.textContent = 'Live listings are temporarily unavailable. Please try again.';
           const retry = document.createElement('button'); retry.className = 'button button--outline'; retry.type = 'button'; retry.textContent = 'TRY AGAIN'; retry.addEventListener('click', load); pagination.append(retry);
         } finally { if (request === requestNumber) list.setAttribute('aria-busy', 'false'); }
       }

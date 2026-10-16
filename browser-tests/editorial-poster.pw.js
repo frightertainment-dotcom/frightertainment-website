@@ -9,7 +9,26 @@ const identities = {
 };
 const override = id => ({schemaVersion:1,overrides:{movies:{id,approved:true,starts:'2026-01-01',ends:'2027-01-01'},indie:{id:id==='longlegs'?'indie-movies-0':'indie-movies-1',approved:true,starts:'2026-01-01',ends:'2027-01-01'}},notes:{}});
 async function pin(page,id) {
-  await page.route('**/data/editorial-spotlight-overrides.json',route=>route.fulfill({json:override(id)}));
+  const selection=override(id);
+  // Owner approvals now ship inside the source-backed first-paint bootstrap.
+  // Override exactly that public release payload, instead of waiting for a
+  // separate JSON request that the fast startup no longer needs.
+  await page.addInitScript(fixture => {
+    let value;
+    Object.defineProperty(window,'FR_EDITORIAL_BOOTSTRAP',{
+      configurable:true,enumerable:true,
+      get(){return value;},
+      set(payload){
+        value=Object.freeze({...payload,settings:{
+          ...payload.settings,
+          overrides:{...payload.settings.overrides,...fixture.overrides},
+          notes:{...payload.settings.notes,...fixture.notes}
+        }});
+      }
+    });
+  }, selection);
+  // This also checks the former fetch route for non-built local development.
+  await page.route('**/data/editorial-spotlight-overrides.json',route=>route.fulfill({json:selection}));
 }
 function media(id, title, year, posterPath='/sample.jpg') {
   return {item:{type:'movie',tmdbId:Number(id),title,firstReleaseDate:year+'-01-01',sourceUrl:'https://www.themoviedb.org/movie/'+id,posterPath,voteAverage:7.2,voteCount:123,ratingKind:'tmdb-community',trailer:{source:'TMDB official video listing',url:'https://www.youtube.com/watch?v=abcdefghijk'}}};
@@ -117,7 +136,7 @@ for(const [room,path,wordmark] of [
 test('Seven tabs and editorial art/copy remain in their responsive tracks', async ({page}) => {
   await pin(page,'longlegs');
   await page.route('**/api/media?**',route=>route.fulfill({status:503}));
-  for(const width of [390,1440]) {
+  for(const width of [320,390,1440]) {
     await page.setViewportSize({width,height:900});
     await page.goto('/movies.html');
     await expect(page.locator('.editorial-pick')).toBeVisible();
@@ -128,7 +147,7 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
       return {
         tabs:tabs.length,
         navRows:new Set(tabs.map(a=>Math.round(a.getBoundingClientRect().top))).size,
-        sideBySide:poster.right<=copy.left+2 && Math.abs(poster.top-copy.top)<16,
+        sideBySide:poster.right<=copy.left+2 && poster.left<copy.left && Math.max(poster.top,copy.top)<Math.min(poster.bottom,copy.bottom),
         stacked:poster.bottom<=copy.top+2,
         width:document.documentElement.scrollWidth,
         viewport:innerWidth
@@ -136,7 +155,10 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
     });
     expect(result.tabs).toBe(7);
     if(width===1440) expect(result.navRows).toBe(1);
-    if(width===390) { expect(result.navRows).toBe(2); expect(result.stacked).toBe(true); }
+    // Updated owner requirement: 360–430px should USE the space beside
+    // the poster; only the narrowest 320px layout needs a vertical stack.
+    if(width===320) { expect(result.navRows).toBe(2); expect(result.stacked).toBe(true); }
+    else if(width===390) { expect(result.navRows).toBe(2); expect(result.sideBySide).toBe(true); }
     else expect(result.sideBySide).toBe(true);
     expect(result.width).toBeLessThanOrEqual(result.viewport+2);
   }

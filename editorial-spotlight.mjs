@@ -320,7 +320,14 @@ async function start() {
   if (!config || !intro) return;
 
   try {
-    const sources = await Promise.all([
+    // Generated at build time from already-public verified editorial files.
+    // Fast path runs in the same task as the first layout; slow path remains
+    // available for local development or a genuinely missing bootstrap file.
+    const bootstrap=window.FR_EDITORIAL_BOOTSTRAP;
+    const sources=bootstrap?.schemaVersion===1 && bootstrap.editorial &&
+      bootstrap.settings && bootstrap.overviews
+      ? [theme==='movies'?null:bootstrap.editorial, bootstrap.settings, bootstrap.overviews]
+      : await Promise.all([
       theme === 'movies' ? Promise.resolve(null) : fetch('/data/editorial.json').then(response => {
         if (!response.ok) throw new Error('Editorial source not reachable');
         return response.json();
@@ -406,12 +413,20 @@ async function start() {
       dots.append(dot);
       return dot;
     });
+    let stableHeight = 0;
     function render() {
       const selected = prepareItem(slides[slideIndex]);
       const note = settings.notes?.[theme]?.[selected.id] || '';
       // The approved owner nomination keeps its editorial label only on that featured item.
       const feature = createSpotlight(config, selected, dayIndex, overridden && slideIndex === 0, note);
       stage.replaceChildren(feature);
+      // The presentation uses the tallest approved synopsis as its measured
+      // module height, so neither long titles nor carousel rotation cause
+      // distracting page jumps or chop the end of a story.
+      if (stableHeight > 0) {
+        feature.style.setProperty('min-height', stableHeight + 'px', 'important');
+        feature.style.setProperty('min-block-size', stableHeight + 'px', 'important');
+      }
       void loadPoster(feature, selected, () => stage.firstElementChild === feature && host.dataset.featureId === selected.id);
       host.dataset.featureId = selected.id;
       host.dataset.slide = String(slideIndex + 1);
@@ -468,6 +483,75 @@ async function start() {
     pause.hidden = overridden || reducedMotion.matches;
     // Place directly below each existing section-title logo without replacing any page structure.
     intro.insertAdjacentElement('afterend', host);
+
+    function reserveEditorialSpace() {
+      if (!host.isConnected || !stage.clientWidth) return;
+      // Measure at the actual rendered viewport, with the same CSS as a live
+      // slide. A temporary inert stage avoids polluting the accessible UI.
+      const probe = make('div', 'editorial-carousel__stage');
+      probe.setAttribute('aria-hidden', 'true');
+      probe.inert = true;
+      probe.style.setProperty('position', 'absolute', 'important');
+      probe.style.setProperty('left', '0', 'important');
+      probe.style.setProperty('top', '0', 'important');
+      probe.style.setProperty('width', stage.getBoundingClientRect().width + 'px', 'important');
+      probe.style.setProperty('visibility', 'hidden', 'important');
+      probe.style.setProperty('pointer-events', 'none', 'important');
+      probe.style.setProperty('height', 'auto', 'important');
+      host.append(probe);
+      let tallest = 0;
+      for (const item of slides) {
+        const prepared = prepareItem(item);
+        const reason = settings.notes?.[theme]?.[prepared.id] || '';
+        const candidate = createSpotlight(config, prepared, dayIndex, false, reason);
+        candidate.style.setProperty('min-height', '0px', 'important');
+        candidate.style.setProperty('min-block-size', '0px', 'important');
+        candidate.style.setProperty('max-height', 'none', 'important');
+        candidate.style.setProperty('max-block-size', 'none', 'important');
+        candidate.style.setProperty('height', 'auto', 'important');
+        candidate.style.setProperty('block-size', 'auto', 'important');
+        if (theme === 'movies' && window.innerWidth >= 1600 && prepared.mediaIdentity && !artHasRights(prepared)) {
+          candidate.querySelector('.editorial-pick__facts')?.append(make('small', 'editorial-pick__tmdb-credit', 'Poster and optional audience score: TMDB. TMDB does not endorse this site. See Credits for attribution.'));
+          const extra = candidate.querySelector('.editorial-pick__links');
+          if (extra && !extra.querySelector('.editorial-pick__media-trailer')) extra.append(make('span', 'editorial-pick__source editorial-pick__media-trailer', 'WATCH OFFICIAL TRAILER ↗'));
+        }
+        probe.replaceChildren(candidate);
+        tallest = Math.max(tallest, Math.ceil(candidate.getBoundingClientRect().height));
+      }
+      probe.remove();
+      stableHeight = tallest;
+      if (tallest > 0) {
+        stage.style.setProperty('min-height', tallest + 'px');
+        const active = stage.querySelector('.editorial-pick');
+        if (active) {
+          active.style.setProperty('min-height', tallest + 'px', 'important');
+          active.style.setProperty('min-block-size', tallest + 'px', 'important');
+        }
+      }
+    }
+
+    reserveEditorialSpace();
+    let resizeFrame = 0;
+    const resizeEditorial = () => {
+      window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(reserveEditorialSpace);
+    };
+    window.addEventListener('resize', resizeEditorial, {passive:true});
+    // The V5 Movies page moves this carousel into a narrower desktop editorial
+    // column after initial insertion. Its width changes without a window resize;
+    // re-measure all slides at their *actual* column width before rotation.
+    host.addEventListener('fr:editorial-layout-change', reserveEditorialSpace);
+    let measuredWidth = host.getBoundingClientRect().width;
+    const widthObserver = new ResizeObserver(entries => {
+      const nextWidth = entries[0]?.contentRect.width || 0;
+      if (nextWidth > 0 && Math.abs(nextWidth - measuredWidth) > 2) {
+        measuredWidth = nextWidth;
+        resizeEditorial();
+      }
+    });
+    widthObserver.observe(host);
+    window.addEventListener('pagehide', () => widthObserver.disconnect(), {once:true});
+    document.fonts?.ready?.then(resizeEditorial).catch(() => {});
     startAutoplay();
   } catch (error) {
     // Failure is visible and honest, without showing fabricated or stale recommendations.

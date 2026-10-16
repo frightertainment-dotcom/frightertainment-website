@@ -1530,7 +1530,8 @@ test('homepage indie showcase features a real sourced film, not a generic placeh
   await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/films/longlegs/');
   await expect(indie).toHaveAttribute('data-media-title', 'Longlegs');
   await expect(indie.locator('[data-media-field="poster"]')).toHaveCount(1);
-  await expect(page.locator('head link[href*="fonts.googleapis.com"]')).toHaveCount(0);
+  await expect(page.locator('head link[rel="stylesheet"][href*="fonts.googleapis.com"]')).toHaveCount(1);
+  await expect(page.locator('head link[rel="preconnect"][href="https://fonts.gstatic.com"]')).toHaveCount(1);
 });
 
 test('optional homepage discovery does not fetch extra provider data until opened', async ({page}) => {
