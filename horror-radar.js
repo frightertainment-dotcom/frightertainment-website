@@ -39,6 +39,8 @@
   };
   const current=date=>date&&date>=new Date().toISOString().slice(0,10);
   const pick=(all,section)=>{
+    if(section==='movies')return all.filter(x=>x.category==='streaming'||x.category==='vod')
+      .sort((a,b)=>Number(current(b.date))-Number(current(a.date))||sort(a,b)).slice(0,8);
     if(section==='home'){
       const ordered=['game','tv','podcast','streaming','vod'];
       return ordered.flatMap(category=>all.filter(x=>x.category===category)
