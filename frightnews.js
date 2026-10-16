@@ -1,4 +1,4 @@
-/* FrightNews: credited original-source links, without rehosting third-party artwork. */
+/* FrightNews: real first-party scene thumbnails; exact-title TMDB posters where verified. */
 (() => {
   const roots = [...document.querySelectorAll('[data-frightnews]')];
   if (!roots.length) return;
@@ -18,6 +18,61 @@
     if (minutes < 10080) return Math.floor(minutes / 1440) + ' DAYS AGO';
     return new Date(n).toLocaleDateString('en-GB').toUpperCase();
   };
+  const moodImages = {
+    movies:['/assets/themes/movies-mobile.webp','/assets/themes/cinema-mobile.webp','/assets/themes/indie-mobile.webp','/assets/worlds/movies-vault.webp'],
+    tv:['/assets/themes/tv-mobile.webp','/assets/themes/tv-wide.webp'],
+    games:['/assets/themes/games-mobile.webp','/assets/themes/games-wide.webp'],
+    podcasts:['/assets/themes/podcasts-mobile.webp','/assets/worlds/podcast-studio.webp'],
+    paranormal:['/assets/themes/home-mobile.webp','/assets/themes/home-wide.webp']
+  };
+  function moodImage(item, category) {
+    const kind = category.includes('GAME') ? 'games' : category.includes('PODCAST') ? 'podcasts' :
+      category.includes('PARANORMAL') ? 'paranormal' : category.includes('TV') ? 'tv' : 'movies';
+    const scenes = moodImages[kind];
+    const hash = String(item.title || '').split('').reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) >>> 0, 37);
+    return scenes[hash % scenes.length];
+  }
+  const normalTitle = text => String(text || '').normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g,' ').trim();
+  let matchedPosters = [];
+  function setVerifiedArtwork(scope) {
+    if (!matchedPosters.length) return;
+    const rows = [...scope.querySelectorAll('.frightnews__row[data-news-title]')];
+    for (const row of rows) {
+      const headline = ' ' + normalTitle(row.dataset.newsTitle) + ' ';
+      const best = matchedPosters.find(item => headline.includes(' ' + item.normal + ' '));
+      if (!best) continue;
+      const frame = row.querySelector('.frightnews__thumb');
+      const image = row.querySelector('.frightnews__thumb-img');
+      if (!frame || !image || frame.dataset.hasPoster === 'yes') continue;
+      frame.dataset.hasPoster = 'yes';
+      const original = image.getAttribute('src');
+      image.classList.add('frightnews__thumb-img--poster');
+      image.title = 'Movie poster: ' + best.title + ' · source TMDB';
+      image.onerror = () => {
+        image.onerror = null;
+        image.classList.remove('frightnews__thumb-img--poster');
+        image.removeAttribute('title');
+        frame.removeAttribute('data-has-poster');
+        image.src = original;
+      };
+      image.src = 'https://image.tmdb.org/t/p/w185' + best.posterPath;
+    }
+  }
+  function loadVerifiedPosters() {
+    fetch('/api/movie-artwork', {headers:{accept:'application/json'}, signal:AbortSignal.timeout(8500)})
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (!data || !Array.isArray(data.items)) return;
+        matchedPosters = data.items.filter(item => item && typeof item.title === 'string' &&
+          /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(item.posterPath || ''))
+          .map(item => ({title:item.title,normal:normalTitle(item.title),posterPath:item.posterPath}))
+          .filter(item => item.normal.length >= 7 && item.normal.split(' ').length > 1)
+          .sort((a,b)=>b.normal.length-a.normal.length);
+        roots.forEach(setVerifiedArtwork);
+      }).catch(() => { /* Keep real, first-party horror artwork when a poster is unavailable. */ });
+  }
   function makeRow(item) {
     let url;
     try { url = new URL(item.url); } catch { return null; }
@@ -26,11 +81,22 @@
     const source = String(item.source || 'Original publisher').slice(0, 80);
     const link = el('a', 'frightnews__row');
     link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.dataset.newsTitle = String(item.title).slice(0, 220);
     link.setAttribute('aria-label', item.title + ' — ' + source + ' (opens a new tab)');
     const image = el('span', 'frightnews__thumb');
     image.setAttribute('aria-hidden', 'true');
     image.dataset.kind = category.toLowerCase().replace(/[^a-z]+/g, '-');
-    image.append(el('span', 'frightnews__thumb-mark', category.includes('TV') ? 'TV' : category.includes('GAME') ? 'GM' : 'FN'));
+    const thumbnail = el('img', 'frightnews__thumb-img');
+    thumbnail.src = moodImage(item, category);
+    thumbnail.alt = '';
+    thumbnail.loading = 'lazy';
+    thumbnail.decoding = 'async';
+    thumbnail.width = 144; thumbnail.height = 90;
+    thumbnail.onerror = () => {
+      thumbnail.onerror = null;
+      thumbnail.src = '/assets/themes/home-mobile.webp';
+    };
+    image.append(thumbnail);
     const copy = el('span', 'frightnews__copy');
     const meta = el('span', 'frightnews__meta');
     meta.append(el('span', 'frightnews__category', category), el('span', 'frightnews__bullet', ' • '), el('span', 'frightnews__publisher', source));
@@ -68,6 +134,7 @@
           const until = Math.min(visible + 40, rows.length);
           list.append(...rows.slice(visible, until).map(row => row.cloneNode(true)));
           visible = until;
+          setVerifiedArtwork(list);
         };
         list.replaceChildren(); show(); end.replaceChildren(); end.hidden = false;
         if (home) {
@@ -85,5 +152,6 @@
         } else end.append(el('span', 'frightnews__end-note', 'END OF THE LATEST HEADLINES'));
         if (state) state.textContent = rows.length + ' SOURCE-LINKED STORIES · UPDATED ' + timeAgo(data.updatedAt);
       });
+      loadVerifiedPosters();
     }).catch(() => roots.forEach(fail));
 })();
