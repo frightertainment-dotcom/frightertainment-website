@@ -205,7 +205,7 @@
   for(const [name,url] of [
    ['HOME','/'],['MOVIES','/movies.html'],['TV SHOWS','/tv-shows.html'],
    ['CINEMA','/cinema.html'],['INDIE MOVIES','/indie-movies.html'],
-   ['PODCASTS','/podcasts.html'],['GAMES','/games.html'],['FRIGHTNEWS','/frightnews.html']
+   ['PODCASTS','/podcasts.html'],['GAMES','/games.html']
   ])menuList.append(link(name,url));
   menu.append(menuButton,menuList);
   const search=el('details','fr-v5-header-search');
