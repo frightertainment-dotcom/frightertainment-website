@@ -1,0 +1,75 @@
+/* FrightWatch: private-preview streaming atmosphere; uses live Frightertainment chrome. */
+body.fr-watch-page { background:#050506; color:#eee9e3; overflow-x:clip }
+.fr-watch-page .fr-watch { max-width:1420px; padding-bottom:35px; min-width:0 }
+.fr-watch-page .hub-header { position:sticky }
+.fr-watch .fr-watch-kicker,.fr-watch .fr-watch-eyebrow { color:#e3aab0; letter-spacing:.2em; font:800 11px/1.5 'Barlow Condensed',sans-serif }
+.fr-watch .fr-watch-eyebrow { color:#f0d5d3; margin:0 0 19px }
+.fr-watch h1,.fr-watch h2,.fr-watch h3 { margin:0; }
+.fr-watch em { font-weight:inherit; color:#d16b7a; font-style:normal; }
+.fr-watch-hero { position:relative;isolation:isolate; overflow:hidden; margin:12px 0 38px; min-height:470px; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr); align-items:center; padding:clamp(27px,5vw,78px); border:1px solid #563033; background:#100709; box-shadow:0 24px 50px #0009; }
+.fr-watch-hero::before { content:''; z-index:-2; position:absolute;inset:0; background:linear-gradient(100deg,#08080ae8 0%,#12070acb 54%,#16060963 100%),url('/assets/themes/indie-wide.webp') center 44% / cover no-repeat; }
+.fr-watch-hero::after { content:'';z-index:-1; position:absolute;inset:0;pointer-events:none; background:radial-gradient(ellipse at 83% 50%,#d41e342f,transparent 39%),repeating-linear-gradient(0deg,#fff0 0px,#fff0 4px,#fff1 5px);mix-blend-mode:screen;opacity:.4; }
+.fr-watch-hero__shade { position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f04154,#5a0a10,transparent) }
+.fr-watch-hero__copy { position:relative;z-index:2;max-width:680px }
+.fr-watch-wordmark h1 { font:700 clamp(50px,7vw,104px)/.92 'Grenze Gotisch',Georgia,serif;letter-spacing:-.045em;text-shadow:0 5px 21px #000,0 0 23px #c5263a48;color:#f7efeb }
+.fr-watch-wordmark img { display:block;width:min(100%,670px);max-height:260px;object-fit:contain;object-position:left center;filter:drop-shadow(0 12px 20px #0007)}
+.fr-watch-wordmark img[hidden] {display:none}
+.fr-watch-hero__intro { font:700 clamp(19px,2.4vw,31px)/1.3 'Cormorant Garamond',Georgia,serif; margin:17px 0 12px; color:#f0b8bf }
+.fr-watch-hero__body { max-width:540px;color:#d2c5c3;font:400 clamp(14px,1.3vw,17px)/1.65 'DM Sans',sans-serif }
+.fr-watch-hero__actions {display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.fr-watch-button { display:inline-flex;align-items:center;justify-content:center;gap:14px;text-align:center;padding:13px 21px;min-height:48px;font:800 12px/1.2 'Barlow Condensed',sans-serif;letter-spacing:.105em;border:1px solid #a84656;transition:background .2s,border-color .2s,box-shadow .2s,transform .2s; }
+.fr-watch-button--primary { background:#a71930;color:#fff;border-color:#bd2e44;box-shadow:0 8px 25px #0005; }
+.fr-watch-button--primary:is(:hover,:focus-visible) {background:#ca2a42;box-shadow:0 0 24px #d91c3e4d;transform:translateY(-1px)}
+.fr-watch-button--secondary {background:#130c10bb;color:#f1d7d7;border-color:#825057}
+.fr-watch-button--secondary:is(:hover,:focus-visible){background:#33151c;border-color:#e58b98}
+.fr-watch-hero__foot {color:#bd9197;font:700 10px/1.4 'Barlow Condensed',sans-serif;letter-spacing:.1em;margin-top:27px}
+.fr-watch-hero__visual {position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:290px;gap:20px;opacity:.9}
+.fr-watch-hero__visual>span {font:800 10px 'Barlow Condensed',sans-serif;letter-spacing:.25em;color:#dcaab1;text-align:center}
+.fr-watch-reel {position:relative;width:min(270px,80%);aspect-ratio:1;border-radius:50%;border:3px solid #8a434d;background:radial-gradient(circle at center,#14090c 0 21%,#34151a 22% 24%,transparent 25%),repeating-conic-gradient(from 22deg,#4c222b 0deg 13deg,#0a0507 14deg 35deg);box-shadow:0 0 60px #cc243b3d,inset 0 0 30px #000,0 28px 25px #0009;animation:fr-watch-reel-pulse 6s ease-in-out infinite}
+.fr-watch-reel__ring {position:absolute;inset:12%;border:2px solid #bc6266a0;border-radius:50%}
+.fr-watch-reel__centre {position:absolute;inset:34%;display:grid;place-items:center;border:2px solid #b97a7b;border-radius:50%;background:#11090a;letter-spacing:.08em;color:#e8c0c2;font:800 26px 'Grenze Gotisch',Georgia,serif}
+@keyframes fr-watch-reel-pulse { 50%{box-shadow:0 0 70px #ca223f6a,inset 0 0 30px #000,0 28px 25px #0009} }
+.fr-watch-section-head {display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:12px}
+.fr-watch-section-head h2,.fr-watch-submit h2 {margin:4px 0 0;font:800 clamp(29px,4vw,55px)/1.04 'Barlow Condensed',sans-serif;letter-spacing:.012em}
+.fr-watch-badge{font:800 10px/1.4 'Barlow Condensed',sans-serif;letter-spacing:.11em;padding:9px 13px;border:1px solid #56363a;color:#cfa7a9;background:#180e11}
+.fr-watch-lead {font:400 14px/1.7 'DM Sans',sans-serif;color:#bdb0af;max-width:800px;margin:13px 0 22px}
+.fr-watch-browser {background:#110d10;border-top:1px solid #71414a;border-bottom:1px solid #3d282d;padding:15px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.fr-watch-filters{display:flex;gap:6px;flex-wrap:wrap}
+.fr-watch-filters button{background:transparent;border:1px solid transparent;padding:10px 12px;color:#b1a6a7;font:800 11px 'Barlow Condensed',sans-serif;letter-spacing:.085em;min-height:42px}
+.fr-watch-filters button:is(:hover,:focus-visible),.fr-watch-filters button.is-active{color:white;background:#41181f;border-color:#925263}
+.fr-watch-search{display:flex;min-width:240px;flex:1 1 240px;max-width:330px}
+.fr-watch-search input{width:100%;min-height:43px;background:#09080a;border:1px solid #604047;color:white;padding:9px 15px;font:700 12px 'DM Sans',sans-serif;letter-spacing:.045em}
+.fr-watch-catalogue {display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:18px;padding-top:18px}
+.fr-watch-film {background:#181014;border:1px solid #57323b;min-width:0;overflow:hidden}
+.fr-watch-film__poster {display:block;width:100%;aspect-ratio:2/3;object-fit:cover;background:#160a0f}
+.fr-watch-film__meta{padding:12px}
+.fr-watch-film__meta h3{font:800 18px/1.15 'Barlow Condensed',sans-serif}
+.fr-watch-film__meta p{font:400 12px/1.45 'DM Sans',sans-serif;color:#c3afb2;margin:8px 0}
+.fr-watch-film__meta a{display:inline-block;padding:7px 0;color:#ffc5ce;font:800 12px 'Barlow Condensed',sans-serif}
+.fr-watch-empty {display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:center;margin-top:15px;padding:clamp(24px,4vw,55px);border:1px solid #51323a;background:linear-gradient(115deg,#1d1117,#0b0a0d 70%);min-height:205px}
+.fr-watch-empty__number{font:800 clamp(72px,12vw,150px)/1 'Barlow Condensed',sans-serif;color:#b8526440}
+.fr-watch-empty h3{font:800 clamp(23px,3vw,36px)/1.08 'Barlow Condensed',sans-serif;letter-spacing:.02em;margin:4px 0 9px}
+.fr-watch-empty p{font:400 13px/1.6 'DM Sans',sans-serif;color:#c2b6b7;max-width:700px}
+.fr-watch-empty a{color:#e7abb4;font:800 12px 'Barlow Condensed',sans-serif;letter-spacing:.07em}
+.fr-watch-genre {margin:55px 0}
+.fr-watch-genre-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:24px}
+.fr-watch-genre-card {min-width:0;min-height:212px;display:flex;flex-direction:column;justify-content:end;padding:19px;border:1px solid #55353c;position:relative;overflow:hidden;background:radial-gradient(ellipse at 30% 30%,#7f354138,transparent 55%),linear-gradient(150deg,#261219,#09080a)}
+.fr-watch-genre-card::before{position:absolute;content:'';width:200px;height:200px;top:-90px;right:-70px;transform:rotate(-26deg);border:22px solid #e4445220;border-radius:50%}
+.fr-watch-genre-card[data-genre='supernatural']{background:radial-gradient(circle at 80% 10%,#7f8b852c,transparent 50%),linear-gradient(140deg,#1b1f20,#0b0a0a)}
+.fr-watch-genre-card[data-genre='indie']{background:radial-gradient(circle at 30% 15%,#ba86503a,transparent 53%),linear-gradient(145deg,#23160e,#0b0908)}
+.fr-watch-genre-card[data-genre='paranormal']{background:radial-gradient(circle at 78% 0%,#a91b412c,transparent 50%),linear-gradient(145deg,#251016,#07090a)}
+.fr-watch-genre-card span{font:800 10px 'Barlow Condensed',sans-serif;letter-spacing:.14em;color:#e4a9b2}
+.fr-watch-genre-card h3{font:800 clamp(20px,2.2vw,31px)/1 'Barlow Condensed',sans-serif;margin:8px 0}
+.fr-watch-genre-card p{font:400 12px/1.45 'DM Sans',sans-serif;color:#c1b0b2;margin:0}
+.fr-watch-disclaimer{color:#93848a;font:400 11px/1.6 'DM Sans',sans-serif}
+.fr-watch-submit {display:grid;grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr);gap:28px;margin:30px 0 40px;padding:clamp(25px,4vw,50px);border-top:3px solid #a51c32;border-bottom:1px solid #5d353e;background:linear-gradient(95deg,#1e0d13,#0b0b0e 80%)}
+.fr-watch-submit__copy p{font:400 13px/1.7 'DM Sans',sans-serif;color:#cdbdc0;max-width:800px}
+.fr-watch-submit__copy strong{color:#faf1f1}
+.fr-watch-submit__copy .fr-watch-button{margin-top:13px}
+.fr-watch-submit__art{min-width:0;display:flex;flex-direction:column;justify-content:center;text-align:center;border:1px solid #56333c;background:radial-gradient(ellipse at center,#b0283a36,transparent 70%),linear-gradient(140deg,#0d080b,#1f0e15);padding:15px}
+.fr-watch-submit__art span,.fr-watch-submit__art small{font:800 10px/1.4 'Barlow Condensed',sans-serif;letter-spacing:.15em;color:#dfa0ae}
+.fr-watch-submit__art strong{font:800 clamp(33px,4vw,60px)/.91 'Barlow Condensed',sans-serif;margin:26px 0;color:#fff2ee}
+@media (max-width:900px){.fr-watch-hero{grid-template-columns:1fr;min-height:0}.fr-watch-hero__visual{display:none}.fr-watch-genre-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){body.fr-watch-page .fr-watch{width:calc(100% - 26px)!important;max-width:100%;}.fr-watch-hero{margin:10px 0 28px;padding:25px 20px 32px}.fr-watch-wordmark h1{font-size:clamp(44px,12vw,70px)}.fr-watch-hero__intro{font-size:23px}.fr-watch-hero__actions{display:grid;grid-template-columns:1fr}.fr-watch-button{width:100%}.fr-watch-section-head{align-items:start;flex-direction:column}.fr-watch-browser{padding:10px}.fr-watch-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;scrollbar-width:thin}.fr-watch-filters button{white-space:nowrap;flex:0 0 auto}.fr-watch-search{max-width:100%;min-width:0}.fr-watch-empty{grid-template-columns:1fr;gap:0}.fr-watch-empty__number{font-size:65px}.fr-watch-genre-grid{gap:10px}.fr-watch-genre-card{min-height:180px;padding:15px}.fr-watch-genre-card h3{font-size:21px}.fr-watch-submit{grid-template-columns:1fr}.fr-watch-submit__art{display:none}}
+@media(max-width:360px){.fr-watch-genre-grid{grid-template-columns:1fr}.fr-watch-genre-card{min-height:150px}}
+@media(prefers-reduced-motion:reduce){.fr-watch-reel{animation:none}.fr-watch-button{transition:none}}
