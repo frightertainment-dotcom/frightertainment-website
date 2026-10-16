@@ -213,6 +213,9 @@
         }
         let visible = 0;
         const total = Number.isInteger(data.total) && data.total >= rows.length ? data.total : rows.length;
+        const archiveLink = document.querySelector('.frightnews__browse-nav a[href="/frightnews.html?archive=1"]');
+        if (archiveLink && Number(data.archiveTotal) > 0)
+          archiveLink.textContent = 'PRESERVED ARCHIVE (' + Number(data.archiveTotal) + ')';
         const canLoadMore = () => visible < rows.length || (data.storageMode === 'persistent' && rows.length < total);
         let loading = false;
         const show = () => {
@@ -259,7 +262,7 @@
           state.textContent = viewingArchive ? 'ARCHIVE · ' + total + ' PRESERVED STORIES' : data.mode === 'source-checked'
             ? checked + ' SOURCE-CHECKED RELEASE UPDATES · LIVE NEWS TEMPORARILY UNAVAILABLE'
             : checked ? live + ' NEWS STORIES · ' + checked + ' SOURCE-CHECKED UPDATES'
-            : rows.length + ' SOURCE-LINKED STORIES · UPDATED ' + timeAgo(data.updatedAt);
+            : total + ' SOURCE-LINKED ARTICLES · UPDATED ' + timeAgo(data.updatedAt);
         }
       });
       // Extra TMDB poster lookup is only needed on the full FrightNews page.
