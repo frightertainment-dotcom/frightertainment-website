@@ -113,9 +113,20 @@ test('Dated UK release caveats remain attached to source-ledger entries',async()
  const d=JSON.parse(await readFile(sourceUrl,'utf8'));
  const uk=d.territories.GB.screenings;
  const clay=uk.find(x=>x.id==='clayface-2026-uk');
- assert.equal(clay.dateConfidence,'disputed');
- assert.equal(clay.sourceUrl,'https://www.dcm.co.uk/film-calendar?film=clayface');
- assert(uk.some(x=>x.title==='Werwulf'&&x.date==='2027-01-01'&&x.dateConfidence==='disputed'));
+ assert.equal(clay.date,'2026-10-23');
+ assert.equal(clay.dateConfidence,undefined);
+ assert.equal(clay.sourceUrl,'https://www.bbfc.co.uk/release/clayface-q29sbgvjdglvbjpwwc0xmte2ndmx');
+ assert(uk.some(x=>x.title==='Werwulf'&&x.date==='2027-01-01'&&x.dateConfidence==='provisional'));
  assert(uk.some(x=>x.title==='The Exorcist: Martyrs'&&x.date==='2027-03-12'));
  assert(uk.some(x=>x.title==='In the Grip of Terror'&&x.venue==='Southport Bijou Cinema'));
+});
+
+test('2027 UK advance dates stay provisional and do not duplicate first-run 2026 titles',async()=>{
+ const d=JSON.parse(await readFile(sourceUrl,'utf8'));
+ const uk=d.territories.GB.screenings;
+ const year=uk.filter(x=>x.date.startsWith('2027-'));
+ assert.ok(year.length>=6,'full 2027 UK calendar must have sourced entries');
+ assert.ok(year.some(x=>x.title==='A Quiet Place: Part III'&&x.dateConfidence==='provisional'));
+ assert.ok(year.some(x=>x.title==='The Mummy 4'&&x.dateConfidence==='provisional'));
+ assert.ok(uk.some(x=>x.id==='clayface-2026-uk'&&x.date==='2026-10-23'));
 });
