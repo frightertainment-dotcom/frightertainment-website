@@ -30,7 +30,7 @@ test('UK source diary populates, marks disputed dates, and preserves distinct ve
  await page.goto('/cinema.html',{waitUntil:'domcontentloaded'});
  const diary=page.locator('[data-cinema-concept-cards]');
  await expect(diary).toContainText('Clayface',{timeout:15000});
- await expect(diary).toContainText('DATE UNDER REVIEW');
+ await expect(diary).toContainText('23 Oct 2026');
  const list=page.locator('#upcoming-cinema [data-catalogue-list]');
  await expect(list).toContainText('Spoiling You',{timeout:15000});
  await expect(list).toContainText('Mr Whispers');
@@ -46,6 +46,25 @@ test('data files expose source-correct territory dates',async({request})=>{
  expect(res.ok()).toBeTruthy(); expect(screenings.ok()).toBeTruthy();
  const [news,diary]=await Promise.all([res.json(),screenings.json()]);
  expect(news.items.find(x=>x.id==='cinema-resident-evil-2026').date).toBe('2026-09-18');
- expect(diary.territories.GB.screenings.find(x=>x.id==='clayface-2026-uk').dateConfidence).toBe('disputed');
+ expect(diary.territories.GB.screenings.find(x=>x.id==='clayface-2026-uk').date).toBe('2026-10-23');
  expect(diary.territories.GB.screenings.some(x=>x.title==='The Exorcist: Martyrs')).toBeTruthy();
+});
+
+test('sourced radar renders across five sections without inventing a streaming arrival',async({page})=>{
+ for(const path of ['/','/movies.html','/tv-shows.html','/games.html','/podcasts.html']){
+   await page.goto(path,{waitUntil:'domcontentloaded'});
+   const radar=page.locator('[data-fr-radar]');
+   await expect(radar).toBeAttached();
+   await expect(radar.locator('.fr-radar__card').first()).toBeAttached({timeout:15000});
+   await expect(radar.locator('.fr-radar__card a.fr-radar__source').first()).toHaveAttribute('href',/^https:\/\//);
+   await expect(radar).not.toContainText('LIVE CINEMA SHOWTIMES');
+ }
+});
+
+test('radar source records preserve country, dates and show undated digital notices',async({request})=>{
+ const r=await request.get('/data/horror-radar.json');expect(r.ok()).toBeTruthy();
+ const j=await r.json();expect(j.items.length).toBeGreaterThan(10);
+ expect(j.items.some(x=>x.category==='game'&&x.title==='Until Dawn 2'&&x.date==='2027-01-28')).toBeTruthy();
+ expect(j.items.some(x=>x.category==='vod'&&x.date===null&&x.status==='announced-undated')).toBeTruthy();
+ expect(j.items.some(x=>x.category==='tv'&&x.channel==='Prime Video UK')).toBeTruthy();
 });
