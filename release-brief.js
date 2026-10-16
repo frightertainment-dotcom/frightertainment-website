@@ -34,7 +34,7 @@
     x.country==='GB' && realDate(x.date) && realDate(x.checkedAt) &&
     /^https:\/\//.test(x.sourceUrl||'');
   const summarise=(items,mode)=>{
-    if(mode==='coming')return items.filter(x=>['cinema','streaming'].includes(x.category)&&
+    if(mode==='coming')return items.filter(x=>['cinema','streaming'].includes(x.category)&&!x.dateIsSourceCheck&&
       x.date>now&&daysAgo(x.date)>=-365).sort((a,b)=>a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
     if(mode==='streaming')return items.filter(x=>x.category==='streaming'&&x.date<=now&&daysAgo(x.date)<=28)
       .sort((a,b)=>b.date.localeCompare(a.date)||a.title.localeCompare(b.title));
@@ -53,8 +53,8 @@
       const note=item.dateConfidence==='disputed'?' · DATE CONFLICT — CHECK CINEMA':'';
       return 'UK '+kind+' '+fmt(item.date)+(item.venue?' · '+item.venue:'')+note;
     }
-    if(mode==='streaming')return 'Added '+fmt(item.date)+' · '+item.service+' UK';
-    if(mode==='coming')return 'Announced for '+fmt(item.date)+' · '+item.service+' UK';
+    if(mode==='streaming')return item.dateIsSourceCheck ? 'UK provider spotlight · source reviewed '+fmt(item.checkedAt)+' · check subscription access' : 'Announced arrival '+fmt(item.date)+' · '+item.service+' UK';
+    if(mode==='coming')return (item.dateIsSourceCheck?'Provider source reviewed ':'Announced for ')+fmt(item.date)+' · '+item.service+' UK';
     return item.dateIsSourceCheck ? item.service+' · source checked '+fmt(item.checkedAt) :
       item.service+' · release '+fmt(item.date);
   };
