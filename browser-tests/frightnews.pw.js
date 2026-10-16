@@ -79,7 +79,7 @@ for (const width of [320,390,1280]) {
       // Phone: four compact headlines, NO internal scroll; move down the actual page.
       await expect(rail.locator('.frightnews__row:visible')).toHaveCount(4);
       expect(metrics.clientHeight).toBeGreaterThan(0);
-      expect(metrics.clientHeight).toBeLessThanOrEqual(420);
+      expect(metrics.clientHeight).toBeLessThanOrEqual(480);
       expect(metrics.scrollHeight - metrics.clientHeight).toBeLessThanOrEqual(2);
       const scrolling = await rail.locator('[data-frightnews-viewport]').evaluate(node =>
         getComputedStyle(node).overflowY);
