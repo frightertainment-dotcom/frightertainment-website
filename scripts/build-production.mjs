@@ -131,9 +131,14 @@ await writeFile(new URL('_headers', destination), headers);
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version: 1, include: ['/api/*'], exclude: []
 }));
-for (const forbidden of ['worker', 'scripts', 'test', '.github', 'API_LICENSING.md', 'STAGING_AUTOMATION.md', 'rankings-preview.js']) {
+for (const forbidden of ['worker', 'scripts', 'test', '.github', 'API_LICENSING.md', 'STAGING_AUTOMATION.md', 'rankings-preview.js', 'frightwatch.html', 'frightwatch.js', 'frightwatch.css', 'frightwatch-banner.js', 'frightwatch-banner.css']) {
   const entries = await readdir(destination);
   if (entries.includes(forbidden)) throw new Error('Internal development file leaked into production: ' + forbidden);
 }
+// FrightWatch remains private: fail production if its catalogue or artwork are bundled.
+const publicAssetEntries = await readdir(new URL('assets/', destination));
+const publicDataEntries = await readdir(new URL('data/', destination));
+if (publicAssetEntries.includes('frightwatch') || publicDataEntries.includes('frightwatch-catalogue.json'))
+  throw new Error('Unreleased FrightWatch catalogue or artwork must never ship in production.');
 await cp(new URL('_redirects', root), new URL('_redirects', destination));
 console.log('Production bundle ready: public pages, restricted source data, public robots, security headers and API-only Function routing.');
