@@ -30,6 +30,15 @@ for (const width of [320,390,1280]) {
     await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(5);
     await expect(page.locator('#latest-horror')).toBeAttached();
     await expect(page.locator('#live-discovery')).toBeAttached();
+    const layout = await rail.locator('.frightnews__row').first().evaluate(row => {
+      const art = row.querySelector('.frightnews__thumb').getBoundingClientRect();
+      const copy = row.querySelector('.frightnews__copy').getBoundingClientRect();
+      return {artLeft:art.left,artRight:art.right,artWidth:art.width,copyLeft:copy.left,copyWidth:copy.width};
+    });
+    expect(layout.artWidth).toBeGreaterThanOrEqual(60);
+    expect(layout.artWidth).toBeLessThanOrEqual(140);
+    expect(layout.artRight).toBeLessThanOrEqual(layout.copyLeft + 2);
+    expect(layout.copyWidth).toBeGreaterThan(75);
     const thumbnails = await rail.locator('.frightnews__thumb img').count();
     expect(thumbnails).toBe(40);
     await expect(rail.locator('.frightnews__thumb img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds)\//);
