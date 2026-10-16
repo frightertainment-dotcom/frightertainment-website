@@ -3,7 +3,7 @@
   // the closest verified upcoming release. No fabricated availability or score.
   const feature=document.querySelector('.hub-feature');
   const films=Array.isArray(window.FR_MOVIES)?window.FR_MOVIES:[];
-  if(feature&&films.length){
+  if(feature&&films.length&&!feature.dataset.editorialCurated){
     const today=new Date().toISOString().slice(0,10);
     const recent=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
     const future=new Date(Date.now()+45*86400000).toISOString().slice(0,10);
