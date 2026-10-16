@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "checkedAt": "2026-10-15",
-  "coverage": "Country-specific, evidence-backed horror cinema release and screening diary; a venue or distributor listing does not guarantee showtimes at every cinema. Territory date conflicts are explicitly flagged; unconfirmed reach is never described as a general release.",
+  "checkedAt": "2026-10-16",
+  "coverage": "Country-specific, evidence-backed horror cinema release and screening diary; a venue or distributor listing does not guarantee showtimes at every cinema. Territory date conflicts are explicitly flagged; unconfirmed reach is never described as a general release. 2027 UK dates drawn from advance film calendars are provisional, not venue bookings.",
   "priorityPolicy": "Group by month first; within a month source-confirmed major studio/general releases first, special re-screenings next and select independent cinema events last. Months always remain in chronological order.",
   "territories": {
     "GB": {
@@ -12,17 +12,16 @@
           "id": "clayface-2026-uk",
           "title": "Clayface",
           "filmYear": 2026,
-          "date": "2026-10-19",
+          "date": "2026-10-23",
           "edition": "new",
           "reach": "general",
           "tier": "studio",
           "distributor": "Warner Bros / DC Studios",
           "genre": "Body horror / supernatural thriller",
-          "sourceUrl": "https://www.dcm.co.uk/film-calendar?film=clayface",
+          "sourceUrl": "https://www.bbfc.co.uk/release/clayface-q29sbgvjdglvbjpwwc0xmte2ndmx",
           "tmdbId": 1400940,
-          "note": "UK cinema advertising calendar (DCM) lists 19 October; Screen Daily listed 23 October. Conflicting source dates: confirm current ticket date with your cinema before travelling; 19 October may include previews.",
-          "checkedAt": "2026-10-15",
-          "dateConfidence": "disputed"
+          "note": "BBFC UK cinema release 23 October 2026; distributor Warner Bros Entertainment UK Ltd. Earlier DCM advance calendar suggested 19 October; BBFC and Warner Bros UK promotional listings take precedence.",
+          "checkedAt": "2026-10-16"
         },
         {
           "id": "dracula-1958-cineworld",
@@ -278,10 +277,10 @@
           "reach": "general",
           "tier": "studio",
           "distributor": "Focus Features / Universal",
-          "sourceUrl": "https://www.the-numbers.com/movie/Werwulf-%282026%29",
-          "dateConfidence": "disputed",
-          "note": "The Numbers and Flicks list 1 January 2027 for UK; IMDb lists 25 December 2026. UK date remains disputed: verify distributor and local cinemas. US opening confirmed separately as 25 December 2026.",
-          "checkedAt": "2026-10-15"
+          "sourceUrl": "https://www.25thframe.co.uk/coming-soon/calendar.php?year=2027",
+          "dateConfidence": "provisional",
+          "note": "UK provisional January 1, 2027 date appears on UK release calendars; US distributor lists December 25, 2026. Check UK distributor/venue nearer opening.",
+          "checkedAt": "2026-10-16"
         },
         {
           "id": "exorcist-martyrs-gb-20270312",
@@ -295,6 +294,81 @@
           "sourceUrl": "https://www.universalpictures.co.uk/movies/unt-mike-flanagan-exorcist-film/",
           "note": "Universal Pictures UK lists a 12 March 2027 opening under the working title 'Unt. Mike Flanagan Exorcist Film'; widely announced title The Exorcist: Martyrs.",
           "checkedAt": "2026-10-15"
+        },
+        {
+          "id": "revenge-llorona-uk-20270226",
+          "title": "The Revenge of La Llorona",
+          "date": "2027-02-26",
+          "distributor": "UK release calendar",
+          "genre": "Supernatural horror",
+          "note": "Provisional UK calendar date; cinema bookings, distributor confirmation and final release scope remain unconfirmed.",
+          "filmYear": 2027,
+          "edition": "new",
+          "reach": "unconfirmed",
+          "tier": "independent",
+          "sourceUrl": "https://www.25thframe.co.uk/coming-soon/calendar.php?year=2027",
+          "dateConfidence": "provisional",
+          "checkedAt": "2026-10-16"
+        },
+        {
+          "id": "godzilla-kong-supernova-uk-20270326",
+          "title": "Godzilla x Kong: Supernova",
+          "date": "2027-03-26",
+          "distributor": "Warner Bros / Legendary",
+          "genre": "Monster / creature feature",
+          "note": "Provisional UK calendar listing; monster-adventure crossover, not a guaranteed pure horror classification.",
+          "filmYear": 2027,
+          "edition": "new",
+          "reach": "unconfirmed",
+          "tier": "studio",
+          "sourceUrl": "https://www.25thframe.co.uk/coming-soon/calendar.php?year=2027",
+          "dateConfidence": "provisional",
+          "checkedAt": "2026-10-16"
+        },
+        {
+          "id": "quiet-place-3-uk-20270709",
+          "title": "A Quiet Place: Part III",
+          "date": "2027-07-09",
+          "distributor": "Paramount Pictures",
+          "genre": "Post-apocalyptic horror",
+          "note": "UK calendar lists 9 July 2027. US release calendars cite 30 July; retain distinct UK provisional date until studio confirmation.",
+          "filmYear": 2027,
+          "edition": "new",
+          "reach": "unconfirmed",
+          "tier": "studio",
+          "sourceUrl": "https://www.25thframe.co.uk/coming-soon/calendar.php?year=2027",
+          "dateConfidence": "provisional",
+          "checkedAt": "2026-10-16"
+        },
+        {
+          "id": "shiver-uk-20270813",
+          "title": "Shiver",
+          "date": "2027-08-13",
+          "distributor": "UK release calendar",
+          "genre": "Thriller / horror — classification to verify",
+          "note": "Source-confirmed provisional UK date only; verify official horror genre and cinema reach before promotion.",
+          "filmYear": 2027,
+          "edition": "new",
+          "reach": "unconfirmed",
+          "tier": "independent",
+          "sourceUrl": "https://www.25thframe.co.uk/coming-soon/calendar.php?year=2027",
+          "dateConfidence": "provisional",
+          "checkedAt": "2026-10-16"
+        },
+        {
+          "id": "mummy-4-uk-20271015",
+          "title": "The Mummy 4",
+          "date": "2027-10-15",
+          "distributor": "Universal Pictures",
+          "genre": "Monster / supernatural adventure",
+          "note": "Provisional UK release-calendar date; release title and cinema bookings subject to studio changes.",
+          "filmYear": 2027,
+          "edition": "new",
+          "reach": "unconfirmed",
+          "tier": "studio",
+          "sourceUrl": "https://www.25thframe.co.uk/coming-soon/calendar.php?year=2027",
+          "dateConfidence": "provisional",
+          "checkedAt": "2026-10-16"
         }
       ]
     },
