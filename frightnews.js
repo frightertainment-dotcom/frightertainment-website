@@ -223,6 +223,8 @@
             : rows.length + ' SOURCE-LINKED STORIES · UPDATED ' + timeAgo(data.updatedAt);
         }
       });
-      loadVerifiedPosters();
+      // Extra TMDB poster lookup is only needed on the full FrightNews page.
+      // Do not load another provider endpoint on every homepage visit.
+      if (roots.some(root => root.dataset.frightnews === 'page')) loadVerifiedPosters();
     }).catch(() => roots.forEach(fail));
 })();
