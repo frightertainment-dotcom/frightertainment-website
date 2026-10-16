@@ -464,13 +464,16 @@
   if(document.querySelector('.fr-v5-mobile-dock'))return;
   const nav=el('nav','fr-v5-mobile-dock');nav.setAttribute('aria-label','Quick horror sections');
   [
-   ['⌂','HOME','/','home'],
-   ['◉','MOVIES','/movies.html','movies'],
-   ['♟','INDIE','/indie-movies.html','indie'],
-   ['♫','PODCASTS','/podcasts.html','podcasts'],
-   ['✦','GAMES','/games.html','games']
-  ].forEach(([symbol,label,href,id])=>{
+   ['⌂','HOME','Home','/','home'],
+   ['◉','MOVIES','Movies','/movies.html','movies'],
+   ['▣','TV','TV Shows','/tv-shows.html','tv'],
+   ['▤','CINEMA','Cinema','/cinema.html','cinema'],
+   ['♟','INDIE','Indie Movies','/indie-movies.html','indie'],
+   ['♫','PODCAST','Podcasts','/podcasts.html','podcasts'],
+   ['✦','GAMES','Games','/games.html','games']
+  ].forEach(([symbol,label,accessibleName,href,id])=>{
    const a=link('',href,theme===id?'active':'');
+   a.setAttribute('aria-label',accessibleName);
    a.append(el('span','fr-v5-dock-symbol',symbol),el('small','',label));
    if(theme===id)a.setAttribute('aria-current','page');
    nav.append(a);
