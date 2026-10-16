@@ -25,13 +25,17 @@ for (const width of [320,390,1440]) {
         const box=el.getBoundingClientRect(),css=getComputedStyle(el);
         return {text:el.textContent.trim(),x:box.x,y:box.y,width:box.width,height:box.height,font:css.font,fontFamily:css.fontFamily,color:css.color};
       }),
-      brokenImages:[...document.images].filter(img=>img.getBoundingClientRect().top<900&&!img.hidden&&(!img.complete||!img.naturalWidth)).map(img=>img.src),
+      brokenImages:[...document.images].filter(img=>{
+        const box=img.getBoundingClientRect();
+        return box.width>0&&box.height>0&&box.bottom>0&&box.top<900&&!img.hidden&&(!img.complete||!img.naturalWidth);
+      }).map(img=>img.src),
       fonts:[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family+'|'+f.style+'|'+f.weight).sort()
     }));
+    await page.screenshot({path:`loading-evidence/${label}-${width}.png`});
+    await writeFile(`loading-evidence/${label}-${width}.json`,JSON.stringify({layout,styles},null,2));
     assert.ok(layout.scrollWidth<=width+2, label+' horizontal overflow at '+width);
     assert.deepEqual(failures,[],label+' JavaScript errors');
     assert.deepEqual(layout.brokenImages,[],label+' broken visible images');
-    await page.screenshot({path:`loading-evidence/${label}-${width}.png`});
     if(label==='after') {
       assert.equal(styles.length,2,'Only two local blocking stylesheets');
       assert.ok(styles.every(url=>url.startsWith('http://127.0.0.1:4181/')));

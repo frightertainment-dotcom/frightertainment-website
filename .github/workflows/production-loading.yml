@@ -38,6 +38,7 @@ jobs:
         run: node scripts/verify-production-loading.mjs
         working-directory: candidate
       - name: Measure live mobile baseline and both controlled previews
+        if: always()
         working-directory: candidate
         env:
           CHROME_PATH: /usr/bin/google-chrome
