@@ -1973,3 +1973,65 @@ body.fr-v5 .fr-v5-ranking__skeleton-score{width:78px;max-width:100%}
   min-height:49px;gap:5px;
  }
 }
+
+
+/* OWNER REQUEST 16 OCT: SINGLE MOBILE NAVIGATION
+   The original seven-link header remains on desktop. On phones the fixed
+   seven-link dock is the only section navigation; header utilities remain. */
+@media(max-width:700px){
+ body.fr-v5 .hub-header{margin-bottom:0!important;min-height:0!important}
+ body.fr-v5 .hub-header .hub-header__inside{
+   grid-template-rows:54px!important;
+   min-height:56px!important;
+   max-height:60px!important;
+   padding:2px 9px!important;
+   gap:0!important;
+ }
+ body.fr-v5 .hub-header .hub-header__inside>.hub-tabs{
+   display:none!important;
+ }
+ body.fr-v5 .hub-main{
+   margin-top:0!important;
+   padding-top:0!important;
+ }
+ body.fr-v5 .fr-v5-mobile-dock{
+   box-sizing:border-box!important;
+   display:grid!important;
+   grid-template-columns:repeat(7,minmax(0,1fr))!important;
+   grid-template-rows:minmax(55px,auto)!important;
+   align-items:stretch!important;
+   min-height:62px!important;max-height:none!important;
+   gap:0!important;
+   padding:4px max(4px,env(safe-area-inset-left)) calc(5px + env(safe-area-inset-bottom))!important;
+   border-top:1px solid #923444!important;
+   background:linear-gradient(180deg,#110c10fc,#050507ff)!important;
+ }
+ body.fr-v5 .fr-v5-mobile-dock a{
+   box-sizing:border-box!important;
+   min-width:0!important;
+   min-height:52px!important;
+   padding:4px 1px 3px!important;
+   gap:4px!important;
+   overflow:hidden;
+   border-bottom:2px solid transparent!important;
+ }
+ body.fr-v5 .fr-v5-mobile-dock a.active,
+ body.fr-v5 .fr-v5-mobile-dock a[aria-current='page']{
+   color:#ff7e8e!important;
+   border-bottom-color:#f04c5d!important;
+   text-shadow:0 0 12px #ed2845!important;
+ }
+ body.fr-v5 .fr-v5-dock-symbol{
+   font:700 clamp(16px,4.8vw,21px)/1 Georgia,serif!important;
+ }
+ body.fr-v5 .fr-v5-mobile-dock small{
+   display:block!important;
+   width:100%;max-width:100%;
+   font:700 clamp(8px,2.05vw,10px)/1.15 system-ui,sans-serif!important;
+   letter-spacing:0!important;
+   white-space:nowrap;
+   text-align:center;
+   overflow:hidden;
+ }
+ body.fr-v5{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
+}
