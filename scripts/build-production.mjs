@@ -55,6 +55,20 @@ if (/criticReferenceSnapshots|frightertainment-private-preview|TEST_FIXTURE_RANK
 }
 await validateHtml(destination);
 
+// Preserve the homepage's exact CSS cascade while cutting six blocking
+// same-origin stylesheet requests down to one. Only the production output is
+// bundled; source CSS stays editable and every interior page remains intact.
+const homeCoreCss = ['styles.css','hub.css','v5-magazine.css','fr-design-system.css','fr-page-themes.css','fr-rating-badge.css'];
+const homeFile = new URL('index.html', destination);
+let home = await readFile(homeFile, 'utf8');
+const originalLinks = homeCoreCss.map(file => '<link rel="stylesheet" href="/' + file + '">').join('');
+if (!home.includes(originalLinks)) throw new Error('Homepage core CSS links unexpectedly changed');
+const homeCssContents = await Promise.all(homeCoreCss.map(file => readFile(new URL(file, destination), 'utf8')));
+await writeFile(new URL('fr-home-core.css', destination),
+  homeCssContents.map((css, index) => '/* '+homeCoreCss[index]+' */\n' + css).join('\n\n'));
+home = home.replace(originalLinks, '<link rel="stylesheet" href="/fr-home-core.css">');
+await writeFile(homeFile, home);
+
 // Explicit production instrumentation. Preview remains untracked so editorial QA
 // and owner-only checks never inflate public visitor analytics.
 const publicWebAnalyticsSiteToken = 'f8adaba13e524ed7ab5d523a2fe2120f';
