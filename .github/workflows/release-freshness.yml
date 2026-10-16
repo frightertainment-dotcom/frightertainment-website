@@ -8,8 +8,12 @@ on:
     paths:
       - 'data/cinema-screenings.json'
       - 'data/editorial-releases.json'
+      - 'data/horror-radar.json'
+      - 'horror-radar.js'
+      - 'horror-radar.css'
       - 'cinema-diary.js'
       - 'release-brief.js'
+      - 'test/horror-radar.test.js'
       - 'scripts/audit-release-freshness.mjs'
       - '.github/workflows/release-freshness.yml'
 
