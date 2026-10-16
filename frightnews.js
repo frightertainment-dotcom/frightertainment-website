@@ -100,10 +100,14 @@
     const copy = el('span', 'frightnews__copy');
     const meta = el('span', 'frightnews__meta');
     meta.append(el('span', 'frightnews__category', category), el('span', 'frightnews__bullet', ' • '), el('span', 'frightnews__publisher', source));
-    const when = el('time', '', timeAgo(item.publishedAt));
-    if (Number.isFinite(Date.parse(item.publishedAt))) when.dateTime = item.publishedAt;
+    const sourceCheck = item.verifiedOnly && /^\d{4}-\d{2}-\d{2}$/.test(item.sourceCheckedAt || '');
+    const when = el('time', '', sourceCheck
+      ? 'SOURCE CHECKED ' + new Date(item.sourceCheckedAt + 'T12:00:00Z').toLocaleDateString('en-GB', {day:'numeric',month:'short',timeZone:'UTC'}).toUpperCase()
+      : timeAgo(item.publishedAt));
+    if (sourceCheck) when.dateTime = item.sourceCheckedAt;
+    else if (Number.isFinite(Date.parse(item.publishedAt))) when.dateTime = item.publishedAt;
     const foot = el('span', 'frightnews__time');
-    foot.append(when, el('span', 'frightnews__outlink', 'READ STORY ↗'));
+    foot.append(when, el('span', 'frightnews__outlink', item.verifiedOnly ? 'VIEW SOURCE ↗' : 'READ STORY ↗'));
     copy.append(meta, el('strong', 'frightnews__headline', item.title),
       el('span', 'frightnews__excerpt', item.excerpt || 'Read the original publisher report.'), foot);
     link.append(image, copy);
@@ -116,9 +120,69 @@
       'Latest publisher-linked horror headlines are temporarily unavailable. Please try again shortly.'));
     if (state) state.textContent = 'FEED TEMPORARILY UNAVAILABLE';
   }
+  // Static, independently source-checked editorial notices provide a truthful
+  // fallback when external publishers are blocked or temporarily unavailable.
+  // Their check dates must NEVER be passed off as story publication dates.
+  async function sourceCheckedFallback() {
+    const files = ['/data/horror-radar.json', '/data/editorial-releases.json'];
+    const results = await Promise.allSettled(files.map(path => fetch(path, {cache:'no-store'})
+      .then(response => response.ok ? response.json() : null)));
+    const [radar, releases] = results.map(outcome => outcome.status === 'fulfilled' ? outcome.value : null);
+    const entries = [];
+    const validUrl = value => {
+      try {
+        const url = new URL(value);
+        return url.protocol === 'https:' && !url.username && !url.password ? url.href : null;
+      } catch { return null; }
+    };
+    const isDay = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') &&
+      Number.isFinite(Date.parse(value + 'T12:00:00Z'));
+    for (const item of Array.isArray(radar?.items) ? radar.items : []) {
+      const url = validUrl(item.sourceUrl);
+      if (!url || !item.title || !item.summary || !isDay(item.checkedAt)) continue;
+      const category = item.category === 'game' ? 'GAMES' :
+        item.category === 'podcast' ? 'PODCASTS' : item.category === 'tv' ? 'TV NEWS' :
+        item.category === 'streaming' ? 'STREAMING' : 'MOVIE NEWS';
+      entries.push({
+        title:item.title, excerpt:item.summary, category,
+        source:item.channel || 'Original announcement', url,
+        sourceCheckedAt:item.checkedAt, publishedAt:item.checkedAt + 'T12:00:00Z',
+        verifiedOnly:true
+      });
+    }
+    for (const item of Array.isArray(releases?.items) ? releases.items : []) {
+      const url = validUrl(item.sourceUrl);
+      if (!url || !item.title || !isDay(item.checkedAt)) continue;
+      const type = item.category === 'cinema' ? 'CINEMA UPDATE' :
+        item.category === 'streaming' ? 'STREAMING' : 'MOVIE UPDATE';
+      const releaseDate = isDay(item.date) ?
+        new Date(item.date+'T12:00:00Z').toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}) : '';
+      entries.push({
+        title:item.title + ' — ' + (item.service || 'release') + ' update',
+        excerpt:(item.sourceName || 'The official source') + ' lists this title' +
+          (releaseDate ? ' for ' + releaseDate : '') + '. Check the linked source for current details.',
+        category:type, source:item.sourceName || item.service || 'Source-checked release', url,
+        sourceCheckedAt:item.checkedAt, publishedAt:item.checkedAt + 'T12:00:00Z',
+        verifiedOnly:true
+      });
+    }
+    return entries.sort((a,b)=>b.sourceCheckedAt.localeCompare(a.sourceCheckedAt) ||
+      a.title.localeCompare(b.title)).slice(0,120);
+  }
   fetch('/api/frightnews', {headers:{accept:'application/json'},cache:'no-store',
-    signal:AbortSignal.timeout(13000)})
-    .then(r => r.ok ? r.json() : Promise.reject(new Error('News unavailable')))
+    signal:AbortSignal.timeout(9000)})
+    .then(r => r.ok ? r.json() : {status:'unavailable',items:[]})
+    .catch(() => ({status:'unavailable',items:[]}))
+    .then(async data => {
+      const live = data.status === 'ok' && Array.isArray(data.items) ? data.items : [];
+      if (live.length >= 10) return {...data,mode:'live'};
+      const fallback = await sourceCheckedFallback();
+      if (!fallback.length) return {...data,items:live,mode:'live'};
+      const seen = new Set(live.map(item => item.title?.trim().toLowerCase()));
+      const supplements = fallback.filter(item => !seen.has(item.title.trim().toLowerCase()));
+      return {...data,status:'ok',mode:live.length ? 'mixed' : 'source-checked',
+        items:[...live,...supplements].slice(0,120)};
+    })
     .then(data => {
       if (data.status !== 'ok' || !Array.isArray(data.items)) throw Error('Invalid feed');
       const rows = data.items.map(makeRow).filter(Boolean);
@@ -150,7 +214,14 @@
           });
           end.append(more);
         } else end.append(el('span', 'frightnews__end-note', 'END OF THE LATEST HEADLINES'));
-        if (state) state.textContent = rows.length + ' SOURCE-LINKED STORIES · UPDATED ' + timeAgo(data.updatedAt);
+        if (state) {
+          const live = data.items.filter(item => !item.verifiedOnly).length;
+          const checked = data.items.length - live;
+          state.textContent = data.mode === 'source-checked'
+            ? checked + ' SOURCE-CHECKED RELEASE UPDATES · LIVE NEWS TEMPORARILY UNAVAILABLE'
+            : checked ? live + ' NEWS STORIES · ' + checked + ' SOURCE-CHECKED UPDATES'
+            : rows.length + ' SOURCE-LINKED STORIES · UPDATED ' + timeAgo(data.updatedAt);
+        }
       });
       loadVerifiedPosters();
     }).catch(() => roots.forEach(fail));
