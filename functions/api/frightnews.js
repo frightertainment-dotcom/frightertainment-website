@@ -110,7 +110,7 @@ async function readFeed(source, now) {
 function responseJson(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: BROWSER_HEADERS });
 }
-export async function onRequestGet(context) {
+async function legacyLiveFeed(context) {
   const request = context.request;
   const cache = typeof caches !== 'undefined' ? caches.default : null;
   const cacheKey = new Request(new URL('/api/frightnews', request.url), { method: 'GET' });
@@ -147,4 +147,114 @@ export async function onRequestGet(context) {
     context.waitUntil(cache.put(cacheKey, edgeCopy).catch(() => {}));
   }
   return responseJson(payload);
+}
+
+// Durable daily headline index: NEVER delete existing items; archived links
+// remain browsable. Failed publisher feeds leave prior headlines untouched.
+const RETRY_AFTER_MS = 60 * 60 * 1000;
+const REFRESH_AFTER_MS = 20 * 60 * 60 * 1000;
+const ROLLING_LIMIT = 500;
+const ARCHIVE_BATCH = 400;
+const LIST_PAGE_SIZE = 120;
+
+async function refreshArchive(db) {
+  const row = await db.prepare(
+    'SELECT last_attempt_at,last_success_at FROM frightnews_sync_state WHERE id=1'
+  ).first();
+  if (!row) throw new Error('FrightNews database migration required');
+  const now = Date.now();
+  const lastSuccess = Date.parse(row.last_success_at || '');
+  if (Number.isFinite(lastSuccess) && now - lastSuccess < REFRESH_AFTER_MS) return;
+  const lastAttempt = Date.parse(row.last_attempt_at || '');
+  if (Number.isFinite(lastAttempt) && now - lastAttempt < RETRY_AFTER_MS) return;
+  const attemptAt = new Date(now).toISOString();
+  const leaseCutoff = new Date(now - RETRY_AFTER_MS).toISOString();
+  const locked = await db.prepare(
+    'UPDATE frightnews_sync_state SET last_attempt_at=? WHERE id=1 ' +
+    'AND (last_attempt_at IS NULL OR last_attempt_at < ?)'
+  ).bind(attemptAt, leaseCutoff).run();
+  if (!locked.meta?.changes) return;
+
+  const feeds = await Promise.allSettled(SOURCES.map(source => readFeed(source, now)));
+  const incoming = new Map();
+  let sourceCount = 0;
+  for (const result of feeds) {
+    if (result.status !== 'fulfilled' || !result.value.length) continue;
+    sourceCount++;
+    for (const item of result.value) if (!incoming.has(item.url)) incoming.set(item.url, item);
+  }
+  if (!incoming.size) return; // Previous articles remain; later refresh retries.
+
+  const items = [...incoming.values()];
+  for (let offset = 0; offset < items.length; offset += 40) {
+    const statements = items.slice(offset, offset + 40).map(item =>
+      db.prepare('INSERT OR IGNORE INTO frightnews_articles ' +
+        '(url,title,excerpt,category,source,published_at) VALUES (?,?,?,?,?,?)')
+        .bind(item.url, item.title, item.excerpt, item.category, item.source, item.publishedAt));
+    await db.batch(statements);
+  }
+
+  // At 500 active articles, label the oldest 400 archived. This does not
+  // remove rows or links; at each threshold, another 400 are archived.
+  const active = await db.prepare(
+    'SELECT COUNT(*) AS total FROM frightnews_articles WHERE archived_at IS NULL'
+  ).first();
+  if (Number(active?.total || 0) >= ROLLING_LIMIT) {
+    await db.prepare(
+      'UPDATE frightnews_articles SET archived_at=? WHERE url IN ' +
+      '(SELECT url FROM frightnews_articles WHERE archived_at IS NULL ' +
+      'ORDER BY published_at ASC, url ASC LIMIT ?)'
+    ).bind(attemptAt, ARCHIVE_BATCH).run();
+  }
+  await db.prepare('UPDATE frightnews_sync_state SET last_success_at=?, ' +
+    'last_source_count=?,last_article_count=? WHERE id=1')
+    .bind(attemptAt,sourceCount,items.length).run();
+}
+
+async function storedNews(context) {
+  const requestUrl = new URL(context.request.url);
+  const db = context.env.DB;
+  const archive = requestUrl.searchParams.get('archive') === '1';
+  const rawOffset = requestUrl.searchParams.get('offset') || '0';
+  const offset = /^\d{1,7}$/.test(rawOffset) ? Number(rawOffset) : NaN;
+  if (!Number.isSafeInteger(offset) || offset < 0 || offset > 1000000)
+    return responseJson({error:'Invalid FrightNews page offset'},400);
+
+  if (!archive && offset === 0) await refreshArchive(db);
+
+  const where = archive ? 'archived_at IS NOT NULL' : 'archived_at IS NULL';
+  const [count, archivedCount, state, articles] = await Promise.all([
+    db.prepare('SELECT COUNT(*) AS total FROM frightnews_articles WHERE '+where).first(),
+    db.prepare('SELECT COUNT(*) AS total FROM frightnews_articles WHERE archived_at IS NOT NULL').first(),
+    db.prepare('SELECT last_success_at,last_source_count FROM frightnews_sync_state WHERE id=1').first(),
+    db.prepare('SELECT url,title,excerpt,category,source,published_at ' +
+      'FROM frightnews_articles WHERE '+where+
+      ' ORDER BY published_at DESC,url ASC LIMIT ? OFFSET ?')
+      .bind(LIST_PAGE_SIZE,offset).all()
+  ]);
+  const total = Number(count?.total||0);
+  const items = (articles.results||[]).map(entry => ({
+    url:entry.url,title:entry.title,excerpt:entry.excerpt,
+    category:entry.category,source:entry.source,publishedAt:entry.published_at
+  }));
+  return responseJson({
+    status: total ? 'ok' : 'unavailable',
+    updatedAt:state?.last_success_at||null,
+    sourceCount:Number(state?.last_source_count||0),
+    storageMode:'persistent', archive, total, archiveTotal:Number(archivedCount?.total||0),
+    offset, hasMore:offset+items.length<total,items,
+    ...(total ? {} : {message:'No saved publisher articles are available yet.'})
+  },total?200:503);
+}
+
+export async function onRequestGet(context) {
+  if (!context.env?.DB) return legacyLiveFeed(context);
+  try { return await storedNews(context); }
+  catch (_error) {
+    // Never silently replace durable storage with an ephemeral feed.
+    return responseJson({
+      status:'unavailable',items:[],total:0,archiveTotal:0,
+      error:'The FrightNews archive is temporarily unavailable. Saved articles have not been deleted.'
+    },503);
+  }
 }
