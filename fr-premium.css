@@ -2092,3 +2092,11 @@ body.fr-v5.hub-home .fr-home-feature-source{
 body.fr-v5.hub-home .fr-home-feature-source:focus-visible{
  outline:2px solid #ff9ca6;outline-offset:3px;
 }
+
+/* Card headings and summaries remain readable as Friday selections rotate. */
+@media(max-width:380px){
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-indie h3{
+  font-size:clamp(18px,6.1vw,25px)!important;
+  line-height:1.11!important;white-space:nowrap!important;
+ }
+}
