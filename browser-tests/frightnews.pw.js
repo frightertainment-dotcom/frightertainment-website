@@ -17,7 +17,7 @@ async function stubNews(page) {
   }));
 }
 for (const width of [320,390,1280]) {
-  test('FrightNews preserves a ten-row scroll viewport at ' + width + 'px', async ({page}) => {
+  test('FrightNews keeps readable thumbnails and compact mobile homepage at ' + width + 'px', async ({page}) => {
     await page.setViewportSize({width,height:850});
     await stubNews(page);
     await page.goto('/');
@@ -32,13 +32,35 @@ for (const width of [320,390,1280]) {
     await expect(page.locator('#live-discovery')).toBeAttached();
     const layout = await rail.locator('.frightnews__row').first().evaluate(row => {
       const art = row.querySelector('.frightnews__thumb').getBoundingClientRect();
-      const copy = row.querySelector('.frightnews__copy').getBoundingClientRect();
-      return {artLeft:art.left,artRight:art.right,artWidth:art.width,copyLeft:copy.left,copyWidth:copy.width};
+      const copyEl = row.querySelector('.frightnews__copy');
+      const copy = copyEl.getBoundingClientRect();
+      const title = row.querySelector('.frightnews__headline').getBoundingClientRect();
+      const description = row.querySelector('.frightnews__excerpt').getBoundingClientRect();
+      const bounds = row.getBoundingClientRect();
+      return {
+        pseudo:getComputedStyle(row,'::before').content,
+        artLeft:art.left,artRight:art.right,artWidth:art.width,
+        copyLeft:copy.left,copyWidth:copy.width,copyRight:copy.right,
+        titleTop:title.top,titleBottom:title.bottom,titleWidth:title.width,
+        descriptionTop:description.top,descriptionWidth:description.width,
+        rowTop:bounds.top,rowBottom:bounds.bottom,rowRight:bounds.right,
+        copyDisplay:getComputedStyle(copyEl).display
+      };
     });
+    // This directly protects against the global external-link ::before
+    // accidentally consuming the first grid cell and hiding headline text.
+    expect(layout.pseudo).toBe('none');
     expect(layout.artWidth).toBeGreaterThanOrEqual(60);
     expect(layout.artWidth).toBeLessThanOrEqual(140);
     expect(layout.artRight).toBeLessThanOrEqual(layout.copyLeft + 2);
     expect(layout.copyWidth).toBeGreaterThan(75);
+    expect(layout.titleWidth).toBeGreaterThan(65);
+    expect(layout.descriptionWidth).toBeGreaterThan(65);
+    expect(layout.titleTop).toBeGreaterThanOrEqual(layout.rowTop);
+    expect(layout.titleBottom).toBeLessThanOrEqual(layout.rowBottom + 1);
+    expect(layout.copyRight).toBeLessThanOrEqual(layout.rowRight + 1);
+    await expect(rail.locator('.frightnews__headline').first()).toBeVisible();
+    await expect(rail.locator('.frightnews__excerpt').first()).toBeVisible();
     const thumbnails = await rail.locator('.frightnews__thumb img').count();
     expect(thumbnails).toBe(40);
     await expect(rail.locator('.frightnews__thumb img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds)\//);
@@ -52,10 +74,22 @@ for (const width of [320,390,1280]) {
       rowHeight:viewport.querySelector('.frightnews__row')?.getBoundingClientRect().height || 0,
       boxWidth:viewport.getBoundingClientRect().width
     }));
-    expect(Math.abs(metrics.clientHeight - metrics.rowHeight*10)).toBeLessThanOrEqual(3);
-    expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight);
     expect(metrics.boxWidth).toBeLessThanOrEqual(width);
-    await rail.locator('[data-frightnews-viewport]').evaluate(node => node.scrollTop = node.scrollHeight);
+    if (width <= 700) {
+      // Phone: four compact headlines, NO internal scroll; move down the actual page.
+      await expect(rail.locator('.frightnews__row:visible')).toHaveCount(4);
+      expect(metrics.clientHeight).toBeGreaterThan(0);
+      expect(metrics.clientHeight).toBeLessThanOrEqual(420);
+      expect(metrics.scrollHeight - metrics.clientHeight).toBeLessThanOrEqual(2);
+      const scrolling = await rail.locator('[data-frightnews-viewport]').evaluate(node =>
+        getComputedStyle(node).overflowY);
+      expect(scrolling).toBe('visible');
+    } else {
+      // Desktop retains the original optional 10-row embedded news scroller.
+      expect(Math.abs(metrics.clientHeight - metrics.rowHeight*10)).toBeLessThanOrEqual(3);
+      expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight);
+      await rail.locator('[data-frightnews-viewport]').evaluate(node => node.scrollTop = node.scrollHeight);
+    }
     await expect(rail.locator('a.frightnews__all-link')).toBeVisible();
     await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
     await page.locator('.fr-v5-header-news-icon').click();
