@@ -141,11 +141,15 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
     await page.goto('/movies.html');
     await expect(page.locator('.editorial-pick')).toBeVisible();
     const result=await page.evaluate(()=>{
-      const tabs=[...document.querySelectorAll('.hub-tabs a')];
+      const mobile=innerWidth<=700;
+      const headerNav=document.querySelector('.hub-header .hub-tabs');
+      const dock=document.querySelector('.fr-v5-mobile-dock');
+      const tabs=[...(mobile?dock:headerNav).querySelectorAll('a')];
       const poster=document.querySelector('.editorial-pick__art').getBoundingClientRect();
       const copy=document.querySelector('.editorial-pick__content').getBoundingClientRect();
       return {
         tabs:tabs.length,
+        headerHidden:mobile?getComputedStyle(headerNav).display==='none':true,
         navRows:new Set(tabs.map(a=>Math.round(a.getBoundingClientRect().top))).size,
         sideBySide:poster.right<=copy.left+2 && poster.left<copy.left && Math.max(poster.top,copy.top)<Math.min(poster.bottom,copy.bottom),
         stacked:poster.bottom<=copy.top+2,
@@ -154,11 +158,11 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
       };
     });
     expect(result.tabs).toBe(7);
-    if(width===1440) expect(result.navRows).toBe(1);
-    // Updated owner requirement: 360–430px should USE the space beside
-    // the poster; only the narrowest 320px layout needs a vertical stack.
-    if(width===320) { expect(result.navRows).toBe(2); expect(result.stacked).toBe(true); }
-    else if(width===390) { expect(result.navRows).toBe(2); expect(result.sideBySide).toBe(true); }
+    expect(result.navRows).toBe(1);
+    expect(result.headerHidden).toBe(true);
+    // At 320px the editorial poster/copy stacks, but the fixed seven-link
+    // mobile dock remains one row; at 390px the editorial story uses two tracks.
+    if(width===320) expect(result.stacked).toBe(true);
     else expect(result.sideBySide).toBe(true);
     expect(result.width).toBeLessThanOrEqual(result.viewport+2);
   }

@@ -37,16 +37,16 @@ test('Home places saved films under the feature and keeps destination headings a
       const r = selector => document.querySelector(selector).getBoundingClientRect();
       const rows = [...document.querySelectorAll('#hub-ranking .hub-chart-row')];
       const tileTitles = [...document.querySelectorAll('.hub-showcase__bottom h3')];
-      const longlegs = document.querySelector('.hub-indie h3').firstChild;
+      const indieTitle = document.querySelector('.hub-indie h3').firstChild;
       const lines = new Set();
-      for (let index = 0; index < longlegs.length; index++) {
-        const range = document.createRange();range.setStart(longlegs,index);range.setEnd(longlegs,index+1);
+      for (let index = 0; index < indieTitle.length; index++) {
+        const range = document.createRange();range.setStart(indieTitle,index);range.setEnd(indieTitle,index+1);
         lines.add(Math.round(range.getBoundingClientRect().top));
       }
       return { feature: r('.hub-feature'), watch: r('#my-watchlist'), chart: r('.hub-charts'),
         editorialTitle: r('.fr-home-dashboard-heading h2'), editorialLink: r('.fr-home-dashboard-heading>a'),
         editorialLineHeight: parseFloat(getComputedStyle(document.querySelector('.fr-home-dashboard-heading h2')).lineHeight),
-        tiles: tileTitles.map(title => title.getBoundingClientRect()), longlegsLines: lines.size,
+        tiles: tileTitles.map(title => title.getBoundingClientRect()), indieTitleLines: lines.size,
         actions: [...document.querySelectorAll('.hub-showcase__bottom .hub-tile__link')].map(link => link.getBoundingClientRect()),
         rows: rows.map(row => ({ title: row.querySelector('a').getBoundingClientRect(),
           score: row.querySelector('.score').getBoundingClientRect(), row: row.getBoundingClientRect() })),
@@ -58,7 +58,7 @@ test('Home places saved films under the feature and keeps destination headings a
     expect(boxes.editorialLink.height, `${width}px`).toBeLessThan(21);
     if (width <= 460) expect(boxes.editorialTitle.bottom).toBeLessThanOrEqual(boxes.editorialLink.top);
     else expect(boxes.editorialTitle.right).toBeLessThanOrEqual(boxes.editorialLink.left + 1);
-    expect(boxes.longlegsLines, `${width}px`).toBe(1);
+    expect(boxes.indieTitleLines, `${width}px`).toBe(1);
     for (const row of boxes.rows) {
       expect(row.title.right, `${width}px`).toBeLessThanOrEqual(row.score.left + 1);
       expect(row.score.right, `${width}px`).toBeLessThanOrEqual(row.row.right + 1);
@@ -108,7 +108,7 @@ test('Home destination copy stays level when real media fields arrive later', as
   await page.route('**/api/media?**', route => {
     const request = new URL(route.request().url());
     const tv = request.searchParams.get('type') === 'tv';
-    return route.fulfill({ json: { item: { title: tv ? 'From' : 'Longlegs',
+    return route.fulfill({ json: { item: { title: tv ? 'Marianne' : 'Rabbit Trap',
       tmdbId: tv ? 120001 : 120002, type: tv ? 'tv' : 'movie',
       ratingKind: 'tmdb-community', voteAverage: 7.6, voteCount: 1287,
       sourceUrl: `https://www.themoviedb.org/${tv ? 'tv' : 'movie'}/${tv ? 120001 : 120002}`,

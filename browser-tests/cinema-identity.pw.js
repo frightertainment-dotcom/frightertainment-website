@@ -19,7 +19,7 @@ async function expectCinemaShell(page) {
   await expect(page.locator('#main > #recent-cinema')).toHaveCount(1);
   await expect(page.locator('.fr-cinema-concept__region #cinema-country')).toHaveCount(1);
   await expect(page.getByRole('navigation', { name: 'Explore horror movies' })).toHaveCount(0);
-  await expect(page.locator('a[aria-current="page"]')).toHaveAttribute('href', '/cinema.html');
+  await expect(page.locator('.fr-v5-mobile-dock a[aria-current="page"]')).toHaveAttribute('href', '/cinema.html');
 }
 
 test('Cinema identity survives a Pages-style extensionless route and late data', async ({ page }) => {
@@ -46,7 +46,7 @@ test('Cinema identity survives a Pages-style extensionless route and late data',
 test('Cinema remains Cinema through internal links, country changes, and history', async ({ page }) => {
   await stubCatalogue(page);
   await page.goto('/movies.html');
-  await page.locator('.hub-tabs a[href="/cinema.html"]').click();
+  await page.locator('.fr-v5-mobile-dock a[href="/cinema.html"]:visible, .hub-tabs a[href="/cinema.html"]:visible').first().click();
   await expect(page).toHaveURL(/\/cinema\.html$/);
   await expectCinemaShell(page);
   await expect(page.locator('[data-cinema-concept-cards]')).not.toContainText('Checking verified release dates');

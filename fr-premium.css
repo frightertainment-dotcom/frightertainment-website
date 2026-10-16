@@ -2032,3 +2032,71 @@ body.fr-v5 .fr-v5-ranking__skeleton-score{width:78px;max-width:100%}
   }
   body.fr-v5.hub-home .hub-chart-row > a { font-size:11px !important; }
 }
+
+/* 16 OCT RELEASE: one seven-destination mobile dock, no duplicate header nav. */
+@media (max-width:700px){
+ body.hub-body.fr-v5 .hub-header{margin-bottom:0!important;min-height:0!important}
+ body.hub-body.fr-v5 .hub-header .hub-header__inside{
+  display:grid!important;grid-template-rows:54px!important;
+  min-height:56px!important;max-height:60px!important;
+  padding:2px 9px!important;gap:0!important;
+ }
+ body.hub-body.fr-v5 .hub-header .hub-tabs{display:none!important}
+ body.hub-body.fr-v5 .hub-main,
+ body.hub-body.fr-v5 main.shell{
+  margin-top:0!important;padding-top:0!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock{
+  box-sizing:border-box!important;display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:0!important;align-items:stretch!important;
+  width:100%!important;min-height:64px!important;max-height:none!important;
+  padding:4px max(3px,env(safe-area-inset-left)) calc(5px + env(safe-area-inset-bottom))!important;
+  background:linear-gradient(180deg,#110c10fc,#050507ff)!important;
+  border-top:1px solid #923444!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock a{
+  box-sizing:border-box!important;min-width:0!important;
+  min-height:55px!important;padding:5px 0 4px!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  gap:4px!important;overflow:hidden;
+  border-bottom:2px solid transparent!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock a.active,
+ body.hub-body.fr-v5 .fr-v5-mobile-dock a[aria-current='page']{
+  color:#ff7e8e!important;border-bottom-color:#f04c5d!important;
+  text-shadow:0 0 12px #ed2845!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-dock-symbol{
+  font:700 clamp(15px,4.4vw,20px)/1 Georgia,serif!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock small{
+  display:block!important;max-width:100%!important;width:100%!important;
+  font:700 clamp(7px,1.88vw,9px)/1.15 system-ui,sans-serif!important;
+  letter-spacing:0!important;text-align:center!important;
+  white-space:normal!important;overflow-wrap:normal!important;
+ }
+ body.hub-body.fr-v5{
+  padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
+ }
+}
+/* Credits remain clickable without adding another tall row to the tiles. */
+body.fr-v5.hub-home .hub-tile__content{position:relative!important}
+body.fr-v5.hub-home .fr-home-feature-source{
+ position:absolute;top:0;right:0;max-width:50%;
+ padding:2px 4px;font:600 9px/1.3 system-ui,sans-serif;
+ color:#d9c7c6;background:#080608c9;
+ text-overflow:ellipsis;overflow:hidden;white-space:nowrap;
+}
+body.fr-v5.hub-home .fr-home-feature-source:focus-visible{
+ outline:2px solid #ff9ca6;outline-offset:3px;
+}
+
+/* Card headings and summaries remain readable as Friday selections rotate. */
+@media(max-width:380px){
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-indie h3{
+  font-size:clamp(18px,6.1vw,25px)!important;
+  line-height:1.11!important;white-space:nowrap!important;
+ }
+}
