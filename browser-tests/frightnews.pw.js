@@ -119,3 +119,40 @@ test('FrightNews stays useful when publisher RSS is down without inventing publi
   await rail.locator('.frightnews__continue').click();
   await expect(page.locator('#editorial-picks')).toBeInViewport();
 });
+
+test('FrightNews archive stays accessible and paginates beyond the first 120 preserved stories', async ({page}) => {
+  const archived = Array.from({length:125},(_,index)=>({
+    title:'Preserved horror headline '+index,
+    excerpt:'Original publisher archive link remains readable.',
+    url:'https://bloody-disgusting.com/old/'+index+'/',
+    publishedAt:'2025-08-10T12:00:00.000Z',
+    category:'MOVIE NEWS',source:'Bloody Disgusting'
+  }));
+  await page.route('**/api/frightnews?*',route => {
+    const request=new URL(route.request().url());
+    if(request.searchParams.get('archive')!=='1')return route.continue();
+    const offset=Number(request.searchParams.get('offset')||0);
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+      status:'ok',storageMode:'persistent',archive:true,total:125,
+      archiveTotal:125,offset,items:archived.slice(offset,offset+120)
+    })});
+  });
+  await page.goto('/frightnews.html?archive=1');
+  const rail = page.locator('[data-frightnews="page"]');
+  await expect(page.locator('.frightnews__browse-nav a[aria-current="page"]')).toHaveAttribute('href','/frightnews.html?archive=1');
+  await expect(rail.locator('.frightnews__row')).toHaveCount(40);
+  for(const expected of [80,120,125]){
+    await rail.locator('.frightnews__load-more').click();
+    await expect(rail.locator('.frightnews__row')).toHaveCount(expected);
+  }
+  await expect(rail.locator('.frightnews__end-note')).toContainText('END OF THE ARCHIVE');
+  await expect(rail.locator('.frightnews__headline').last()).toContainText('124');
+});
+test('Archive stays clearly empty until the first 500-story threshold',async({page})=>{
+  await page.route('**/api/frightnews?archive=1',route=>route.fulfill({
+    status:503,contentType:'application/json',body:JSON.stringify({status:'unavailable',items:[],archiveTotal:0})
+  }));
+  await page.goto('/frightnews.html?archive=1');
+  await expect(page.locator('.frightnews__empty')).toContainText('No articles have been archived yet');
+  await expect(page.locator('.frightnews__row')).toHaveCount(0);
+});
