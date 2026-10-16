@@ -169,12 +169,19 @@
     return entries.sort((a,b)=>b.sourceCheckedAt.localeCompare(a.sourceCheckedAt) ||
       a.title.localeCompare(b.title)).slice(0,120);
   }
-  fetch('/api/frightnews', {headers:{accept:'application/json'},cache:'no-store',
+  const viewingArchive = roots.some(root => root.dataset.frightnews === 'page') &&
+    new URLSearchParams(location.search).get('archive') === '1';
+  if (viewingArchive) {
+    const description = document.querySelector('.frightnews--page .frightnews__heading p');
+    if (description) description.textContent = 'The FrightNews archive preserves older horror headlines and links once the active news library reaches 500 stories.';
+  }
+  fetch('/api/frightnews' + (viewingArchive ? '?archive=1' : ''), {headers:{accept:'application/json'},cache:'no-store',
     signal:AbortSignal.timeout(9000)})
     .then(r => r.ok ? r.json() : {status:'unavailable',items:[]})
     .catch(() => ({status:'unavailable',items:[]}))
     .then(async data => {
       const live = data.status === 'ok' && Array.isArray(data.items) ? data.items : [];
+      if (viewingArchive) return {...data,status:'ok',mode:'archive'};
       if (live.length >= 10) return {...data,mode:'live'};
       const fallback = await sourceCheckedFallback();
       if (!fallback.length) return {...data,items:live,mode:'live'};
@@ -185,15 +192,24 @@
     })
     .then(data => {
       if (data.status !== 'ok' || !Array.isArray(data.items)) throw Error('Invalid feed');
-      const rows = data.items.map(makeRow).filter(Boolean);
-      if (!rows.length) throw Error('Empty feed');
+      let rows = data.items.map(makeRow).filter(Boolean);
+      if (!rows.length && !viewingArchive) throw Error('Empty feed');
       roots.forEach(root => {
         const list = root.querySelector('[data-frightnews-list]');
         const end = root.querySelector('[data-frightnews-end]');
         const state = root.querySelector('[data-frightnews-state]');
         if (!list || !end) return;
         const home = root.dataset.frightnews === 'home';
+        if (viewingArchive && !rows.length) {
+          list.replaceChildren(el('p','frightnews__empty','No articles have been archived yet. Older articles remain in the main FrightNews collection until it reaches 500.'));
+          end.hidden = true;
+          if (state) state.textContent = 'ARCHIVE: 0 ARTICLES';
+          return;
+        }
         let visible = 0;
+        const total = Number.isInteger(data.total) && data.total >= rows.length ? data.total : rows.length;
+        const canLoadMore = () => visible < rows.length || (data.storageMode === 'persistent' && rows.length < total);
+        let loading = false;
         const show = () => {
           const until = Math.min(visible + 40, rows.length);
           list.append(...rows.slice(visible, until).map(row => row.cloneNode(true)));
@@ -205,19 +221,37 @@
           const all = el('a', 'frightnews__all-link', 'VIEW ALL FRIGHTNEWS  →');
           all.href = '/frightnews.html';
           end.append(el('span', 'frightnews__end-note', 'THERE IS ALWAYS MORE IN THE DARK'), all);
-        } else if (visible < rows.length) {
+        } else if (canLoadMore()) {
           const more = el('button', 'frightnews__load-more', 'SHOW 40 MORE STORIES  ↓');
           more.type = 'button';
-          more.addEventListener('click', () => {
-            show();
-            if (visible >= rows.length) more.replaceWith(el('span', 'frightnews__end-note', 'END OF THE LATEST HEADLINES'));
+          more.addEventListener('click', async () => {
+            if (loading) return;
+            loading = true;
+            more.disabled = true;
+            const previousText = more.textContent;
+            more.textContent = 'LOADING MORE STORIES…';
+            try {
+              if (visible >= rows.length && data.storageMode === 'persistent' && rows.length < total) {
+                const next = '/api/frightnews?offset=' + rows.length + (viewingArchive ? '&archive=1' : '');
+                const response = await fetch(next, {headers:{accept:'application/json'}});
+                if (!response.ok) throw Error('Older stories unavailable');
+                const payload = await response.json();
+                if (!Array.isArray(payload.items)) throw Error('Invalid story page');
+                rows.push(...payload.items.map(makeRow).filter(Boolean));
+              }
+              show();
+              if (!canLoadMore()) more.replaceWith(el('span','frightnews__end-note','END OF THE ' + (viewingArchive ? 'ARCHIVE' : 'LATEST HEADLINES')));
+              else more.textContent = previousText;
+            } catch {
+              more.textContent = 'RETRY LOADING STORIES  ↻';
+            } finally { more.disabled = false;loading = false; }
           });
           end.append(more);
         } else end.append(el('span', 'frightnews__end-note', 'END OF THE LATEST HEADLINES'));
         if (state) {
           const live = data.items.filter(item => !item.verifiedOnly).length;
           const checked = data.items.length - live;
-          state.textContent = data.mode === 'source-checked'
+          state.textContent = viewingArchive ? 'ARCHIVE · ' + total + ' PRESERVED STORIES' : data.mode === 'source-checked'
             ? checked + ' SOURCE-CHECKED RELEASE UPDATES · LIVE NEWS TEMPORARILY UNAVAILABLE'
             : checked ? live + ' NEWS STORIES · ' + checked + ' SOURCE-CHECKED UPDATES'
             : rows.length + ' SOURCE-LINKED STORIES · UPDATED ' + timeAgo(data.updatedAt);
