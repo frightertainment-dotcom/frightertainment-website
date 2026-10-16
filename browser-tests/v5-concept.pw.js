@@ -137,14 +137,20 @@ test('V5 owner-concept header is usable on mobile and keeps seven real tabs',asy
  await expect(header.locator('.fr-v5-header-menu summary')).toBeVisible();
  await expect(header.locator('.fr-v5-header-search summary')).toBeVisible();
  await expect(header.locator('.fr-v5-contact-icon')).toHaveAttribute('href','/contact.html');
- const metrics=await header.evaluate(el=>{
-  const tabs=[...el.querySelectorAll('.hub-tabs a')].map(x=>x.getBoundingClientRect());
+ const nav=page.locator('.fr-v5-mobile-dock');
+ await expect(header.locator('.hub-tabs')).toBeHidden();
+ await expect(nav.locator('a')).toHaveCount(7);
+ await expect(nav.locator('a[aria-current="page"]')).toHaveAttribute('aria-label','Indie Movies');
+ const metrics=await nav.evaluate(el=>{
+  const tabs=[...el.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
   return {count:tabs.length,rows:new Set(tabs.map(r=>Math.round(r.y))).size,
-    widths:tabs.map(r=>r.width),overflow:document.documentElement.scrollWidth-innerWidth};
+    widths:tabs.map(r=>r.width),heights:tabs.map(r=>r.height),
+    overflow:document.documentElement.scrollWidth-innerWidth};
  });
  expect(metrics.count).toBe(7);
- expect(metrics.rows).toBe(2);
- expect(Math.min(...metrics.widths)).toBeGreaterThan(35);
+ expect(metrics.rows).toBe(1);
+ expect(Math.min(...metrics.widths)).toBeGreaterThan(38);
+ expect(Math.min(...metrics.heights)).toBeGreaterThanOrEqual(52);
  expect(metrics.overflow).toBeLessThanOrEqual(2);
  await header.locator('.fr-v5-header-menu summary').click();
  await expect(header.locator('.fr-v5-menu-list a')).toHaveCount(7);
@@ -248,12 +254,14 @@ test('All seven editorial pages protect mobile dock clearance and real copy at 3
     return {dock:Math.ceil(dock.getBoundingClientRect().height),
       bodyPadding:parseFloat(getComputedStyle(document.body).paddingBottom),
       overflow:document.documentElement.scrollWidth-innerWidth,
-      tabs:[...document.querySelectorAll('.hub-tabs a')].map(x=>Math.round(x.getBoundingClientRect().height))};
+      headerNavHidden:getComputedStyle(document.querySelector('.hub-header .hub-tabs')).display==='none',
+      tabs:[...dock.querySelectorAll('a')].map(x=>Math.round(x.getBoundingClientRect().height))};
   });
   expect(metrics.bodyPadding).toBeGreaterThanOrEqual(metrics.dock+10);
+  expect(metrics.headerNavHidden).toBe(true);
   expect(metrics.overflow).toBeLessThanOrEqual(2);
   expect(metrics.tabs.length).toBe(7);
-  expect(Math.min(...metrics.tabs)).toBeGreaterThanOrEqual(38);
+  expect(Math.min(...metrics.tabs)).toBeGreaterThanOrEqual(52);
  }
 });
 
@@ -625,4 +633,25 @@ test('TV editorial requests title and original air year and displays exact match
  await expect(page.locator('.editorial-pick__poster')).toBeVisible();
  await expect(page.locator('.editorial-pick__art-credit')).toContainText('Poster via TMDB');
  expect(queries.some(q=>q.type==='tv'&&q.title&&/^20[0-2][0-9]$/.test(q.year))).toBe(true);
+});
+
+test('Friday homepage features show all six source-backed selections, with no stale TV or game headline',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ const expected=[
+  ['.hub-feature','HERETIC'],
+  ['.hub-tv','MARIANNE'],
+  ['.hub-indie','LONGLEGS'],
+  ['.hub-podcast','OLD GODS OF APPALACHIA'],
+  ['.hub-games','PHASMOPHOBIA'],
+  ['.hub-cinema','CLAYFACE']
+ ];
+ for(const [selector,title] of expected){
+  await expect(page.locator(selector+' h3')).toHaveText(title);
+  await expect(page.locator(selector+' .hub-tile__link')).toHaveAttribute('href',/\S+/);
+ }
+ const feed=await page.request.get('/data/homepage-features.json');
+ expect(feed.ok()).toBe(true);
+ const payload=await feed.json();
+ expect(Object.keys(payload.features).sort()).toEqual(['cinema','games','indie','movie','podcast','tv']);
 });
