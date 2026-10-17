@@ -1,6 +1,6 @@
 /* Private-preview-only sitewide FrightWatch banner. Not imported into production. */
-.fr-watch-promo{display:block;position:relative;isolation:isolate;width:min(1320px,calc(100% - 96px));margin:12px auto 18px;overflow:hidden;border:1px solid #64313c;background:#07070a;box-shadow:0 9px 30px #0008;transition:box-shadow .2s ease,transform .2s ease}
-.fr-watch-promo:is(:hover,:focus-visible){box-shadow:0 0 0 1px #df546a,0 12px 34px #a8263f57;transform:translateY(-1px)}
+.fr-watch-promo{display:block;position:relative;isolation:isolate;width:min(1320px,calc(100% - 96px));margin:12px auto 18px;overflow:hidden;border:0;background:#07070a;box-shadow:0 9px 30px #0008;transition:box-shadow .2s ease,transform .2s ease}
+.fr-watch-promo:is(:hover,:focus-visible){box-shadow:0 12px 38px #a8263f3c;transform:translateY(-1px)}
 .fr-watch-promo picture,.fr-watch-promo img{display:block;width:100%;height:auto}
 .fr-watch-promo img{object-fit:contain;min-height:0}
 .fr-watch-promo__placeholder{display:none;padding:13px 18px;background:linear-gradient(100deg,#09090d,#3a0c15 45%,#060509);color:#fff;align-items:center;justify-content:space-between;gap:20px;min-height:74px;font:800 clamp(14px,2.3vw,25px)/1.2 'Barlow Condensed',Georgia,serif;letter-spacing:.045em}
