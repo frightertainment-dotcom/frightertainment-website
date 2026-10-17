@@ -3,68 +3,95 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="theme-color" content="#080708">
-<meta name="description" content="FrightWatch — an upcoming free-to-watch independent horror showcase from Frightertainment.">
-<title>FrightWatch | Frightertainment — Private Preview</title>
+<meta name="theme-color" content="#060506">
+<meta name="description" content="Private FrightWatch concept preview — Frightertainment's upcoming independent horror streaming showcase.">
+<title>FrightWatch · Private Streaming Preview | Frightertainment</title>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/hub.css"><link rel="stylesheet" href="/v5-magazine.css"><link rel="stylesheet" href="/fr-design-system.css"><link rel="stylesheet" href="/fr-page-themes.css"><link rel="stylesheet" href="/fr-premium.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/frightwatch.css">
 <script defer src="/frightwatch.js"></script>
 </head>
-<body class="hub-body hub-section fr-v5 fr-watch-page" data-theme="frightwatch">
-<a class="skip-link" href="#main">Skip to main content</a><div class="red-thread" aria-hidden="true"></div>
-<div class="microbar hub-microbar"><div class="shell microbar__inner"><span><span class="pulse-dot"></span> THE DARK IS CALLING. STAY AWHILE.</span><span>ENTER IF YOU DARE.</span></div></div>
-<header class="header hub-header" id="top"><div class="shell hub-header__inside">
-<a class="brand hub-brand" href="/" aria-label="Frightertainment home"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a>
-<nav class="hub-tabs" aria-label="Main site sections"><a href="/">HOME</a><a href="/movies.html">MOVIES</a><a href="/tv-shows.html">TV SHOWS</a><a href="/cinema.html">CINEMA</a><a href="/indie-movies.html">INDIE MOVIES</a><a href="/podcasts.html">PODCASTS</a><a href="/games.html">GAMES</a></nav>
-</div></header>
-<main id="main" class="shell fr-watch" data-fr-v5-ready="true">
-<section class="fr-watch-hero" aria-labelledby="watch-title">
-<div class="fr-watch-hero__shade" aria-hidden="true"></div>
-<div class="fr-watch-hero__copy">
-<p class="fr-watch-eyebrow">FRIGHTERTAINMENT PRESENTS · THE INDIE HORROR SCREEN</p>
-<div class="fr-watch-wordmark">
-<img id="fr-watch-logo" data-frightwatch-logo="/assets/frightwatch/frightwatch-logo.webp" alt="FrightWatch" hidden>
-<h1 id="watch-title">FrightWatch</h1>
-</div>
-<p class="fr-watch-hero__intro">A new home for independent nightmares.</p>
-<p class="fr-watch-hero__body">A free-to-watch horror showcase is being prepared for Frightertainment. We want the stories, voices and filmmakers who make the strange unforgettable.</p>
-<div class="fr-watch-hero__actions"><a class="fr-watch-button fr-watch-button--primary" href="#explore">EXPLORE FRIGHTWATCH <span aria-hidden="true">→</span></a><a class="fr-watch-button fr-watch-button--secondary" href="#submit">SUBMIT YOUR PRODUCTION</a></div>
-<div class="fr-watch-hero__foot">IN DEVELOPMENT · FILMS WILL APPEAR ONLY WITH FILMMAKER PERMISSION</div>
-</div>
-<div class="fr-watch-hero__visual" aria-hidden="true"><div class="fr-watch-reel"><div class="fr-watch-reel__ring"></div><div class="fr-watch-reel__centre">FW</div></div><span>YOUR NEXT NIGHTMARE STARTS HERE</span></div>
+<body class="fw-app">
+<a class="fw-skip" href="#main">Skip to content</a>
+<div class="fw-app__smoke" aria-hidden="true"></div>
+<header class="fw-header" id="top">
+  <div class="fw-header__left">
+    <a class="fw-logo" href="/frightwatch.html" aria-label="FrightWatch home"><img src="/assets/frightwatch/logo.webp" alt="FrightWatch" width="569" height="175"></a>
+    <nav class="fw-nav fw-nav--desktop" aria-label="FrightWatch main navigation">
+      <button type="button" data-view="home" aria-current="page">Home</button><button type="button" data-view="movies">Movies</button><button type="button" data-view="series">Series</button><button type="button" data-view="originals">Originals</button><button type="button" data-view="list">My List</button>
+    </nav>
+  </div>
+  <div class="fw-header__right">
+    <div class="fw-search" data-search-wrap>
+      <label for="fw-search-input" class="fw-sr-only">Search FrightWatch concept titles</label>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7.25"></circle><path d="m16 16 5 5"></path></svg>
+      <input id="fw-search-input" type="search" placeholder="Search horror, titles, people…" autocomplete="off" maxlength="80">
+    </div>
+    <button class="fw-search-toggle" type="button" aria-label="Search FrightWatch" aria-expanded="false" aria-controls="fw-search-input"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7.25"></circle><path d="m16 16 5 5"></path></svg></button>
+    <span class="fw-avatar" aria-label="FrightWatch demo profile">FW</span>
+    <a class="fw-back" href="/" aria-label="Return to Frightertainment" title="Back to Frightertainment">↗</a>
+  </div>
+  <nav class="fw-nav fw-nav--mobile" aria-label="FrightWatch mobile navigation">
+    <button type="button" data-view="home" aria-current="page">Home</button><button type="button" data-view="movies">Movies</button><button type="button" data-view="series">Series</button><button type="button" data-view="originals">Originals</button><button type="button" data-view="list">My List</button>
+  </nav>
+</header>
+<main id="main">
+<div class="fw-demo-note" role="status"><strong>PRIVATE DESIGN PREVIEW</strong><span>Sample posters and titles are for appearance only · not available to stream</span></div>
+<section class="fw-hero" aria-label="Featured FrightWatch concept">
+  <div class="fw-hero__scene" aria-hidden="true"></div>
+  <div class="fw-hero__content">
+    <p class="fw-hero__eyebrow">A <strong>FRIGHTWATCH</strong> CONCEPT FEATURE</p>
+    <div class="fw-hero__title"><span>THE</span><h1>HOLLOWING</h1></div>
+    <p class="fw-hero__description">A grieving woman returns to her family's abandoned estate only to discover a darker truth — some places never let go.</p>
+    <p class="fw-hero__tags">SUPERNATURAL <i aria-hidden="true">•</i> MYSTERY <i aria-hidden="true">•</i> HORROR <i aria-hidden="true">•</i> 2024</p>
+    <div class="fw-hero__actions"><button type="button" class="fw-action fw-action--play" data-demo-title="The Hollowing"><span aria-hidden="true">▶</span> Play</button><button type="button" class="fw-action fw-action--info" data-demo-title="The Hollowing"><span aria-hidden="true">ⓘ</span> More Info</button></div>
+  </div>
+  <div class="fw-hero__pager" aria-label="Concept slide 1 of 4"><span class="is-current"></span><span></span><span></span><span></span></div>
 </section>
 
-<section class="fr-watch-overview" id="explore" aria-labelledby="watch-explore">
-<div class="fr-watch-section-head"><div><span class="fr-watch-kicker">THE FRIGHTWATCH LIBRARY</span><h2 id="watch-explore">ENTER THE <em>DARK.</em></h2></div><span class="fr-watch-badge">FREE-TO-WATCH HORROR · COMING SOON</span></div>
-<p class="fr-watch-lead">Browse independent horror movies, short films, series, documentaries and paranormal investigations when their creators have approved them for screening.</p>
-<div class="fr-watch-browser" aria-label="Film browsing controls">
-<div class="fr-watch-filters" role="group" aria-label="Production formats">
-<button type="button" class="is-active" data-watch-format="all" aria-pressed="true">ALL</button>
-<button type="button" data-watch-format="feature" aria-pressed="false">FEATURE FILMS</button>
-<button type="button" data-watch-format="short" aria-pressed="false">SHORT HORROR</button>
-<button type="button" data-watch-format="series" aria-pressed="false">SERIES</button>
-<button type="button" data-watch-format="documentary" aria-pressed="false">DOCUMENTARIES</button>
-<button type="button" data-watch-format="paranormal" aria-pressed="false">PARANORMAL</button>
-</div>
-<label class="fr-watch-search"><span class="sr-only">Search available productions</span><input type="search" id="fr-watch-search" placeholder="SEARCH THE DARKNESS…" maxlength="80" autocomplete="off" aria-label="Search available productions"></label>
-</div>
-<div id="fr-watch-catalogue" class="fr-watch-catalogue" aria-live="polite"></div>
-<div id="fr-watch-empty" class="fr-watch-empty">
-<span class="fr-watch-empty__number">00</span><div><span class="fr-watch-kicker">THE SCREEN IS BEING PREPARED</span><h3>THE FIRST NIGHTMARES ARE ON THEIR WAY.</h3><p>No full films are available to play yet. We're inviting independent creators to be part of FrightWatch. Every title will be shared with permission and properly credited.</p><a href="#submit">ARE YOU A FILMMAKER? GET IN TOUCH ↗</a></div>
-</div>
+<div class="fw-shelves" id="fw-shelves">
+<section class="fw-shelf" data-shelf="continue" data-filters="home" aria-labelledby="fw-continue-title">
+  <div class="fw-shelf__heading"><h2 id="fw-continue-title">Continue Watching <small>DEMO</small></h2><button class="fw-shelf__arrow" type="button" aria-label="Scroll Continue Watching right" data-scroll="continue">›</button></div>
+  <div class="fw-shelf__track fw-shelf__track--wide" data-track="continue" tabindex="0" aria-label="Demonstration Continue Watching film covers"></div>
 </section>
-<section class="fr-watch-genre" aria-labelledby="watch-genres">
-<div class="fr-watch-section-head"><div><span class="fr-watch-kicker">BEYOND THE ORDINARY</span><h2 id="watch-genres">HORROR IN EVERY <em>FORM.</em></h2></div></div>
-<div class="fr-watch-genre-grid">
-<article class="fr-watch-genre-card" data-genre="found"><span>01 / TERROR ON TAPE</span><h3>FOUND FOOTAGE</h3><p>Fiction and footage that feels too real.</p></article>
-<article class="fr-watch-genre-card" data-genre="supernatural"><span>02 / THE UNEXPLAINED</span><h3>SUPERNATURAL</h3><p>Spirits, hauntings and things unseen.</p></article>
-<article class="fr-watch-genre-card" data-genre="indie"><span>03 / NEW VOICES</span><h3>INDIE ORIGINALITY</h3><p>Fresh ideas from independent filmmakers.</p></article>
-<article class="fr-watch-genre-card" data-genre="paranormal"><span>04 / REAL INVESTIGATIONS</span><h3>PARANORMAL CASES</h3><p>Investigations and episodic explorations.</p></article>
-</div><p class="fr-watch-disclaimer">These are proposed categories, not currently playable productions or claims of exclusive rights.</p>
+<section class="fw-shelf" data-shelf="trending" data-filters="home movies" aria-labelledby="fw-trending-title">
+  <div class="fw-shelf__heading"><h2 id="fw-trending-title">Trending Now <small>CONCEPT</small></h2><button class="fw-shelf__arrow" type="button" aria-label="Scroll Trending Now right" data-scroll="trending">›</button></div>
+  <div class="fw-shelf__track fw-shelf__track--posters" data-track="trending" tabindex="0" aria-label="Demonstration trending horror poster covers"></div>
 </section>
-<section class="fr-watch-submit" id="submit" aria-labelledby="watch-submit-title"><div class="fr-watch-submit__copy"><span class="fr-watch-kicker">FILMMAKERS · CREATORS · PRODUCTION COMPANIES</span><h2 id="watch-submit-title">YOUR WORK DESERVES <em>AN AUDIENCE.</em></h2><p>Frightertainment welcomes enquiries from creators of independent horror films, shorts, TV-style series, documentaries and paranormal investigations.</p><p>We know how much time, cost and passion goes into a production. Right now, FrightWatch is exploring voluntary, <strong>unpaid streaming permissions</strong>. We cannot currently offer licensing fees. You retain ownership, and nothing is hosted without a separate written agreement covering the rights, territory and duration.</p><p>If that might work for your project, we'd love to have a conversation. There's no obligation to take part.</p><a class="fr-watch-button fr-watch-button--primary" href="mailto:frightertainment@gmail.com?subject=FrightWatch%20independent%20production%20enquiry">CONTACT FRIGHTERTAINMENT <span aria-hidden="true">↗</span></a></div><div class="fr-watch-submit__art" aria-hidden="true"><span>MADE INDEPENDENTLY.</span><strong>SEEN<br>EVERYWHERE?</strong><small>BUILDING A HOME FOR YOUR HORROR</small></div></section>
+<section class="fw-shelf" data-shelf="originals" data-filters="home originals" aria-labelledby="fw-originals-title">
+  <div class="fw-shelf__heading"><h2 id="fw-originals-title">FrightWatch Originals <small>CONCEPT ONLY</small></h2><button class="fw-shelf__arrow" type="button" aria-label="Scroll FrightWatch Originals concept art right" data-scroll="originals">›</button></div>
+  <div class="fw-shelf__track fw-shelf__track--wide fw-shelf__track--originals" data-track="originals" tabindex="0" aria-label="Fictional FrightWatch Originals concept artwork"></div>
+</section>
+<section class="fw-shelf" data-shelf="new" data-filters="home movies series" aria-labelledby="fw-new-title">
+  <div class="fw-shelf__heading"><h2 id="fw-new-title">New Releases <small>DEMO</small></h2><button class="fw-shelf__arrow" type="button" aria-label="Scroll New Releases right" data-scroll="new">›</button></div>
+  <div class="fw-shelf__track fw-shelf__track--wide" data-track="new" tabindex="0" aria-label="Demonstration new releases"></div>
+</section>
+<section class="fw-shelf fw-shelf--genres" data-shelf="genres" data-filters="home movies series" aria-labelledby="fw-genres-title">
+  <div class="fw-shelf__heading"><h2 id="fw-genres-title">Explore the Darkness</h2></div>
+  <div class="fw-genres"><button type="button" data-demo-genre="Slashers">Slashers <span>↗</span></button><button type="button" data-demo-genre="Supernatural">Supernatural <span>↗</span></button><button type="button" data-demo-genre="Psychological Horror">Psychological Horror <span>↗</span></button><button type="button" data-demo-genre="Cult Classics">Cult Classics <span>↗</span></button><button type="button" data-demo-genre="Paranormal Investigations">Paranormal Investigations <span>↗</span></button></div>
+</section>
+</div>
+<section class="fw-no-results" data-no-results hidden><h2>No matching demo titles</h2><p>Try another search, or return to Home to browse the private layout concept.</p><button type="button" data-view="home">Back to Home</button></section>
+<section class="fw-submissions" id="submissions">
+ <span class="fw-submissions__eyebrow">FOR INDIE HORROR FILMMAKERS</span>
+ <div class="fw-submissions__row"><div><h2>YOUR STORIES. <em>A DARKER STAGE.</em></h2><p>FrightWatch is inviting independent horror films, shorts, documentaries, series and paranormal investigations. We're currently exploring permission-based screenings without licensing fees. That means unpaid streaming permissions, with no obligation to take part. You keep ownership; nothing goes live without a separate written agreement.</p></div><a href="mailto:Frightertainment@gmail.com?subject=FrightWatch%20production%20enquiry">SUBMIT YOUR PRODUCTION ↗</a></div>
+</section>
 </main>
-<footer class="footer hub-footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · HORROR CULTURE, INDEPENDENTLY.</span><a href="/credits.html">CREDITS</a><a href="/contact.html">CONTACT US</a><a href="/privacy.html">PRIVACY</a></div></footer>
-<script defer src="/app.js"></script><script defer src="/v5-magazine.js"></script><script defer src="/fr-ambient.js"></script>
-</body></html>
+<footer class="fw-footer"><a href="/">← FRIGHTERTAINMENT</a><span>FRIGHTWATCH · PRIVATE CONCEPT PREVIEW · NO FILMS CURRENTLY AVAILABLE</span><a href="mailto:Frightertainment@gmail.com">CONTACT</a></footer>
+<nav class="fw-bottom-nav" aria-label="FrightWatch mobile bottom navigation">
+ <button type="button" data-view="home" aria-current="page"><span class="fw-bottom-icon" aria-hidden="true">⌂</span>Home</button>
+ <button type="button" data-view="movies"><span class="fw-bottom-icon" aria-hidden="true">▣</span>Movies</button>
+ <button type="button" data-view="series"><span class="fw-bottom-icon" aria-hidden="true">▤</span>Series</button>
+ <button type="button" data-view="originals"><span class="fw-bottom-icon" aria-hidden="true">☆</span>Originals</button>
+ <button type="button" data-view="list"><span class="fw-bottom-icon" aria-hidden="true">▯</span>My List</button>
+</nav>
+<dialog class="fw-modal" aria-labelledby="fw-modal-title">
+ <button class="fw-modal__close" type="button" data-close-modal aria-label="Close dialog">×</button>
+ <span class="fw-modal__eyebrow">PRIVATE CONCEPT · NOT STREAMABLE</span>
+ <h2 id="fw-modal-title">THE HOLLOWING</h2>
+ <p data-modal-description>This is demonstration artwork from your FrightWatch concept, not an available film. The live catalogue will show only productions with confirmed written screening permission.</p>
+ <div class="fw-modal__actions"><button type="button" data-save-demo>☆ Save demo to My List</button><button type="button" data-close-modal>BACK TO FRIGHTWATCH</button></div>
+</dialog>
+</body>
+</html>
