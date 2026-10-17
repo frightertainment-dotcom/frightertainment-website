@@ -1,3 +1,9 @@
+# SUPERSEDED — DO NOT USE AS CURRENT IMPLEMENTATION SPEC
+
+The current owner direction is in [FRIGHTWATCH_CURRENT_DIRECTION.md](FRIGHTWATCH_CURRENT_DIRECTION.md). Sample posters, invented Originals, multiple tabs, fake playback and extra shelves have been removed by owner request on 17 October 2026. The below is historical background only.
+
+---
+
 # FrightWatch — private streaming experience specification
 Status: DESIGN BRIEF / PRIVATE ONLY — not published
 Source of truth: the CURRENT Frightertainment production website, not any earlier theme or discarded ZIP.
