@@ -46,7 +46,7 @@ async function markHtmlNoIndex(directory) {
       // Generated film/ranking pages can predate the current build: ensure
       // supporting routes receive the same visual identity without modifying
       // their source claims or accidentally overriding the seven V5 landings.
-      if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
+      if (entry.name !== 'frightwatch.html' && !/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
         html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
       // Only the isolated private preview gets the FrightWatch sitewide promo.
       // Never modify source HTML, production bundle, or FrightWatch's own page.
