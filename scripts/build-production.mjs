@@ -11,7 +11,7 @@ const publicFiles = [
   'film.html',
   'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'homepage-features.js', 'dynamic-film.js', 'top20.js',
   'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-radar.js', 'horror-radar.css', 'cinema-diary.js', 'cinema-concept.js', 'straight-to-stream.js', 'streaming-watch.js',
-  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'indie-phase3.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
+  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'fr-polish.css', 'indie-phase3.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
@@ -59,7 +59,7 @@ await validateHtml(destination);
 // Self-host the identical licensed fonts to remove the blocking Google CSS
 // connection. Subsets remain demand-loaded by the browser's unicode ranges.
 const homeCoreCss = ['styles.css','hub.css','v5-magazine.css','fr-design-system.css','fr-page-themes.css','fr-rating-badge.css'];
-const homeFinalCss = ['fr-premium.css','horror-radar.css','frightnews.css'];
+const homeFinalCss = ['fr-premium.css','horror-radar.css','frightnews.css','fr-polish.css'];
 const homeFile = new URL('index.html', destination);
 let home = await readFile(homeFile, 'utf8');
 const originalLinks = homeCoreCss.map(file => '<link rel="stylesheet" href="/' + file + '">').join('');

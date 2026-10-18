@@ -60,7 +60,7 @@ test('A title collision or wrong release year never paints a poster',async({page
  const card=page.locator('.editorial-pick');
  await expect(card).toHaveAttribute('data-feature-id','heart-eyes');
  await expect(card.locator('.editorial-pick__poster')).toHaveCount(0);
- await expect(card.locator('.editorial-pick__art-sub')).toContainText('ORIGINAL FRIGHTERTAINMENT ART');
+ await expect(card.locator('.editorial-pick__art-sub')).toContainText('POSTER NOT AVAILABLE');
  await expect(card.locator('.editorial-pick__art-frame')).toHaveAttribute('aria-label',/not an official film poster/i);
 });
 

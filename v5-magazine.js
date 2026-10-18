@@ -603,6 +603,13 @@
    nav.append(a);
   });
   document.body.append(nav);
+  // Keep the selected section in view when the readable seven-item dock scrolls.
+  if(window.matchMedia('(max-width:700px)').matches){
+   requestAnimationFrame(()=>{
+    const active=nav.querySelector('[aria-current="page"]');
+    if(active)nav.scrollLeft=Math.max(0,active.offsetLeft-(nav.clientWidth-active.clientWidth)/2);
+   });
+  }
  }
  function decorateHero(){
   const carousel=main.querySelector('.editorial-carousel');if(!carousel)return;

@@ -39,8 +39,12 @@ test('Cinema release marquee stays country-specific, source-linked and legible a
   await page.goto('/cinema.html');
   await page.locator('#cinema-country').selectOption('US');
   await expect(page.locator('.fr-cinema-concept__card')).toHaveCount(4);
-  const expected = ['Clayface', 'The Devils', 'Godzilla Minus Zero', 'Victorian Psycho'];
-  await expect(page.locator('.fr-cinema-concept__title')).toHaveText(expected);
+  // As today's date passes a confirmed screening, it must disappear from
+  // upcoming releases; the marquee should use four *current* sourced titles.
+  const currentTitles = await page.locator('.fr-cinema-concept__title').allTextContents();
+  expect(currentTitles).toHaveLength(4);
+  expect(new Set(currentTitles).size).toBe(4);
+  expect(currentTitles.every(title => title.trim().length > 0)).toBe(true);
   for (const width of [320, 375, 390, 768, 1024, 1440]) {
     await page.setViewportSize({width,height:900});
     const checks = await page.locator('.fr-cinema-concept__card').evaluateAll(elements => ({

@@ -178,21 +178,30 @@ test('Home lower discovery summaries keep their text and action in separate trac
   }
 });
 
-test('Each destination requests its own correctly composed scene for the viewport', async ({ page }) => {
+test('Seven destination mastheads are text-led, without prefetched illustrated scenes', async ({ page }) => {
   const routes = [['home', '/'], ['movies', '/movies.html'], ['tv', '/tv-shows.html'],
     ['cinema', '/cinema.html'], ['indie', '/indie-movies.html'],
     ['podcasts', '/podcasts.html'], ['games', '/games.html']];
   for (const width of [390, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
-    for (const [name, route] of routes) {
+    await page.setViewportSize({width, height:900});
+    for (const [theme, route] of routes) {
       await page.goto(route);
-      const selected = width < 700 ? 'mobile' : 'wide';
-      const unused = width < 700 ? 'wide' : 'mobile';
-      await expect.poll(() => page.evaluate(name => performance.getEntriesByType('resource')
-        .some(entry => entry.name.includes(`/assets/themes/${name}-${innerWidth < 700 ? 'mobile' : 'wide'}.webp`)), name)).toBe(true);
-      const resources = await page.evaluate(() => performance.getEntriesByType('resource').map(entry => entry.name));
-      expect(resources.some(url => url.includes(`/assets/themes/${name}-${selected}.webp`))).toBe(true);
-      expect(resources.some(url => url.includes(`/assets/themes/${name}-${unused}.webp`))).toBe(false);
+      await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
+      const state = await page.evaluate(() => {
+        const intro = document.querySelector('.hub-page-intro, .fr-home-intro');
+        return {
+          art: getComputedStyle(intro).backgroundImage,
+          scene: getComputedStyle(document.body).getPropertyValue('--fr-scene-current').trim(),
+          preloads: [...document.querySelectorAll('link[rel="preload"][as="image"]')]
+            .filter(n => n.href.includes('/assets/themes/')).length,
+          width:document.documentElement.scrollWidth, viewport:innerWidth
+        };
+      });
+      expect(state.art, route).not.toContain('/assets/themes/');
+      expect(state.scene, route).toBe('none');
+      expect(state.preloads, route).toBe(0);
+      expect(state.width, route).toBeLessThanOrEqual(state.viewport + 2);
+      await expect(page.locator('.hub-header .hub-brand img')).toBeVisible();
     }
   }
 });

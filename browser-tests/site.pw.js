@@ -286,10 +286,10 @@ test('film and Top 20 pages offer main-content skip links', async ({ page }) => 
   await navigateLegacy(page,'/top-20/2026/');
   await expect(page.locator('.skip-link')).toHaveCount(1);
 });
-test('homepage artwork is first-party and movie posters are not copied without permission', async ({ page }) => {
+test('homepage avoids illustrated backdrops while respecting poster rights', async ({ page }) => {
   await navigateLegacy(page,'/');
   const artURL = await page.locator('.hub-feature').evaluate(el => getComputedStyle(el, '::before').backgroundImage);
-  expect(artURL).toContain('/assets/themes/movies-wide.webp');
+  expect(artURL).not.toContain('/assets/themes/');
   await navigateLegacy(page,'/movies.html');
   await expect(page.locator('.movie-card__art img.licensed-poster')).toHaveCount(0);
   await expect(page.locator('.movie-card__actions a[target="_blank"]')).toHaveCount(8);
@@ -1473,8 +1473,8 @@ test('UK cinema diary orders months chronologically while ranking studio ahead o
  await page.locator('#cinema-country').selectOption('US');
  await expect(page.locator('#cinema-heading')).toHaveText('US CINEMA RELEASE DIARY.');
  await expect(listing).toContainText('Clayface');
- await expect(listing).toContainText('The Devils');
- await expect(listing).toContainText('RE-RELEASE SCREENINGS');
+ // A 16 October US screening is no longer an upcoming show on 18 October.
+ await expect(listing).not.toContainText('The Devils');
  await expect(listing).not.toContainText('Obsession');
  await expect(listing).not.toContainText('In the Grip of Terror');
  await page.locator('#cinema-country').selectOption('CA');

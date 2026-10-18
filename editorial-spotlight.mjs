@@ -216,18 +216,18 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
       card.replaceChildren(
         make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'),
         make('strong', 'editorial-pick__art-title', item.title),
-        make('span', 'editorial-pick__art-sub', 'ORIGINAL FRIGHTERTAINMENT ART')
+        make('span', 'editorial-pick__art-sub', 'POSTER NOT AVAILABLE')
       );
-      card.setAttribute('aria-label', 'Original Frightertainment art, not an official film poster');
+      card.setAttribute('aria-label', 'Editorial title card, not an official film poster');
       card.classList.remove('editorial-pick__art-frame--poster');
     }, {once:true});
     card.append(img);
     card.append(make('small', 'editorial-pick__art-credit', 'Artwork © ' + item.posterCredit));
   } else {
-    card.setAttribute('aria-label', 'Original Frightertainment art, not an official film poster');
+    card.setAttribute('aria-label', 'Editorial title card, not an official film poster');
     card.append(make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'));
     card.append(make('strong', 'editorial-pick__art-title', item.title));
-    card.append(make('span', 'editorial-pick__art-sub', 'ORIGINAL FRIGHTERTAINMENT ART'));
+    card.append(make('span', 'editorial-pick__art-sub', 'POSTER NOT AVAILABLE'));
   }
   art.append(card);
 

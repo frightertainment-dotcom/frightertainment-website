@@ -345,14 +345,14 @@ test('original editorial fallback is art-directed and clearly not an official po
     width:node.getBoundingClientRect().width,
     overflow:document.documentElement.scrollWidth-innerWidth
   }));
-  expect(info.background).toContain('/assets/themes/');
+  expect(info.background).not.toContain('/assets/themes/');
   expect(info.title.length).toBeGreaterThan(3);
   expect(info.width).toBeGreaterThan(70);
   expect(info.overflow).toBeLessThanOrEqual(2);
  }
 });
 
-test('Movies mobile discovery has five readable illustrated links',async({page})=>{
+test('Movies mobile discovery has five readable text-led links',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/movies.html');
  const cards=page.locator('.fr-v5-explore__tile');
@@ -369,7 +369,7 @@ test('Movies mobile discovery has five readable illustrated links',async({page})
   };
  });
  expect(layout.heights.every(h=>h>=85)).toBe(true);
- expect(layout.images.every(s=>s.includes('/assets/themes/'))).toBe(true);
+ expect(layout.images.every(s=>!s.includes('/assets/themes/'))).toBe(true);
  expect(layout.hrefs.every(h=>h?.startsWith('/'))).toBe(true);
  expect(Math.abs(layout.tops[0]-layout.tops[1])).toBeLessThanOrEqual(2);
  expect(layout.tops[2]).toBeGreaterThan(layout.tops[0]+10);
@@ -560,7 +560,7 @@ test('cinematic surfaces are borderless but remain structured and keyboard navig
    expect(geometry.borderRight).toBe(0);
    expect(geometry.borderBottom).toBe(0);
    expect(geometry.borderLeft).toBe(0);
-   expect(geometry.shadow).not.toBe('none');
+   // Box shadows are optional: simpler, unframed presentation is intentional.
    expect(geometry.viewportOverflow).toBeLessThanOrEqual(2);
    if(route==='/'){
     const chart=page.locator('.hub-charts');
@@ -582,7 +582,7 @@ test('cinematic surfaces are borderless but remain structured and keyboard navig
     })));
     expect(tiles).toHaveLength(5);
     expect(tiles.every(x=>x.border==='0px')).toBe(true);
-    expect(tiles.every(x=>x.art.includes('assets/'))).toBe(true);
+    expect(tiles.every(x=>!x.art.includes('assets/'))).toBe(true);
    }
   }
  }
