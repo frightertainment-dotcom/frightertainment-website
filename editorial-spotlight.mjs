@@ -40,11 +40,11 @@ export function buildEditorialCarousel(items, dayIndex, offset = 0, requestedId 
 }
 
 const categoryMap = {
-  movies: { title: 'MOVIES', offset: 0, label: 'THE FEATURE PRESENTATION' },
-  tv: { title: 'TV SHOWS', collection: 'tv-shows', offset: 2, label: 'TONIGHT’S SERIES' },
-  indie: { title: 'INDIE MOVIES', collection: 'indie-movies', offset: 4, label: 'THE INDEPENDENT CUT' },
-  podcasts: { title: 'PODCASTS', collection: 'podcasts', offset: 1, label: 'LISTEN AFTER DARK' },
-  games: { title: 'GAMES', collection: 'games', offset: 3, label: 'ENTER IF YOU DARE' }
+  movies: { title: 'MOVIES', offset: 0, label: 'THE FEATURE PRESENTATION', fileLabel: 'FILM FILE', artKind: 'poster' },
+  tv: { title: 'TV SHOWS', collection: 'tv-shows', offset: 2, label: 'TONIGHT’S SERIES', fileLabel: 'SERIES FILE', artKind: 'poster' },
+  indie: { title: 'INDIE MOVIES', collection: 'indie-movies', offset: 4, label: 'THE INDEPENDENT CUT', fileLabel: 'INDIE FILM FILE', artKind: 'poster' },
+  podcasts: { title: 'PODCASTS', collection: 'podcasts', offset: 1, label: 'LISTEN AFTER DARK', fileLabel: 'PODCAST FILE', artKind: 'cover art' },
+  games: { title: 'GAMES', collection: 'games', offset: 3, label: 'ENTER IF YOU DARE', fileLabel: 'GAME FILE', artKind: 'cover art' }
 };
 
 const httpUrl = value => {
@@ -196,6 +196,21 @@ function appendVideo(parent, trailer, title) {
   parent.append(details);
   addLink(parent, 'Open official upload ↗', trailer.source, 'editorial-pick__source');
 }
+function renderEditorialTitleCard(card, title, config) {
+  const brand = make('img', 'editorial-pick__art-mark');
+  brand.src = '/assets/frightertainment-f.png';
+  brand.alt = '';
+  brand.setAttribute('aria-hidden', 'true');
+  card.replaceChildren(
+    make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · ' + config.fileLabel),
+    brand,
+    make('strong', 'editorial-pick__art-title', title),
+    make('span', 'editorial-pick__art-sub', 'EDITORIAL TITLE CARD')
+  );
+  card.setAttribute('role', 'img');
+  card.setAttribute('aria-label', 'Frightertainment title card for ' + title + '; no official ' + config.artKind + ' available');
+  card.classList.remove('editorial-pick__art-frame--poster');
+}
 function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   const feature = make('section', 'editorial-pick');
   feature.setAttribute('aria-label', config.title + ' editorial selection');
@@ -213,21 +228,12 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     img.decoding = 'async';
     img.addEventListener('error', () => {
       if (!card.isConnected) return;
-      card.replaceChildren(
-        make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'),
-        make('strong', 'editorial-pick__art-title', item.title),
-        make('span', 'editorial-pick__art-sub', 'POSTER NOT AVAILABLE')
-      );
-      card.setAttribute('aria-label', 'Editorial title card, not an official film poster');
-      card.classList.remove('editorial-pick__art-frame--poster');
+      renderEditorialTitleCard(card, item.title, config);
     }, {once:true});
     card.append(img);
     card.append(make('small', 'editorial-pick__art-credit', 'Artwork © ' + item.posterCredit));
   } else {
-    card.setAttribute('aria-label', 'Editorial title card, not an official film poster');
-    card.append(make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'));
-    card.append(make('strong', 'editorial-pick__art-title', item.title));
-    card.append(make('span', 'editorial-pick__art-sub', 'POSTER NOT AVAILABLE'));
+    renderEditorialTitleCard(card, item.title, config);
   }
   art.append(card);
 
@@ -304,6 +310,8 @@ async function loadPoster(feature, item, isCurrent) {
     await image.decode();
     if (!isCurrent() || !card.isConnected) return;
     card.replaceChildren(image);
+    card.removeAttribute('role');
+    card.removeAttribute('aria-label');
     card.classList.add('editorial-pick__art-frame--poster');
     card.append(make('small', 'editorial-pick__art-credit', 'Poster via TMDB · ' + item.title + ' (' + item.year + ')'));
     feature.querySelector('.editorial-pick__facts').append(make('small', 'editorial-pick__tmdb-credit',

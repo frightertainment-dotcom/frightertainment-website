@@ -463,7 +463,7 @@
   }catch{mockFreeState(list,'Release notices are temporarily unavailable. Use the complete discovery tools below.');}
  };
  const addRanking=async(parent)=>{
-  const p=panel('fr-v5-ranking','TOP 20 HORROR','Verified viewer rankings.','/top-20/'+new Date().getFullYear()+'/');
+  const p=panel('fr-v5-ranking','TOP 20 HORROR','Annual chart · qualifying scores only.','/top-20/'+new Date().getFullYear()+'/');
   const list=el('ol','fr-v5-ranking__list');p.append(list);parent.append(p);
   // Reserve real row heights until sourced rankings arrive. Unlike the
   // former one-line loading label, replacing this ledger will not move
@@ -482,7 +482,9 @@
    if(!response.ok)throw Error('ranking unavailable');
    const data=await response.json();
    const items=(Array.isArray(data.items)?data.items:[]).filter(x=>x&&typeof x.title==='string'&&Number.isInteger(x.position)&&Number.isInteger(x.averageScore)&&x.position>=1&&x.position<=20).sort((a,b)=>a.position-b.position).slice(0,10);
-   if(!items.length){mockFreeState(list,'This year’s verified ranking is still being assembled.');return;}
+   p.querySelector('.fr-v5-panel__head p').textContent=data.ratingKind==='tmdb-community'
+    ? 'TMDB community votes · /10.':'Source-cleared professional critics · /10.';
+   if(!items.length){mockFreeState(list,'No films currently qualify for a numbered ranking.');return;}
    list.replaceChildren();
    const meta=el('small','fr-v5-ranking__source',data.ratingKind==='tmdb-community'?'TMDB COMMUNITY · /10':'VERIFIED PROFESSIONAL CRITICS · /10');
    list.before(meta);
@@ -495,7 +497,7 @@
     else score.textContent=(x.averageScore/10).toFixed(1);
     li.append(position,item,score);list.append(li);
    }
-  } catch{mockFreeState(list,'The live rankings could not be loaded. Open the annual ranking page to retry.');}
+  } catch{mockFreeState(list,'The annual ranking is unavailable. Open the year page for verified film files.');}
  };
  const addTrailer=async(parent,type,{hideWhenUnavailable=false}={})=>{
   const p=panel('fr-v5-trailer',type==='indie'?'LATEST INDIE TRAILERS':'LATEST TRAILERS','Verified official trailers.',type==='indie'?'#trending':'#upcoming');
@@ -672,11 +674,13 @@
     const wide=window.matchMedia('(min-width:1000px)');
     const arrange=()=>{
       if(wide.matches){
-        main.insertBefore(spotlight,explore);
+        // Resize and content-layout events may call arrange again while explore
+        // already lives inside spotlight. Keep the stable showcase as anchor.
+        if(spotlight.parentElement!==main)main.insertBefore(spotlight,showcase);
         spotlight.append(after,explore,ranking);
       }else{
-        main.insertBefore(after,showcase);
-        main.insertBefore(explore,showcase);
+        if(after.parentElement!==main)main.insertBefore(after,showcase);
+        if(explore.parentElement!==main)main.insertBefore(explore,showcase);
         upper.insertBefore(ranking,upper.children[1]||null);
         spotlight.remove();
       }

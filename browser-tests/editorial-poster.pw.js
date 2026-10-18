@@ -60,8 +60,8 @@ test('A title collision or wrong release year never paints a poster',async({page
  const card=page.locator('.editorial-pick');
  await expect(card).toHaveAttribute('data-feature-id','heart-eyes');
  await expect(card.locator('.editorial-pick__poster')).toHaveCount(0);
- await expect(card.locator('.editorial-pick__art-sub')).toContainText('POSTER NOT AVAILABLE');
- await expect(card.locator('.editorial-pick__art-frame')).toHaveAttribute('aria-label',/not an official film poster/i);
+ await expect(card.locator('.editorial-pick__art-sub')).toContainText('EDITORIAL TITLE CARD');
+ await expect(card.locator('.editorial-pick__art-frame')).toHaveAttribute('aria-label',/no official poster available/i);
 });
 
 test('Broken images retain original display art and rapid navigation does not restore a previous poster',async({page})=>{
@@ -160,10 +160,9 @@ test('Seven tabs and editorial art/copy remain in their responsive tracks', asyn
     expect(result.tabs).toBe(7);
     expect(result.navRows).toBe(1);
     expect(result.headerHidden).toBe(true);
-    // At 320px the editorial poster/copy stacks, but the fixed seven-link
-    // mobile dock remains one row; at 390px the editorial story uses two tracks.
-    if(width===320) expect(result.stacked).toBe(true);
-    else expect(result.sideBySide).toBe(true);
+    // The compact V2 film file keeps artwork and readable editorial copy
+    // alongside each other even at 320px; the seven-link dock remains one row.
+    expect(result.sideBySide).toBe(true);
     expect(result.width).toBeLessThanOrEqual(result.viewport+2);
   }
 });

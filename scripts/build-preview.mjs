@@ -1,5 +1,6 @@
 // Staging-only build: publish public website assets, never repository or Worker files.
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { useLocalFonts } from './use-local-fonts.mjs';
 
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
@@ -46,6 +47,7 @@ async function markHtmlNoIndex(directory) {
       // their source claims or accidentally overriding the seven V5 landings.
       if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
         html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
+      html = useLocalFonts(html);
       await writeFile(file, html.replace(/<head(\s[^>]*)?>/i,
         match => match + '<meta name="robots" content="noindex,nofollow,noarchive">'));
     }

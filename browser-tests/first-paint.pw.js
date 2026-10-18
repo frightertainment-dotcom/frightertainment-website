@@ -29,21 +29,26 @@ for (const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/game
     await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
   });
 }
-test('Priority assets are discoverable from document head without blocking font imports',async({page})=>{
+test('Priority assets and self-hosted fonts are discoverable from document head',async({page})=>{
   for (const route of ['/','/movies.html','/tv-shows.html','/cinema.html','/indie-movies.html','/podcasts.html','/games.html']) {
     await page.goto(route);
-    const state=await page.evaluate(()=>{
+    const state=await page.evaluate(async()=>{
+      await document.fonts.ready;
       const head=document.head;
       const theme=document.body.dataset.theme;
-      const css=head.querySelector('link[href="/fr-premium.css"]');
+      const css=head.querySelector('link[href^="/fr-premium.css"]');
       return {scene:head.querySelectorAll('link[rel="preload"][as="image"]').length,
-        fonts:head.querySelectorAll('link[href*="Cormorant+Garamond"]').length,
+        fonts:head.querySelectorAll('link[href^="/assets/fonts/fr-fonts.css"]').length,
+        remoteFonts:head.querySelectorAll('link[href*="fonts.googleapis.com/css2"]').length,
         earlyStyle:!!head.querySelector('link[rel="stylesheet"][href^="/fr-first-paint.css"]'),
-        css:!!css,theme};
+        css:!!css,theme,
+        loadedFamilies:[...document.fonts].filter(face=>face.status==='loaded').map(face=>face.family)};
     });
     // We preload the original brand, not the retired decorative hero scenes.
     expect(state.scene).toBe(route === '/' ? 1 : 0);
     expect(state.fonts).toBe(1);
+    expect(state.remoteFonts).toBe(0);
+    expect(state.loadedFamilies).toContain('DM Sans');
     expect(state.earlyStyle).toBe(true);
     expect(state.css).toBe(true);
   }

@@ -14,7 +14,7 @@ test('Every supporting page carries the AFTER DARK identity and brand without si
     await page.setViewportSize({width,height:900});
     for(const path of interiors){
       await page.goto(path);
-      await expect(page.locator('link[href="/fr-inner.css"]')).toHaveCount(1);
+      await expect(page.locator('link[href^="/fr-inner.css"]')).toHaveCount(1);
       await expect(page.locator('.hub-brand img[src="/assets/frightertainment-brand.png"]')).toBeVisible();
       await expect(page.locator('.hub-tabs a')).toHaveCount(7);
       const state=await page.evaluate(()=>({

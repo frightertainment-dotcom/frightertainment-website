@@ -27,7 +27,8 @@ for (const width of [320,390,1280]) {
     await expect(page.locator('#editorial-picks')).toBeVisible();
     await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
     await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
-    await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(5);
+    await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(4);
+    await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
     await expect(page.locator('#latest-horror')).toBeAttached();
     await expect(page.locator('#live-discovery')).toBeAttached();
     const layout = await rail.locator('.frightnews__row').first().evaluate(row => {
@@ -63,11 +64,11 @@ for (const width of [320,390,1280]) {
     await expect(rail.locator('.frightnews__excerpt').first()).toBeVisible();
     const thumbnails = await rail.locator('.frightnews__thumb img').count();
     expect(thumbnails).toBe(40);
-    await expect(rail.locator('.frightnews__thumb img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds)\//);
+    await expect(rail.locator('.frightnews__thumb img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds|news-thumbs)\//);
     const scrollBehaviour = await rail.locator('[data-frightnews-viewport]').evaluate(node => getComputedStyle(node).overscrollBehaviorY);
     expect(scrollBehaviour).not.toBe('contain');
     await rail.locator('.frightnews__continue').click();
-    await expect(page.locator('#editorial-picks')).toBeInViewport();
+    await expect(page.locator('#latest-horror')).toBeInViewport();
     await expect(page.locator('.fr-v5-header-news-icon')).toBeVisible();
     const metrics = await rail.locator('[data-frightnews-viewport]').evaluate(viewport => ({
       clientHeight:viewport.clientHeight,scrollHeight:viewport.scrollHeight,
@@ -113,11 +114,11 @@ test('FrightNews stays useful when publisher RSS is down without inventing publi
   await expect(rail.locator('.frightnews__row')).toHaveCount(40);
   await expect(rail.locator('[data-frightnews-state]')).toContainText('SOURCE-CHECKED');
   await expect(rail.locator('.frightnews__time').first()).toContainText('SOURCE CHECKED');
-  await expect(rail.locator('.frightnews__thumb-img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds)\//);
+  await expect(rail.locator('.frightnews__thumb-img').first()).toHaveAttribute('src',/\/assets\/(?:themes|worlds|news-thumbs)\//);
   await expect(page.locator('#editorial-picks')).toBeVisible();
   await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
   await rail.locator('.frightnews__continue').click();
-  await expect(page.locator('#editorial-picks')).toBeInViewport();
+  await expect(page.locator('#latest-horror')).toBeInViewport();
 });
 
 test('FrightNews archive stays accessible and paginates beyond the first 120 preserved stories', async ({page}) => {

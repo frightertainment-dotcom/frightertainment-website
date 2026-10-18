@@ -22,7 +22,7 @@ const filmHeroMarkup=movie=>{
     '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
     '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
     '<strong>'+escapeHTML(movie.title)+'</strong>'+
-    '<small>MOVIE POSTER</small></div>'+
+    '<small>EDITORIAL TITLE CARD</small></div>'+
     '<div class="fr-movie-hero__info"><span class="hub-eyebrow">FROM THE HORROR VAULT</span>'+
     '<h1>'+escapeHTML(movie.title)+'</h1>'+
     '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+

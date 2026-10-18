@@ -269,8 +269,11 @@ test('mobile homepage keeps the featured film before the chart and supporting ca
   await page.setViewportSize({ width: 390, height: 844 });
   await navigateLegacy(page,'/');
   const order = await page.locator('.hub-dashboard > *').evaluateAll(nodes => nodes.map(node =>
-    node.classList.contains('hub-showcase__lead') ? 'feature and watchlist' : node.classList.contains('hub-charts') ? 'chart' : 'support'));
-  expect(order).toEqual(['feature and watchlist', 'chart', 'support']);
+    node.classList.contains('hub-showcase__lead') ? 'feature and watchlist' :
+    node.classList.contains('hub-charts') ? 'chart' :
+    node.classList.contains('fr-home-cinema-note') ? 'cinema diary' : 'support'));
+  expect(order).toEqual(['feature and watchlist', 'chart', 'support', 'cinema diary']);
+  await expect(page.locator('.hub-dashboard > .fr-home-cinema-note .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
   const positions = await page.evaluate(() => Object.fromEntries([
     ['feature', '.hub-feature'], ['watchlist', '#my-watchlist'], ['chart', '.hub-charts'],
     ['support', '.hub-showcase__bottom']
@@ -718,7 +721,7 @@ test('curated studio films retain crew and title fallback when TMDB is unavailab
   await navigateLegacy(page,'/films/victorian-psycho/');
   await expect(page.locator('.fr-movie-hero')).toBeVisible();
   await expect(page.locator('.fr-movie-hero__art')).toContainText('Victorian Psycho');
-  await expect(page.locator('.fr-movie-hero__art')).toContainText('MOVIE POSTER');
+  await expect(page.locator('.fr-movie-hero__art')).toContainText('EDITORIAL TITLE CARD');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('DIRECTED BY');
   await expect(page.locator('.fr-movie-hero__facts')).toContainText('FEATURED CAST');
   await expect(page.locator('.fr-movie-hero__browse')).toHaveAttribute('href','/all-horror-movies.html?year=2026');
@@ -876,7 +879,7 @@ test('homepage composition stays ordered and usable across the approved viewport
       expect(layout.supportTop).toBeGreaterThanOrEqual(layout.featureBottom);
     }
     if (width <= 700) {
-      expect(layout.supportCards).toHaveLength(5);
+      expect(layout.supportCards).toHaveLength(4);
       const cards = layout.supportCards;
       for (let index = 1; index < cards.length; index++) {
         if (Math.abs(cards[index].top - cards[index - 1].top) < 2)
@@ -884,11 +887,10 @@ test('homepage composition stays ordered and usable across the approved viewport
         else expect(cards[index].top).toBeGreaterThan(cards[index - 1].top + 10);
       }
     } else if (width <= 900) {
-      expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(3);
+      expect(layout.supportColumns.trim().split(/\s+/)).toHaveLength(2);
     }
     if (width === 390) {
-      // Four compact FrightNews stories now precede Editorial Picks. Keep
-      // the original film feature reachable without a giant homepage rail.
+      // Film and chart lead; the compact news rail follows the Cinema diary.
       await expect(page.locator('[data-frightnews="home"] .frightnews__row:visible')).toHaveCount(4);
       await expect(page.locator('[data-frightnews="home"] .frightnews__headline').first()).toBeVisible();
       expect(layout.featureTop).toBeLessThanOrEqual(1450);
@@ -1140,8 +1142,8 @@ test('mobile copy and active navigation use legible color tokens across all seve
         return (values[0] + .05) / (values[1] + .05);
       };
       const body = getComputedStyle(document.body);
-      const heading = document.querySelector(theme === 'home' ? '.fr-home-intro__motto' : '.hub-page-intro h1');
-      const copy = document.querySelector(theme === 'home' ? '.fr-home-intro__copy>p:not(.fr-home-intro__motto)' : '.hub-page-intro>p');
+      const heading = document.querySelector(theme === 'home' ? '.fr-home-intro h1' : '.hub-page-intro h1');
+      const copy = document.querySelector(theme === 'home' ? '.fr-home-intro__copy>p' : '.hub-page-intro>p');
       const active = document.querySelector('.hub-tabs a[aria-current="page"]');
       const base = '#050708';
       return {
@@ -1538,8 +1540,8 @@ test('homepage indie showcase features a real sourced film, not a generic placeh
   await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/indie-movies.html');
   await expect(indie).toHaveAttribute('data-media-title', 'Rabbit Trap');
   await expect(indie.locator('[data-media-field="poster"]')).toHaveCount(1);
-  await expect(page.locator('head link[rel="stylesheet"][href*="fonts.googleapis.com"]')).toHaveCount(1);
-  await expect(page.locator('head link[rel="preconnect"][href="https://fonts.gstatic.com"]')).toHaveCount(1);
+  await expect(page.locator('head link[rel="stylesheet"][href^="/assets/fonts/fr-fonts.css"]')).toHaveCount(1);
+  await expect(page.locator('head link[href*="fonts.googleapis.com/css2"]')).toHaveCount(0);
 });
 
 test('optional homepage discovery does not fetch extra provider data until opened', async ({page}) => {

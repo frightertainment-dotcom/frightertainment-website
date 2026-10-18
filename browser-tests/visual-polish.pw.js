@@ -16,7 +16,7 @@ test('The original Frightertainment branding and seven destinations survive', as
     await expect(page.locator('.hub-brand img')).toHaveAttribute('src', '/assets/frightertainment-brand.png');
     await expect(page.locator('.hub-header .hub-brand img')).toBeVisible();
     await expect(page.locator('.hub-tabs a')).toHaveCount(7);
-    await expect(page.locator('link[href="/fr-polish.css"]')).toHaveCount(1);
+    await expect(page.locator('link[href^="/fr-polish.css"]')).toHaveCount(1);
     const bg = await page.locator('.hub-page-intro, .fr-home-intro').first()
       .evaluate(node => getComputedStyle(node).backgroundImage);
     expect(bg).not.toContain('/assets/themes/');

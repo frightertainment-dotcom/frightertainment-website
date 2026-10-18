@@ -338,7 +338,7 @@ test('original editorial fallback is art-directed and clearly not an official po
   await expect(art).toBeVisible();
   // Matched real posters have their own licensed UI, and must never be covered by a fallback.
   if(await art.evaluate(node=>node.classList.contains('editorial-pick__art-frame--poster')))continue;
-  await expect(art).toHaveAttribute('aria-label',/not an official film poster/i);
+  await expect(art).toHaveAttribute('aria-label',/no official (?:poster|cover art) available/i);
   const info=await art.evaluate(node=>({
     background:getComputedStyle(node).backgroundImage,
     title:node.querySelector('.editorial-pick__art-title')?.textContent?.trim()||'',
@@ -580,7 +580,8 @@ test('cinematic surfaces are borderless but remain structured and keyboard navig
       border:getComputedStyle(x).borderTopWidth,
       art:getComputedStyle(x,'::before').backgroundImage
     })));
-    expect(tiles).toHaveLength(5);
+    expect(tiles).toHaveLength(4);
+    await expect(page.locator('.fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
     expect(tiles.every(x=>x.border==='0px')).toBe(true);
     expect(tiles.every(x=>!x.art.includes('assets/'))).toBe(true);
    }

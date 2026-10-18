@@ -66,11 +66,11 @@
     const synopsis=firstClaim(movie,'synopsis')?.value ||
       'Explore the verified film information and original source links below. Additional story details will appear after editorial checks.';
     return '<section class="fr-movie-hero" aria-label="Film overview">'+
-      '<div class="fr-movie-hero__art" data-cover-style="'+coverStyle+'" role="img" aria-label="Original Frightertainment title artwork, not an official movie poster">'+
+      '<div class="fr-movie-hero__art" data-cover-style="'+coverStyle+'" role="img" aria-label="Original Frightertainment editorial title artwork, not an official poster">'+
       '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
       '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
       '<strong>'+escapeHTML(movie.title)+'</strong>'+
-      '<small>MOVIE POSTER</small></div>'+
+      '<small>EDITORIAL TITLE CARD</small></div>'+
       '<div class="fr-movie-hero__info"><span class="hub-eyebrow">WELCOME TO THE HORROR FILE</span>'+
       '<h1>'+escapeHTML(movie.title)+'</h1>'+
       '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+

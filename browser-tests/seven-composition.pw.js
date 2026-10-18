@@ -10,19 +10,26 @@ test('Movies masthead keeps its wordmark, eyebrow and final route visible at 320
       const intro = document.querySelector('.hub-page-intro').getBoundingClientRect();
       const header = document.querySelector('.hub-header').getBoundingClientRect();
       const targets = [document.querySelector('.hub-page-intro .hub-eyebrow'),
-        document.querySelector('.hub-page-wordmark'),
-        ...document.querySelectorAll('.hub-page-intro .hub-section-jumps a')];
+        document.querySelector('.hub-page-wordmark')];
+      const jumps = [...document.querySelectorAll('.fr-movies-jumps a')];
       return { intro, header, children: targets.map(node => node.getBoundingClientRect()),
+        jumps: jumps.map(node => node.getBoundingClientRect()),
         scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth };
     });
     for (const state of [await measure(), await (async () => { await page.waitForTimeout(1100); return measure(); })()]) {
       expect(state.intro.top).toBeGreaterThanOrEqual(state.header.bottom - 1);
-      expect(state.children.length).toBeGreaterThan(3);
+      expect(state.children.length).toBe(2);
+      expect(state.jumps.length).toBe(3);
       for (const child of state.children) {
         expect(child.left).toBeGreaterThanOrEqual(state.intro.left - 1);
         expect(child.right).toBeLessThanOrEqual(state.intro.right + 1);
         expect(child.top).toBeGreaterThanOrEqual(state.intro.top - 1);
         expect(child.bottom).toBeLessThanOrEqual(state.intro.bottom + 1);
+      }
+      for (const jump of state.jumps) {
+        expect(jump.left).toBeGreaterThanOrEqual(state.intro.left - 1);
+        expect(jump.right).toBeLessThanOrEqual(state.intro.right + 1);
+        expect(jump.top).toBeGreaterThanOrEqual(state.intro.bottom - 1);
       }
       expect(state.scrollWidth).toBeLessThanOrEqual(state.viewport + 2);
     }

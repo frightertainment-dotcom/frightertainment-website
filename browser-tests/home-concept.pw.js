@@ -6,7 +6,8 @@ test('Homepage is a compact cinematic dashboard on a phone, not a giant feed',as
  await expect(page.locator('.fr-home-intro')).toBeVisible();
  await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
  await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
- await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(5);
+ await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(4);
+ await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
  await expect(page.locator('link[href^="/fr-design-system.css"]')).toHaveCount(1);
  const sizes=await page.evaluate(()=>{
   const rect=selector=>document.querySelector(selector).getBoundingClientRect();
@@ -16,8 +17,8 @@ test('Homepage is a compact cinematic dashboard on a phone, not a giant feed',as
     rankedTop:rank.top,rankedBottom:rank.bottom,supportTop:support.top,
     tabs:tabs.length,pageWidth:document.documentElement.scrollWidth,viewport:window.innerWidth};
  });
- expect(sizes.introHeight).toBeGreaterThanOrEqual(300);
- expect(sizes.introHeight).toBeLessThan(510);
+ expect(sizes.introHeight).toBeGreaterThanOrEqual(200);
+ expect(sizes.introHeight).toBeLessThan(330);
  expect(sizes.featuredTop).toBeLessThan(sizes.rankedTop);
  expect(sizes.supportTop).toBeGreaterThan(sizes.rankedBottom);
  expect(sizes.tabs).toBe(7);
@@ -41,7 +42,7 @@ test('Homepage gives the film spotlight and Top 20 adjacent desktop panels',asyn
     categories:cards.length,cardRows:new Set(cards.map(c=>Math.round(c.getBoundingClientRect().top))).size,
     pageWidth:document.documentElement.scrollWidth,viewport:window.innerWidth};
  });
- expect(measures.categories).toBe(5);
+ expect(measures.categories).toBe(4);
  expect(Math.abs(measures.feature.top-measures.ranking.top)).toBeLessThan(6);
  expect(measures.feature.right).toBeLessThan(measures.ranking.left);
  expect(measures.cardRows).toBe(1);

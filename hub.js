@@ -56,7 +56,7 @@
   const heading = document.querySelector('.hub-charts h2 em');
   if (heading) heading.textContent = 'FILMS · ' + year;
   const chartFoot = document.querySelector('.hub-charts__foot');
-  if (chartFoot) chartFoot.textContent = year + ' · SOURCE-LINKED RANKINGS';
+  if (chartFoot) chartFoot.textContent = year + ' · CHART PENDING';
   const fullChart = document.querySelector('.hub-charts__all');
   if (fullChart) fullChart.href = '/top-20/' + year + '/';
   const previewLimit = 5;
@@ -89,7 +89,7 @@
     return state;
   }
 
-  function renderUnranked(year, rankedIds = new Set()) {
+  function renderUnranked(year, rankedIds = new Set(), expanded = false, kind = ratingKind) {
     const films = (window.FR_MOVIES || []).filter(film => {
       const filmYear = (film.claims || []).find(claim => claim.field === 'filmYear');
       return film.editorialStatus === 'approved' && Number(filmYear?.value) === year && !rankedIds.has(film.id);
@@ -98,8 +98,9 @@
 
     const disclosure = document.createElement('details');
     disclosure.className = 'hub-unranked';
+    disclosure.open = expanded;
     const summary = document.createElement('summary');
-    summary.textContent = `${films.length} verified ${year} ${films.length === 1 ? 'film' : 'films'} awaiting eligible critic reviews`;
+    summary.textContent = `${films.length} verified ${year} ${films.length === 1 ? 'film file' : 'film files'} ${kind === 'tmdb-community' ? 'outside the current TMDB community chart' : 'without an eligible critic ranking'}`;
     const list = document.createElement('div');
     list.className = 'hub-unranked__list';
     for (const film of films) {
@@ -217,15 +218,20 @@
       else content.push(rendered.node);
       const updated = document.createElement('p');
       updated.className = 'hub-ranking__updated';
-      updated.textContent = formatDate(data?.updatedAt) ? `TMDB data checked: ${formatDate(data.updatedAt)}` : 'TMDB data check unavailable';
+      updated.textContent = formatDate(data?.updatedAt)
+        ? `${ratingKind === 'tmdb-community' ? 'TMDB data checked' : 'Chart snapshot checked'}: ${formatDate(data.updatedAt)}`
+        : 'Chart check date unavailable';
       content.push(updated);
       if (data?.stale === true) content.push(createState('Ranking data may be out of date', 'Showing the last valid ranking while its sources are reviewed.', 'stale'));
     } else if (data?.stale === true) {
       content.push(createState('Ranking data may be out of date', 'No current verified ranking is available.', 'stale'));
     } else {
-      content.push(createState('Critic ranking pending', 'Verified critic scores are not yet available.'));
+      content.push(ratingKind === 'tmdb-community'
+        ? createState('TMDB community chart pending', 'No qualifying viewer scores are available yet.')
+        : createState('Critic ranking pending', 'Verified critic scores are not yet available.'));
     }
-    const unranked = ratingKind === 'tmdb-community' ? null : renderUnranked(year, rendered.ids);
+    const unranked = ratingKind === 'tmdb-community' && rendered.count > 0
+      ? null : renderUnranked(year, rendered.ids, rendered.count === 0);
     if (unranked) content.push(unranked);
     root.replaceChildren(...content);
   }
@@ -238,7 +244,7 @@
     .then(setResult)
     .catch(() => {
       root.replaceChildren(createState('Ranking unavailable', 'The annual chart could not be refreshed. Please try again later.', 'unavailable'));
-      const unranked = renderUnranked(year);
+      const unranked = renderUnranked(year, new Set(), true);
       if (unranked) root.append(unranked);
     })
     .finally(finish);

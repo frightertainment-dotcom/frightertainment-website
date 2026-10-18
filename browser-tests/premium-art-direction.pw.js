@@ -16,8 +16,8 @@ test('AFTER DARK CSS and site-owned brand remain present on every destination', 
     await page.setViewportSize({width:1440,height:900});
     await page.goto(path);
     await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
-    await expect(page.locator('link[href="/fr-premium.css"]')).toHaveCount(1);
-    await expect(page.locator('script[src="/fr-ambient.js"]')).toHaveCount(1);
+    await expect(page.locator('link[href^="/fr-premium.css"]')).toHaveCount(1);
+    await expect(page.locator('script[src^="/fr-ambient.js"]')).toHaveCount(1);
     await expect(page.locator('.hub-header .hub-brand img')).toHaveAttribute('src', '/assets/frightertainment-brand.png');
     await expect(page.locator('.hub-header .hub-brand img')).toBeVisible();
     const themed = await page.evaluate(() => {

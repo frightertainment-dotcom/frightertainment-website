@@ -2,6 +2,7 @@
 // Ship only public website files. Never copy source code, fixtures, Worker code, keys or reviews.
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { injectWebAnalytics } from './web-analytics-beacon.mjs';
+import { useLocalFonts } from './use-local-fonts.mjs';
 
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
@@ -105,7 +106,7 @@ async function instrumentPublicHtml(directory) {
     let html = await readFile(current, 'utf8');
     if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
       html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
-    await writeFile(current, injectWebAnalytics(html, publicWebAnalyticsSiteToken));
+    await writeFile(current, injectWebAnalytics(useLocalFonts(html), publicWebAnalyticsSiteToken));
   }
 }
 await instrumentPublicHtml(destination);
