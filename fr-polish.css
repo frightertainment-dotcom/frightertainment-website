@@ -268,3 +268,10 @@ body.fr-v5 .frightnews__panel {
 body.fr-v5 .frightnews__row {
   border-bottom:1px solid #ffffff14!important;
 }
+
+/* Put actual cinema releases within the first desktop fold, not behind a hero. */
+@media(min-width:701px) {
+  body.fr-v5[data-theme='cinema'] .hub-page-intro {
+    margin-bottom:10px!important;
+  }
+}
