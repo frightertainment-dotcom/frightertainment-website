@@ -1,0 +1,447 @@
+/*
+ * Frightertainment owner-directed visual polish (18 Oct 2026).
+ * Preserve original wordmark, sourced posters, data and all seven destinations.
+ * Applied after existing CSS so removing this file reverts the visual treatment.
+ */
+body.fr-v5[data-theme]{
+ --fr-scene-wide:none!important;
+ --fr-scene-mobile:none!important;
+ --fr-scene-current:none!important;
+ --fr-movies-scene:none!important;
+ --room-art:none!important;
+ --pick-scene:none!important;
+ background-color:#09090c!important;
+}
+body.fr-v5::before{
+ background:radial-gradient(ellipse at 50% 0%,#53212b19,transparent 46%),linear-gradient(180deg,#0c0a0e,#08090c 65%)!important;
+}
+body.fr-v5 .hub-header{
+ background:#09090df5!important;
+ box-shadow:0 5px 25px #0007!important;
+}
+body.fr-v5 .red-thread{display:none!important}
+body.fr-v5 .hub-tabs a[aria-current='page']::before{
+ box-shadow:none!important;
+ border-radius:0!important;
+}
+body.fr-v5 :is(.hub-page-intro,.hub-intro.fr-home-intro),
+body.fr-v5.hub-section[data-theme] .hub-page-intro{
+ min-height:clamp(310px,27vw,390px)!important;
+ height:auto!important;
+ padding:clamp(27px,3.5vw,46px)!important;
+ margin-bottom:clamp(20px,2.5vw,34px)!important;
+ background:linear-gradient(115deg,#191016,#100d13 48%,#101015)!important;
+ box-shadow:none!important;
+ border:0!important;
+ border-radius:0!important;
+}
+body.fr-v5.hub-home .hub-intro.fr-home-intro{
+ min-height:clamp(245px,21vw,300px)!important;
+ padding:clamp(20px,2.8vw,36px)!important;
+ background:radial-gradient(ellipse at 82% 42%,#76383b28,transparent 39%),linear-gradient(115deg,#1a0e15,#0c0d12 82%)!important;
+}
+body.fr-v5.hub-section[data-theme='movies'] .hub-page-intro{
+ min-height:225px!important;
+ padding-block:25px!important;
+ margin-bottom:10px!important;
+ background:radial-gradient(ellipse at 82% 45%,#7c354122,transparent 39%),linear-gradient(112deg,#1a0e15,#0d0d12 80%)!important;
+}
+body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro{
+ min-height:205px!important;padding-block:25px!important;margin-bottom:10px!important;
+}
+/* Series reads like a transmission; the independent film cut keeps the
+   archive's more tactile left-hand art track. Both use actual editorial data. */
+body.fr-v5.hub-section[data-theme='tv'] .hub-page-intro{
+ background:radial-gradient(ellipse at 85% 35%,#46565d25,transparent 40%),linear-gradient(115deg,#16151b,#0d0e12 80%)!important;
+}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick{
+ grid-template-columns:minmax(0,1fr) minmax(210px,31%)!important;
+ grid-template-areas:'copy art' 'facts art'!important;
+ background:radial-gradient(ellipse at 80% 40%,#39475022,transparent 42%),linear-gradient(115deg,#10151a,#0b0d12 78%)!important;
+}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ background:radial-gradient(ellipse at 50% 28%,#5362712b,transparent 60%),linear-gradient(165deg,#171c25,#0d1116 75%)!important;
+}
+body.fr-v5.hub-section[data-theme='indie'] .hub-page-intro{
+ background:radial-gradient(ellipse at 85% 35%,#80614824,transparent 40%),linear-gradient(112deg,#1b1415,#100e11 80%)!important;
+}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick{
+ grid-template-columns:minmax(185px,23%) minmax(0,1fr)!important;
+ background:radial-gradient(ellipse at 13% 60%,#77534021,transparent 43%),linear-gradient(110deg,#1b1416,#0c0d10 78%)!important;
+}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ background:radial-gradient(ellipse at 40% 32%,#8764482b,transparent 60%),linear-gradient(165deg,#281e1c,#111013 76%)!important;
+}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__art{grid-column:2!important;grid-row:1/3!important}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__content{grid-column:1!important;grid-row:1!important}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__facts{grid-column:1!important;grid-row:2!important}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__art{grid-column:1!important;grid-row:1/3!important}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__content{grid-column:2!important;grid-row:1!important}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__facts{grid-column:2!important;grid-row:2!important}
+body.fr-v5.hub-home .fr-home-intro__actions{margin-top:14px!important}
+body.fr-v5 .hub-page-intro>p,
+body.fr-v5.hub-home .fr-home-intro p:not(.fr-home-intro__motto){
+ max-width:60ch!important;
+ line-height:1.58!important;
+ color:#dcd4d5!important;
+}
+body.fr-v5 :is(.fr-home-intro__actions a,.editorial-pick__cta,.hub-tile__link,.hub-charts__all){
+ box-shadow:none!important;
+ border-radius:3px!important;
+}
+body.fr-v5.hub-home .fr-home-dashboard-heading h2,
+body.fr-v5 :is(.fr-v5-panel__head,.fr-catalogue-head,.hub-editorial-more__head) h2{
+ font-size:clamp(30px,3.25vw,50px)!important;
+ line-height:1.1!important;
+ overflow-wrap:break-word!important;
+ text-wrap:balance;
+ letter-spacing:-.025em!important;
+}
+body.fr-v5.hub-home .hub-feature h3,
+body.fr-v5 .editorial-pick__title{
+ overflow-wrap:break-word!important;
+ word-break:normal!important;
+ hyphens:none!important;
+ text-wrap:balance;
+}
+body.fr-v5 .fr-v5-explore__tile,
+body.fr-v5 .fr-v5-editorial-tile:not([style*="--fr-v5-tile-image"]){
+ background-image:linear-gradient(135deg,#22151c,#0e0e12 78%)!important;
+ border:0!important;
+ box-shadow:none!important;
+}
+body.fr-v5 .fr-v5-deeper__summary,
+body.fr-v5 .fr-home-updates>summary,
+body.fr-v5 .home-discovery-wrap__summary{
+ background-image:linear-gradient(110deg,#1b1219,#0c0c10)!important;
+ box-shadow:none!important;
+ border:0!important;
+}
+body.fr-v5 .hub-catalog .hub-tile,
+body.fr-v5 .hub-editorial-more .hub-tile{
+ background:linear-gradient(135deg,#1b141a,#0c0c11)!important;
+ box-shadow:none!important;
+ border:0!important;
+}
+body.fr-v5 .hub-catalog .hub-tile::before,
+body.fr-v5 .hub-editorial-more .hub-tile::before{
+ background-image:none!important;
+}
+body.fr-v5 .hub-editorial-poster:not([hidden]),
+body.fr-v5 .hub-feature__poster:not([hidden]),
+body.fr-v5 :is(.fr-v5-poster__image,.editorial-pick__poster){
+ opacity:1!important;
+ filter:none!important;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ background-image:linear-gradient(150deg,#281820,#101017 73%)!important;
+}
+body.fr-v5.hub-home .hub-showcase__lead>.hub-feature{
+ min-height:420px!important;
+ background:linear-gradient(135deg,#211218,#100c12 58%,#0c0d11)!important;
+ box-shadow:none!important;
+}
+body.fr-v5.hub-home .hub-feature::before,
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile::before{
+ background-image:none!important;
+ opacity:0!important;
+}
+body.fr-v5.hub-home .hub-feature .hub-tile__wash{
+ background:linear-gradient(90deg,#07070bcf,#09090b83 52%,transparent)!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{
+ background:linear-gradient(150deg,#22141b,#101015 72%)!important;
+ box-shadow:none!important;
+ border:0!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom{
+ grid-template-columns:minmax(0,1.18fr) minmax(0,1fr) minmax(0,1.08fr) minmax(0,.94fr)!important;
+ gap:clamp(9px,1.4vw,18px)!important;
+}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-tv{background:radial-gradient(ellipse at 90% 12%,#43547332,transparent 62%),#111116!important}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-podcast{background:radial-gradient(ellipse at 82% 16%,#78537930,transparent 61%),#121014!important}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-indie{background:radial-gradient(ellipse at 86% 16%,#8050432d,transparent 61%),#141111!important}
+body.fr-v5.hub-home .hub-showcase__bottom .hub-games{background:radial-gradient(ellipse at 86% 16%,#365e6030,transparent 61%),#0e1315!important}
+@media(min-width:701px) and (max-width:900px){
+ body.fr-v5.hub-home .hub-showcase__bottom{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+body.fr-v5.hub-home .fr-home-cinema-note{
+ grid-column:1/-1; min-height:0!important; height:auto!important; margin:0!important;
+ padding:15px clamp(16px,2vw,26px)!important; border:0!important; border-radius:0!important;
+ background:radial-gradient(ellipse at 88% 50%,#8e312922,transparent 42%),#100d10!important;
+ box-shadow:none!important;
+}
+body.fr-v5.hub-home .fr-home-cinema-note::before{content:none!important}
+body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__content{
+ display:grid!important; grid-template-columns:minmax(115px,.6fr) minmax(130px,.8fr) minmax(0,1.6fr) auto auto;
+ align-items:center!important; gap:9px 18px!important; position:relative!important;
+ width:100%!important; max-width:none!important; margin:0!important; padding:0!important;
+}
+body.fr-v5.hub-home .fr-home-cinema-note :is(.fr-home-category,h3,p,.hub-tile__link,.fr-home-cinema-note__diary){
+ display:block!important; margin:0!important; min-width:0!important; max-width:none!important;
+}
+body.fr-v5.hub-home .fr-home-cinema-note__source[hidden]{display:none!important}
+body.fr-v5.hub-home .fr-home-cinema-note h3{font:600 clamp(20px,2vw,29px)/1.05 var(--fr-display)!important;color:#f0dfdd!important}
+body.fr-v5.hub-home .fr-home-cinema-note p{font:400 13px/1.4 var(--fr-ui)!important;color:#cbbdc0!important}
+body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__link{min-height:0!important;padding:0!important;white-space:nowrap!important}
+body.fr-v5.hub-home .fr-home-cinema-note__diary{font:700 11px/1.4 var(--fr-ui);letter-spacing:.03em;color:#f1b1b7;text-decoration:none}
+body.fr-v5.hub-home .fr-home-cinema-note__diary:hover{color:#fff}
+body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-charts{
+ min-height:420px!important;
+ background:#101014!important;
+ border:0!important;
+ box-shadow:none!important;
+}
+body.fr-v5.hub-home .hub-chart-row{
+ border:0!important;
+ padding-block:10px!important;
+}
+body.fr-v5.hub-home .hub-unranked[open]{margin-block:12px 6px}
+body.fr-v5.hub-home .hub-unranked__item{border:0!important}
+body.fr-v5 :is(.fr-v5-panel,.fr-catalogue-section,.fr-v5-ranking,.fr-v5-poster-card,.fr-home-watch-shelf){
+ box-shadow:none!important;border:0!important;
+}
+body.fr-v5 :is(.fr-v5-panel__head,.fr-catalogue-head){
+ border:0!important;
+ background:transparent!important;
+}
+/* Focus is intentionally an outline even when decorative borders disappear. */
+body.fr-v5 :is(.hub-tabs a,.fr-v5-mobile-dock a,.fr-v5-explore__tile,a,button,summary):focus-visible{
+ outline:2px solid #ffd8c7!important;
+ outline-offset:3px!important;
+}
+@media(hover:hover) and (pointer:fine){
+ body.fr-v5 .fr-v5-explore__tile:hover,
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile:hover{
+  transform:translateY(-2px)!important;
+  filter:brightness(1.08)!important;
+ }
+}
+@media(max-width:700px){
+ body.fr-v5 :is(.hub-page-intro,.hub-intro.fr-home-intro),
+ body.fr-v5.hub-section[data-theme] .hub-page-intro{
+  min-height:310px!important;
+  padding:25px 18px 21px!important;
+  margin-bottom:21px!important;
+  background:linear-gradient(130deg,#1c1119,#0d0d12 83%)!important;
+ }
+ body.fr-v5.hub-home .hub-intro.fr-home-intro{
+  min-height:225px!important;padding:18px 18px 17px!important;margin-bottom:14px!important;
+ }
+ body.fr-v5.hub-home .fr-home-intro h1 img{max-height:88px!important}
+ body.fr-v5.hub-home .fr-home-intro__copy>p{margin:7px 0!important;line-height:1.42!important}
+ body.fr-v5.hub-home .fr-home-intro__actions{margin-top:10px!important}
+ body.fr-v5.hub-home .fr-home-intro__actions a:nth-child(2){display:none!important}
+ body.fr-v5.hub-section[data-theme='movies'] .hub-page-intro{
+  min-height:0!important;padding:19px 18px 14px!important;margin-bottom:8px!important;
+ }
+ body.fr-v5.hub-section[data-theme='movies'] .hub-page-intro>p{line-height:1.4!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro{
+  min-height:0!important;padding:18px 18px 15px!important;margin-bottom:8px!important;
+ }
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro .hub-page-wordmark{max-height:73px!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro>p{line-height:1.4!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro .hub-section-jumps{margin-top:5px!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:'copy' 'art' 'facts'!important;
+  gap:17px!important;padding-top:42px!important;
+ }
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__art{min-height:0!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__art-frame{width:min(66vw,200px)!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__content{grid-column:1!important;grid-row:1!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__art{grid-column:1!important;grid-row:2!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__facts{grid-column:1!important;grid-row:3!important}
+ body.fr-v5.hub-home .hub-showcase__bottom{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__content{grid-template-columns:1fr auto!important}
+ body.fr-v5.hub-home .fr-home-cinema-note .fr-home-category{grid-column:1/-1}
+ body.fr-v5.hub-home .fr-home-cinema-note h3{grid-column:1}
+ body.fr-v5.hub-home .fr-home-cinema-note p{grid-column:1/-1}
+ body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__link{grid-column:1}
+ body.fr-v5.hub-home .fr-home-cinema-note__diary{grid-column:2;grid-row:4;max-width:105px!important}
+ body.fr-v5 .hub-page-intro>p,
+ body.fr-v5.hub-home .fr-home-intro p:not(.fr-home-intro__motto){
+  font-size:15px!important;
+  line-height:1.55!important;
+ }
+ body.fr-v5 :is(.hub-page-intro,.fr-home-intro) .hub-eyebrow{
+  font-size:11px!important;
+  letter-spacing:.13em!important;
+ }
+ body.fr-v5.hub-section[data-theme] .hub-page-intro :is(.hub-subtabs,.hub-section-jumps) a{
+  display:inline-flex!important;align-items:center!important;
+  min-height:38px!important;padding:7px 0!important;
+  font-size:11px!important;line-height:1.35!important;
+  letter-spacing:.02em!important;
+ }
+ body.fr-v5.hub-home .fr-home-dashboard-heading h2,
+ body.fr-v5 :is(.fr-v5-panel__head,.fr-catalogue-head,.hub-editorial-more__head) h2{
+  font-size:clamp(28px,7.6vw,37px)!important;
+  line-height:1.08!important;
+ }
+ body.fr-v5.hub-home .hub-feature h3{
+  font-size:clamp(31px,8vw,47px)!important;
+  line-height:1.07!important;
+ }
+ body.fr-v5.hub-home .hub-showcase__lead>.hub-feature{min-height:340px!important}
+ body.fr-v5.hub-home .hub-dashboard.hub-showcase>.hub-charts{
+  min-height:0!important;height:auto!important;
+ }
+ /* Seven destinations, no unreadable 7px labels; scroll or open the menu. */
+ body.hub-body.fr-v5 .fr-v5-mobile-dock{
+  display:flex!important;position:fixed!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  overscroll-behavior-x:contain;scroll-snap-type:x proximity;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  height:calc(75px + env(safe-area-inset-bottom,0px))!important;
+  min-height:75px!important;
+  padding:5px max(6px,env(safe-area-inset-left)) calc(5px + env(safe-area-inset-bottom))!important;
+  background:#0b0b0f!important;
+  border:0!important;
+  box-shadow:0 -5px 19px #0008!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock::-webkit-scrollbar{display:none}
+ body.hub-body.fr-v5 .fr-v5-mobile-dock a{
+  flex:0 0 73px!important;width:73px!important;min-width:73px!important;
+  min-height:59px!important;padding:7px 4px!important;gap:5px!important;
+  scroll-snap-align:center;
+  border:0!important;
+  overflow:visible!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock a[aria-current='page']{
+  color:#ffb2bc!important;font-weight:800!important;
+  text-shadow:none!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-mobile-dock small{
+  font-size:10px!important;line-height:1.2!important;
+  letter-spacing:0!important;overflow-wrap:normal!important;
+  white-space:normal!important;
+ }
+ body.hub-body.fr-v5 .fr-v5-dock-symbol{font-size:20px!important}
+ body.hub-body.fr-v5{
+  padding-bottom:calc(98px + env(safe-area-inset-bottom,0px))!important;
+ }
+}
+@media(max-width:350px){
+ body.fr-v5 .hub-page-intro .hub-page-wordmark{max-width:100%!important}
+ body.fr-v5.hub-home .fr-home-dashboard-heading h2,
+ body.fr-v5 :is(.fr-v5-panel__head,.fr-catalogue-head) h2{
+  font-size:27px!important;max-width:100%!important;
+ }
+ body.fr-v5.hub-home .hub-charts h2{
+  font-size:clamp(26px,8vw,34px)!important;
+  overflow-wrap:break-word!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.fr-v5 .fr-v5-explore__tile,
+ body.fr-v5.hub-home .hub-showcase__bottom .hub-tile{
+  transition:none!important;transform:none!important;
+ }
+}
+
+/* Editorial pages: the legacy showcase still painted fictional world art via
+   a locally defined --pick-scene. The owner wants real posters or plain type. */
+body.fr-v5 .editorial-carousel { --pick-scene:none!important; }
+body.fr-v5 .editorial-pick {
+  background:linear-gradient(115deg,#1b121a,#0d0d13 75%)!important;
+  box-shadow:none!important;
+  border:0!important;
+}
+body.fr-v5 .editorial-pick::before{
+ content:'FRIGHTERTAINMENT · THE EDITORIAL CUT';
+ top:11px;left:clamp(15px,2vw,28px);right:auto;width:auto;height:auto;
+ padding:0!important;border:0!important;background:none!important;
+ color:#deb9bd;font:700 10px/1.3 var(--fr-ui);letter-spacing:.13em;
+}
+body.fr-v5 .editorial-pick::after{content:none!important}
+body.fr-v5 .editorial-pick__art-frame {
+  box-shadow:none!important;
+  border:0!important;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) {
+  background:radial-gradient(ellipse at 55% 44%,#69354030,transparent 52%),linear-gradient(150deg,#24171e,#111016 73%)!important;
+}
+body.fr-v5 .editorial-pick__art-mark{display:block;width:clamp(36px,5vw,60px);height:auto;opacity:.85}
+body.fr-v5 .editorial-pick__art-title{font-size:clamp(20px,1.8vw,27px)!important;overflow-wrap:normal!important;word-break:normal!important}
+body.fr-v5 .editorial-pick__meta,body.fr-v5 .editorial-pick__facts{border:0!important}
+body.fr-v5 .editorial-pick__art-frame--poster img {
+  object-fit:contain!important;
+}
+@media(max-width:700px) {
+  body.fr-v5[data-theme] .editorial-pick {
+    min-height:0!important;
+    background:linear-gradient(135deg,#1a1119,#0e0d13 75%)!important;
+  }
+}
+
+/* FrightNews should read as editorial journalism, not a boxed dashboard widget. */
+body.fr-v5 .frightnews__heading {
+  border-bottom:0!important;
+}
+body.fr-v5 .frightnews__panel {
+  border:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+  background:#100d12!important;
+}
+body.fr-v5 .frightnews__row {
+  border:0!important;
+}
+body.fr-v5 .fr-movies-jumps{
+ display:flex;flex-wrap:wrap;gap:5px 20px;align-items:center;
+ padding-block:7px 18px;margin-block:0 7px;
+}
+body.fr-v5 .fr-movies-jumps a{min-height:32px;padding:8px 0;color:#d7c4c7;font:700 11px/1.25 var(--fr-ui);letter-spacing:.06em;text-decoration:none}
+body.fr-v5 .fr-movies-jumps a:hover{color:#fff}
+@media(max-width:700px){
+ body.fr-v5[data-theme='movies'] .editorial-pick{
+  display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;
+  align-items:start!important;gap:12px!important;padding:37px 15px 17px!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__art{
+  display:block!important;grid-column:1!important;grid-row:1!important;
+  width:82px!important;height:auto!important;margin:0!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__art-frame{
+  width:82px!important;max-width:82px!important;min-height:123px!important;
+  padding:8px 4px!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__art-eyebrow,
+ body.fr-v5[data-theme='movies'] .editorial-pick__art-sub{font-size:7px!important;line-height:1.2!important}
+ body.fr-v5[data-theme='movies'] .editorial-pick__art-eyebrow{display:none!important}
+ body.fr-v5[data-theme='movies'] .editorial-pick__content{
+  grid-column:2!important;grid-row:1!important;width:100%!important;
+  min-width:0!important;margin:0!important;padding:0!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__title{
+  font-size:clamp(20px,5.1vw,27px)!important;line-height:1.07!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__synopsis{
+  display:block!important;-webkit-line-clamp:unset!important;
+  overflow:visible!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__facts{
+  grid-column:1/-1!important;grid-row:2!important;margin-top:2px!important;
+ }
+ body.fr-v5[data-theme='movies'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-title{display:none}
+ body.fr-v5 .editorial-pick__art-mark{width:31px}
+ body.fr-v5 .fr-movies-jumps{gap:4px 14px;padding-block:4px 12px}
+ body.fr-v5 .fr-movies-jumps a{font-size:10px}
+}
+
+/* The original Gothic F is decorative. Bound its height so the genuine
+   game title and artwork credit remain inside a landscape sleeve. */
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) .editorial-pick__art-mark{
+ max-height:31px!important;width:auto!important;max-width:33px!important;
+ object-fit:contain!important;align-self:center!important;flex:0 1 31px!important;
+}
+
+/* Put actual cinema releases within the first desktop fold, not behind a hero. */
+@media(min-width:701px) {
+  /* The cinema release diary, not a tall empty masthead, is the first-fold priority. */
+  body.fr-v5.hub-section[data-theme='cinema'] .hub-page-intro {
+    min-height:clamp(305px,24vw,350px)!important;
+    margin-bottom:10px!important;
+  }
+}

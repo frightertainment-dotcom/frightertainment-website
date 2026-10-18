@@ -1,0 +1,43 @@
+name: Frightertainment full QA gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Validate sources and run unit tests
+        run: |
+          npm run build:pages
+          npm run check
+          npm test
+          node scripts/audit-release-freshness.mjs --strict
+      - name: Confirm clean production bundle
+        run: |
+          npm run build:production
+          npm run check:published
+      - name: Install Chromium for responsive end-to-end tests
+        run: npx playwright install --with-deps chromium
+      - name: Test 320, 390, 768 and 1440px layouts, cinema and streaming
+        run: npm run test:browser
+      - name: Save failed browser evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frightertainment-playwright-evidence
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14

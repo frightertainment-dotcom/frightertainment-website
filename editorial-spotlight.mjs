@@ -40,11 +40,11 @@ export function buildEditorialCarousel(items, dayIndex, offset = 0, requestedId 
 }
 
 const categoryMap = {
-  movies: { title: 'MOVIES', offset: 0, label: 'THE FEATURE PRESENTATION' },
-  tv: { title: 'TV SHOWS', collection: 'tv-shows', offset: 2, label: 'TONIGHT’S SERIES' },
-  indie: { title: 'INDIE MOVIES', collection: 'indie-movies', offset: 4, label: 'THE INDEPENDENT CUT' },
-  podcasts: { title: 'PODCASTS', collection: 'podcasts', offset: 1, label: 'LISTEN AFTER DARK' },
-  games: { title: 'GAMES', collection: 'games', offset: 3, label: 'ENTER IF YOU DARE' }
+  movies: { title: 'MOVIES', offset: 0, label: 'THE FEATURE PRESENTATION', fileLabel: 'FILM FILE', artKind: 'poster' },
+  tv: { title: 'TV SHOWS', collection: 'tv-shows', offset: 2, label: 'TONIGHT’S SERIES', fileLabel: 'SERIES FILE', artKind: 'poster' },
+  indie: { title: 'INDIE MOVIES', collection: 'indie-movies', offset: 4, label: 'THE INDEPENDENT CUT', fileLabel: 'INDIE FILM FILE', artKind: 'poster' },
+  podcasts: { title: 'PODCASTS', collection: 'podcasts', offset: 1, label: 'LISTEN AFTER DARK', fileLabel: 'PODCAST FILE', artKind: 'cover art' },
+  games: { title: 'GAMES', collection: 'games', offset: 3, label: 'ENTER IF YOU DARE', fileLabel: 'GAME FILE', artKind: 'cover art' }
 };
 
 const httpUrl = value => {
@@ -63,6 +63,13 @@ const filmSource = movie => claim(movie, 'title')?.source || claim(movie, 'synop
 // IMDb identifiers (or the corresponding TMDB title page). Never search artwork by title.
 export const filmMediaIdentities = Object.freeze({
   'longlegs': { id: 1226578, year: 2024 },
+  // Exact independently verified film identities; never borrow artwork or
+  // original film years from unrelated mainstream editorial selections.
+  'buddy': { id: 1514026, year: 2026 },
+  'the-ugly-stepsister': { id: 1284120, year: 2025 },
+  'in-a-violent-nature': { id: 1214509, year: 2024 },
+  'rabbit-trap': { id: 1193824, year: 2025 },
+  'deadstream': { id: 886083, year: 2022 },
   'heart-eyes': { id: 1302916, year: 2025 },
   'heretic': { id: 1138194, year: 2024 },
   'nosferatu': { id: 426063, year: 2024 },
@@ -89,9 +96,9 @@ const tvEditorialYears = Object.freeze({
   'tv-shows-expanded-7': 2019 // Evil
 });
 const indieFilmIds = Object.freeze({
-  'indie-movies-0':'longlegs', 'indie-movies-1':'the-monkey',
-  'indie-movies-2':'together', 'indie-movies-3':'heretic',
-  'indie-movies-4':'bring-her-back', 'indie-movies-5':'nosferatu'
+  'indie-movies-0':'buddy', 'indie-movies-1':'the-ugly-stepsister',
+  'indie-movies-2':'in-a-violent-nature', 'indie-movies-3':'rabbit-trap',
+  'indie-movies-4':'deadstream', 'indie-movies-5':'together'
 });
 export function matchedMedia(item, media) {
   const identity = item.mediaIdentity;
@@ -189,6 +196,21 @@ function appendVideo(parent, trailer, title) {
   parent.append(details);
   addLink(parent, 'Open official upload ↗', trailer.source, 'editorial-pick__source');
 }
+function renderEditorialTitleCard(card, title, config) {
+  const brand = make('img', 'editorial-pick__art-mark');
+  brand.src = '/assets/frightertainment-f.png';
+  brand.alt = '';
+  brand.setAttribute('aria-hidden', 'true');
+  card.replaceChildren(
+    make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · ' + config.fileLabel),
+    brand,
+    make('strong', 'editorial-pick__art-title', title),
+    make('span', 'editorial-pick__art-sub', 'EDITORIAL TITLE CARD')
+  );
+  card.setAttribute('role', 'img');
+  card.setAttribute('aria-label', 'Frightertainment title card for ' + title + '; no official ' + config.artKind + ' available');
+  card.classList.remove('editorial-pick__art-frame--poster');
+}
 function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   const feature = make('section', 'editorial-pick');
   feature.setAttribute('aria-label', config.title + ' editorial selection');
@@ -206,19 +228,12 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
     img.decoding = 'async';
     img.addEventListener('error', () => {
       if (!card.isConnected) return;
-      card.replaceChildren(
-        make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'),
-        make('strong', 'editorial-pick__art-title', item.title),
-        make('span', 'editorial-pick__art-sub', 'FRIGHTERTAINMENT ORIGINAL DISPLAY ART · NOT AN OFFICIAL POSTER')
-      );
-      card.classList.remove('editorial-pick__art-frame--poster');
+      renderEditorialTitleCard(card, item.title, config);
     }, {once:true});
     card.append(img);
     card.append(make('small', 'editorial-pick__art-credit', 'Artwork © ' + item.posterCredit));
   } else {
-    card.append(make('span', 'editorial-pick__art-eyebrow', 'FRIGHTERTAINMENT · SELECTS'));
-    card.append(make('strong', 'editorial-pick__art-title', item.title));
-    card.append(make('span', 'editorial-pick__art-sub', 'FRIGHTERTAINMENT ORIGINAL DISPLAY ART · NOT AN OFFICIAL POSTER'));
+    renderEditorialTitleCard(card, item.title, config);
   }
   art.append(card);
 
@@ -229,14 +244,19 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   content.append(eyebrow);
   content.append(make('span', 'editorial-pick__series', config.label));
   content.append(make('h2', 'editorial-pick__title', item.title));
-  content.append(make('div', 'editorial-pick__genre', [item.category, item.year].filter(Boolean).join(' · ')));
+  const category = String(item.category || '');
+  const sourceYear = String(item.year || '');
+  const year = /^\d{4}$/.test(sourceYear) && !category.split(/\D+/).includes(sourceYear) ? sourceYear : '';
+  content.append(make('div', 'editorial-pick__genre', [category, year].filter(Boolean).join(' · ')));
   content.append(make('p', 'editorial-pick__synopsis', item.description));
   if (extraText) content.append(make('p', 'editorial-pick__why', extraText));
   const meta = make('div', 'editorial-pick__meta');
-  // A missing licensed Fright Rating is not a numerical zero.
-  meta.append(make('span', 'editorial-pick__score', typeof item.frightRating === 'number' &&
-    item.frightRating >= 0 && item.frightRating <= 10 && item.ratingEvidence?.approved === true ?
-    'FRIGHT RATING ' + item.frightRating.toFixed(1) + '/10' : 'FRIGHT RATING · AWAITING VERIFIED SCORES'));
+  if (item.mediaIdentity && ['movie','tv'].includes(item.mediaIdentity.type || 'movie')) {
+    const score = make('span', 'editorial-pick__score');
+    window.FRRatingBadge.render(score, {score:null,source:'tmdb-community',voteCount:null,
+      size:'standard',state:'loading'});
+    meta.append(score);
+  }
   const checked = dateLabel(item.checkedAt);
   if (checked) meta.append(make('span', '', 'SOURCE CHECKED ' + checked));
   content.append(meta);
@@ -259,7 +279,12 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
 }
 async function loadPoster(feature, item, isCurrent) {
   const card = feature.querySelector('.editorial-pick__art-frame');
-  if (!item.mediaIdentity || artHasRights(item)) return;
+  const score = feature.querySelector('.editorial-pick__score');
+  const unavailable = () => {
+    if (isCurrent() && score?.isConnected) window.FRRatingBadge.render(score,
+      {score:null,source:'tmdb-community',voteCount:null,size:'standard'});
+  };
+  if (!item.mediaIdentity) return;
   const params = new URLSearchParams({type:item.mediaIdentity.type || 'movie'});
   if (item.mediaIdentity.id) params.set('id', item.mediaIdentity.id);
   else if (item.mediaIdentity.imdb) params.set('imdb', item.mediaIdentity.imdb);
@@ -269,9 +294,16 @@ async function loadPoster(feature, item, isCurrent) {
   } else return;
   try {
     const response = await fetch('/api/media?' + params, {headers:{accept:'application/json'}});
-    if (!response.ok) return;
+    if (!response.ok) { unavailable(); return; }
     const media = (await response.json())?.item;
-    if (!isCurrent() || !matchedMedia(item, media)) return;
+    if (!isCurrent()) return;
+    if (!matchedMedia(item, media)) { unavailable(); return; }
+    if (score?.isConnected) {
+      if (media.ratingKind === 'tmdb-community')
+        window.FRRatingBadge.render(score, window.FRRatingBadge.fromTmdbMedia(media, 'standard'));
+      else unavailable();
+    }
+    if (artHasRights(item)) return;
     const image = new Image();
     image.alt = 'Poster for ' + item.title + ' (' + item.year + '), via TMDB';
     image.className = 'editorial-pick__poster';
@@ -281,13 +313,12 @@ async function loadPoster(feature, item, isCurrent) {
     await image.decode();
     if (!isCurrent() || !card.isConnected) return;
     card.replaceChildren(image);
+    card.removeAttribute('role');
+    card.removeAttribute('aria-label');
     card.classList.add('editorial-pick__art-frame--poster');
     card.append(make('small', 'editorial-pick__art-credit', 'Poster via TMDB · ' + item.title + ' (' + item.year + ')'));
     feature.querySelector('.editorial-pick__facts').append(make('small', 'editorial-pick__tmdb-credit',
       'Poster and optional audience score: TMDB. TMDB does not endorse this site. See Credits for attribution.'));
-    const score = feature.querySelector('.editorial-pick__score');
-    if (Number.isFinite(media.voteAverage) && media.voteAverage > 0 && media.voteCount > 0)
-      score.textContent = 'TMDB AUDIENCE · ' + media.voteAverage.toFixed(1) + '/10 · ' + media.voteCount + ' votes';
     if (media.trailer?.source === 'TMDB official video listing' &&
         /^https:\/\/www\.youtube\.com\/watch\?v=[A-Za-z0-9_-]{11}$/.test(media.trailer.url || '')) {
       const links = feature.querySelector('.editorial-pick__links');
@@ -296,6 +327,7 @@ async function loadPoster(feature, item, isCurrent) {
     }
   } catch {
     // Network and image failures retain the labelled original display art.
+    unavailable();
   }
 }
 
@@ -306,7 +338,14 @@ async function start() {
   if (!config || !intro) return;
 
   try {
-    const sources = await Promise.all([
+    // Generated at build time from already-public verified editorial files.
+    // Fast path runs in the same task as the first layout; slow path remains
+    // available for local development or a genuinely missing bootstrap file.
+    const bootstrap=window.FR_EDITORIAL_BOOTSTRAP;
+    const sources=bootstrap?.schemaVersion===1 && bootstrap.editorial &&
+      bootstrap.settings && bootstrap.overviews
+      ? [theme==='movies'?null:bootstrap.editorial, bootstrap.settings, bootstrap.overviews]
+      : await Promise.all([
       theme === 'movies' ? Promise.resolve(null) : fetch('/data/editorial.json').then(response => {
         if (!response.ok) throw new Error('Editorial source not reachable');
         return response.json();
@@ -392,12 +431,20 @@ async function start() {
       dots.append(dot);
       return dot;
     });
+    let stableHeight = 0;
     function render() {
       const selected = prepareItem(slides[slideIndex]);
       const note = settings.notes?.[theme]?.[selected.id] || '';
       // The approved owner nomination keeps its editorial label only on that featured item.
       const feature = createSpotlight(config, selected, dayIndex, overridden && slideIndex === 0, note);
       stage.replaceChildren(feature);
+      // The presentation uses the tallest approved synopsis as its measured
+      // module height, so neither long titles nor carousel rotation cause
+      // distracting page jumps or chop the end of a story.
+      if (stableHeight > 0) {
+        feature.style.setProperty('min-height', stableHeight + 'px', 'important');
+        feature.style.setProperty('min-block-size', stableHeight + 'px', 'important');
+      }
       void loadPoster(feature, selected, () => stage.firstElementChild === feature && host.dataset.featureId === selected.id);
       host.dataset.featureId = selected.id;
       host.dataset.slide = String(slideIndex + 1);
@@ -454,6 +501,75 @@ async function start() {
     pause.hidden = overridden || reducedMotion.matches;
     // Place directly below each existing section-title logo without replacing any page structure.
     intro.insertAdjacentElement('afterend', host);
+
+    function reserveEditorialSpace() {
+      if (!host.isConnected || !stage.clientWidth) return;
+      // Measure at the actual rendered viewport, with the same CSS as a live
+      // slide. A temporary inert stage avoids polluting the accessible UI.
+      const probe = make('div', 'editorial-carousel__stage');
+      probe.setAttribute('aria-hidden', 'true');
+      probe.inert = true;
+      probe.style.setProperty('position', 'absolute', 'important');
+      probe.style.setProperty('left', '0', 'important');
+      probe.style.setProperty('top', '0', 'important');
+      probe.style.setProperty('width', stage.getBoundingClientRect().width + 'px', 'important');
+      probe.style.setProperty('visibility', 'hidden', 'important');
+      probe.style.setProperty('pointer-events', 'none', 'important');
+      probe.style.setProperty('height', 'auto', 'important');
+      host.append(probe);
+      let tallest = 0;
+      for (const item of slides) {
+        const prepared = prepareItem(item);
+        const reason = settings.notes?.[theme]?.[prepared.id] || '';
+        const candidate = createSpotlight(config, prepared, dayIndex, false, reason);
+        candidate.style.setProperty('min-height', '0px', 'important');
+        candidate.style.setProperty('min-block-size', '0px', 'important');
+        candidate.style.setProperty('max-height', 'none', 'important');
+        candidate.style.setProperty('max-block-size', 'none', 'important');
+        candidate.style.setProperty('height', 'auto', 'important');
+        candidate.style.setProperty('block-size', 'auto', 'important');
+        if (theme === 'movies' && window.innerWidth >= 1600 && prepared.mediaIdentity && !artHasRights(prepared)) {
+          candidate.querySelector('.editorial-pick__facts')?.append(make('small', 'editorial-pick__tmdb-credit', 'Poster and optional audience score: TMDB. TMDB does not endorse this site. See Credits for attribution.'));
+          const extra = candidate.querySelector('.editorial-pick__links');
+          if (extra && !extra.querySelector('.editorial-pick__media-trailer')) extra.append(make('span', 'editorial-pick__source editorial-pick__media-trailer', 'WATCH OFFICIAL TRAILER ↗'));
+        }
+        probe.replaceChildren(candidate);
+        tallest = Math.max(tallest, Math.ceil(candidate.getBoundingClientRect().height));
+      }
+      probe.remove();
+      stableHeight = tallest;
+      if (tallest > 0) {
+        stage.style.setProperty('min-height', tallest + 'px');
+        const active = stage.querySelector('.editorial-pick');
+        if (active) {
+          active.style.setProperty('min-height', tallest + 'px', 'important');
+          active.style.setProperty('min-block-size', tallest + 'px', 'important');
+        }
+      }
+    }
+
+    reserveEditorialSpace();
+    let resizeFrame = 0;
+    const resizeEditorial = () => {
+      window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(reserveEditorialSpace);
+    };
+    window.addEventListener('resize', resizeEditorial, {passive:true});
+    // The V5 Movies page moves this carousel into a narrower desktop editorial
+    // column after initial insertion. Its width changes without a window resize;
+    // re-measure all slides at their *actual* column width before rotation.
+    host.addEventListener('fr:editorial-layout-change', reserveEditorialSpace);
+    let measuredWidth = host.getBoundingClientRect().width;
+    const widthObserver = new ResizeObserver(entries => {
+      const nextWidth = entries[0]?.contentRect.width || 0;
+      if (nextWidth > 0 && Math.abs(nextWidth - measuredWidth) > 2) {
+        measuredWidth = nextWidth;
+        resizeEditorial();
+      }
+    });
+    widthObserver.observe(host);
+    window.addEventListener('pagehide', () => widthObserver.disconnect(), {once:true});
+    document.fonts?.ready?.then(resizeEditorial).catch(() => {});
     startAutoplay();
   } catch (error) {
     // Failure is visible and honest, without showing fabricated or stale recommendations.

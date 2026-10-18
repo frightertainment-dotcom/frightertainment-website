@@ -1230,8 +1230,6 @@ body[data-theme="games"] .hub-tile__content{width:100%;max-width:100%}
 body[data-theme="games"] .hub-catalog--expanded .hub-tile{min-height:395px}
 body[data-theme="games"] .hub-tile__content .fr-trailer-button{margin:4px 10px 9px 0}
 @media(max-width:640px){body[data-theme="games"] .hub-catalog .hub-tile{min-height:320px}.game-store-widget{height:170px}}
-/* Every visible interface label and paragraph uses the same brand-adjacent face. */
-body.hub-body :where(*):not(svg):not(path){font-family:var(--font-body)!important}
 .podcast-player{display:block;width:min(100%,520px);height:175px;border:0;background:var(--world);margin:10px 0}
 body[data-theme="podcasts"] main>.hub-catalog>.hub-tile:first-child{min-height:520px}
 body[data-theme="podcasts"] main>.hub-catalog>.hub-tile{min-height:340px}
@@ -1301,8 +1299,6 @@ body[data-theme="podcasts"] main>.hub-catalog>.hub-tile .hub-tile__content{width
   .hub-intro h1{font-size:clamp(17px,4.8vw,19px);white-space:nowrap;text-wrap:nowrap;transform:scaleX(.96);transform-origin:left center}
 }
 
-/* Logo-adjacent type: the original wordmark is artwork, so use one lighter blackletter face throughout. */
-.hub-body :where(*):not(svg):not(path){font-family:var(--font-body)!important;font-synthesis:none}
 .hub-body :where(h1,h2,h3,h4,h5,h6,strong,b){font-weight:400!important;font-synthesis:none}
 .hub-body h1,.hub-section .hub-page-intro h1{font-size:clamp(25px,3.5vw,44px);line-height:1.08}
 .hub-body h2{font-size:clamp(22px,2.8vw,34px);line-height:1.1}
@@ -1315,9 +1311,7 @@ body[data-theme="podcasts"] main>.hub-catalog>.hub-tile .hub-tile__content{width
 @media(max-width:640px){.hub-intro h1{font-size:clamp(13px,3.8vw,16px)!important;line-height:1.2}.hub-intro>p{font-size:14px;line-height:1.42}}
 
 
-/* Readable Times New Roman type across the site; supplied wordmarks carry the gothic title treatment. */
 :root{--font-display:"Times New Roman",Times,serif;--font-body:"Times New Roman",Times,serif;--font-room:"Times New Roman",Times,serif;--font-horror:"Times New Roman",Times,serif}
-body.hub-body :where(*):not(svg):not(path){font-family:"Times New Roman",Times,serif!important;font-synthesis:weight style}
 .hub-body :where(h1,h2,h3,h4,h5,h6,strong,b){font-weight:600!important}
 .hub-page-intro .hub-page-title--wordmark{display:block;width:min(100%,600px);max-width:100%;margin:.25rem 0 1rem;line-height:0}
 .hub-page-intro .hub-page-wordmark{display:block;width:min(100%,560px);height:auto;max-height:145px;object-fit:contain;object-position:left center;filter:drop-shadow(0 3px 5px #000c)}

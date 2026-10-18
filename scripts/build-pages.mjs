@@ -22,7 +22,7 @@ const filmHeroMarkup=movie=>{
     '<span class="fr-movie-hero__studio">FRIGHTERTAINMENT · CINEMA FILE</span>'+
     '<span class="fr-movie-hero__year">'+escapeHTML(year)+'</span>'+
     '<strong>'+escapeHTML(movie.title)+'</strong>'+
-    '<small>MOVIE POSTER</small></div>'+
+    '<small>EDITORIAL TITLE CARD</small></div>'+
     '<div class="fr-movie-hero__info"><span class="hub-eyebrow">FROM THE HORROR VAULT</span>'+
     '<h1>'+escapeHTML(movie.title)+'</h1>'+
     '<p class="fr-movie-hero__genre">'+escapeHTML(genre)+' · '+escapeHTML(year)+'</p>'+
@@ -51,6 +51,7 @@ function decorateHubLayout(html) {
     html = html.replace(/<body([^>]*)>/, '<body$1><a class="skip-link" href="#main-content">Skip to main content</a>');
     html = html.replace('<main class="shell film-page"', '<main id="main-content" class="shell film-page"');
   }
+  if (!html.includes('fr-rating-badge.js')) html = html.replace('</head>', '<link rel="stylesheet" href="/fr-rating-badge.css"><script src="/fr-rating-badge.js"></script></head>');
   return html
     .replace(/<nav class="nav"[^>]*>[\s\S]*?<\/nav>/,
       '<nav class="hub-tabs" aria-label="Main site sections">' + sectionTabs + '</nav>')
@@ -60,7 +61,7 @@ function decorateHubLayout(html) {
     .replace('<a class="brand"','<a class="brand hub-brand"')
     .replace(/<button class="menu-toggle"[^>]*>[\s\S]*?<\/button>/, '')
     .replace(/<a class="header__action"[^>]*>[\s\S]*?<\/a>/,'')
-    .replace('</head>', '<link rel="stylesheet" href="/hub.css"></head>')
+    .replace('</head>', '<link rel="stylesheet" href="/hub.css"><link rel="stylesheet" href="/fr-inner.css"></head>')
     .replace('</div></footer>', '<a href="/contact.html">CONTACT US</a><a href="/privacy.html">PRIVACY</a></div></footer>')
     .replace('</body>', '<script src="/media-ui.js" defer></script></body>');
 }
@@ -99,17 +100,19 @@ for (const year of rankingYears) {
   await mkdir(directory, { recursive: true });
   const slug = `/top-20/${year}/`;
   yearLocations.push(`${base}${slug}`);
-  const html = `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><meta name="description" content="Frightertainment's annual horror film chart with clearly labelled source-linked scores."><meta property="og:type" content="article"><meta property="og:title" content="Top 20 Horror Films of ${year} — Frightertainment"><meta property="og:description" content="Explore the annual horror chart and its source-linked scores."><meta property="og:url" content="${base}${slug}"><link rel="canonical" href="${base}${slug}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><title>Top 20 Horror Films of ${year} — Frightertainment</title></head><body data-theme="movies" data-ranking-year="${year}"><a class="skip-link" href="#ranking-content">Skip to ranking</a><div class="red-thread" aria-hidden="true"></div><header class="header"><div class="shell header__inner"><a class="brand" href="/" aria-label="Frightertainment homepage"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a><nav class="nav" aria-label="Main navigation"><a href="/movies.html#discovery">DISCOVERY</a><a href="/top-20/" aria-current="page">TOP 20</a><a href="/movies.html#upcoming">FILMS</a><a href="/#horror-tv">TV & AUDIO</a></nav><a class="header__action" href="/top-20/">ARCHIVE <span aria-hidden="true">></span></a><button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button></div><nav class="mobile-nav" id="mobile-nav" aria-label="Additional navigation" hidden><a href="/top-20/">TOP 20 HORROR</a></nav></header><main class="shell film-page" id="ranking-content"><div class="film-page__inner"><p><a href="/top-20/">← Annual ranking archive</a></p><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> SOURCE-LINKED · ANNUAL HORROR CHART</div><h1>TOP 20 HORROR FILMS<br><em>OF ${year}.</em></h1><details class="ranking-method"><summary>How the TMDB chart works</summary><p id="ranking-method">TMDB viewer scores out of 10. Each ranked film needs at least 50 votes. Release years follow the first release listed by TMDB.</p></details><p id="ranking-status" class="film-status" aria-live="polite">Checking the annual ranking…</p><p id="ranking-updated">Last successful ranking: none</p><p id="ranking-attribution" class="tmdb-notice" hidden>This product uses the TMDB API but is not endorsed or certified by TMDB. <a href="/credits.html">TMDB credits and attribution</a>.</p><div id="ranking-list" class="ranking-list" aria-live="polite"></div><div id="unranked-films"></div><p></p></div></main><footer class="footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · INDEPENDENT HORROR EDITORIAL</span></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/top20.js" defer></script></body></html>`;
+  const html = `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><meta name="description" content="Frightertainment's annual horror film chart with clearly labelled source-linked scores."><meta property="og:type" content="article"><meta property="og:title" content="Top 20 Horror Films of ${year} — Frightertainment"><meta property="og:description" content="Explore the annual horror chart and its source-linked scores."><meta property="og:url" content="${base}${slug}"><link rel="canonical" href="${base}${slug}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/fr-rating-badge.css"><script src="/fr-rating-badge.js"></script><title>Top 20 Horror Films of ${year} — Frightertainment</title></head><body data-theme="movies" data-ranking-year="${year}"><a class="skip-link" href="#ranking-content">Skip to ranking</a><div class="red-thread" aria-hidden="true"></div><header class="header"><div class="shell header__inner"><a class="brand" href="/" aria-label="Frightertainment homepage"><img src="/assets/frightertainment-brand.png" alt="Frightertainment"></a><nav class="nav" aria-label="Main navigation"><a href="/movies.html#discovery">DISCOVERY</a><a href="/top-20/" aria-current="page">TOP 20</a><a href="/movies.html#upcoming">FILMS</a><a href="/#horror-tv">TV & AUDIO</a></nav><a class="header__action" href="/top-20/">ARCHIVE <span aria-hidden="true">></span></a><button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button></div><nav class="mobile-nav" id="mobile-nav" aria-label="Additional navigation" hidden><a href="/top-20/">TOP 20 HORROR</a></nav></header><main class="shell film-page" id="ranking-content"><div class="film-page__inner"><p><a href="/top-20/">← Annual ranking archive</a></p><div class="eyebrow eyebrow--small"><span class="eyebrow__line"></span> SOURCE-LINKED · ANNUAL HORROR CHART</div><h1>TOP 20 HORROR FILMS<br><em>OF ${year}.</em></h1><details class="ranking-method"><summary>How the TMDB chart works</summary><p id="ranking-method">TMDB viewer scores out of 10. Each ranked film needs at least 50 votes. Release years follow the first release listed by TMDB.</p></details><p id="ranking-status" class="film-status" aria-live="polite">Checking the annual ranking…</p><p id="ranking-updated">Last successful ranking: none</p><p id="ranking-attribution" class="tmdb-notice" hidden>This product uses the TMDB API but is not endorsed or certified by TMDB. <a href="/credits.html">TMDB credits and attribution</a>.</p><div id="ranking-list" class="ranking-list" aria-live="polite"></div><div id="unranked-films"></div><p></p></div></main><footer class="footer"><div class="shell footer__bottom"><span>FRIGHTERTAINMENT · INDEPENDENT HORROR EDITORIAL</span></div></footer><script src="/data/movies.js"></script><script src="/app.js"></script><script src="/top20.js" defer></script></body></html>`;
   await writeFile(new URL('index.html', directory), decorateHubLayout(html));
 }
 
 // Roll the global navigation and homepage chart into the next year automatically.
-for (const filename of ['index.html','movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html','film.html','media.html']) {
+for (const filename of ['index.html','movies.html','frightnews.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html','film.html','media.html']) {
   const file = new URL('../' + filename, import.meta.url);
   let source = await readFile(file, 'utf8');
   source = source.replace(/\/top-20\/20\d{2}\//g, '/top-20/' + currentYear + '/')
     .replace(/TOP 20 HORROR FILMS? · 20\d{2}/g, 'TOP 20 HORROR FILMS · ' + currentYear);
   if(!source.includes('src="/media-ui.js"'))source=source.replace('</body>','<script src="/media-ui.js" defer></script></body>');
+  if(source.includes('src="/media-ui.js"') && !source.includes('src="/fr-rating-badge.js"'))
+    source=source.replace('</head>','<link rel="stylesheet" href="/fr-rating-badge.css"><script src="/fr-rating-badge.js"></script></head>');
   await writeFile(file, source);
 }
 const homepagePath = new URL('../index.html', import.meta.url);
@@ -119,6 +122,6 @@ homepage = homepage.replace(/\/top-20\/\d{4}\//g, `/top-20/${currentYear}/`)
   .replace(/OF \d{4}/g, `OF ${currentYear}`);
 await writeFile(homepagePath, homepage);
 
-const locations = [`${base}/`, ...['movies.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html','contact.html','privacy.html'].map(file => `${base}/${file}`), `${base}/top-20/`, ...yearLocations, ...movies.map(movie => `${base}/films/${movie.id}/`)];
+const locations = [`${base}/`, ...['movies.html','frightnews.html','all-horror-movies.html','archive-film.html','tv-shows.html','indie-movies.html','podcasts.html','games.html','credits.html','contact.html','privacy.html'].map(file => `${base}/${file}`), `${base}/top-20/`, ...yearLocations, ...movies.map(movie => `${base}/films/${movie.id}/`)];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${locations.map(location => `  <url><loc>${location}</loc></url>`).join('\n')}\n</urlset>\n`;
 await writeFile(new URL('../sitemap.xml', import.meta.url), sitemap);

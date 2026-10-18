@@ -1,6 +1,28 @@
 (() => {
   'use strict';
   const cache = new Map(), queue = [];
+  // TMDB-derived public metadata is not personal data. A short-lived session
+  // cache avoids refetching the same posters when visitors change sections.
+  // Fail closed if browser storage is disabled; the live API remains canonical.
+  const sessionPrefix='fr-media-v2:';
+  const sessionTtl=15*60*1000;
+  const readSession=key=>{
+    try {
+      const raw=sessionStorage.getItem(sessionPrefix+key);
+      if(!raw)return undefined;
+      const value=JSON.parse(raw);
+      if(!value||!Number.isFinite(value.saved)||Date.now()-value.saved>sessionTtl){
+        sessionStorage.removeItem(sessionPrefix+key);return undefined;
+      }
+      return value.item||null;
+    }catch{return undefined;}
+  };
+  const saveSession=(key,item)=>{
+    if(!item||!Number.isInteger(item.tmdbId)||!item.sourceUrl)return;
+    try {
+      sessionStorage.setItem(sessionPrefix+key,JSON.stringify({saved:Date.now(),item}));
+    }catch{/* Browsers may restrict session storage. */}
+  };
   let active = 0;
   const keyFor = params => new URLSearchParams(params).toString();
   function drain() {
@@ -11,15 +33,21 @@
   }
   function get(params) {
     const key = keyFor(params);
-    if (!cache.has(key)) cache.set(key, new Promise(resolve => {
+    if (!cache.has(key)) {
+      const warm=readSession(key);
+      if(warm!==undefined){cache.set(key,Promise.resolve(warm));return cache.get(key);}
+      cache.set(key, new Promise(resolve => {
       queue.push(async () => {
         try {
           const response = await fetch('/api/media?' + key, {headers:{accept:'application/json'}});
           const data = response.ok ? await response.json() : null;
-          resolve(data?.item || null);
+          const item=data?.item||null;
+          saveSession(key,item);
+          resolve(item);
         } catch { resolve(null); }
       }); drain();
     }));
+    }
     return cache.get(key);
   }
   const prettyDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') ?
@@ -30,7 +58,9 @@
     if (!root.isConnected) return;
     root.dataset.mediaStatus = item ? 'ready' : 'unavailable';
     if (!item) {
-      root.querySelectorAll('[data-media-field="rating"]').forEach(node => {node.textContent='Not rated';});
+      root.querySelectorAll('[data-media-field="rating"]').forEach(node => {
+        window.FRRatingBadge.render(node,{score:null,source:'tmdb-community',voteCount:null,size:'compact'});
+      });
       for(const [field,label] of Object.entries({'poster-status':'Poster unavailable','trailer-status':'No official trailer available','date':'Release date unavailable','overview':'A synopsis is not available for this title.'}))root.querySelectorAll(`[data-media-field="${field}"]`).forEach(node=>{node.textContent=label;});
       return;
     }
@@ -42,16 +72,20 @@
           if(node.getAttribute('role')==='img')node.setAttribute('aria-label','Poster for '+item.title);
           let img = node.matches('img') ? node : node.querySelector('img');
           if (!img) {img=document.createElement('img');node.prepend(img);}
-          img.alt = 'Poster for '+item.title; img.loading=root.dataset.mediaEager==='true'?'eager':'lazy'; img.decoding='async'; img.hidden=false;
+          const nearTop=root.dataset.mediaEager==='true' || root.getBoundingClientRect().top<innerHeight+350;
+          img.alt = 'Poster for '+item.title;
+          img.loading=nearTop?'eager':'lazy';
+          if(nearTop)img.fetchPriority='high';
+          img.decoding='async'; img.hidden=false;
           img.addEventListener('load',()=> {img.hidden=false; node.classList.add('has-tmdb-poster'); img.parentElement.classList.add('has-tmdb-poster');root.querySelectorAll('[data-media-field="poster-status"]').forEach(n=>n.hidden=true);}, {once:true});
           img.addEventListener('error',()=> {img.hidden=true; node.classList.remove('has-tmdb-poster');img.parentElement.classList.remove('has-tmdb-poster');root.querySelectorAll('[data-media-field="poster-status"]').forEach(n=>{n.hidden=false;n.textContent='Poster unavailable';});}, {once:true});
           img.src=url; if(img.complete && img.naturalWidth>0) {img.hidden=false;node.classList.add('has-tmdb-poster');img.parentElement.classList.add('has-tmdb-poster');}
           break;
         }
         case 'rating': {
-          const rated=Number.isFinite(item.voteAverage)&&item.voteAverage>0&&item.voteCount>0;
-          node.textContent=rated?'TMDB '+item.voteAverage.toFixed(1)+'/10':'Not rated';
-          node.setAttribute('aria-label',rated?`TMDB viewer rating ${item.voteAverage.toFixed(1)} out of 10 from ${item.voteCount} votes`:'No TMDB viewer rating yet');
+          if (item.ratingKind === 'tmdb-community')
+            window.FRRatingBadge.render(node,window.FRRatingBadge.fromTmdbMedia(item,'compact'));
+          else node.textContent = 'Rating unavailable';
           break;
         }
         case 'votes':node.textContent=item.voteCount>0?new Intl.NumberFormat('en-GB').format(item.voteCount)+' viewer votes':'';break;
@@ -84,7 +118,7 @@
     return params;
   }
   function hydrate(root) {const params=paramsFor(root);if(!params.id&&!params.imdb&&!params.title)return;get(params).then(item=>apply(root,item));}
-  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){observer.unobserve(entry.target);hydrate(entry.target);}}),{rootMargin:'250px'});
+  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){observer.unobserve(entry.target);hydrate(entry.target);}}),{rootMargin:'850px 0px'});
   function scan() {
     document.querySelectorAll('[data-media-type]').forEach(root=>{
       const key=keyFor(paramsFor(root));if(observed.get(root)===key)return;observed.set(root,key);

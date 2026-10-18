@@ -134,11 +134,15 @@
 
       const score = document.createElement('div');
       score.className = 'ranking-row__score';
-      const value = document.createElement('strong');
-      value.textContent = (film.averageScore / 10).toFixed(1);
-      const scale = document.createElement('span');
-      scale.textContent = '/10';
-      score.append(value, scale);
+      if (ratingKind === 'tmdb-community') {
+        window.FRRatingBadge.render(score, window.FRRatingBadge.fromTmdbChart(film, 'standard'));
+      } else {
+        const value = document.createElement('strong');
+        value.textContent = (film.averageScore / 10).toFixed(1);
+        const scale = document.createElement('span');
+        scale.textContent = '/10';
+        score.append(value, scale);
+      }
       if (ratingKind === 'tmdb-community' && /^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.(?:jpg|png|webp)$/i.test(film.posterPath || '')) {
         const poster = document.createElement('img');
         poster.className = 'ranking-row__poster';

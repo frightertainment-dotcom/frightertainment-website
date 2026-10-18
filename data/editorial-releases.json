@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-09T03:30:00Z",
+  "updatedAt": "2026-10-16T05:30:00Z",
   "country": "GB",
-  "coverage": "Source-checked editorial release notices, not a licensed real-time availability feed or proof of remaining on platform",
+  "coverage": "Source-checked editorial release notices, not a licensed real-time availability feed or proof of remaining on platform Provider spotlight rows carry dateIsSourceCheck=true; these are source-check dates, never invented streaming premieres.",
   "items": [
     {
       "id": "shudder-uk-the-beast-within-2026-10-01",
@@ -404,12 +404,11 @@
       "year": 2026,
       "country": "GB",
       "service": "UK cinemas",
-      "date": "2026-10-09",
-      "sourceName": "Sony Pictures UK",
-      "sourceUrl": "https://www.sonypictures.co.uk/",
-      "checkedAt": "2026-10-09",
-      "availability": "listed-now",
-      "dateIsSourceCheck": true
+      "date": "2026-09-18",
+      "sourceName": "Sony Pictures United Kingdom",
+      "sourceUrl": "https://www.sonypictures.co.uk/index.php/movies/resident-evil",
+      "checkedAt": "2026-10-15",
+      "availability": "release-listing"
     },
     {
       "id": "vod-bone-temple-2026",
@@ -440,6 +439,81 @@
       "availability": "listed-now",
       "dateIsSourceCheck": true,
       "filmId": "insidious-out-of-the-further"
+    },
+    {
+      "id": "disney-uk-ready-or-not-2-20261016",
+      "title": "Ready or Not 2: Here I Come",
+      "year": 2026,
+      "service": "Disney+",
+      "sourceName": "Explore Disney+ UK Halloween guide",
+      "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/best-halloween-movies",
+      "category": "streaming",
+      "country": "GB",
+      "date": "2026-10-16",
+      "dateIsSourceCheck": true,
+      "checkedAt": "2026-10-16",
+      "availability": "listed-now",
+      "sourceScope": "Provider UK watch guide: date is editorial listing check, not the title's streaming arrival date; check title availability with the provider."
+    },
+    {
+      "id": "disney-uk-soulm8te-20261016",
+      "title": "SOULM8TE",
+      "year": 2026,
+      "service": "Disney+",
+      "sourceName": "Explore Disney+ UK Halloween guide",
+      "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/best-halloween-movies",
+      "category": "streaming",
+      "country": "GB",
+      "date": "2026-10-16",
+      "dateIsSourceCheck": true,
+      "checkedAt": "2026-10-16",
+      "availability": "listed-now",
+      "sourceScope": "Provider UK watch guide: date is editorial listing check, not the title's streaming arrival date; check title availability with the provider."
+    },
+    {
+      "id": "disney-uk-cradle-20261016",
+      "title": "The Hand That Rocks the Cradle",
+      "year": 2025,
+      "service": "Disney+",
+      "sourceName": "Explore Disney+ UK Halloween guide",
+      "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/best-halloween-movies",
+      "category": "streaming",
+      "country": "GB",
+      "date": "2026-10-16",
+      "dateIsSourceCheck": true,
+      "checkedAt": "2026-10-16",
+      "availability": "listed-now",
+      "sourceScope": "Provider UK watch guide: date is editorial listing check, not the title's streaming arrival date; check title availability with the provider."
+    },
+    {
+      "id": "disney-uk-basement-20261016",
+      "title": "The Man in My Basement",
+      "year": 2025,
+      "service": "Disney+",
+      "sourceName": "Explore Disney+ UK Halloween guide",
+      "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/best-halloween-movies",
+      "category": "streaming",
+      "country": "GB",
+      "date": "2026-10-16",
+      "dateIsSourceCheck": true,
+      "checkedAt": "2026-10-16",
+      "availability": "listed-now",
+      "sourceScope": "Provider UK watch guide: date is editorial listing check, not the title's streaming arrival date; check title availability with the provider."
+    },
+    {
+      "id": "disney-uk-predator-20261016",
+      "title": "Predator: Badlands",
+      "year": 2025,
+      "service": "Disney+",
+      "sourceName": "Explore Disney+ UK title guide",
+      "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/predator-badlands-movie",
+      "category": "streaming",
+      "country": "GB",
+      "date": "2026-10-16",
+      "dateIsSourceCheck": true,
+      "checkedAt": "2026-10-16",
+      "availability": "listed-now",
+      "sourceScope": "Provider UK watch guide: date is editorial listing check, not the title's streaming arrival date; check title availability with the provider."
     }
   ]
 }

@@ -2,20 +2,21 @@
 // Ship only public website files. Never copy source code, fixtures, Worker code, keys or reviews.
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { injectWebAnalytics } from './web-analytics-beacon.mjs';
+import { useLocalFonts } from './use-local-fonts.mjs';
 
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
 const publicFiles = [
-  'index.html', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html',
+  'index.html', 'frightnews.html', 'frightnews.js', 'frightnews.css', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html',
   'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html',
   'film.html',
-  'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js',
-  'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js', 'streaming-watch.js',
-  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'homepage-concept.css', 'v5-magazine.css', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
+  'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'home-cinema-note.js', 'homepage-features.js', 'dynamic-film.js', 'top20.js',
+  'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-radar.js', 'horror-radar.css', 'cinema-diary.js', 'cinema-concept.js', 'straight-to-stream.js', 'streaming-watch.js',
+  'horror-archive.js', 'archive-film.js', 'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'fr-polish.css', 'indie-phase3.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
-  'data/movies.js', 'data/editorial-releases.json', 'data/editorial.json', 'data/editorial-spotlight-overrides.json', 'data/movie-editorial-overviews.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json',
+  'data/movies.js', 'data/horror-radar.json', 'data/editorial-releases.json', 'data/editorial.json', 'data/homepage-features.json', 'data/editorial-spotlight-overrides.json', 'data/movie-editorial-overviews.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json', 'data/indie-archive.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 
@@ -55,6 +56,45 @@ if (/criticReferenceSnapshots|frightertainment-private-preview|TEST_FIXTURE_RANK
 }
 await validateHtml(destination);
 
+// Keep the approved cascade byte-for-byte, including its final theme layers.
+// Self-host the identical licensed fonts to remove the blocking Google CSS
+// connection. Subsets remain demand-loaded by the browser's unicode ranges.
+const homeCoreCss = ['styles.css','hub.css','v5-magazine.css','fr-design-system.css','fr-page-themes.css','fr-rating-badge.css'];
+const homeFinalCss = ['fr-premium.css','horror-radar.css','frightnews.css','fr-polish.css'];
+const homeFile = new URL('index.html', destination);
+let home = await readFile(homeFile, 'utf8');
+const originalLinks = homeCoreCss.map(file => '<link rel="stylesheet" href="/' + file + '">').join('');
+if (!home.includes(originalLinks)) throw new Error('Homepage core CSS links unexpectedly changed');
+const allHomeCss = [...homeCoreCss, ...homeFinalCss];
+const homeCssContents = await Promise.all(allHomeCss.map(file => readFile(new URL(file, destination), 'utf8')));
+const fontCss = await readFile(new URL('assets/fonts/fr-fonts.css', destination), 'utf8');
+await writeFile(new URL('fr-home-core.css', destination),
+  fontCss + '\n' + homeCssContents.map((css, index) => '/* '+allHomeCss[index]+' */\n' + css).join('\n\n'));
+home = home.replace(originalLinks, '<link rel="stylesheet" href="/fr-home-core.css">');
+for (const file of homeFinalCss) {
+  const link = '<link rel="stylesheet" href="/' + file + '">';
+  if (!home.includes(link)) throw new Error('Homepage final CSS link unexpectedly changed: ' + file);
+  home = home.replace(link, '');
+}
+home = home.replace(/<link\b[^>]*href="https:\/\/fonts\.(?:googleapis|gstatic)\.com[^>]*>/g, '');
+home = home.replace('<script src="/fr-rating-badge.js"></script>', '<script src="/fr-rating-badge.js" defer></script>');
+// Serve smaller lossless encodings of the original logo at the sizes actually
+// painted by the browser. Keep the original PNG as the fallback and social art.
+const logoSet = '/assets/frightertainment-brand-640.webp 640w, /assets/frightertainment-brand-1280.webp 1280w';
+const logoSizes = '(max-width:700px) 320px, 540px';
+home = home.replace('href="/assets/frightertainment-brand.png" fetchpriority="high"',
+  'href="/assets/frightertainment-brand.png" fetchpriority="high" imagesrcset="'+logoSet+'" imagesizes="'+logoSizes+'"');
+home = home.replaceAll('src="/assets/frightertainment-brand.png"',
+  'src="/assets/frightertainment-brand.png" srcset="'+logoSet+'" sizes="'+logoSizes+'"');
+await writeFile(homeFile, home);
+
+// News thumbnails used to download entire 940–1400px scene files. Only the
+// news script uses these 320px derivatives; full scene artwork stays intact.
+const newsFile = new URL('frightnews.js', destination);
+const news = await readFile(newsFile, 'utf8');
+await writeFile(newsFile, news.replace(/\/assets\/(?:themes|worlds)\/([a-z0-9-]+\.webp)/g,
+  '/assets/news-thumbs/$1'));
+
 // Explicit production instrumentation. Preview remains untracked so editorial QA
 // and owner-only checks never inflate public visitor analytics.
 const publicWebAnalyticsSiteToken = 'f8adaba13e524ed7ab5d523a2fe2120f';
@@ -63,8 +103,10 @@ async function instrumentPublicHtml(directory) {
     const current = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
     if (entry.isDirectory()) { await instrumentPublicHtml(current); continue; }
     if (!entry.name.endsWith('.html')) continue;
-    const html = await readFile(current, 'utf8');
-    await writeFile(current, injectWebAnalytics(html, publicWebAnalyticsSiteToken));
+    let html = await readFile(current, 'utf8');
+    if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
+      html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
+    await writeFile(current, injectWebAnalytics(useLocalFonts(html), publicWebAnalyticsSiteToken));
   }
 }
 await instrumentPublicHtml(destination);

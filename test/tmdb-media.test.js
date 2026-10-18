@@ -45,25 +45,54 @@ test('title lookup rejects ambiguous remakes and mismatched years without fetchi
   } finally { globalThis.fetch = previous; }
 });
 
-test('historical chart keeps the year boundary and excludes major producers from indie rankings', async () => {
-  const previous = globalThis.fetch; const urls = [];
-  globalThis.fetch = async url => {
-    const u = new URL(url); urls.push(u);
-    if (u.pathname.includes('/discover/')) return reply({ total_pages: 1, total_results: 2, results: [
-      { id: 1, title: 'Independent', genre_ids: [27], poster_path: '/a.jpg', release_date: '2025-03-01' },
-      { id: 2, title: 'Major', genre_ids: [27], poster_path: '/b.jpg', release_date: '2025-03-01' }
-    ] });
-    const id = Number(u.pathname.split('/').at(-1));
-    return reply({ id, title: id === 1 ? 'Independent' : 'Major', release_date: '2025-03-01', poster_path: '/a.jpg', vote_average: 8, vote_count: 100,
-      production_companies: [{ name: id === 1 ? 'Tiny Film Company' : 'Universal Pictures' }] });
+test('indie chart includes source-backed films, rejects studio producers, and never discovers franchises', async () => {
+  const previous=globalThis.fetch;
+  let discovers=0, nextId=2500;
+  const byId=new Map([[1193824,'Rabbit Trap'],[1284120,'The Ugly Stepsister']]);
+  globalThis.fetch=async url=>{
+    const u=new URL(url);
+    if(u.pathname==='/3/discover/movie'){discovers++;return reply({results:[{id:999,title:'Halloween'},{id:998,title:'Insidious: Chapter 2'}]});}
+    if(u.pathname==='/3/search/movie'){
+      const title=u.searchParams.get('query');
+      const id=++nextId;
+      byId.set(id,title);
+      return reply({results:[{id,title,release_date:'2025-02-02'}]});
+    }
+    const id=Number(u.pathname.split('/').at(-1));
+    const title=byId.get(id);
+    if(!title)return new Response('',{status:404});
+    return reply({id,title,release_date:'2025-02-02',
+      poster_path:'/indie.jpg',genre_ids:[27],vote_average:7.9,vote_count:86,
+      production_companies:[{name:title==='Together'?'Universal Pictures':'Independent Productions'}],
+      budget:1200000});
   };
   try {
-    const result = await fetchCatalogue(env, { type: 'indie', mode: 'chart', year: 2025, page: 1, country: 'GB' });
-    assert.equal(urls[0].searchParams.get('primary_release_date.lte'), '2025-12-31');
-    assert.deepEqual(result.items.map(item => item.tmdbId), [1]);
-    assert.equal(result.items[0].position, 1); assert.equal(result.minimumVotes, 50);
-    assert.equal(JSON.stringify(result).includes('private-fixture'), false);
-  } finally { globalThis.fetch = previous; }
+    const result=await fetchCatalogue(env,{type:'indie',mode:'chart',year:2025,page:1,country:'GB'});
+    assert.equal(discovers,0,'never use open-ended TMDB discovery for the indie chart');
+    assert(result.items.length>0);
+    assert(result.items.every(item=>item.indieVerified===true && item.indieOriginalYear===2025));
+    assert(result.items.every(item=>item.voteCount>=50 && item.ratingKind==='tmdb-community'));
+    assert(!result.items.some(item=>/Halloween|Insidious|Together/.test(item.title)));
+    assert(result.items.some(item=>item.title==='Rabbit Trap'));
+    assert(result.items.every((item,index)=>item.position===index+1));
+    assert.equal(result.classification,'source-checked-independent-films');
+    assert.equal(JSON.stringify(result).includes('private-fixture'),false);
+  } finally {globalThis.fetch=previous;}
+});
+
+test('source-checked festival records remain browseable without invented ratings when TMDB lacks them',async()=>{
+  const previous=globalThis.fetch;
+  globalThis.fetch=async()=>reply({results:[]});
+  try{
+    const data=await fetchCatalogue(env,{type:'indie',mode:'archive',year:2026,query:'Leviticus',page:1,country:'GB'});
+    assert.equal(data.items.length,1);
+    assert.equal(data.items[0].title,'Leviticus');
+    assert.equal(data.items[0].indieVerified,true);
+    assert.equal(data.items[0].voteAverage,null);
+    assert.equal(data.items[0].tmdbId,null);
+    assert.match(data.items[0].indieSourceUrl,/sundance\.org/);
+    assert(!data.items.some(item=>/Halloween|Insidious/i.test(item.title)));
+  } finally{globalThis.fetch=previous;}
 });
 
 test('cinema screens the next batch and only shows future UK theatrical dates', async () => {
@@ -271,4 +300,18 @@ test('Cinema API excludes old releases and repeated regional theatrical dates in
       assert.equal(data.items[0].cinemaReissue,false);
     }
   }finally{globalThis.fetch=previous;}
+});
+
+test('source-backed indie fallback has valid public provenance, even without TMDB', async () => {
+  const { validateDataset } = await import('../src/core.js');
+  const catalogue = await fetchCatalogue({}, {
+    type: 'indie', mode: 'archive', year: 1922, page: 1, country: 'GB', sourceOnly: true
+  });
+  assert.ok(catalogue.items.length > 0);
+  assert.ok(catalogue.items.every(item => item.tmdbId === null && item.voteAverage === null));
+  assert.doesNotThrow(() => validateDataset({
+    kind: 'tmdb-list-source-only-test', sourceName: 'TMDB',
+    sourceUrl: 'https://www.themoviedb.org', territory: 'Global',
+    checkedAt: '2026-10-16', items: catalogue.items
+  }));
 });

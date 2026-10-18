@@ -170,9 +170,10 @@ async function handleMovieArtwork(env) {
 }
 
 async function handleTMDBMedia(env, request, catalogue = false) {
-  if (!tmdbReady(env)) return json({ error: 'Not available' }, 404);
   const params = new URL(request.url).searchParams;
   const type = params.get('type') || 'movie';
+  // A reviewed indie archive has an independent, non-credentialled source ledger.
+  if (!tmdbReady(env) && !(catalogue && type === 'indie')) return json({ error: 'Not available' }, 404);
   if (!(catalogue ? ['movie', 'tv', 'indie'] : ['movie', 'tv']).includes(type)) throw new HttpError(400, 'Invalid media type');
   const cinemaMode=catalogue && ['cinema','cinema-recent'].includes(params.get('mode'));
   const watchMode=catalogue && params.get('mode')==='streaming-watch';
@@ -181,7 +182,8 @@ async function handleTMDBMedia(env, request, catalogue = false) {
   if(watchMode && !['GB','US'].includes(requestedCinemaCountry)) throw new HttpError(400,'Unsupported streaming country');
   const country=(cinemaMode||watchMode) ? requestedCinemaCountry : countryOf(request,env);
   const currentYear = new Date().getUTCFullYear();
-  const year = watchMode && params.get('year')==='all' ? null
+  const indieAllYears = catalogue && type === 'indie' && params.get('mode') === 'archive' && params.get('year') === 'all';
+  const year = (watchMode && params.get('year')==='all') || indieAllYears ? null
     :params.has('year') ? Number(params.get('year')) : catalogue ? currentYear : null;
   if (year !== null && (!Number.isInteger(year) || year < 1888 || year > currentYear + 2)) throw new HttpError(400, 'Invalid media year');
   const options = { type, country, year };
@@ -197,11 +199,31 @@ async function handleTMDBMedia(env, request, catalogue = false) {
       options.catalogueVersion=5;
     }
     if (cinemaMode) options.catalogueVersion = 4;
+    // Indie V6 is a source-reviewed catalogue, not the former broad TMDB candidate feed.
+    // Change snapshot identity so previously cached studio/franchise entries cannot recur.
+    if (type === 'indie') {
+      options.catalogueVersion = 7; // Revised verified-year index and history filters.
+      if (options.mode === 'archive' && params.has('decade')) {
+        const decade = Number(params.get('decade'));
+        if (!Number.isInteger(decade) || decade % 10 !== 0 ||
+            decade < 1880 || decade > currentYear)
+          throw new HttpError(400,'Invalid indie decade');
+        options.decade = decade;
+      }
+    }
   } else {
     options.id = params.get('id'); options.imdb = params.get('imdb'); options.title = (params.get('title') || '').trim();
     if (options.id && !/^[1-9][0-9]{0,9}$/.test(options.id)) throw new HttpError(400, 'Invalid TMDB identifier');
     if (options.imdb && !/^tt[0-9]{7,10}$/.test(options.imdb)) throw new HttpError(400, 'Invalid IMDb identifier');
     if (!options.id && !options.imdb && (!options.title || options.title.length > 240)) throw new HttpError(400, 'A media identifier or title is required');
+  }
+  // Do not depend on a paid/licensed media provider or D1 for a historical
+  // publication whose individual records already have primary source links.
+  if (catalogue && type === 'indie' && (!tmdbReady(env) || !env.DB)) {
+    options.sourceOnly = true;
+    const result = await fetchCatalogue(env, options);
+    return json({ ...result, status:'source-only', stale:false, updatedAt:null },
+      200, { 'cache-control':'public, max-age=300' });
   }
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(options)));
   const hash = [...new Uint8Array(digest)].slice(0, 12).map(n => n.toString(16).padStart(2, '0')).join('');

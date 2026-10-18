@@ -24,20 +24,24 @@ test('all directly served HTML pages load the shared typography stylesheet', asy
   }
 });
 
-test('site-wide typography uses readable Times New Roman and the supplied page wordmarks', async () => {
+test('seven destinations use readable UI typography and the supplied page wordmarks', async () => {
   const css = await readFile(join(process.cwd(), 'hub.css'), 'utf8');
   const baseCss = await readFile(join(process.cwd(), 'styles.css'), 'utf8');
+  const systemCss = await readFile(join(process.cwd(), 'fr-design-system.css'), 'utf8');
   assert.match(baseCss, /--font-display:'Times New Roman',Georgia,serif;--font-body:'Times New Roman',Georgia,serif/);
   assert.doesNotMatch(baseCss, /UnifrakturMaguntia/);
   assert.match(css, /--font-horror:'Times New Roman',Georgia,serif/);
   assert.match(css, /--font-room:'Times New Roman',Georgia,serif/);
-  assert.match(css, /font-family:"Times New Roman",Times,serif!important/);
+  assert.doesNotMatch(css, /font-family:"Times New Roman",Times,serif!important/);
+  assert.match(systemCss, /--fr-ui: system-ui, -apple-system, 'Segoe UI', sans-serif/);
+  assert.match(systemCss, /--fr-display: 'Grenze Gotisch', Georgia, serif/);
   assert.doesNotMatch(css, /UnifrakturMaguntia/);
   for (const [page, image] of [['movies.html','page-title-movies.png'],['all-horror-movies.html','page-title-movies.png'],['tv-shows.html','page-title-tv-shows.png'],['cinema.html','page-title-cinema.png'],['indie-movies.html','page-title-indie-movies.png'],['podcasts.html','page-title-podcasts.png'],['games.html','page-title-games.png']]) {
     const html = await readFile(join(process.cwd(), page), 'utf8');
     assert.match(html, /class="hub-page-title hub-page-title--wordmark" aria-label=/);
     assert.match(html, new RegExp('/assets/' + image.replaceAll('.', '\\.')));
     assert.match(html, /class="sr-only"/);
+    if(page !== 'all-horror-movies.html')assert.match(html, /fr-design-system\.css/);
   }
 });
 
@@ -45,6 +49,7 @@ test('Times New Roman and accessible section wordmarks are documented', async ()
   const docs = await readFile(join(process.cwd(), 'TYPOGRAPHY.md'), 'utf8');
   assert.match(docs, /Times New Roman/);
   assert.match(docs, /accessible text heading/);
+  assert.match(docs, /Seven-destination update/);
 });
 
 test('generated film detail templates present a synopsis once and retain the sourced claim list', async () => {

@@ -1,0 +1,915 @@
+{
+  "capturedAt": "2026-10-18T15:12:34.824Z",
+  "environment": "headless Chromium against local dist; not hosted preview",
+  "observations": [
+    {
+      "name": "home",
+      "route": "/",
+      "width": 320,
+      "status": 200,
+      "title": "Home | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "Frightertainment",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": "page"
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "movies",
+      "route": "/movies.html",
+      "width": 320,
+      "status": 200,
+      "title": "Movies | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "HORROR MOVIES",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": "page"
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-movies.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "tv",
+      "route": "/tv-shows.html",
+      "width": 320,
+      "status": 200,
+      "title": "TV Shows | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "HORROR TV SHOWS",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": "page"
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-tv-shows.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "cinema",
+      "route": "/cinema.html",
+      "width": 320,
+      "status": 200,
+      "title": "Cinema | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "HORROR CINEMA",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": "page"
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-cinema.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "indie",
+      "route": "/indie-movies.html",
+      "width": 320,
+      "status": 200,
+      "title": "Indie Movies | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "INDIE HORROR",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": "page"
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-indie-movies.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "podcasts",
+      "route": "/podcasts.html",
+      "width": 320,
+      "status": 200,
+      "title": "Podcasts | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "HORROR PODCASTS",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": "page"
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-podcasts.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "games",
+      "route": "/games.html",
+      "width": 320,
+      "status": 200,
+      "title": "Games | Frightertainment",
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "firstHeading": "HORROR GAMES",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": "page"
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-games.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "home",
+      "route": "/",
+      "width": 1440,
+      "status": 200,
+      "title": "Home | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "Frightertainment",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": "page"
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "movies",
+      "route": "/movies.html",
+      "width": 1440,
+      "status": 200,
+      "title": "Movies | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "HORROR MOVIES",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": "page"
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-movies.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "tv",
+      "route": "/tv-shows.html",
+      "width": 1440,
+      "status": 200,
+      "title": "TV Shows | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "HORROR TV SHOWS",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": "page"
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-tv-shows.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "cinema",
+      "route": "/cinema.html",
+      "width": 1440,
+      "status": 200,
+      "title": "Cinema | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "HORROR CINEMA",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": "page"
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-cinema.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "indie",
+      "route": "/indie-movies.html",
+      "width": 1440,
+      "status": 200,
+      "title": "Indie Movies | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "INDIE HORROR",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": "page"
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-indie-movies.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "podcasts",
+      "route": "/podcasts.html",
+      "width": 1440,
+      "status": 200,
+      "title": "Podcasts | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "HORROR PODCASTS",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": "page"
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": null
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-podcasts.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    },
+    {
+      "name": "games",
+      "route": "/games.html",
+      "width": 1440,
+      "status": 200,
+      "title": "Games | Frightertainment",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "firstHeading": "HORROR GAMES",
+      "mainNav": [
+        {
+          "text": "HOME",
+          "href": "/",
+          "current": null
+        },
+        {
+          "text": "MOVIES",
+          "href": "/movies.html",
+          "current": null
+        },
+        {
+          "text": "TV SHOWS",
+          "href": "/tv-shows.html",
+          "current": null
+        },
+        {
+          "text": "CINEMA",
+          "href": "/cinema.html",
+          "current": null
+        },
+        {
+          "text": "INDIE MOVIES",
+          "href": "/indie-movies.html",
+          "current": null
+        },
+        {
+          "text": "PODCASTS",
+          "href": "/podcasts.html",
+          "current": null
+        },
+        {
+          "text": "GAMES",
+          "href": "/games.html",
+          "current": "page"
+        }
+      ],
+      "visibleImages": [
+        {
+          "alt": "Frightertainment",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-brand.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/page-title-games.png",
+          "loaded": true
+        },
+        {
+          "alt": "",
+          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
+          "loaded": true
+        }
+      ],
+      "errors": [],
+      "failedRequests": []
+    }
+  ]
+}

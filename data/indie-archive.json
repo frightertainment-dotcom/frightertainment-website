@@ -1,0 +1,567 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-15",
+  "scope": "Selected, individually source-checked independent horror films, not an exhaustive global film census.",
+  "availableYears": [
+    2026,
+    2025,
+    2024,
+    2023,
+    2022,
+    2021,
+    2020,
+    2019,
+    2018,
+    2017,
+    2016,
+    2015,
+    2014,
+    2012,
+    2011,
+    2010,
+    2009,
+    2008,
+    2007,
+    2006,
+    2005,
+    2004,
+    2003,
+    2002,
+    2001,
+    2000,
+    1999,
+    1998,
+    1997,
+    1995,
+    1992,
+    1987,
+    1982,
+    1981,
+    1978,
+    1977,
+    1974,
+    1968,
+    1962,
+    1958,
+    1932,
+    1922
+  ],
+  "items": [
+    {
+      "title": "Buddy",
+      "originalYear": 2026,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/"
+    },
+    {
+      "title": "Leviticus",
+      "originalYear": 2026,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/"
+    },
+    {
+      "title": "Mum, I'm Alien Pregnant",
+      "originalYear": 2026,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/"
+    },
+    {
+      "title": "Rock Springs",
+      "originalYear": 2026,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/"
+    },
+    {
+      "title": "Saccharine",
+      "originalYear": 2026,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/"
+    },
+    {
+      "title": "Dead Lover",
+      "originalYear": 2025,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/"
+    },
+    {
+      "title": "Didn't Die",
+      "originalYear": 2025,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/"
+    },
+    {
+      "title": "Opus",
+      "originalYear": 2025,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/"
+    },
+    {
+      "title": "Rabbit Trap",
+      "originalYear": 2025,
+      "indieSourceName": "Filmmaker",
+      "indieSourceUrl": "https://brynchainey.com/rabbit-trap"
+    },
+    {
+      "title": "The Ugly Stepsister",
+      "originalYear": 2025,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/"
+    },
+    {
+      "title": "The Undertone",
+      "originalYear": 2025,
+      "indieSourceName": "Fantasia",
+      "indieSourceUrl": "https://fantasiafestival.com/en/news/fantasia-2025-third-wave"
+    },
+    {
+      "title": "Together",
+      "originalYear": 2025,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/"
+    },
+    {
+      "title": "Touch Me",
+      "originalYear": 2025,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/"
+    },
+    {
+      "title": "Handling the Undead",
+      "originalYear": 2024,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2024-sundance-film-festival-announces-91-projects-selected-for-the-feature-films-episodic-and-new-frontier-lineup-for-40th-edition/"
+    },
+    {
+      "title": "I Saw the TV Glow",
+      "originalYear": 2024,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2024-sundance-film-festival-announces-91-projects-selected-for-the-feature-films-episodic-and-new-frontier-lineup-for-40th-edition/"
+    },
+    {
+      "title": "In a Violent Nature",
+      "originalYear": 2024,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2024-sundance-film-festival-announces-91-projects-selected-for-the-feature-films-episodic-and-new-frontier-lineup-for-40th-edition/"
+    },
+    {
+      "title": "The Moogai",
+      "originalYear": 2024,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2024-sundance-film-festival-announces-91-projects-selected-for-the-feature-films-episodic-and-new-frontier-lineup-for-40th-edition/"
+    },
+    {
+      "title": "Your Monster",
+      "originalYear": 2024,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2024-sundance-film-festival-announces-91-projects-selected-for-the-feature-films-episodic-and-new-frontier-lineup-for-40th-edition/"
+    },
+    {
+      "title": "birth/rebirth",
+      "originalYear": 2023,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2023-sundance-film-festival-announces-lineup-of-99-feature-films/"
+    },
+    {
+      "title": "Horror in the High Desert 2: Minerva",
+      "originalYear": 2023,
+      "indieSourceName": "Indie Rights",
+      "indieSourceUrl": "https://www.thefilmcatalogue.com/films/horror-in-the-high-desert-2-minerva"
+    },
+    {
+      "title": "Infinity Pool",
+      "originalYear": 2023,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2023-sundance-film-festival-announces-lineup-of-99-feature-films/"
+    },
+    {
+      "title": "Run Rabbit Run",
+      "originalYear": 2023,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2023-sundance-film-festival-announces-lineup-of-99-feature-films/"
+    },
+    {
+      "title": "Talk to Me",
+      "originalYear": 2023,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2023-sundance-film-festival-announces-lineup-of-99-feature-films/"
+    },
+    {
+      "title": "Deadstream",
+      "originalYear": 2022,
+      "indieSourceName": "SXSW",
+      "indieSourceUrl": "https://sxsw.com/wp-content/uploads/2022/02/SXSW-2022-Festival-Slate-Release-FINAL.pdf"
+    },
+    {
+      "title": "Hypochondriac",
+      "originalYear": 2022,
+      "indieSourceName": "SXSW",
+      "indieSourceUrl": "https://sxsw.com/wp-content/uploads/2022/02/SXSW-2022-Festival-Slate-Release-FINAL.pdf"
+    },
+    {
+      "title": "Sissy",
+      "originalYear": 2022,
+      "indieSourceName": "SXSW",
+      "indieSourceUrl": "https://sxsw.com/wp-content/uploads/2022/02/SXSW-2022-Festival-Slate-Release-FINAL.pdf"
+    },
+    {
+      "title": "Skinamarink",
+      "originalYear": 2022,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/lists/10-great-horror-films-decade-so-far"
+    },
+    {
+      "title": "Horror in the High Desert",
+      "originalYear": 2021,
+      "indieSourceName": "Indie Rights",
+      "indieSourceUrl": "https://www.thefilmcatalogue.com/films/horror-in-the-high-desert"
+    },
+    {
+      "title": "Amulet",
+      "originalYear": 2020,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2020-sundance-film-festival-118-feature-films-announced-3/"
+    },
+    {
+      "title": "Bad Hair",
+      "originalYear": 2020,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "His House",
+      "originalYear": 2020,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Host",
+      "originalYear": 2020,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/118e678a-5a29-5b2b-8c71-4f4ded6c2b26/host"
+    },
+    {
+      "title": "Relic",
+      "originalYear": 2020,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2020-sundance-film-festival-118-feature-films-announced-3/"
+    },
+    {
+      "title": "Scare Me",
+      "originalYear": 2020,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2020-sundance-film-festival-118-feature-films-announced-3/"
+    },
+    {
+      "title": "Depraved",
+      "originalYear": 2019,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "Little Monsters",
+      "originalYear": 2019,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Sweetheart",
+      "originalYear": 2019,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Hole in the Ground",
+      "originalYear": 2019,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/2019-sundance-film-festival-112-features-announced-3/"
+    },
+    {
+      "title": "The Lodge",
+      "originalYear": 2019,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Hereditary",
+      "originalYear": 2018,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Mandy",
+      "originalYear": 2018,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "XX",
+      "originalYear": 2017,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Greasy Strangler",
+      "originalYear": 2016,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Under the Shadow",
+      "originalYear": 2016,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Witch",
+      "originalYear": 2015,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "A Girl Walks Home Alone at Night",
+      "originalYear": 2014,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/festival-history/"
+    },
+    {
+      "title": "It Follows",
+      "originalYear": 2014,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Babadook",
+      "originalYear": 2014,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/festival-history/"
+    },
+    {
+      "title": "What We Do in the Shadows",
+      "originalYear": 2014,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/festival-history/"
+    },
+    {
+      "title": "Black Rock",
+      "originalYear": 2012,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Innkeepers",
+      "originalYear": 2011,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "Bitter Feast",
+      "originalYear": 2010,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "Frozen",
+      "originalYear": 2010,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Stake Land",
+      "originalYear": 2010,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "Tucker and Dale vs Evil",
+      "originalYear": 2010,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The House of the Devil",
+      "originalYear": 2009,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "I Can See You",
+      "originalYear": 2008,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "I Sell the Dead",
+      "originalYear": 2008,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "Diary of the Dead",
+      "originalYear": 2007,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/9c9338a0-ec55-58e5-8bdb-be4cf12cc772/george-a-romeros-diary-of-the-dead"
+    },
+    {
+      "title": "Fido",
+      "originalYear": 2006,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Last Winter",
+      "originalYear": 2006,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "The Descent",
+      "originalYear": 2005,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/be5b05dd-16a6-5175-bdf9-7f04bf3b1a62/the-descent"
+    },
+    {
+      "title": "The Roost",
+      "originalYear": 2005,
+      "indieSourceName": "Glass Eye Pix",
+      "indieSourceUrl": "https://glasseyepix.com/projects/chronological/"
+    },
+    {
+      "title": "Saw",
+      "originalYear": 2004,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "High Tension",
+      "originalYear": 2003,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/features/where-begin-with-alexandre-aja"
+    },
+    {
+      "title": "May",
+      "originalYear": 2002,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Session 9",
+      "originalYear": 2001,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/c5cfb9ab-7b49-56fb-9032-c1ba549dc641/session-9"
+    },
+    {
+      "title": "Ginger Snaps",
+      "originalYear": 2000,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/eda9a40a-508c-5dcb-9f0b-27883b2be2f9/ginger-snaps"
+    },
+    {
+      "title": "Psycho Beach Party",
+      "originalYear": 2000,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Blair Witch Project",
+      "originalYear": 1999,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "The Last Broadcast",
+      "originalYear": 1998,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/5241124d-a426-5fd7-95c6-18dddf32469c/the-last-broadcast"
+    },
+    {
+      "title": "Cube",
+      "originalYear": 1997,
+      "indieSourceName": "Sundance",
+      "indieSourceUrl": "https://www.sundance.org/blogs/30-years-of-chills-and-thrills-your-sundance-midnight-horror-watch-list-3/"
+    },
+    {
+      "title": "Habit",
+      "originalYear": 1995,
+      "indieSourceName": "IFC Center",
+      "indieSourceUrl": "https://www.ifccenter.com/films/habit-2/"
+    },
+    {
+      "title": "Braindead",
+      "originalYear": 1992,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/lists/10-great-films-with-diy-special-effects"
+    },
+    {
+      "title": "Bad Taste",
+      "originalYear": 1987,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/lists/10-great-films-with-diy-special-effects"
+    },
+    {
+      "title": "Basket Case",
+      "originalYear": 1982,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/lists/10-great-films-about-brothers"
+    },
+    {
+      "title": "The Evil Dead",
+      "originalYear": 1981,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/features/where-begin-with-sam-raimi"
+    },
+    {
+      "title": "The Shout",
+      "originalYear": 1978,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/c52089c5-0918-57f5-9ae8-664bc72c3709/the-shout"
+    },
+    {
+      "title": "Eraserhead",
+      "originalYear": 1977,
+      "indieSourceName": "Criterion Collection",
+      "indieSourceUrl": "https://www.criterion.com/films/28382-eraserhead"
+    },
+    {
+      "title": "The Texas Chain Saw Massacre",
+      "originalYear": 1974,
+      "indieSourceName": "Texas State Historical Association",
+      "indieSourceUrl": "https://www.tshaonline.org/handbook/entries/the-texas-chain-saw-massacre-1974"
+    },
+    {
+      "title": "Night of the Living Dead",
+      "originalYear": 1968,
+      "indieSourceName": "Criterion Collection",
+      "indieSourceUrl": "https://www.criterion.com/films/29331-night-of-the-living-dead"
+    },
+    {
+      "title": "Carnival of Souls",
+      "originalYear": 1962,
+      "indieSourceName": "Criterion Collection",
+      "indieSourceUrl": "https://www.criterion.com/films/607-carnival-of-souls"
+    },
+    {
+      "title": "The Blob",
+      "originalYear": 1958,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/film/cd638744-5241-5f02-b5cc-9c59afd51f12/the-blob"
+    },
+    {
+      "title": "Vampyr",
+      "originalYear": 1932,
+      "indieSourceName": "Criterion Collection",
+      "indieSourceUrl": "https://www.criterion.com/films/661-vampyr"
+    },
+    {
+      "title": "White Zombie",
+      "originalYear": 1932,
+      "indieSourceName": "AFI Catalog",
+      "indieSourceUrl": "https://catalog.afi.com/Film/7222-WHITE-ZOMBIE"
+    },
+    {
+      "title": "Nosferatu",
+      "originalYear": 1922,
+      "indieSourceName": "BFI",
+      "indieSourceUrl": "https://www.bfi.org.uk/resources-events-teachers/resources-teachers/gothic-classroom/film-2-nosferatu-1922"
+    }
+  ]
+}

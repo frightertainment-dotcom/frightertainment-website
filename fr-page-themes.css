@@ -1,0 +1,504 @@
+/* Page-owned atmosphere and palette. The scene is decorative; titles, poster
+   data, scores and controls remain independent DOM content. */
+body.fr-v5[data-theme='home'] {
+  --fr-scene-wide:url('/assets/themes/home-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/home-mobile.webp');
+  --fr-movies-scene:url('/assets/themes/movies-wide.webp');
+  --room-art:var(--fr-scene-current);
+}
+body.fr-v5[data-theme='movies'] {
+  --fr-scene-wide:url('/assets/themes/movies-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/movies-mobile.webp');
+  --room-art:var(--fr-scene-current);
+  --pick-scene:var(--fr-scene-current);
+}
+body.fr-v5[data-theme='tv'] {
+  --fr-scene-wide:url('/assets/themes/tv-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/tv-mobile.webp');
+  --room-art:var(--fr-scene-current);
+  --pick-scene:var(--fr-scene-current);
+}
+body.fr-v5[data-theme='cinema'] {
+  --red:#e6b58f; --red-dark:#873d34; --hair:#563635;
+  --world:#0e090b; --surface-world:#171012; --surface-raised:#211417;
+  --edge:#714543; --world-glow:#79282f;
+  --fr-scene-wide:url('/assets/themes/cinema-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/cinema-mobile.webp');
+  --room-art:var(--fr-scene-current);
+  --pick-scene:var(--fr-scene-current);
+}
+body.fr-v5[data-theme='indie'] {
+  --fr-scene-wide:url('/assets/themes/indie-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/indie-mobile.webp');
+  --room-art:var(--fr-scene-current);
+  --pick-scene:var(--fr-scene-current);
+}
+body.fr-v5[data-theme='podcasts'] {
+  --fr-scene-wide:url('/assets/themes/podcasts-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/podcasts-mobile.webp');
+  --room-art:var(--fr-scene-current);
+  --pick-scene:var(--fr-scene-current);
+}
+body.fr-v5[data-theme='games'] {
+  --fr-scene-wide:url('/assets/themes/games-wide.webp');
+  --fr-scene-mobile:url('/assets/themes/games-mobile.webp');
+  --room-art:var(--fr-scene-current);
+  --pick-scene:var(--fr-scene-current);
+}
+
+/* A carousel page reserves the normal-state space needed by its longest
+   editorial item, with one line of room for browser font-metric differences.
+   The content, poster and controls remain distinct tracks; opening a player
+   can still expand the card. */
+@media (min-width:1101px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:clamp(541px,calc(8vw + 440px),596px); }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:clamp(566px,calc(5vw + 516px),616px); }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:clamp(596px,calc(6vw + 536px),656px); }
+}
+@media (min-width:1001px) and (max-width:1100px) {
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:546px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:576px; }
+}
+@media (min-width:701px) and (max-width:800px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:446px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:486px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:526px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:446px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:431px; }
+}
+@media (max-width:700px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:686px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:736px; }
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:766px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:636px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:636px; }
+}
+@media (max-width:380px) {
+  body.fr-v5[data-theme='indie'] .editorial-pick { min-block-size:816px; }
+}
+@media (max-width:359px) {
+  body.fr-v5[data-theme='movies'] .editorial-pick { min-block-size:756px; }
+  body.fr-v5[data-theme='tv'] .editorial-pick { min-block-size:751px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick { min-block-size:656px; }
+  body.fr-v5[data-theme='games'] .editorial-pick { min-block-size:651px; }
+}
+
+body.fr-v5 .hub-catalog .hub-tile:first-child::before { background-image:var(--fr-scene-current); }
+body.fr-v5 .hub-catalog .hub-tile:not(:first-child)::before { background-image:linear-gradient(90deg,#0506079c,#05060742),var(--fr-scene-current); }
+body.fr-v5 .hub-catalog .hub-tile__wash { background:linear-gradient(90deg,#060708ec,#060708a6 54%,#0607083b); }
+body.fr-v5 .hub-catalog .hub-tile:not(:first-child) .hub-tile__wash { background:linear-gradient(0deg,#050607ee,#05060779 64%,transparent); }
+body.fr-v5 .fr-v5-editorial-tile { background-image:linear-gradient(0deg,#050607ec,#05060781 68%,transparent),var(--fr-scene-current); background-position:center; }
+body.fr-v5 .fr-v5-explore__tile { background-image:linear-gradient(0deg,#050607eb,#0506075b 75%,transparent),var(--fr-scene-current); }
+body.fr-v5[data-theme='movies'] .fr-v5-explore__tile[data-art='indie'] { background-image:linear-gradient(0deg,#050607eb,#0506073a 75%,transparent),url('/assets/themes/indie-wide.webp'); }
+body.fr-v5[data-theme='movies'] .fr-v5-explore__tile[data-art='new'] { background-image:linear-gradient(0deg,#050607eb,#0506073a 75%,transparent),url('/assets/themes/cinema-wide.webp'); }
+body.fr-v5[data-theme='movies'] .fr-v5-explore__tile[data-art='top'] { background-image:linear-gradient(0deg,#050607eb,#0506073a 75%,transparent),url('/assets/themes/home-wide.webp'); }
+body.fr-v5 .fr-v5-deeper__summary { background-image:linear-gradient(90deg,#080a0de7,#080a0d81),var(--fr-scene-current); background-size:cover; background-position:center 54%; }
+body.fr-v5 .fr-catalogue-head em,body.fr-v5 .fr-v5-panel__head em,
+body.fr-v5 .hub-editorial-more__head em { color:var(--red); }
+body.fr-v5 .fr-v5-panel__head::before { background:var(--red); }
+body.fr-v5 :is(.fr-v5-panel__all,.fr-v5-editorial-tile__go,.fr-v5-explore__tile:hover) { color:var(--red); }
+
+/* Each Home exit previews its destination's own environment. */
+body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-tv::before { background-image:url('/assets/themes/tv-wide.webp'); }
+body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-podcast::before { background-image:url('/assets/themes/podcasts-wide.webp'); }
+body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-indie::before { background-image:url('/assets/themes/indie-wide.webp'); }
+body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-games::before { background-image:url('/assets/themes/games-wide.webp'); }
+body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-cinema::before { background-image:url('/assets/themes/cinema-wide.webp'); }
+
+/* Mobile homepage destination scenes are decorative, below the fold.
+   Hold their network requests until the associated card approaches view.
+   All gradients, text and links remain visible during the lazy phase. */
+@media(max-width:700px) {
+  body.fr-v5[data-theme='home'] .hub-showcase__bottom .hub-tile:not(.fr-image-visible)::before {
+    background-image:none;
+  }
+}
+
+/* Source podcast covers are square, clear of text and actions. */
+body.fr-v5[data-theme='podcasts'] .editorial-pick__art-frame { aspect-ratio:1; }
+body.fr-v5[data-theme='podcasts'] .editorial-pick__poster { object-fit:contain; }
+body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover { display:grid; grid-template-columns:minmax(0,1fr) minmax(130px,32%); align-items:center; gap:12px; }
+body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover .podcast-cover { position:relative; grid-column:2; grid-row:1; right:auto; top:auto; width:100%; height:auto; aspect-ratio:1; object-fit:contain; opacity:1; padding:14px; z-index:1; }
+body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover .hub-tile__content { grid-column:1; grid-row:1; max-width:100%; width:100%; }
+body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover .hub-tile__wash { grid-column:1/-1; grid-row:1; }
+body.fr-v5[data-theme='podcasts'] .podcast-chart { max-height:none; overflow:visible; }
+
+/* Game art is landscape; an official store widget can expand on request. */
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame { aspect-ratio:16/10; justify-self:stretch; width:100%; max-width:310px; }
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) { gap:5px; }
+body.fr-v5[data-theme='games'] .editorial-pick__art { grid-template-columns:minmax(0,1fr); }
+body.fr-v5[data-theme='games'] .editorial-pick__art-title { flex:0 0 auto; -webkit-line-clamp:3; font-size:clamp(23px,2.2vw,30px); line-height:1.1; }
+body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) { padding-bottom:34px; }
+body.fr-v5[data-theme='games'] .editorial-pick__poster { object-fit:contain; }
+body.fr-v5[data-theme='games'] .fr-player-gate { max-width:100%; }
+body.fr-v5[data-theme='games'] .fr-game-spotlight__media { min-width:0; }
+
+/* The diary and country control form one theatre spread. */
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(260px,.85fr); grid-template-areas:'features region'; gap:clamp(12px,2vw,24px); width:100%; margin:0 0 clamp(25px,3vw,40px); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__features,
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region { min-width:0; border:0; background:linear-gradient(145deg,#181113,#09090b); box-shadow:inset 0 1px #ffffff1c,0 17px 33px #0008; padding:clamp(15px,2vw,24px); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__features { grid-area:features; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region { grid-area:region; display:flex; flex-direction:column; justify-content:center; gap:10px; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head { display:flex; align-items:end; justify-content:space-between; flex-wrap:wrap; gap:8px 15px; margin:0 0 16px; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept h2 { margin:0; color:var(--fr-ink); font:600 clamp(23px,2.2vw,32px)/1.08 var(--fr-display); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept a { color:var(--red); font:700 11px/1.3 var(--fr-ui); text-decoration:none; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__features { background:linear-gradient(140deg,#221619,#08090b 80%),var(--fr-scene-current); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards { display:grid; grid-template-columns:1fr; gap:6px; min-height:0; padding:6px; background:linear-gradient(160deg,#030405,#140d10); box-shadow:inset 0 0 0 1px #b39b8460,inset 0 0 24px #000; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__empty { min-height:70px; display:grid; place-items:center; margin:0; color:var(--fr-muted); font:400 14px/1.4 var(--fr-ui); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card { display:grid; grid-template-columns:28px minmax(0,1fr) max-content; grid-template-areas:'order title date' 'order details source'; align-items:center; gap:4px 10px; min-width:0; min-height:75px; padding:10px 12px; background:linear-gradient(90deg,#e7d9c2 0%,#f7f0dc 50%,#d4c4af 100%); box-shadow:inset 0 0 0 1px #fff7d1a1,0 2px 6px #000a; color:#160e10; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__order { grid-area:order; align-self:center; color:#8b2730; font:700 17px/1 var(--fr-display); font-variant-numeric:tabular-nums; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__title { grid-area:title; min-width:0; overflow-wrap:normal; word-break:normal; color:#190e12; font:700 clamp(16px,1.5vw,21px)/1.12 var(--fr-display); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__date { grid-area:date; justify-self:end; color:#29191b; font:700 12px/1.15 var(--fr-ui); font-variant-numeric:tabular-nums; white-space:nowrap; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__details { grid-area:details; min-width:0; color:#5d4241; font:700 10px/1.2 var(--fr-ui); letter-spacing:.02em; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept a.fr-cinema-concept__source { grid-area:source; justify-self:end; color:#741e2b; font:700 10px/1.15 var(--fr-ui); text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__source:focus-visible { outline:2px solid #741e2b; outline-offset:3px; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region p { margin:0; color:var(--fr-muted); font:400 14px/1.48 var(--fr-ui); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region>a { align-self:start; padding:9px 0; border-bottom:1px solid var(--red); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-region { display:flex; flex-wrap:wrap; align-items:center; gap:9px; margin:15px 0; font:700 12px/1.3 var(--fr-ui); }
+body.fr-v5[data-theme='cinema'] .fr-cinema-region select { min-height:40px; max-width:100%; padding:7px; color:#fff; border:1px solid #ffffff5b; background:#0e0e10; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-diary__media { aspect-ratio:2/3; }
+body.fr-v5[data-theme='cinema'] .fr-cinema-diary__media img { width:100%; height:100%; object-fit:contain; }
+
+@media (max-width:800px) {
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept { grid-template-columns:1fr; grid-template-areas:'region' 'features'; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__region { min-height:0; }
+}
+@media (min-width:701px) and (max-width:800px) {
+  /* Give the longest real game title its own readable landscape track at the
+     narrow two-column breakpoint. The fallback must fit across font engines. */
+  body.fr-v5[data-theme='games'] .editorial-pick { grid-template-columns:minmax(230px,34%) minmax(0,1fr); }
+  body.fr-v5[data-theme='games'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) { aspect-ratio:3/2; gap:4px; padding:10px 12px 12px; }
+  body.fr-v5[data-theme='games'] .editorial-pick__art-title { font-size:21px; }
+}
+@media (max-width:700px) {
+  /* A single long TV title such as Yellowjackets must remain a whole word. */
+  body.fr-v5[data-theme='tv'] .editorial-pick__art-frame { width:min(100%,150px); }
+  body.fr-v5[data-theme='tv'] .editorial-pick__art-title { font-size:18px; }
+  body.fr-v5[data-theme='podcasts'] .editorial-pick__art-frame { width:min(100%,180px); }
+  body.fr-v5[data-theme='games'] .editorial-pick__art-frame { width:100%; max-width:240px; }
+  body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover { grid-template-columns:1fr; }
+  body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover .podcast-cover { grid-column:1; grid-row:1; justify-self:start; width:130px; margin:16px 16px 0; padding:0; }
+  body.fr-v5[data-theme='podcasts'] .hub-catalog .hub-tile.has-podcast-cover .hub-tile__content { grid-column:1; grid-row:2; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card { grid-template-columns:23px minmax(0,1fr) max-content; gap:4px 7px; padding:9px 7px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__title { font-size:16px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__date { font-size:10px; }
+}
+
+/* 14 Oct: Owner-requested refinements to source-backed chart, cinema release board
+   and spoiler-light editorial synopses. Deliberately preview-safe and scoped to V5. */
+
+/* A ranking entry must never allocate only 33px to a real, sourced rating badge.
+   Let the list grow for all actual results rather than creating implicit columns. */
+body.fr-v5 .fr-v5-ranking__list {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:none;
+  grid-auto-flow:row;
+  grid-auto-rows:auto;
+  gap:7px;
+  padding:12px;
+  min-height:0;
+  max-height:none;
+  overflow:visible;
+  list-style:none;
+}
+body.fr-v5 .fr-v5-ranking__entry {
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) minmax(100px,max-content);
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  min-height:52px;
+  margin:0;
+  padding:8px 11px;
+  border:1px solid #393238;
+  border-left:2px solid #913446;
+  background:linear-gradient(100deg,#1c151a,#0b0d10 80%);
+  box-shadow:inset 0 1px #ffffff0a;
+}
+body.fr-v5 .fr-v5-ranking__position {
+  font:700 17px/1 Georgia,serif;
+  color:#e7a8ab;
+  font-variant-numeric:tabular-nums;
+}
+body.fr-v5 .fr-v5-ranking__movie {
+  min-width:0;
+  overflow-wrap:anywhere;
+  overflow:visible;
+  text-overflow:clip;
+  white-space:normal;
+  color:#f5eeee;
+  font:600 13px/1.35 system-ui,sans-serif;
+  text-decoration:none;
+}
+body.fr-v5 .fr-v5-ranking__movie:hover { color:#ffb2bb; text-decoration:underline; }
+body.fr-v5 .fr-v5-ranking__score {
+  display:flex;
+  justify-content:flex-end;
+  min-width:0;
+  text-align:right;
+  overflow:visible;
+}
+body.fr-v5 .fr-v5-ranking__score .fr-rating-badge {
+  --fr-rating-seal:1.25rem;
+  --fr-rating-value:1.02rem;
+  gap:4px;
+  max-width:100%;
+}
+body.fr-v5 .fr-v5-ranking__score .fr-rating-badge__source { font-size:9px; letter-spacing:0; }
+body.fr-v5 .fr-v5-ranking__score .fr-rating-badge__value small { font-size:.44em; }
+body.fr-v5 .fr-v5-ranking__source { font-size:10px; line-height:1.4; padding:9px 13px 2px; }
+@media(min-width:1180px) {
+  body.fr-v5 .fr-v5-ranking__list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body.fr-v5 .fr-v5-ranking__entry { grid-template-columns:27px minmax(0,1fr) minmax(100px,max-content); }
+}
+@media(max-width:410px) {
+  body.fr-v5 .fr-v5-ranking__list { padding:8px; gap:6px; }
+  body.fr-v5 .fr-v5-ranking__entry { grid-template-columns:25px minmax(0,1fr) minmax(98px,max-content); gap:5px; padding:8px 6px; }
+  body.fr-v5 .fr-v5-ranking__movie { font-size:12px; }
+  body.fr-v5 .fr-v5-ranking__position { font-size:15px; }
+}
+
+/* Theatre marquee: luminous acrylic programme strips, black dividing rails,
+   numbered film positions and release dates on the right. Not a ticket board. */
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__features {
+  background:radial-gradient(ellipse at 50% 0%,#54151f 0%,#1a090f 28%,#050607 74%);
+  border:1px solid #482c34;
+  box-shadow:0 17px 33px #000a,inset 0 0 0 5px #090709,inset 0 0 0 6px #693b42;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head {
+  padding:7px 4px 12px;
+  border-bottom:1px solid #4d252f;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__head h2 {
+  color:#f1d3d5;
+  text-shadow:0 0 14px #9e152e85;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards {
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-auto-rows:auto;
+  gap:3px;
+  min-width:0;
+  min-height:0;
+  padding:9px;
+  background:#050506;
+  border:2px solid #0a0a0c;
+  box-shadow:0 0 0 2px #75444b,inset 0 0 0 2px #010102,0 9px 28px #000c;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::before {
+  content:'FRIGHTERTAINMENT  •  CINEMA RELEASE BOARD';
+  display:block;
+  margin:0 0 7px;
+  padding:7px 4px 10px;
+  color:#e84053;
+  font:700 clamp(15px,2vw,23px)/1.25 Georgia,serif;
+  letter-spacing:.13em;
+  text-align:center;
+  text-shadow:0 0 4px #e22a43,0 0 16px #c40c2f91;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::after {
+  content:'RELEASE DATES SHOWN  •  CHECK PARTICIPATING VENUES';
+  display:block;
+  padding:9px 5px 4px;
+  color:#a89b9c;
+  font:600 9px/1.4 system-ui,sans-serif;
+  text-align:center;
+  letter-spacing:.075em;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card {
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:27px minmax(0,1fr) minmax(96px,max-content);
+  grid-template-areas:'order title date' 'order details source';
+  grid-template-rows:auto auto;
+  align-items:center;
+  gap:4px 9px;
+  min-width:0;
+  min-height:74px;
+  padding:10px 12px;
+  border:1px solid #cfc9c1;
+  border-bottom:3px solid #29282c;
+  border-radius:0;
+  color:#171417;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 8px,#fefefe25 9px),
+    linear-gradient(92deg,#d6d7d6,#fffefa 21%,#f9f9f3 72%,#d1d3d1);
+  box-shadow:inset 0 1px 8px #fff, inset 0 -2px 10px #aba7a780,0 0 18px #fff3;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__order {
+  grid-area:order;
+  color:#a71b31;
+  font:800 20px/1.1 Georgia,serif;
+  text-shadow:0 1px #fff;
+  font-variant-numeric:tabular-nums;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__title {
+  grid-area:title;
+  align-self:end;
+  min-width:0;
+  color:#131217;
+  font:800 clamp(17px,1.6vw,23px)/1.09 'Barlow Condensed',Impact,system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  overflow-wrap:break-word;
+  text-shadow:0 1px #fff;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__date {
+  grid-area:date;
+  justify-self:end;
+  align-self:end;
+  white-space:nowrap;
+  color:#272027;
+  font:800 12px/1.3 'Barlow Condensed',system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.01em;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__details {
+  grid-area:details;
+  align-self:start;
+  color:#5d5356;
+  font:700 10px/1.25 'Barlow Condensed',system-ui,sans-serif;
+  letter-spacing:.035em;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept a.fr-cinema-concept__source {
+  grid-area:source;
+  justify-self:end;
+  align-self:start;
+  color:#872032;
+  font:800 10px/1.2 system-ui,sans-serif;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+body.fr-v5[data-theme='cinema'] .fr-cinema-concept__empty {
+  padding:28px 14px;
+  color:#f3d9dc;
+}
+@media(max-width:700px) {
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__features { padding:13px 10px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards { padding:6px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__cards::before { font-size:15px; letter-spacing:.07em; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__card { grid-template-columns:23px minmax(0,1fr) minmax(86px,max-content); gap:4px 5px; padding:9px 6px; min-height:70px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__title { font-size:clamp(15px,4.2vw,19px); }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__date { font-size:11px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept__details { font-size:9px; }
+  body.fr-v5[data-theme='cinema'] .fr-cinema-concept a.fr-cinema-concept__source { font-size:9px; }
+}
+
+/* Editorial picks: remove the competing fixed 235/326px clipping rules.
+   Keep poster art visible but allow the source-backed plot to use the space. */
+body.hub-body.fr-v5[data-theme] .editorial-pick {
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:minmax(140px,24%) minmax(0,1fr);
+  grid-template-areas:'art copy' 'art facts';
+  grid-template-rows:auto auto;
+  align-items:start;
+  gap:13px clamp(14px,2.5vw,34px);
+  block-size:auto;
+  min-block-size:0;
+  max-block-size:none;
+  height:auto;
+  overflow:visible;
+  padding:44px clamp(15px,2.8vw,28px) 23px;
+}
+body.hub-body.fr-v5[data-theme] .editorial-pick__art {
+  grid-area:art;
+  grid-column:auto;
+  grid-row:auto;
+  align-self:start;
+  justify-content:center;
+  min-height:0;
+  height:auto;
+  max-height:none;
+}
+body.hub-body.fr-v5[data-theme] .editorial-pick__art-frame { width:min(100%,220px); max-height:none; }
+body.hub-body.fr-v5[data-theme] .editorial-pick__content {
+  grid-area:copy;
+  grid-column:auto;
+  grid-row:auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-self:start;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  height:auto;
+  max-height:none;
+  overflow:visible;
+}
+body.hub-body.fr-v5[data-theme] .editorial-pick__synopsis {
+  display:block;
+  -webkit-line-clamp:unset;
+  max-height:none;
+  max-width:78ch;
+  margin:12px 0 0;
+  overflow:visible;
+  font:400 clamp(14px,1.2vw,16px)/1.56 Georgia,'Times New Roman',serif;
+  color:#f0e9e7;
+  text-wrap:pretty;
+}
+body.hub-body.fr-v5[data-theme] .editorial-pick__why {
+  display:block;
+  -webkit-line-clamp:unset;
+  max-height:none;
+  overflow:visible;
+  margin:10px 0 0;
+  font:italic 13px/1.55 Georgia,serif;
+}
+body.hub-body.fr-v5[data-theme] .editorial-pick__facts {
+  grid-area:facts;
+  grid-column:auto;
+  grid-row:auto;
+  align-self:start;
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  gap:5px 12px;
+  min-width:0;
+  min-height:0;
+  max-height:none;
+  overflow:visible;
+  padding:10px 12px;
+}
+body.hub-body.fr-v5[data-theme] .editorial-pick__facts small {
+  display:block;
+  max-height:none;
+  white-space:normal;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  overflow:visible;
+}
+@media(max-width:700px) {
+  body.hub-body.fr-v5[data-theme] .editorial-pick {
+    grid-template-columns:minmax(0,31%) minmax(0,1fr);
+    grid-template-areas:'art copy' 'facts facts';
+    grid-template-rows:auto auto;
+    gap:11px 9px;
+    block-size:auto;
+    min-block-size:0;
+    max-block-size:none;
+    height:auto;
+    overflow:visible;
+    padding:34px 10px 14px;
+  }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__art { grid-area:art; grid-column:auto; grid-row:auto; width:100%; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__art-frame { width:100%; max-width:160px; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__content { grid-area:copy; grid-column:auto; grid-row:auto; justify-content:flex-start; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__title { display:block; max-height:none; -webkit-line-clamp:unset; overflow:visible; font-size:clamp(19px,4.7vw,27px); line-height:1.07; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__synopsis { display:block; -webkit-line-clamp:unset; max-height:none; overflow:visible; font:400 12.5px/1.48 Georgia,serif; margin:8px 0 0; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__why { display:block; -webkit-line-clamp:unset; max-height:none; overflow:visible; font-size:11.5px; line-height:1.43; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__meta { font-size:9px; gap:5px 8px; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__links { gap:6px; margin-top:10px; }
+  body.hub-body.fr-v5[data-theme] :is(.editorial-pick__cta,.editorial-pick__source,.editorial-pick__trailer summary) { min-height:34px; font-size:10px; padding:7px 9px; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__facts { grid-area:facts; grid-column:1/-1; grid-row:auto; max-height:none; margin-top:2px; }
+}
+@media(max-width:359px) {
+  body.hub-body.fr-v5[data-theme] .editorial-pick { grid-template-columns:minmax(0,29%) minmax(0,1fr); gap:9px 7px; padding-inline:8px; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__title { font-size:18px; }
+  body.hub-body.fr-v5[data-theme] .editorial-pick__synopsis { font-size:12px; }
+}

@@ -3,8 +3,11 @@
    watchlists, ranking values, video links or third-party poster rights. */
 (() => {
  'use strict';
- const theme=location.pathname.endsWith('/cinema.html')?'cinema':document.body?.dataset.theme;
- if (!['movies','indie','tv','podcasts','games','home','cinema'].includes(theme)) return;
+ // Page identity is explicit so alternate URLs and delayed work cannot turn
+ // Cinema's movie catalogue into the Movies magazine layout. Other pages still
+ // use their existing theme value until their markup declares data-page.
+ const theme=document.body?.dataset.page||document.body?.dataset.theme;
+ if (!['movies','indie','tv','podcasts','games','home','cinema','news'].includes(theme)) return;
  const main=document.querySelector('main');
  const intro=main?.querySelector('.hub-page-intro');
  if (!main) return;
@@ -55,26 +58,45 @@
  const poster=(x,type)=>{
   const a=link('',filmHref(x,type),'fr-v5-poster');
   const art=image(x,type);
-  const foot=el('div','fr-v5-poster__bottom');
+  const foot=link('',filmHref(x,type),'fr-v5-poster__bottom');
   foot.append(el('strong','',x.title));
-  const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+  const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
   if(year>=1888&&year<=2100) foot.append(el('small','',String(year)));
-  a.append(art,foot);
+  a.append(art);
   a.setAttribute('aria-label','Explore '+x.title+' details');
-  if(type==='movie' || type==='indie'){
-   const box=el('article','fr-v5-poster-card');
-   const year=Number(String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
-   box.append(a,watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
-   return box;
+  const box=el('article','fr-v5-poster-card');
+  const media=el('div','fr-v5-poster__media');
+  media.append(a);
+  box.append(media,foot);
+  const source=link('SOURCE',`https://www.themoviedb.org/${type==='tv'?'tv':'movie'}/${itemId(x)}`,'fr-v5-poster__source');
+  source.setAttribute('aria-label','TMDB source for '+x.title);
+  source.target='_blank';source.rel='noopener noreferrer';
+  media.append(source);
+  if(x.ratingKind==='tmdb-community'&&Number.isFinite(x.voteAverage)&&Number.isInteger(x.voteCount)&&x.voteCount>0){
+   const rating=el('span','fr-v5-poster__rating');
+   rating.append(window.FRRatingBadge.create(window.FRRatingBadge.fromTmdbMedia(x,'compact')));
+   media.append(rating);
   }
-  return a;
+  const video=mediaKey(x);
+  if(/^[A-Za-z0-9_-]{11}$/.test(video)){
+   const play=el('button','fr-v5-poster__trailer','▶ TRAILER');
+   play.type='button';play.dataset.trailerVideo=video;play.dataset.trailerTitle=x.title;
+   play.setAttribute('aria-label','Play official trailer for '+x.title);
+   media.append(play);
+  }
+  if(type==='movie' || type==='indie'){
+   const year=Number(type==='indie' && x.indieOriginalYear || String(x.firstReleaseDate||x.releaseDate||'').slice(0,4));
+   media.append(watchButton({tmdbId:itemId(x),title:x.title,posterPath:x.posterPath,year,type}));
+  }
+  return box;
  };
  const valid=x=>x&&typeof x.title==='string'&&x.title.trim()&&itemId(x)>0;
  const catalogueRequests=new Map();
- const fetchList=(type,mode)=>{
-  const key=type+':'+mode;
+ const fetchList=(type,mode,year=null)=>{
+  const key=type+':'+mode+':'+(year??'current');
   if(catalogueRequests.has(key))return catalogueRequests.get(key);
   const query=new URLSearchParams({type,mode,page:'1'});if(mode==='cinema')query.set('country','GB');
+  if(year!==null)query.set('year',String(year));
   const url='/api/catalogue?'+query;
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),10000);
@@ -83,7 +105,7 @@
    if(!response.ok)throw new Error('Catalogue unavailable');
    const data=await response.json();
    if(!Array.isArray(data.items))throw new Error('Catalogue response invalid');
-   return data.items.filter(valid);
+   return data.items.filter(item => valid(item) && (type !== 'indie' || item.indieVerified === true));
   } finally {clearTimeout(timeout);}})();
   catalogueRequests.set(key,promise);
   return promise;
@@ -135,24 +157,40 @@
   document.addEventListener('fr-v5-watchlist-updated',update);
   return button;
  };
- const addWatchlist=parent=>{
-  const p=panel('fr-v5-watchlist','MY WATCHLIST','Your saved horror films.','/all-horror-movies.html');
-  const grid=el('div','fr-v5-watchlist__grid');p.append(grid);parent.append(p);
+ const mountHomeWatchlist=()=>{
+  const section=document.querySelector('#my-watchlist');
+  if(!section)return;
+  const grid=section.querySelector('[data-home-watch-items]');
+  const count=section.querySelector('[data-home-watch-count]');
+  const description=section.querySelector('[data-home-watch-description]');
+  if(!grid||!count||!description)return;
   const render=()=>{
    const items=savedWatch();
+   count.textContent=String(items.length);
+   section.dataset.hasItems=String(items.length>0);
+   grid.hidden=items.length===0;
    if(!items.length){
-    mockFreeState(grid,'Nothing saved yet. Press + on a film poster below to make your list.');
+    grid.replaceChildren();
+    description.textContent='Save a horror film with + in Movies, then find it here.';
     return;
    }
-   grid.replaceChildren(...items.slice(0,5).map(item=>{
-    const a=link('',filmHref(item,item.type),'fr-v5-watchlist__item');
-    a.setAttribute('aria-label','Open '+item.title);
-    a.append(image(item,item.type),el('span','fr-v5-watchlist__title',item.title));
-    const box=el('div','fr-v5-watchlist__saved');box.append(a,watchButton(item));
+   description.textContent='Tap a saved poster to see film details. Saved on this browser.';
+   grid.replaceChildren(...items.map(item=>{
+    const box=el('div','fr-home-watch-shelf__item');
+    const a=link('',filmHref(item,item.type),'fr-home-watch-shelf__movie');
+    a.setAttribute('aria-label','Open details for '+item.title);
+    a.append(image(item,item.type),el('strong','fr-home-watch-shelf__movie-title',item.title));
+    const remove=el('button','fr-home-watch-shelf__remove','×');
+    remove.type='button';
+    remove.setAttribute('aria-label','Remove '+item.title+' from my watchlist');
+    remove.addEventListener('click',()=>toggleWatch(item));
+    box.append(a,remove);
     return box;
    }));
   };
   document.addEventListener('fr-v5-watchlist-updated',render);
+  window.addEventListener('storage',event=>{if(event.key===watchKey||event.key===null)render();});
+  window.addEventListener('pageshow',render);
   render();
  };
  const installHeader=()=>{
@@ -183,26 +221,227 @@
   form.append(label,input,submit);search.append(searchButton,form);
   search.addEventListener('toggle',()=>{if(search.open){menu.open=false;input.focus();}});
   menu.addEventListener('toggle',()=>{if(menu.open)search.open=false;});
+  const news=link('','/frightnews.html','fr-v5-header-news-icon');
+  news.setAttribute('aria-label','Open FrightNews horror headlines');
+  news.title='FrightNews';
+  const paper=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  paper.setAttribute('viewBox','0 0 24 24');paper.setAttribute('aria-hidden','true');
+  paper.setAttribute('fill','none');paper.setAttribute('stroke','currentColor');
+  paper.setAttribute('stroke-width','1.7');paper.setAttribute('stroke-linecap','round');
+  paper.setAttribute('stroke-linejoin','round');
+  for(const d of ['M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a3 3 0 0 1-3-3V7',
+    'M3 7v11a3 3 0 0 0 3 3','M8 8h10','M8 11h10','M8 14h4','M15 14h3','M8 17h10']){
+    const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+    line.setAttribute('d',d);paper.append(line);
+  }
+  news.append(paper);
+  if(theme==='news')news.setAttribute('aria-current','page');
   const contact=link('☠','/contact.html','fr-v5-contact-icon');
   contact.setAttribute('aria-label','Contact Frightertainment');
-  actions.append(menu,search,contact);
+  actions.append(menu,search,news,contact);
   head.append(actions);
   document.addEventListener('keydown',event=>{
    if(event.key==='Escape'){menu.open=false;search.open=false;}
   });
  };
 
+ /* An offline provider should never turn a premium editorial destination into
+    a stack of retry boxes. Keep the live-feed limitation explicit, but use
+    existing approved, source-linked editorial work for a real discovery shelf.
+    This is not a substitute for live regional availability or rankings. */
+ const curatedLink=value=>{
+   if(/^\/films\/[a-z0-9-]+\/$/.test(String(value||'')))return value;
+   try{
+     const url=new URL(value);
+     return url.protocol==='https:'&&!url.username&&!url.password?url.href:'';
+   }catch{return '';}
+ };
+ const getCuratedFallback=async(type)=>{
+   if(type==='movie'){
+     return (Array.isArray(window.FR_MOVIES)?window.FR_MOVIES:[])
+       .filter(x=>x&&x.editorialStatus==='approved'&&/^[a-z0-9-]+$/.test(x.id||'')
+         &&typeof x.title==='string'&&x.claims?.some(claim=>claim.field==='title'&&curatedLink(claim.source)))
+       .slice(0,6).map(x=>({
+         title:x.title,
+         category:x.claims?.find(c=>c.field==='genre')?.value||'SOURCE-CHECKED HORROR',
+         description:x.claims?.find(c=>c.field==='synopsis')?.value||'Explore the verified film file and original studio sources.',
+         sourceName:x.claims?.find(c=>c.field==='title')?.sourceName||'Official film source',
+         sourceUrl:'/films/'+x.id+'/'
+       }));
+   }
+   const key=type==='tv'?'tv-shows':type==='indie'?'indie-movies':'';
+   if(!key)return [];
+   const cached=window.FR_EDITORIAL_BOOTSTRAP?.editorial?.[key];
+   if(Array.isArray(cached))return cached
+     .filter(x=>x&&typeof x.title==='string'&&x.title.trim().length>0&&
+       typeof x.description==='string'&&curatedLink(x.sourceUrl)).slice(0,6);
+   const response=await fetch('/data/editorial.json',{headers:{accept:'application/json'}});
+   if(!response.ok)throw Error('Curated recommendations unavailable');
+   const data=await response.json();
+   return (Array.isArray(data[key])?data[key]:[])
+     .filter(x=>x&&typeof x.title==='string'&&x.title.trim().length>0&&
+       typeof x.description==='string'&&curatedLink(x.sourceUrl))
+     .slice(0,6);
+ };
+ const showCuratedFallback=async(panelNode,type)=>{
+   try{
+     const entries=await getCuratedFallback(type);
+     if(!entries.length||!panelNode.isConnected)return;
+     const gallery=el('div','fr-v5-curated-grid');
+     gallery.setAttribute('aria-label','Verified Frightertainment editorial selections');
+     const themeClass=type==='tv'?'series':type==='indie'?'independent':'film';
+     gallery.dataset.kind=themeClass;
+     const cards=entries.map((entry,index)=>{
+       const href=curatedLink(entry.sourceUrl);
+       const anchor=link('',href,'fr-v5-curated-card');
+       anchor.dataset.curatedIndex=String(index+1);
+       if(href.startsWith('https://')){anchor.target='_blank';anchor.rel='noopener noreferrer';}
+       anchor.setAttribute('aria-label','Explore '+entry.title+' via '+(entry.sourceName||'verified source'));
+       const number=el('span','fr-v5-curated-card__number',String(index+1).padStart(2,'0'));
+       number.setAttribute('aria-hidden','true');
+       const copy=el('span','fr-v5-curated-card__copy');
+       copy.append(
+         el('small','fr-v5-curated-card__kind',entry.category||'CURATED HORROR'),
+         el('strong','fr-v5-curated-card__title',entry.title),
+         el('span','fr-v5-curated-card__synopsis',String(entry.description).slice(0,180)),
+         el('span','fr-v5-curated-card__action',href.startsWith('/')?'EXPLORE FILM FILE  ↗':'OFFICIAL SOURCE  ↗')
+       );
+       anchor.append(number,copy);
+       return anchor;
+     });
+     gallery.append(...cards);
+     const intro=el('p','fr-v5-curated-intro','FRIGHTERTAINMENT SELECTS · VERIFIED EDITORIAL DISCOVERY');
+     panelNode.append(intro,gallery);
+   }catch{/* No unverified placeholders or fabricated posters on fetch failure. */}
+ };
+
  const showPosterRack=async(config,host)=>{
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-poster-grid');
   grid.setAttribute('aria-live','polite');
-  grid.append(el('p','fr-v5-loading','Finding source-linked releases…'));
+  if(config.type==='indie'){
+   grid.classList.add('fr-indie-compact-grid');
+   const updateColumns=()=>{
+    // Hard layout contract also works when stale shared stylesheet rules exist.
+    const w=window.innerWidth;
+    grid.style.setProperty('grid-template-columns',w<=700?'repeat(2,minmax(0,1fr))':w<=1100?'repeat(3,minmax(0,1fr))':'repeat(4,minmax(0,1fr))','important');
+    grid.style.setProperty('display','grid','important');
+   };
+   updateColumns();
+   window.addEventListener('resize',updateColumns,{passive:true});
+  }
+  // Image-sized reserved slots keep the exact final shelf geometry. Do not
+  // switch a visible editorial layout into a differently sized poster grid.
+  const count=config.type==='indie'?12:8;
+  const slots=Array.from({length:count},()=>{
+   const card=el('div','fr-v5-poster-skeleton');
+   card.setAttribute('aria-hidden','true');
+   card.append(el('span','fr-v5-poster-skeleton__art'),
+    el('span','fr-v5-poster-skeleton__title'));
+   return card;
+  });
+  grid.replaceChildren(...slots);
   p.append(grid);host.append(p);
   try{
    const data=await fetchList(config.type,config.mode);
-   if(!data.length) return mockFreeState(grid,'No verified titles are available in this selection yet. Explore the complete catalogue below.');
-   grid.replaceChildren(...data.slice(0,config.type==='indie'?3:8).map(x=>poster(x,config.type)));
-  }catch{mockFreeState(grid,'The live catalogue is unavailable right now. The full catalogue and archive remain below.');}
+   if(!data.length){
+    mockFreeState(grid,'Live catalogue has no qualifying titles yet. Explore our sourced editorial selections below.');
+    await showCuratedFallback(p,config.type);
+    return;
+   }
+   let selections=data.slice(0,count);
+   if(config.type==='indie' && selections.length<count){
+    // Supplement recent films with real, editorially verified catalogue
+    // records from earlier film years. Never invent film identities or art.
+    const seen=new Set(selections.map(x=>itemId(x)));
+    const currentYear=new Date().getFullYear();
+    for(const year of [currentYear,currentYear-1,currentYear-2,currentYear-3,currentYear-4]){
+     if(selections.length>=count)break;
+     try{
+      const archive=await fetchList('indie','archive',year);
+      for(const item of archive){
+       const filmId=itemId(item);
+       if(!filmId||seen.has(filmId)||!item.indieVerified)continue;
+       seen.add(filmId);selections.push(item);
+       if(selections.length>=count)break;
+      }
+     }catch{/* Keep all successfully loaded verified posters. */}
+    }
+   }
+   if(config.type==='indie' && selections.length<count){
+    // Source-only films fill the remaining spaces with original house artwork,
+    // NOT borrowed third-party posters or fabricated audience scores.
+    try{
+     const response=await fetch('/data/indie-archive.json',{headers:{accept:'application/json'}});
+     if(response.ok){
+      const index=await response.json();
+      const names=new Set(selections.map(x=>x.title.toLowerCase()));
+      for(const item of index.items||[]){
+       if(selections.length>=count)break;
+       if(!item.title||!/^https:\/\//.test(item.indieSourceUrl||'')||names.has(item.title.toLowerCase()))continue;
+       names.add(item.title.toLowerCase());
+       selections.push({title:item.title,indieOriginalYear:item.originalYear,
+        indieVerified:true,indieSourceName:item.indieSourceName,
+        indieSourceUrl:item.indieSourceUrl,sourceOnly:true});
+      }
+     }
+    }catch{/* Keep verified titles already found. */}
+   }
+   grid.replaceChildren(...selections.slice(0,count).map(x=>{
+    if(!x.sourceOnly)return poster(x,config.type);
+    const box=el('article','fr-v5-poster-card fr-indie-source-card');
+    const media=el('div','fr-v5-poster__media');
+    const a=link('',x.indieSourceUrl,'fr-v5-poster');
+    a.target='_blank';a.rel='noopener noreferrer';
+    a.setAttribute('aria-label','Source record for '+x.title);
+    const art=el('div','fr-v5-poster__art fr-indie-source-art');
+    art.append(el('span','fr-indie-source-art__category','INDEPENDENT HORROR'),
+      el('strong','fr-indie-source-art__title',x.title),
+      el('small','fr-indie-source-art__year',String(x.indieOriginalYear)));
+    a.append(art);media.append(a);
+    const source=link('SOURCE ↗',x.indieSourceUrl,'fr-v5-poster__source');
+    source.target='_blank';source.rel='noopener noreferrer';media.append(source);
+    const foot=link('',x.indieSourceUrl,'fr-v5-poster__bottom');
+    foot.target='_blank';foot.rel='noopener noreferrer';
+    foot.append(el('strong','',x.title),el('small','',String(x.indieOriginalYear)));
+    box.append(media,foot);return box;
+   }));
+  }catch{
+   mockFreeState(grid,'Live catalogue unavailable. The selections below are editorial recommendations, not current availability.');
+   await showCuratedFallback(p,config.type);
+  }
+ };
+ const addIndieHeritage=async(host)=>{
+  const shelf=panel('fr-indie-heritage','FROM THE INDEPENDENT VAULT',
+    'Source-checked horror history, from the 1960s to today.','#archive');
+  shelf.setAttribute('aria-label','Independent horror through the decades');
+  const grid=el('div','fr-indie-heritage__grid');
+  grid.setAttribute('aria-live','polite');
+  shelf.append(grid);host.append(shelf);
+  try{
+    const response=await fetch('/data/indie-archive.json',{headers:{accept:'application/json'}});
+    if(!response.ok)throw Error('Verified indie index unavailable');
+    const index=await response.json();
+    const years=[1922,1932,1958,1962,1974,1999,2022];
+    const records=years.map(year=>index.items?.find(x=>x.originalYear===year)).filter(x=>
+      x&&typeof x.title==='string'&&/^https:\/\//.test(x.indieSourceUrl||''));
+    if(!records.length){shelf.remove();return;}
+    const cards=records.map((entry,index)=>{
+      const card=el('article','fr-indie-heritage__card');
+      const film=link('', '/indie-movies.html?archiveYear='+entry.originalYear+'#archive',
+        'fr-indie-heritage__film');
+      film.append(el('small','fr-indie-heritage__era',
+          String(entry.originalYear).slice(0,3)+'0s · '+String(index+1).padStart(2,'0')),
+        el('strong','fr-indie-heritage__title',entry.title),
+        el('span','fr-indie-heritage__year','ORIGINAL FILM YEAR · '+entry.originalYear));
+      film.setAttribute('aria-label','Explore '+entry.title+' in the '+entry.originalYear+' indie archive');
+      const source=link('VERIFIED SOURCE ↗',entry.indieSourceUrl,'fr-indie-heritage__source');
+      source.rel='noopener noreferrer';source.target='_blank';
+      card.append(film,source);
+      return card;
+    });
+    grid.replaceChildren(...cards);
+  }catch{shelf.remove();}
  };
  const addNotices=async(parent)=>{
   const p=panel('fr-v5-notices','LATEST HORROR DROPS','Source-checked UK release notices.','#straight-to-stream');
@@ -224,15 +463,28 @@
   }catch{mockFreeState(list,'Release notices are temporarily unavailable. Use the complete discovery tools below.');}
  };
  const addRanking=async(parent)=>{
-  const p=panel('fr-v5-ranking','TOP 20 HORROR','Verified viewer rankings.','/top-20/'+new Date().getFullYear()+'/');
+  const p=panel('fr-v5-ranking','TOP 20 HORROR','Annual chart · qualifying scores only.','/top-20/'+new Date().getFullYear()+'/');
   const list=el('ol','fr-v5-ranking__list');p.append(list);parent.append(p);
-  list.append(el('li','fr-v5-loading','Loading verified annual scores…'));
+  // Reserve real row heights until sourced rankings arrive. Unlike the
+  // former one-line loading label, replacing this ledger will not move
+  // the poster shelves hundreds of pixels after first paint.
+  list.setAttribute('aria-label','Source-backed annual horror rankings');
+  list.append(...Array.from({length:10},()=>{
+   const row=el('li','fr-v5-ranking__skeleton-entry');
+   row.setAttribute('aria-hidden','true');
+   row.append(el('span','fr-v5-ranking__skeleton-position'),
+    el('span','fr-v5-ranking__skeleton-title'),
+    el('span','fr-v5-ranking__skeleton-score'));
+   return row;
+  }));
   try {
    const response=await fetch('/api/rankings?year='+new Date().getFullYear(),{headers:{accept:'application/json'}});
    if(!response.ok)throw Error('ranking unavailable');
    const data=await response.json();
    const items=(Array.isArray(data.items)?data.items:[]).filter(x=>x&&typeof x.title==='string'&&Number.isInteger(x.position)&&Number.isInteger(x.averageScore)&&x.position>=1&&x.position<=20).sort((a,b)=>a.position-b.position).slice(0,10);
-   if(!items.length){mockFreeState(list,'This year’s verified ranking is still being assembled.');return;}
+   p.querySelector('.fr-v5-panel__head p').textContent=data.ratingKind==='tmdb-community'
+    ? 'TMDB community votes · /10.':'Source-cleared professional critics · /10.';
+   if(!items.length){mockFreeState(list,'No films currently qualify for a numbered ranking.');return;}
    list.replaceChildren();
    const meta=el('small','fr-v5-ranking__source',data.ratingKind==='tmdb-community'?'TMDB COMMUNITY · /10':'VERIFIED PROFESSIONAL CRITICS · /10');
    list.before(meta);
@@ -240,26 +492,28 @@
     const li=el('li','fr-v5-ranking__entry');
     const position=el('span','fr-v5-ranking__position',String(x.position).padStart(2,'0'));
     const item=link(x.title,x.tmdbId?'/media.html?type=movie&id='+Number(x.tmdbId):'/top-20/'+new Date().getFullYear()+'/','fr-v5-ranking__movie');
-    const score=el('span','fr-v5-ranking__score',(x.averageScore/10).toFixed(1));
+    const score=el('span','fr-v5-ranking__score');
+    if(data.ratingKind==='tmdb-community')window.FRRatingBadge.render(score,window.FRRatingBadge.fromTmdbChart(x,'compact'));
+    else score.textContent=(x.averageScore/10).toFixed(1);
     li.append(position,item,score);list.append(li);
    }
-  } catch{mockFreeState(list,'The live rankings could not be loaded. Open the annual ranking page to retry.');}
+  } catch{mockFreeState(list,'The annual ranking is unavailable. Open the year page for verified film files.');}
  };
- const addTrailer=async(parent,type)=>{
+ const addTrailer=async(parent,type,{hideWhenUnavailable=false}={})=>{
   const p=panel('fr-v5-trailer',type==='indie'?'LATEST INDIE TRAILERS':'LATEST TRAILERS','Verified official trailers.',type==='indie'?'#trending':'#upcoming');
   const node=el('div','fr-v5-trailer__content');
   node.append(el('p','fr-v5-loading','Checking official trailers…'));p.append(node);parent.append(p);
   try{
    const data=await fetchList(type,'trending');
    const featured=data.find(x=>/^[A-Za-z0-9_-]{11}$/.test(mediaKey(x)));
-   if(!featured){mockFreeState(node,'No verified trailer is attached to this selection. Browse the films for official video sources.');return;}
+   if(!featured){if(type==='indie')mockFreeState(node,'No matched official indie trailer is currently available.');else p.remove();return;}
    const a=link('',filmHref(featured,type),'fr-v5-trailer__film');
    a.append(image(featured,type),el('strong','',featured.title));
    const play=link('▶','#','fr-v5-trailer__play');
    play.setAttribute('aria-label','Watch official trailer for '+featured.title);
    if(!guard(play,mediaKey(featured))){mockFreeState(node,'No verified video available.');return;}
    node.replaceChildren(a,play);
-  }catch{mockFreeState(node,'Trailers could not be checked. Find source-linked films in the catalogue below.');}
+  }catch{p.remove();}
  };
  const addUpcoming=async(parent,type)=>{
   const p=panel('fr-v5-announced','NEWLY ANNOUNCED','Upcoming horror worth watching.',type==='indie'?'#upcoming':'#upcoming');
@@ -267,7 +521,7 @@
   try{
    const data=await fetchList(type,'upcoming');
    const film=data.find(x=>x&&valid(x));
-   if(!film){mockFreeState(node,'No confirmed upcoming entry is available at the moment.');return;}
+   if(!film){p.remove();return;}
    const a=link('',filmHref(film,type),'fr-v5-announced__row');
    a.append(image(film,type));
    const copy=el('div','fr-v5-announced__copy');
@@ -276,42 +530,88 @@
    if(/^\d{4}-\d{2}-\d{2}$/.test(released||''))copy.append(el('small','',released+' · Release details'));
    copy.append(el('span','',String(film.overview||'Explore the title and its source-linked release details.').slice(0,150)));
    a.append(copy,el('span','fr-v5-announced__arrow','›'));node.replaceChildren(a);
-  }catch{mockFreeState(node,'New release information could not be loaded. Check the catalogue below.');}
+  }catch{p.remove();}
  };
  const addEditorialList=async(config,host)=>{
   const p=panel('fr-v5-rack',config.heading,config.tagline,config.href);
   const grid=el('div','fr-v5-editorial-grid');p.append(grid);host.append(p);
   try{
-   const response=await fetch('/data/editorial.json');
-   if(!response.ok)throw Error('Editorial feed unavailable');
-   const data=await response.json();
+   const cached=window.FR_EDITORIAL_BOOTSTRAP?.schemaVersion===1
+     ?window.FR_EDITORIAL_BOOTSTRAP.editorial:null;
+   const data=cached || await fetch('/data/editorial.json')
+     .then(response=>{if(!response.ok)throw Error('Editorial feed unavailable');return response.json();});
    const entries=(Array.isArray(data[config.editorial])?data[config.editorial]:[]).filter(x=>typeof x.title==='string'&&/^https:\/\//.test(x.sourceUrl||'')).slice(0,6);
    if(!entries.length)return mockFreeState(grid,'No source-checked recommendations are available.');
    const backdrop=config.editorial==='games'?'/assets/worlds/games-control-room.webp':'/assets/worlds/podcast-studio.webp';
    grid.replaceChildren(...entries.map(x=>{
     const a=link('',x.sourceUrl,'fr-v5-editorial-tile');
     a.target='_blank';a.rel='noopener noreferrer';
+    a.dataset.editorialTitle=x.title;
     a.style.setProperty('--fr-v5-tile-image','url("'+backdrop+'")');
     a.append(el('span','fr-v5-editorial-tile__eyebrow',x.category||config.editorial),el('strong','',x.title),el('small','',x.sourceName||'Publisher source'),el('span','fr-v5-editorial-tile__go','EXPLORE  ›'));
     return a;
    }));
+   if(config.editorial==='podcasts'){
+    // This route already supplies creator artwork. Match by exact title and
+    // retain the house scene whenever an image is absent or fails to load.
+    try{
+     const response=await fetch('/api/podcasts',{headers:{accept:'application/json'}});
+     if(response.ok){
+      const shows=await response.json();
+      const covers=new Map((Array.isArray(shows.items)?shows.items:[])
+       .filter(x=>x&&typeof x.title==='string'&&typeof x.artworkUrl==='string')
+       .map(x=>[x.title.trim().toLocaleLowerCase('en-GB'),x.artworkUrl]));
+      for(const tile of grid.querySelectorAll('[data-editorial-title]')){
+       const url=covers.get(tile.dataset.editorialTitle.trim().toLocaleLowerCase('en-GB'));
+       if(!url)continue;
+       try{
+        const parsed=new URL(url);
+        if(parsed.protocol!=='https:')continue;
+        const art=new Image();
+        art.onload=()=>tile.style.setProperty('--fr-v5-tile-image','url("'+parsed.href.replace(/"/g,'%22')+'")');
+        art.src=parsed.href;
+       }catch{}
+      }
+     }
+    }catch{}
+   }
   }catch{mockFreeState(grid,'Recommendations are unavailable. Explore the editorial selections below.');}
  };
  function mobileDock(){
+  // Override older responsive rules that forcibly re-display the header tabs.
+  const topNav=document.querySelector('.hub-header .hub-tabs');
+  if(topNav){
+   const mq=window.matchMedia('(max-width:700px)');
+   const sync=()=>{if(mq.matches)topNav.style.setProperty('display','none','important');
+     else topNav.style.removeProperty('display');};
+   sync();mq.addEventListener('change',sync);
+  }
   if(document.querySelector('.fr-v5-mobile-dock'))return;
-  const nav=el('nav','fr-v5-mobile-dock');nav.setAttribute('aria-label','Quick horror sections');
+  const nav=el('nav','fr-v5-mobile-dock');
+  nav.setAttribute('aria-label','Frightertainment mobile section navigation');
   [
-   ['⌂','HOME','/','home'],
-   ['◉','MOVIES','/movies.html','movies'],
-   ['♟','INDIE','/indie-movies.html','indie'],
-   ['♫','PODCASTS','/podcasts.html','podcasts'],
-   ['✦','GAMES','/games.html','games']
-  ].forEach(([symbol,label,href,id])=>{
+   ['⌂','HOME','Home','/','home'],
+   ['◉','MOVIES','Movies','/movies.html','movies'],
+   ['▣','TV SHOWS','TV Shows','/tv-shows.html','tv'],
+   ['▤','CINEMA','Cinema','/cinema.html','cinema'],
+   ['♟','INDIE','Indie Movies','/indie-movies.html','indie'],
+   ['♫','PODCASTS','Podcasts','/podcasts.html','podcasts'],
+   ['✦','GAMES','Games','/games.html','games']
+  ].forEach(([symbol,label,accessibleName,href,id])=>{
    const a=link('',href,theme===id?'active':'');
+   a.setAttribute('aria-label',accessibleName);
    a.append(el('span','fr-v5-dock-symbol',symbol),el('small','',label));
    if(theme===id)a.setAttribute('aria-current','page');
    nav.append(a);
-  });document.body.append(nav);
+  });
+  document.body.append(nav);
+  // Keep the selected section in view when the readable seven-item dock scrolls.
+  if(window.matchMedia('(max-width:700px)').matches){
+   requestAnimationFrame(()=>{
+    const active=nav.querySelector('[aria-current="page"]');
+    if(active)nav.scrollLeft=Math.max(0,active.offsetLeft-(nav.clientWidth-active.clientWidth)/2);
+   });
+  }
  }
  function decorateHero(){
   const carousel=main.querySelector('.editorial-carousel');if(!carousel)return;
@@ -324,10 +624,14 @@
  async function build(){
   if(main.dataset.frV5Ready)return;
   installHeader();
-  main.dataset.frV5Ready='true';
+  // Do not reveal legacy sections before the premium DOM composition is assembled.
   mobileDock();
   // Cinema stays in document order: never flash or relocate its diary after load.
-  if(theme==='home'||theme==='cinema')return;
+  // These pages already contain their final premium structure in HTML.
+  // They must never be held behind the async editorial-layout gate.
+  if(theme==='home'){mountHomeWatchlist();main.dataset.frV5Ready='true';return;}
+  if(theme==='news'){main.dataset.frV5Ready='true';return;}
+  if(theme==='cinema'){main.dataset.frV5Ready='true';return;}
   decorateHero();
   const config=configs[theme];if(!config)return;
   const showcase=el('div','fr-v5-front');
@@ -338,15 +642,56 @@
   const jobs=[];
   if(config.editorial){
    jobs.push(addEditorialList(config,showcase));
+   // Keep the working chart accessible in the visible page composition.
+   // Its order is editorial; it is not an invented audience rating.
+   if(theme==='podcasts'){
+    const chart=main.querySelector('.podcast-chart');
+    if(chart){chart.classList.add('fr-v5-pinned');showcase.append(chart);}
+   }
   }else{
    const upper=el('div','fr-v5-feature-panels');
    if(theme==='movies'){
-    addWatchlist(upper);
     jobs.push(addRanking(upper));
-    jobs.push(addTrailer(upper,'movie'));
+    jobs.push(addTrailer(upper,'movie',{hideWhenUnavailable:true}));
     showcase.append(upper);
+    const explore=el('nav','fr-v5-explore');
+    explore.setAttribute('aria-label','Explore horror movies');
+    explore.append(el('h2','','EXPLORE MOVIES'));
+    for(const [label,href,art] of [
+      ['2026 HORROR','/all-horror-movies.html?year=2026','all'],
+      ['NEW RELEASES','/movies.html#straight-to-stream','new'],
+      ['INDIE','/indie-movies.html','indie'],
+      ['CULT CLASSICS','/all-horror-movies.html?year=1980','classics'],
+      ['1978 HORROR','/all-horror-movies.html?year=1978','top']
+    ]){
+     const a=link(label+'  ›',href,'fr-v5-explore__tile');a.dataset.art=art;explore.append(a);
+    }
+    main.insertBefore(explore,showcase);
+    // The approved desktop composition pairs the editorial film and the
+    // working chart. Keep the source-backed chart after the hero on phones.
+    const ranking=upper.querySelector('.fr-v5-ranking');
+    const spotlight=el('div','fr-v5-spotlight-row');
+    const wide=window.matchMedia('(min-width:1000px)');
+    const arrange=()=>{
+      if(wide.matches){
+        // Resize and content-layout events may call arrange again while explore
+        // already lives inside spotlight. Keep the stable showcase as anchor.
+        if(spotlight.parentElement!==main)main.insertBefore(spotlight,showcase);
+        spotlight.append(after,explore,ranking);
+      }else{
+        if(after.parentElement!==main)main.insertBefore(after,showcase);
+        if(explore.parentElement!==main)main.insertBefore(explore,showcase);
+        upper.insertBefore(ranking,upper.children[1]||null);
+        spotlight.remove();
+      }
+      // The editorial renderer owns stable-height measurement. Notify it
+      // synchronously when the *container* changes, even without viewport resize.
+      after.dispatchEvent(new Event('fr:editorial-layout-change'));
+    };
+    arrange();wide.addEventListener('change',arrange);
    }
    jobs.push(showPosterRack(config,showcase));
+   if(theme==='indie')jobs.push(addIndieHeritage(showcase));
    if(theme==='indie'||theme==='tv'){
     const lower=el('div','fr-v5-secondary-panels');
     jobs.push(addUpcoming(lower,config.type));
@@ -356,7 +701,7 @@
   }
 
   if(theme!=='home'&&document.querySelector('.fr-v5-front')){
-   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper'));
+   const original=[...main.children].filter(node=>node!==intro&&node!==showcase&&node!==main.querySelector('.editorial-carousel')&&!node.classList.contains('fr-v5-spotlight-row')&&!node.classList.contains('fr-v5-explore')&&node.tagName!=='SCRIPT'&&!node.classList.contains('fr-v5-deeper')&&!node.classList.contains('fr-v5-pinned'));
    if(original.length){
     const details=el('details','fr-v5-deeper');
     details.id='fr-v5-complete-discovery';
@@ -370,7 +715,13 @@
     main.append(details);
     const reveal=()=>{
      const hash=location.hash.slice(1);
-     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){details.open=true;}
+     if(hash && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash) && details.querySelector('#'+CSS.escape(hash))){
+      details.open=true;
+      // Follow first-party decade links into the open archive.
+      if(theme==='indie' && hash==='archive' && new URL(location.href).searchParams.has('archiveYear')){
+       requestAnimationFrame(()=>details.querySelector('#archive')?.scrollIntoView({block:'start'}));
+      }
+     }
     };
     window.addEventListener('hashchange',reveal);
     document.addEventListener('click',event=>{
@@ -383,11 +734,12 @@
    }
   }
 
+  main.dataset.frV5Ready='true';
   await Promise.allSettled(jobs);
  }
  // Keep editorial-spotlight.mjs as the carousel owner: place our page sections
  // only after its async insertion; preserve the original accessible catalogue.
- if(theme==='home'||theme==='cinema'){build();return;}
+ if(theme==='home'||theme==='cinema'||theme==='news'){build();return;}
  if(main.querySelector('.editorial-carousel')){build();return;}
  const observer=new MutationObserver(()=>{
   if(main.querySelector('.editorial-carousel')){

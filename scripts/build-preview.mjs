@@ -1,5 +1,6 @@
 // Staging-only build: publish public website assets, never repository or Worker files.
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { useLocalFonts } from './use-local-fonts.mjs';
 
 const root = new URL('../', import.meta.url);
 const destination = new URL('../dist/', import.meta.url);
@@ -7,9 +8,9 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const publicFiles = [
-  'index.html', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
-  'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'cinema-diary.js', 'straight-to-stream.js', 'streaming-watch.js', 'horror-archive.js', 'archive-film.js',
-  'styles.css', 'hub.css', 'cinematic-redesign.css', 'homepage-concept.css', 'v5-magazine.css', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'sitemap.xml'
+  'index.html', 'frightnews.html', 'frightnews.js', 'frightnews.css', 'movies.html', 'cinema.html', 'contact.html', 'contact.js', 'podcasts.js', 'credits.html', 'privacy.html', 'all-horror-movies.html', 'archive-film.html', 'tv-shows.html', 'indie-movies.html', 'podcasts.html', 'games.html', 'film.html',
+  'media.html', 'media-ui.js', 'embed-consent.js', 'catalogue.js', 'media-detail.js', 'app.js', 'discovery.js', 'home-discovery.js', 'home-cinema-note.js', 'homepage-features.js', 'dynamic-film.js', 'top20.js', 'hub.js', 'release-calendar.js', 'release-brief.js', 'horror-radar.js', 'horror-radar.css', 'cinema-diary.js', 'cinema-concept.js', 'straight-to-stream.js', 'streaming-watch.js', 'horror-archive.js', 'archive-film.js',
+  'styles.css', 'hub.css', 'cinematic-redesign.css', 'v5-magazine.css', 'fr-design-system.css', 'fr-page-themes.css', 'fr-rating-badge.css', 'fr-rating-badge.js', 'fr-first-paint.css', 'fr-premium.css', 'fr-polish.css', 'indie-phase3.css', 'fr-inner.css', 'fr-ambient.js', 'v5-magazine.js', 'editorial-spotlight.css', 'editorial-spotlight.mjs', 'editorial-bootstrap.js', 'sitemap.xml'
 ];
 for (const file of publicFiles) {
   await cp(new URL(file, root), new URL(file, destination));
@@ -19,12 +20,15 @@ for (const directory of ['assets', 'films', 'top-20']) {
 }
 await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
+await cp(new URL('data/horror-radar.json', root), new URL('data/horror-radar.json', destination));
 await cp(new URL('data/editorial-releases.json', root), new URL('data/editorial-releases.json', destination));
 await cp(new URL('data/editorial.json', root), new URL('data/editorial.json', destination));
+await cp(new URL('data/homepage-features.json', root), new URL('data/homepage-features.json', destination));
 await cp(new URL('data/editorial-spotlight-overrides.json', root), new URL('data/editorial-spotlight-overrides.json', destination));
 await cp(new URL('data/movie-editorial-overviews.json', root), new URL('data/movie-editorial-overviews.json', destination));
 await cp(new URL('data/cinema-screenings.json', root), new URL('data/cinema-screenings.json', destination));
 await cp(new URL('data/streaming-discovery.json', root), new URL('data/streaming-discovery.json', destination));
+await cp(new URL('data/indie-archive.json', root), new URL('data/indie-archive.json', destination));
 await mkdir(new URL('data/archive/', destination), {recursive:true});
 await cp(new URL('data/archive/horror-films.json', root), new URL('data/archive/horror-films.json', destination));
 await cp(new URL('data/archive/profiles.json', root), new URL('data/archive/profiles.json', destination));
@@ -36,8 +40,14 @@ async function markHtmlNoIndex(directory) {
     if (entry.isDirectory()) {
       await markHtmlNoIndex(file);
     } else if (entry.name.endsWith('.html')) {
-      const html = await readFile(file, 'utf8');
+      let html = await readFile(file, 'utf8');
       if (!/<head(?:\s|>)/i.test(html)) throw new Error('HTML head missing in ' + file.href);
+      // Generated film/ranking pages can predate the current build: ensure
+      // supporting routes receive the same visual identity without modifying
+      // their source claims or accidentally overriding the seven V5 landings.
+      if (!/<body[^>]*class=["'][^"']*\bfr-v5\b/i.test(html) && !html.includes('href="/fr-inner.css"'))
+        html = html.replace('</head>', '<link rel="stylesheet" href="/fr-inner.css"></head>');
+      html = useLocalFonts(html);
       await writeFile(file, html.replace(/<head(\s[^>]*)?>/i,
         match => match + '<meta name="robots" content="noindex,nofollow,noarchive">'));
     }
@@ -51,8 +61,21 @@ const sharedHeaders = await readFile(new URL('_headers', root), 'utf8');
 if (!sharedHeaders.startsWith('/*')) throw new Error('Shared security headers are missing the Pages _headers rule');
 const previewHeaders = sharedHeaders.replace('  Cache-Control: no-cache, must-revalidate', '  Cache-Control: no-store');
 if (!previewHeaders.includes('Cache-Control: no-store')) throw new Error('Protected preview must use no-store');
+// HTML, API responses and private preview documents still do not cache.
+// Versioned JS/CSS and public decorative assets are safe for browser-private
+// caching, which avoids re-downloading the entire visual skin on every tap.
+// Cloudflare Access remains required; this is NOT an Access bypass.
+const safeBrowserCache=[
+  '/*.css',
+  '  Cache-Control: private, max-age=86400',
+  '/*.js',
+  '  Cache-Control: private, max-age=86400',
+  '/assets/*',
+  '  Cache-Control: private, max-age=86400'
+].join('\n');
 await writeFile(new URL('_headers', destination),
-  previewHeaders.replace('/*', '/*\n  X-Robots-Tag: noindex, nofollow, noarchive'));
+  previewHeaders.replace('/*', '/*\n  X-Robots-Tag: noindex, nofollow, noarchive')+
+  '\n\n'+safeBrowserCache+'\n');
 // Keep static pages free of Functions invocation charges.
 await writeFile(new URL('_routes.json', destination), JSON.stringify({
   version:1, include:['/api/*'], exclude:[]

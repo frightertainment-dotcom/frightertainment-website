@@ -1,13 +1,13 @@
 import { navigateLegacy,openCompleteDiscovery } from './helpers/open-full-discovery.mjs';
 import {test,expect} from '@playwright/test';
-const film = {tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,trailer:{key:'abcdefghijk',name:'Official trailer'}};
-const series = {...film,tmdbId:456,mediaType:'tv',title:'Haunted Series'};
+const film = {indieVerified:true,tmdbId:123,mediaType:'movie',title:'Independent Nightmare',posterPath:'/nightmare.jpg',overview:'A verified horror synopsis.',releaseDate:'2026-01-02',releaseLabel:'First release',voteAverage:7.8,voteCount:120,ratingKind:'tmdb-community',sourceUrl:'https://www.themoviedb.org/movie/123',trailer:{key:'abcdefghijk',name:'Official trailer'}};
+const series = {...film,tmdbId:456,mediaType:'tv',title:'Haunted Series',sourceUrl:'https://www.themoviedb.org/tv/456'};
 test('indie charts and paged archive use TMDB metadata and year changes',async({page})=>{
  await page.route('**/api/catalogue?**',route=>{const query=new URL(route.request().url()).searchParams;route.fulfill({json:{items:[film],page:Number(query.get('page')),totalPages:query.get('mode')==='archive'?2:1,totalResults:2,status:'ready'}});});
  await navigateLegacy(page,'/indie-movies.html');
  await expect(page.locator('#chart .fr-media-card')).toHaveCount(1);
  await expect(page.locator('#chart')).toContainText('7.8');
- await expect(page.locator('#chart img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
+ await expect(page.locator('#chart .tmdb-card-poster')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
  await expect(page.locator('#chart [data-trailer-video]')).toHaveAttribute('data-trailer-video','abcdefghijk');
  const changed=page.waitForRequest(req=>req.url().includes('/api/catalogue?')&&req.url().includes('year=2025')&&req.url().includes('mode=chart'));
  await page.locator('#chart select').selectOption('2025');await changed;
@@ -22,8 +22,8 @@ test('TV sections and internal detail render series metadata without Fright Rati
  for(const section of ['chart','trending','upcoming','archive'])await expect(page.locator('#'+section+' .fr-media-card')).toHaveCount(1);
  await page.locator('#chart h3 a').click();
  await expect(page.locator('#media-detail h1')).toHaveText('Haunted Series');
- await expect(page.locator('#media-detail img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
- await expect(page.locator('#media-detail')).toContainText('120 viewer votes');
+ await expect(page.locator('#media-detail .fr-media-detail__poster img')).toHaveAttribute('src','https://image.tmdb.org/t/p/w500/nightmare.jpg');
+ await expect(page.locator('#media-detail .fr-rating-badge')).toHaveAttribute('aria-label',/TMDB audience rating 7\.8 out of 10 from 120 votes/);
  await expect(page.locator('#media-detail')).not.toContainText('FRIGHT RATING');
 });
 
@@ -73,7 +73,7 @@ test('375px catalogue layouts keep posters, readable long titles and all feature
 });
 
 test('indie chart continues past studio-heavy pages, deduplicates and stops at 20',async({page})=>{
- const candidates=Array.from({length:20},(_,index)=>({...film,tmdbId:index+1,title:'Independent Film '+(index+1),voteAverage:9-index/10}));
+ const candidates=Array.from({length:20},(_,index)=>({...film,indieVerified:true,tmdbId:index+1,title:'Independent Film '+(index+1),voteAverage:9-index/10}));
  const requested=[];
  await page.route('**/api/catalogue?**',route=>{
   const query=new URL(route.request().url()).searchParams;
@@ -87,4 +87,24 @@ test('indie chart continues past studio-heavy pages, deduplicates and stops at 2
  expect(requested).toEqual([1,3]);
  await expect(page.locator('#chart h3').first()).toHaveText('Independent Film 1');
  await expect(page.locator('#chart .fr-catalogue-status')).toContainText('20 films');
+});
+
+test('indie rejects unverified studio and franchise listings in both catalogue and premium rack',async({page})=>{
+  const mixed=[
+    {...film,tmdbId:5001,title:'Halloween',indieVerified:false},
+    {...film,tmdbId:5002,title:'Insidious: Chapter 2',indieVerified:false},
+    {...film,tmdbId:5003,title:'Deadstream',indieVerified:true}
+  ];
+  await page.route('**/api/catalogue?**',route=>{
+    const type=new URL(route.request().url()).searchParams.get('type');
+    return route.fulfill({json:{items:type==='indie'?mixed:[],page:1,totalPages:1,status:'ready'}});
+  });
+  await navigateLegacy(page,'/indie-movies.html');
+  await expect(page.locator('#chart .fr-media-card')).toHaveCount(1);
+  await expect(page.locator('#chart .fr-media-card h3')).toHaveText('Deadstream');
+  // Premium rack intentionally fills the sourced 12-film indie shelf; it is not a
+  // mirror of the API's one-item chart fixture.
+  await expect(page.locator('.fr-v5-rack .fr-v5-poster-card')).toHaveCount(12);
+  await expect(page.locator('main')).not.toContainText('Insidious: Chapter 2');
+  await expect(page.locator('main')).not.toContainText('Halloween');
 });

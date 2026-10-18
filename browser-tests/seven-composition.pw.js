@@ -1,0 +1,241 @@
+import { test, expect } from '@playwright/test';
+
+test('Movies masthead keeps its wordmark, eyebrow and final route visible at 320 and 980 pixels', async ({ page }) => {
+  await page.route('https://fonts.googleapis.com/**', route => route.abort());
+  for (const width of [320, 980]) {
+    await page.setViewportSize({ width, height: 850 });
+    await page.goto('/movies.html');
+    await expect(page.locator('.hub-page-wordmark')).toBeVisible();
+    const measure = () => page.evaluate(() => {
+      const intro = document.querySelector('.hub-page-intro').getBoundingClientRect();
+      const header = document.querySelector('.hub-header').getBoundingClientRect();
+      const targets = [document.querySelector('.hub-page-intro .hub-eyebrow'),
+        document.querySelector('.hub-page-wordmark')];
+      const jumps = [...document.querySelectorAll('.fr-movies-jumps a')];
+      return { intro, header, children: targets.map(node => node.getBoundingClientRect()),
+        jumps: jumps.map(node => node.getBoundingClientRect()),
+        scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth };
+    });
+    for (const state of [await measure(), await (async () => { await page.waitForTimeout(1100); return measure(); })()]) {
+      expect(state.intro.top).toBeGreaterThanOrEqual(state.header.bottom - 1);
+      expect(state.children.length).toBe(2);
+      expect(state.jumps.length).toBe(3);
+      for (const child of state.children) {
+        expect(child.left).toBeGreaterThanOrEqual(state.intro.left - 1);
+        expect(child.right).toBeLessThanOrEqual(state.intro.right + 1);
+        expect(child.top).toBeGreaterThanOrEqual(state.intro.top - 1);
+        expect(child.bottom).toBeLessThanOrEqual(state.intro.bottom + 1);
+      }
+      for (const jump of state.jumps) {
+        expect(jump.left).toBeGreaterThanOrEqual(state.intro.left - 1);
+        expect(jump.right).toBeLessThanOrEqual(state.intro.right + 1);
+        expect(jump.top).toBeGreaterThanOrEqual(state.intro.bottom - 1);
+      }
+      expect(state.scrollWidth).toBeLessThanOrEqual(state.viewport + 2);
+    }
+  }
+});
+
+test('Indie synopsis and portrait, and Podcasts synopsis and square cover, fit at intermediate widths', async ({ page }) => {
+  for (const [route, shape] of [['/indie-movies.html', 1.5], ['/podcasts.html', 1]]) {
+    for (const width of [768, 980]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(route);
+      await expect(page.locator('.editorial-pick__synopsis')).toBeVisible();
+      const result = await page.evaluate(() => {
+        const host = document.querySelector('.editorial-pick').getBoundingClientRect();
+        const art = document.querySelector('.editorial-pick__art-frame').getBoundingClientRect();
+        const synopsis = document.querySelector('.editorial-pick__synopsis');
+        const links = document.querySelector('.editorial-pick__links').getBoundingClientRect();
+        return { host, art, synopsisHeight: synopsis.clientHeight,
+          synopsisLine: parseFloat(getComputedStyle(synopsis).lineHeight), links,
+          scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth };
+      });
+      expect(result.synopsisHeight).toBeGreaterThanOrEqual(result.synopsisLine - 1);
+      expect(result.art.height / result.art.width).toBeGreaterThan(shape - .08);
+      expect(result.art.height / result.art.width).toBeLessThan(shape + .08);
+      expect(result.art.bottom).toBeLessThanOrEqual(result.host.bottom + 1);
+      expect(result.links.bottom).toBeLessThanOrEqual(result.host.bottom + 1);
+      expect(result.links.left).toBeGreaterThanOrEqual(result.host.left - 1);
+      expect(result.scrollWidth).toBeLessThanOrEqual(result.viewport + 2);
+    }
+  }
+});
+
+test('Five TMDB fixture rankings form one readable Home group without an inner scroller', async ({ page }) => {
+  const items = Array.from({ length: 5 }, (_, i) => ({ filmId: `tmdb-${1700001 + i}`,
+    tmdbId: 1700001 + i, title: `An Extended Horror Film Title ${i + 1}`,
+    position: i + 1, averageScore: 86 - i * 2, voteCount: 80 + i * 30 }));
+  await page.route('**/api/rankings?year=*', route => route.fulfill({ json: {
+    status: 'ranked', ratingKind: 'tmdb-community', items,
+    updatedAt: '2026-10-12T09:00:00Z' } }));
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    await expect(page.locator('#hub-ranking .hub-chart-row')).toHaveCount(5);
+    const state = await page.evaluate(() => {
+      const chart = document.querySelector('.hub-charts').getBoundingClientRect();
+      const list = document.querySelector('#hub-ranking');
+      const rows = [...list.querySelectorAll('.hub-chart-row')].map(node => node.getBoundingClientRect());
+      const link = document.querySelector('.hub-charts__all').getBoundingClientRect();
+      return { chart, rows, link, scrollHeight: list.scrollHeight, clientHeight: list.clientHeight,
+        scrollWidth: document.documentElement.scrollWidth, viewport: innerWidth };
+    });
+    expect(state.scrollHeight).toBeLessThanOrEqual(state.clientHeight + 1);
+    for (let i = 1; i < state.rows.length; i++) expect(state.rows[i].top).toBeGreaterThanOrEqual(state.rows[i - 1].bottom - 1);
+    expect(state.link.top).toBeGreaterThanOrEqual(state.rows.at(-1).bottom - 1);
+    expect(state.link.bottom).toBeLessThanOrEqual(state.chart.bottom + 1);
+    expect(state.scrollWidth).toBeLessThanOrEqual(state.viewport + 2);
+  }
+});
+
+test('Game fallback artwork keeps its title clear of the credit at mobile, tablet and desktop widths', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [320, 390, 701, 768, 800, 980, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/games.html');
+    const dots = page.locator('.editorial-carousel__dot');
+    await expect(dots).toHaveCount(5);
+    for (let index = 0; index < 5; index++) {
+      const dot = dots.nth(index);
+      await dot.click();
+      const title = await page.locator('.editorial-pick__art-title').first().textContent();
+      expect(await dot.getAttribute('aria-label')).toContain(title);
+      const state = await page.locator('.editorial-pick__art-frame').first().evaluate(frame => {
+        const artTitle = frame.querySelector('.editorial-pick__art-title');
+        const credit = frame.querySelector('.editorial-pick__art-sub');
+        const eyebrow = frame.querySelector('.editorial-pick__art-eyebrow');
+        return { frame: frame.getBoundingClientRect(), eyebrow: eyebrow.getBoundingClientRect(), title: artTitle.getBoundingClientRect(),
+          credit: credit.getBoundingClientRect(), lineHeight: parseFloat(getComputedStyle(artTitle).lineHeight) };
+      });
+      const context = `${width}px, slide ${index + 1}, ${title}`;
+      expect(state.eyebrow.top, context).toBeGreaterThanOrEqual(state.frame.top);
+      expect(state.eyebrow.bottom, context).toBeLessThanOrEqual(state.title.top);
+      expect(state.title.height, context).toBeGreaterThanOrEqual(state.lineHeight - 1);
+      expect(state.title.top, context).toBeGreaterThanOrEqual(state.frame.top);
+      expect(state.title.bottom, context).toBeLessThanOrEqual(state.credit.top);
+      expect(state.credit.bottom, context).toBeLessThanOrEqual(state.frame.bottom);
+    }
+  }
+});
+
+test('TV editorial source artwork titles remain within their mobile frames', async ({ page }) => {
+  await page.route('**/data/editorial-spotlight-overrides.json', route => route.fulfill({ json: {
+    schemaVersion: 1, overrides: { tv: { id: 'tv-shows-expanded-6', approved: true,
+      starts: '2026-01-01', ends: '2027-01-01' } }, notes: {}
+  } }));
+  await page.route('**/api/media?**', route => route.fulfill({ status: 503 }));
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/tv-shows.html');
+    await expect(page.locator('.editorial-pick')).toHaveAttribute('data-feature-id', /^tv-shows-(?:expanded-)?\d+$/);
+    const state = await page.locator('.editorial-pick__art-title').evaluate(title => {
+      const text = title.firstChild;
+      const tops = new Set();
+      for (let index = 0; index < text.length; index++) {
+        const range = document.createRange();
+        range.setStart(text, index);
+        range.setEnd(text, index + 1);
+        tops.add(Math.round(range.getBoundingClientRect().top));
+      }
+      const frame = title.closest('.editorial-pick__art-frame').getBoundingClientRect();
+      return { text: title.textContent, lines: tops.size,
+        titleRect: title.getBoundingClientRect(), frame };
+    });
+    expect(state.text.length).toBeGreaterThan(2);
+    expect(state.lines, `${width}px`).toBeGreaterThanOrEqual(1);
+    expect(state.titleRect.left, `${width}px`).toBeGreaterThanOrEqual(state.frame.left);
+    expect(state.titleRect.right, `${width}px`).toBeLessThanOrEqual(state.frame.right);
+  }
+});
+
+test('Unavailable film and series shelves use compact full-width messages', async ({ page }) => {
+  await page.route('**/api/catalogue?**', route => route.fulfill({ status: 503, body: 'Unavailable' }));
+  for (const route of ['/movies.html', '/tv-shows.html', '/indie-movies.html']) {
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(route);
+      const shelf = page.locator('.fr-v5-poster-grid').first();
+      const message = shelf.locator('.fr-v5-empty').first();
+      await expect(message).toBeVisible();
+      const state = await shelf.evaluate(node => ({
+        parent: node.getBoundingClientRect(), child: node.querySelector('.fr-v5-empty').getBoundingClientRect()
+      }));
+      expect(state.child.width).toBeGreaterThan(state.parent.width * .8);
+      expect(state.parent.height).toBeLessThan(120);
+    }
+  }
+});
+
+test('Home lower discovery summaries keep their text and action in separate tracks', async ({ page }) => {
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    for (const selector of ['.fr-home-updates > summary', '.home-discovery-wrap__summary']) {
+      const state = await page.locator(selector).evaluate(summary => {
+        const [copy, action] = summary.children;
+        return { summary: summary.getBoundingClientRect(), copy: copy.getBoundingClientRect(),
+          action: action.getBoundingClientRect() };
+      });
+      if (width <= 380) expect(state.copy.bottom).toBeLessThanOrEqual(state.action.top + 1);
+      else expect(state.copy.right).toBeLessThanOrEqual(state.action.left + 1);
+      expect(state.action.right).toBeLessThanOrEqual(state.summary.right + 1);
+      expect(state.copy.bottom).toBeLessThanOrEqual(state.summary.bottom + 1);
+    }
+  }
+});
+
+test('Seven destination mastheads are text-led, without prefetched illustrated scenes', async ({ page }) => {
+  const routes = [['home', '/'], ['movies', '/movies.html'], ['tv', '/tv-shows.html'],
+    ['cinema', '/cinema.html'], ['indie', '/indie-movies.html'],
+    ['podcasts', '/podcasts.html'], ['games', '/games.html']];
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({width, height:900});
+    for (const [theme, route] of routes) {
+      await page.goto(route);
+      await expect(page.locator('body')).toHaveAttribute('data-theme', theme);
+      const state = await page.evaluate(() => {
+        const intro = document.querySelector('.hub-page-intro, .fr-home-intro');
+        return {
+          art: getComputedStyle(intro).backgroundImage,
+          scene: getComputedStyle(document.body).getPropertyValue('--fr-scene-current').trim(),
+          preloads: [...document.querySelectorAll('link[rel="preload"][as="image"]')]
+            .filter(n => n.href.includes('/assets/themes/')).length,
+          width:document.documentElement.scrollWidth, viewport:innerWidth
+        };
+      });
+      expect(state.art, route).not.toContain('/assets/themes/');
+      expect(state.scene, route).toBe('none');
+      expect(state.preloads, route).toBe(0);
+      expect(state.width, route).toBeLessThanOrEqual(state.viewport + 2);
+      await expect(page.locator('.hub-header .hub-brand img')).toBeVisible();
+    }
+  }
+});
+
+test('Podcast feed failure replaces its loading label while curated listening remains available', async ({ page }) => {
+  await page.route('**/api/podcasts', route => route.fulfill({ status: 503, body: 'Unavailable' }));
+  await page.goto('/podcasts.html');
+  await expect(page.locator('#podcast-chart-checked')).toContainText('Podcast list unavailable');
+  await expect(page.locator('#podcast-chart')).toContainText('temporarily unavailable');
+  await expect(page.locator('#podcast-chart-checked')).not.toContainText('Checking');
+  await expect(page.locator('.fr-v5-editorial-tile').first()).toBeVisible();
+});
+
+test('Ordinary editorial rotations keep a stable page-specific footprint at each breakpoint', async ({ page }) => {
+  test.setTimeout(180_000);
+  for (const width of [320, 390, 700, 701, 800, 801, 1024, 1100, 1101, 1440, 1920]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const route of ['/movies.html', '/tv-shows.html', '/indie-movies.html', '/podcasts.html', '/games.html']) {
+      await page.goto(route);
+      await expect(page.locator('.editorial-pick')).toBeVisible();
+      const count = await page.locator('.editorial-carousel__dot').count();
+      const heights = [];
+      for (let index = 0; index < count; index++) {
+        heights.push(await page.locator('.editorial-carousel__stage').evaluate(node => node.getBoundingClientRect().height));
+        if (index < count - 1) await page.getByRole('button', { name: 'Next editorial pick' }).click();
+      }
+      expect(Math.max(...heights) - Math.min(...heights), `${route} at ${width}px`).toBeLessThanOrEqual(2);
+    }
+  }
+});

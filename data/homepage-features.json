@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "weekOf": "2026-10-16",
+  "policy": "Friday homepage editorial recommendations are source-backed selections, not claims of streaming availability, audience trends, partnerships, rights or film showtimes. Rotate five editorial categories from verified candidates. The separate Cinema diary note reads date-safe UK entries from cinema-screenings.json. Never imply licence to reproduce a film poster.",
+  "features": {
+    "movie": {
+      "title": "Heretic",
+      "year": 2024,
+      "description": "Two missionaries enter a secluded house, where a conversation about faith becomes a terrifying test of belief.",
+      "href": "/films/heretic/",
+      "sourceUrl": "https://a24films.com/films/heretic",
+      "sourceName": "A24",
+      "checkedAt": "2026-10-16"
+    },
+    "tv": {
+      "title": "Marianne",
+      "year": 2019,
+      "description": "A horror novelist returns home to discover that the nightmare she wrote may have escaped her books.",
+      "href": "/tv-shows.html",
+      "sourceUrl": "https://www.netflix.com/gb/title/80217779",
+      "sourceName": "Netflix",
+      "checkedAt": "2026-10-16"
+    },
+    "indie": {
+      "title": "Rabbit Trap",
+      "year": 2025,
+      "description": "Mysterious sound recordings awaken an ancient presence in rural Wales.",
+      "href": "/indie-movies.html",
+      "sourceUrl": "https://brynchainey.com/rabbit-trap",
+      "sourceName": "Bryn Chainey, filmmaker",
+      "checkedAt": "2026-10-14"
+    },
+    "podcast": {
+      "title": "Old Gods of Appalachia",
+      "description": "A folk-horror audio anthology about ancient darkness beneath the Appalachian mountains.",
+      "href": "https://www.oldgodsofappalachia.com/",
+      "sourceUrl": "https://www.oldgodsofappalachia.com/",
+      "sourceName": "Official podcast site",
+      "checkedAt": "2026-10-16"
+    },
+    "games": {
+      "title": "Phasmophobia",
+      "description": "Investigate haunted locations, identify paranormal activity and escape with the evidence.",
+      "href": "https://www.kineticgames.co.uk/phasmophobia",
+      "sourceUrl": "https://www.kineticgames.co.uk/phasmophobia",
+      "sourceName": "Kinetic Games",
+      "checkedAt": "2026-10-16"
+    }
+  }
+}

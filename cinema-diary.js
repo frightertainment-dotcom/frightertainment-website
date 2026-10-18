@@ -13,11 +13,11 @@
  const sourceSafe=u=>{try{const a=new URL(u);return a.protocol==='https:'&&!a.username&&!a.password?a.href:null}catch{return null}};
  const validate=e=>e&&/^[a-z0-9-]+$/.test(e.id||'')&&typeof e.title==='string'&&
    /^\d{4}-\d{2}-\d{2}$/.test(e.date||'')&&Number.isInteger(e.filmYear)&&
-   ['new','re-release'].includes(e.edition)&&['general','limited'].includes(e.reach)&&
+   ['new','re-release'].includes(e.edition)&&['general','limited','unconfirmed'].includes(e.reach)&&
    ['studio','special','independent'].includes(e.tier)&&sourceSafe(e.sourceUrl);
  const countryNames={GB:'United Kingdom',US:'United States',CA:'Canada',AU:'Australia',IE:'Ireland'};
  function merge(source,tmdb,country='GB'){
-   const now=today(),out=[],known=new Set();
+   const now=today(),out=[],known=new Set(),knownPremieres=new Set();
    if(!Object.hasOwn(countryNames,country))return out;
    // The source ledger is specific to one territory; never reuse UK dates abroad.
    const curated=source?.schemaVersion===2
@@ -25,9 +25,10 @@
      : source?.schemaVersion===1&&source.territory===country ? source.screenings||[] : [];
    for(const e of curated){
      if(!validate(e)||e.date<now)continue;
-     const identity=month(e.date)+'|'+key(e.title);
+     const identity=e.date+'|'+key(e.title)+'|'+e.edition+'|'+key(e.venue);
      if(known.has(identity))continue;
      out.push({...e,country,verified:true});known.add(identity);
+     if(e.edition==='new')knownPremieres.add(month(e.date)+'|'+key(e.title));
    }
    for(const raw of tmdb||[]){
      const date=raw.theatricalDate;
@@ -39,8 +40,8 @@
      if(!/^\d{4}-\d{2}-\d{2}$/.test(raw.firstReleaseDate||'')||
        raw.firstReleaseDate<now||raw.cinemaReissue===true||raw.hasPriorLocalCinemaRelease===true)continue;
      const identity=month(date)+'|'+key(raw.title);
-     if(known.has(identity))continue;
-     known.add(identity);
+     if(knownPremieres.has(identity))continue;
+     knownPremieres.add(identity);
      out.push({...raw,date,country,edition:'new',verified:false,
        reach:raw.cinemaReleaseType===2?'limited':'general',
        tier:'unverified',majorProduction:raw.majorProduction===true});
@@ -72,7 +73,8 @@
      const date=el('span','fr-cinema-diary__date',pretty(row.date));
      const label=el('div','fr-cinema-flags');
      label.append(el('span','fr-cinema-pill',row.edition==='re-release'?'RE-RELEASE SCREENINGS':'NEW CINEMA RELEASE'));
-     label.append(el('span','fr-cinema-pill fr-cinema-pill--reach',row.reach==='limited'?'LIMITED CINEMAS':'GENERAL RELEASE · VENUES VARY'));
+     label.append(el('span','fr-cinema-pill fr-cinema-pill--reach',row.reach==='limited'?'LIMITED CINEMAS':row.reach==='unconfirmed'?'VENUES NOT YET CONFIRMED':'GENERAL RELEASE · VENUES VARY'));
+     if(row.dateConfidence==='disputed'||row.dateConfidence==='provisional')label.append(el('span','fr-cinema-pill fr-cinema-pill--unverified',row.dateConfidence==='provisional'?'PROVISIONAL RELEASE · CHECK VENUES':'UK RELEASE DATE DISPUTED · CHECK VENUE'));
      const credits=el('p','fr-cinema-diary__credit',row.distributor||(countryNames[country]||'Regional')+' release listing');
      const note=el('p','fr-cinema-diary__note',row.note||'Check the screening source for confirmed venues.');
      const sourceLink=el('a','fr-cinema-diary__source','VIEW VERIFIED SCREENING SOURCE ↗');

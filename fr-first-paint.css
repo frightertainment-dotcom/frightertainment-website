@@ -1,0 +1,12 @@
+/* Frightertainment V5 / render-blocking first-paint contract.
+   Served as a normal same-origin stylesheet so the production CSP permits it.
+   Never hide the approved Home dashboard or the Cinema release programme. */
+body.fr-v5.hub-section:not([data-theme="cinema"])
+main:not([data-fr-v5-ready="true"]) >
+:not(.hub-page-intro):not(.editorial-carousel):not(.fr-v5-front):not(script) {
+  display:none!important;
+}
+body.fr-v5.hub-section:not([data-theme="cinema"])
+main:not([data-fr-v5-ready="true"]) .fr-v5-front {
+  visibility:hidden!important;
+}

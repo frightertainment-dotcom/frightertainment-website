@@ -107,7 +107,7 @@ for (const page of ['movies.html','tv-shows.html','indie-movies.html','podcasts.
 }
 for (const [page, theme] of Object.entries({
   'index.html':'home','movies.html':'movies','all-horror-movies.html':'movies','archive-film.html':'movies',
-  'film.html':'movies','tv-shows.html':'tv','indie-movies.html':'indie','podcasts.html':'podcasts','games.html':'games','cinema.html':'movies','contact.html':'home'
+  'film.html':'movies','tv-shows.html':'tv','indie-movies.html':'indie','podcasts.html':'podcasts','games.html':'games','cinema.html':'cinema','contact.html':'home'
 })) {
   const markup = await readFile(new URL(page, root), 'utf8');
   if (!markup.includes(`data-theme="${theme}"`)) errors.push(`${page} is missing its ${theme} theme token`);
