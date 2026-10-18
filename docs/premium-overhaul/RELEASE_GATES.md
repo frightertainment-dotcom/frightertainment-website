@@ -4,7 +4,7 @@ The current public Pages project is `frightertainment-live`. API inspection on 1
 
 | Gate | Current state |
 | --- | --- |
-| Protected preview | Preview project, repo, branch allowlist, Access wildcard app and separate staging D1 binding verified by Cloudflare API. Authenticated rendered state, exact V2 deploy ID and served SHA are pending. |
+| Protected preview | Preview project, repo, branch allowlist, Access wildcard app and separate staging D1 binding verified by Cloudflare API. Deployment `b0ae123c-ad7c-4243-93ff-82297d88fdc5` succeeded for `c18f52b2da00f94d0f1d0fd8c47046f8649dffd6` at `https://b0ae123c.frightertainment-private-preview.pages.dev`. The cloud HTTP CONNECT tunnel returns 403 before Access, so the hosted served bytes, rendered state, font/poster/API loading and interactions are unverified. |
 | Local release artifact | `build:production` and `check:published` passed for 45 HTML files; these commands only wrote `dist/` in the cloud workspace. Worker dry run and full dependency audit passed. The production artifact was never uploaded. |
 | Data isolation | Preview `DB` is staging and live `DB` is production, with distinct IDs verified. Local captures read static files only. No remote schema migration or catalogue write was run. Any future preview write test must prove it targets disposable/approved staging data. |
 | Rights | Original brand and title artwork preserved. No new third-party poster/image copied into the repo. Existing TMDB token is masked server-side; non-commercial flag presence is not a blanket commercial poster or redistribution licence. Podcast/game cover rights and 276 external link destinations require review. |
