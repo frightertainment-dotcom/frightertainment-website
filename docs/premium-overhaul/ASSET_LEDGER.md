@@ -1,0 +1,17 @@
+# Asset and rights ledger — initial V2 source audit
+
+Machine-readable repository counts and year groups: [media-coverage.json](media-coverage.json), regenerated with `node scripts/measure-v2-coverage.mjs`. This counts repository fields, **not** correct rendered artwork on the protected preview.
+
+| Asset / pipeline | Origin and current permission evidence | Use, size and next check |
+| --- | --- | --- |
+| `assets/frightertainment-brand.png` | Original supplied Gothic brand image; tracked unchanged from the baseline commit. SHA-256 `9fb8c9c03a556f0ea90daad35b8f16a2cf46d3d6949fc0d087ceaa3587cb98d4`. | Header/Home mark, 346,593 B. Preserve lettering and geometry; test loaded and fallback widths. |
+| `assets/frightertainment-f.png` | Existing first-party brand monogram; SHA-256 `2e58d5196e704e3141fa1714e38038ed39e50818f20f9139bdaf8e56f158dd17`. | New neutral editorial title card on Movies and shared carousel when an official poster is missing; 38,095 B. Decorative `alt=""`, containing card labels identity and lack of official poster. No film rights implied. |
+| `assets/page-title-*.png` | Existing approved section-title artwork, preserved. | Seven route headings. Inspect responsive intrinsic size and long-title interactions; do not regenerate. |
+| `assets/fonts/*.woff2` | Repository contains Barlow Condensed, Cormorant Garamond and DM Sans subset files and their SIL OFL texts. | Local font stylesheet exists but the seven pages still request Google Fonts; those external requests failed in cloud Chromium due tunnel policy. Font licensing/weight subset and rendered load/CLS need a dedicated pass. |
+| `assets/themes/*`, `assets/worlds/*` | Existing first-party scene assets documented in older art notes. Their synthetic/rights and actual visual role require individual review. | V2 first slice does not represent them as official film art. No new third-party images were downloaded or copied. |
+| Film/TV runtime posters | Exact-ID media resolver and server-side TMDB binding exist; preview configuration has `TMDB_READ_ACCESS_TOKEN` as `secret_text` by name only. | Local static capture cannot invoke Pages Functions. Verify exact film/TV match, sizing, attribution, commercial scope and hosted load before calling coverage complete. No token was read or logged. |
+| Podcast/game artwork | Existing editorial lists have 9 podcast and 9 game records, with **0 direct artwork URLs** in those records; 8 game records have official Steam widget IDs. | Creator-feed/official-store art permissions and rendered square/cover media remain unverified. A widget is not a verified cover image. |
+
+The 24 manual `data/movies.js` records have **0 directly permission-documented poster fields**. The 86 indie archive records also have 0 such fields. The 9,772-record broad archive has source QIDs; 900 currently have enriched profiles. No assertion about whole-site poster coverage can be made from this source census. Next media pass must record source ID, source URL, owner/credit, use conditions, checked date, dimensions, bytes, responsive variants and actual preview image load per title/year. If rights are missing, keep a neutral title card and record the gap.
+
+Total new evidence in `docs/premium-overhaul/evidence/` is capped at roughly 5 MiB for this slice. Keep representative final images and actionable failures; avoid repeated full build archives or thousands of screenshots in Git.
