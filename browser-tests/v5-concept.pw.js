@@ -37,7 +37,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
     hero:loc('.editorial-carousel').top,
     rack:loc('.fr-v5-rack').top,
     lower:loc('.fr-v5-secondary-panels').top,
-    artBottom:art.bottom,textTop:text.top,artRight:art.right,textLeft:text.left,
+    artTop:art.top,artBottom:art.bottom,textTop:text.top,textBottom:text.bottom,artRight:art.right,textLeft:text.left,
     pageWidth:document.documentElement.scrollWidth,
     viewport:innerWidth,
     legacyOpen:document.querySelector('.fr-v5-deeper').open
@@ -48,7 +48,7 @@ test('V5 Indie mobile follows the approved editorial panel order and real catalo
  expect(visual.lower).toBeGreaterThan(visual.rack);
  // Premium editorial allows side-by-side poster and text, or a stacked
  // composition where neither track covers the other at narrow widths.
- expect(visual.artBottom<=visual.textTop+4 || visual.artRight<=visual.textLeft+4).toBe(true);
+ expect(visual.artBottom<=visual.textTop+4 || visual.textBottom<=visual.artTop+4 || visual.artRight<=visual.textLeft+4).toBe(true);
  expect(visual.pageWidth).toBeLessThanOrEqual(visual.viewport+2);
  expect(visual.legacyOpen).toBe(false);
 
@@ -581,7 +581,7 @@ test('cinematic surfaces are borderless but remain structured and keyboard navig
       art:getComputedStyle(x,'::before').backgroundImage
     })));
     expect(tiles).toHaveLength(4);
-    await expect(page.locator('.fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
+    await expect(page.locator('.fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html#upcoming-cinema');
     expect(tiles.every(x=>x.border==='0px')).toBe(true);
     expect(tiles.every(x=>!x.art.includes('assets/'))).toBe(true);
    }
@@ -645,7 +645,7 @@ test('TV editorial requests title and original air year and displays exact match
  expect(queries.some(q=>q.type==='tv'&&q.title&&/^20[0-2][0-9]$/.test(q.year))).toBe(true);
 });
 
-test('Friday homepage features show all six source-backed selections, with no stale TV or game headline',async({page})=>{
+test('Friday homepage features keep five source-backed selections beside the date-safe cinema diary',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/');
  const expected=[
@@ -653,8 +653,7 @@ test('Friday homepage features show all six source-backed selections, with no st
   ['.hub-tv','MARIANNE'],
   ['.hub-indie','RABBIT TRAP'],
   ['.hub-podcast','OLD GODS OF APPALACHIA'],
-  ['.hub-games','PHASMOPHOBIA'],
-  ['.hub-cinema','CLAYFACE']
+  ['.hub-games','PHASMOPHOBIA']
  ];
  for(const [selector,title] of expected){
   await expect(page.locator(selector+' h3')).toHaveText(title);
@@ -663,5 +662,6 @@ test('Friday homepage features show all six source-backed selections, with no st
  const feed=await page.request.get('/data/homepage-features.json');
  expect(feed.ok()).toBe(true);
  const payload=await feed.json();
- expect(Object.keys(payload.features).sort()).toEqual(['cinema','games','indie','movie','podcast','tv']);
+ expect(Object.keys(payload.features).sort()).toEqual(['games','indie','movie','podcast','tv']);
+ await expect(page.locator('.fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html#upcoming-cinema');
 });

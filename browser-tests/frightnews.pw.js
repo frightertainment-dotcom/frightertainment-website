@@ -28,7 +28,7 @@ for (const width of [320,390,1280]) {
     await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
     await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
     await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(4);
-    await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
+    await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html#upcoming-cinema');
     await expect(page.locator('#latest-horror')).toBeAttached();
     await expect(page.locator('#live-discovery')).toBeAttached();
     const layout = await rail.locator('.frightnews__row').first().evaluate(row => {

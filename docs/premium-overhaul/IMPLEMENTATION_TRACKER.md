@@ -4,11 +4,11 @@ Allowed states: `NOT_STARTED`, `IN_PROGRESS`, `IMPLEMENTED_UNVERIFIED`, `VERIFIE
 
 | Surface | State | Work now / exact remaining verification |
 | --- | --- | --- |
-| Home | IN_PROGRESS | Film/chart before news; four supporting picks and compact Cinema diary; chart pending state exposes verified film links, including an empty TMDB response. Local 320/1440 captures and browser contracts. Still needs authenticated preview, genuine data, all widths, accessibility/performance and media review. |
+| Home | IN_PROGRESS | Film/chart before news; four supporting picks and a compact Cinema diary drawn from the date-safe, source-checked UK ledger. The five other editorial picks no longer overwrite Cinema from a static weekly file. Chart pending state exposes verified film links. Local 320/1440 captures and browser contracts. Still needs authenticated preview, genuine ranking data, accessibility/performance and media review. |
 | Movies | IN_PROGRESS | Compact masthead, visible film title at 320, uncut synopsis, neutral fallback, responsive rearrangement fix and truthful generated film-file title cards. Still needs full archive journeys, posters, charts, all widths, hosted API and no-JS review. |
-| TV Shows | NOT_STARTED | Existing route audited visually at 320/1440. Dedicated series art/data and responsive pass required. |
-| Cinema | NOT_STARTED | Existing route and seven-nav identity audited locally. Dedicated UK/territory/date/calendar pass required. Home's new Clayface diary note has a 23 October 2026 date; replace its static selection with source-driven expiry before that date passes. |
-| Indie Movies | NOT_STARTED | Existing route and 86-record source count audited. Dedicated archive/media/layout pass required. |
+| TV Shows | IN_PROGRESS | Shorter series masthead, cold transmission palette and type-first editorial composition when official poster art is unavailable. At 320, the sourced series title ends at y=446, ahead of the dock at y=665; archive link opens the existing complete-discovery controls. Four local widths captured. Exact series art, broader catalogue, details and hosted review remain. |
+| Cinema | IN_PROGRESS | Home's static Clayface note is replaced by a date-safe, month/priority-matched UK selection from `cinema-screenings.json`, with an evergreen no-JS/upstream-failure state. The Cinema route itself still needs a dedicated date/calendar, visual, territory and borderless pass. |
+| Indie Movies | IN_PROGRESS | Shorter festival masthead, warm print palette, type-first sourced film content and an honest “viewer chart” label. At 320, Buddy ends at y=412 ahead of the dock at y=665; archive jump opens preserved controls. Duplicate source year removed. The 86-record archive, rights/media and hosted journeys need deeper work. |
 | Podcasts | NOT_STARTED | Existing route and 9-record editorial subset audited. Creator-feed cover and listening-link audit required. |
 | Games | NOT_STARTED | Existing route and 9-record subset audited. Cover/screenshot/developer/platform audit required. |
 | Supporting routes, details, search, charts, 404 | IN_PROGRESS | Route inventory and local link check complete; no custom 404 found. Chart integrity, historical years, media detail and error states remain. |
@@ -18,6 +18,6 @@ Allowed states: `NOT_STARTED`, `IN_PROGRESS`, `IMPLEMENTED_UNVERIFIED`, `VERIFIE
 
 ## Work queue
 
-1. Get an authorised browser path to deployment `b0ae123c-ad7c-4243-93ff-82297d88fdc5` and inspect served SHA, all seven routes, fonts, posters, APIs and controls; record true hosted screenshots and console/network results. The local Chromium suite is 243/243, not a substitute.
-2. Replace Home's static 23 October 2026 Cinema note with a source-driven/expiry-safe choice, then make dedicated TV and Indie passes, followed by Podcasts/Games and Cinema supporting routes. Re-run neighbouring pages after each pass.
+1. Use the owner's existing authenticated **Local browser session** for the newest protected-preview deployment. Verify served SHA, all seven routes, fonts, posters, APIs and controls; record true hosted screenshots and console/network results. This cloud task cannot reach the host through its CONNECT 403 tunnel. Local Chromium is not a substitute.
+2. Continue TV/Indie data/media/deep journeys; then make dedicated Podcasts, Games and Cinema passes and finish supporting routes. Re-run neighbouring pages after each pass. The Home Cinema note is now source-driven and expiry-safe; test it on the actual hosted bundle.
 3. Perform resumable whole-catalogue/media backfill with the exact denominator in `COVERAGE_LEDGER.md`.

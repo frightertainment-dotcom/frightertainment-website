@@ -4,8 +4,8 @@
   'use strict';
   const root=document.querySelector('#home-showcase');
   if(!root)return;
-  const selector={movie:'.hub-feature',tv:'.hub-tv',indie:'.hub-indie',podcast:'.hub-podcast',games:'.hub-games',cinema:'.hub-cinema'};
-  const cta={movie:'EXPLORE FILM',tv:'EXPLORE SHOWS',indie:'EXPLORE FILM',podcast:'LISTEN TO PODCAST',games:'EXPLORE GAME',cinema:'CINEMA DETAILS'};
+  const selector={movie:'.hub-feature',tv:'.hub-tv',indie:'.hub-indie',podcast:'.hub-podcast',games:'.hub-games'};
+  const cta={movie:'EXPLORE FILM',tv:'EXPLORE SHOWS',indie:'EXPLORE FILM',podcast:'LISTEN TO PODCAST',games:'EXPLORE GAME'};
   const safeURL=value=>{
     if(typeof value!=='string')return '';
     if(/^\/(?!\/)[a-z0-9\/_?#=&.-]+$/i.test(value))return value;

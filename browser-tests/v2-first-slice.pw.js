@@ -10,7 +10,7 @@ test('Home gives the sourced feature and chart priority over news at 320px', asy
   ));
   expect(positions['home-showcase']).toBeLessThan(positions['frightnews-home-heading']);
   expect(await page.locator('#home-showcase .hub-showcase__bottom > .hub-tile').count()).toBe(4);
-  await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href', '/cinema.html');
+  await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href', '/cinema.html#upcoming-cinema');
   await page.getByRole('link', { name: /today's film pick/i }).click();
   await expect(page).toHaveURL(/#home-showcase$/);
   expect(await page.evaluate(() => document.body.scrollWidth)).toBe(320);

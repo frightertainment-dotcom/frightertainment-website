@@ -46,6 +46,38 @@ body.fr-v5.hub-section[data-theme='movies'] .hub-page-intro{
  margin-bottom:10px!important;
  background:radial-gradient(ellipse at 82% 45%,#7c354122,transparent 39%),linear-gradient(112deg,#1a0e15,#0d0d12 80%)!important;
 }
+body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro{
+ min-height:205px!important;padding-block:25px!important;margin-bottom:10px!important;
+}
+/* Series reads like a transmission; the independent film cut keeps the
+   archive's more tactile left-hand art track. Both use actual editorial data. */
+body.fr-v5.hub-section[data-theme='tv'] .hub-page-intro{
+ background:radial-gradient(ellipse at 85% 35%,#46565d25,transparent 40%),linear-gradient(115deg,#16151b,#0d0e12 80%)!important;
+}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick{
+ grid-template-columns:minmax(0,1fr) minmax(210px,31%)!important;
+ grid-template-areas:'copy art' 'facts art'!important;
+ background:radial-gradient(ellipse at 80% 40%,#39475022,transparent 42%),linear-gradient(115deg,#10151a,#0b0d12 78%)!important;
+}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ background:radial-gradient(ellipse at 50% 28%,#5362712b,transparent 60%),linear-gradient(165deg,#171c25,#0d1116 75%)!important;
+}
+body.fr-v5.hub-section[data-theme='indie'] .hub-page-intro{
+ background:radial-gradient(ellipse at 85% 35%,#80614824,transparent 40%),linear-gradient(112deg,#1b1415,#100e11 80%)!important;
+}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick{
+ grid-template-columns:minmax(185px,23%) minmax(0,1fr)!important;
+ background:radial-gradient(ellipse at 13% 60%,#77534021,transparent 43%),linear-gradient(110deg,#1b1416,#0c0d10 78%)!important;
+}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster){
+ background:radial-gradient(ellipse at 40% 32%,#8764482b,transparent 60%),linear-gradient(165deg,#281e1c,#111013 76%)!important;
+}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__art{grid-column:2!important;grid-row:1/3!important}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__content{grid-column:1!important;grid-row:1!important}
+body.fr-v5.hub-section[data-theme='tv'] .editorial-pick__facts{grid-column:1!important;grid-row:2!important}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__art{grid-column:1!important;grid-row:1/3!important}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__content{grid-column:2!important;grid-row:1!important}
+body.fr-v5.hub-section[data-theme='indie'] .editorial-pick__facts{grid-column:2!important;grid-row:2!important}
 body.fr-v5.hub-home .fr-home-intro__actions{margin-top:14px!important}
 body.fr-v5 .hub-page-intro>p,
 body.fr-v5.hub-home .fr-home-intro p:not(.fr-home-intro__motto){
@@ -148,6 +180,7 @@ body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__content{
 body.fr-v5.hub-home .fr-home-cinema-note :is(.fr-home-category,h3,p,.hub-tile__link,.fr-home-cinema-note__diary){
  display:block!important; margin:0!important; min-width:0!important; max-width:none!important;
 }
+body.fr-v5.hub-home .fr-home-cinema-note__source[hidden]{display:none!important}
 body.fr-v5.hub-home .fr-home-cinema-note h3{font:600 clamp(20px,2vw,29px)/1.05 var(--fr-display)!important;color:#f0dfdd!important}
 body.fr-v5.hub-home .fr-home-cinema-note p{font:400 13px/1.4 var(--fr-ui)!important;color:#cbbdc0!important}
 body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__link{min-height:0!important;padding:0!important;white-space:nowrap!important}
@@ -203,6 +236,22 @@ body.fr-v5 :is(.hub-tabs a,.fr-v5-mobile-dock a,.fr-v5-explore__tile,a,button,su
   min-height:0!important;padding:19px 18px 14px!important;margin-bottom:8px!important;
  }
  body.fr-v5.hub-section[data-theme='movies'] .hub-page-intro>p{line-height:1.4!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro{
+  min-height:0!important;padding:18px 18px 15px!important;margin-bottom:8px!important;
+ }
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro .hub-page-wordmark{max-height:73px!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro>p{line-height:1.4!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .hub-page-intro .hub-section-jumps{margin-top:5px!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:'copy' 'art' 'facts'!important;
+  gap:17px!important;padding-top:42px!important;
+ }
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__art{min-height:0!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__art-frame{width:min(66vw,200px)!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__content{grid-column:1!important;grid-row:1!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__art{grid-column:1!important;grid-row:2!important}
+ body.fr-v5.hub-section:is([data-theme='tv'],[data-theme='indie']) .editorial-pick__facts{grid-column:1!important;grid-row:3!important}
  body.fr-v5.hub-home .hub-showcase__bottom{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  body.fr-v5.hub-home .fr-home-cinema-note .hub-tile__content{grid-template-columns:1fr auto!important}
  body.fr-v5.hub-home .fr-home-cinema-note .fr-home-category{grid-column:1/-1}

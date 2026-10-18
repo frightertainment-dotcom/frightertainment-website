@@ -273,7 +273,7 @@ test('mobile homepage keeps the featured film before the chart and supporting ca
     node.classList.contains('hub-charts') ? 'chart' :
     node.classList.contains('fr-home-cinema-note') ? 'cinema diary' : 'support'));
   expect(order).toEqual(['feature and watchlist', 'chart', 'support', 'cinema diary']);
-  await expect(page.locator('.hub-dashboard > .fr-home-cinema-note .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
+  await expect(page.locator('.hub-dashboard > .fr-home-cinema-note .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html#upcoming-cinema');
   const positions = await page.evaluate(() => Object.fromEntries([
     ['feature', '.hub-feature'], ['watchlist', '#my-watchlist'], ['chart', '.hub-charts'],
     ['support', '.hub-showcase__bottom']

@@ -7,7 +7,7 @@ test('Homepage is a compact cinematic dashboard on a phone, not a giant feed',as
  await expect(page.locator('#home-showcase .hub-feature')).toBeVisible();
  await expect(page.locator('#home-showcase .hub-charts')).toBeVisible();
  await expect(page.locator('#home-showcase .hub-showcase__bottom .hub-tile')).toHaveCount(4);
- await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html');
+ await expect(page.locator('#home-showcase .fr-home-cinema-note__diary')).toHaveAttribute('href','/cinema.html#upcoming-cinema');
  await expect(page.locator('link[href^="/fr-design-system.css"]')).toHaveCount(1);
  const sizes=await page.evaluate(()=>{
   const rect=selector=>document.querySelector(selector).getBoundingClientRect();

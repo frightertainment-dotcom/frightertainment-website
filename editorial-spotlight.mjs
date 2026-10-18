@@ -244,7 +244,10 @@ function createSpotlight(config, item, dayIndex, overridden, extraText = '') {
   content.append(eyebrow);
   content.append(make('span', 'editorial-pick__series', config.label));
   content.append(make('h2', 'editorial-pick__title', item.title));
-  content.append(make('div', 'editorial-pick__genre', [item.category, item.year].filter(Boolean).join(' · ')));
+  const category = String(item.category || '');
+  const sourceYear = String(item.year || '');
+  const year = /^\d{4}$/.test(sourceYear) && !category.split(/\D+/).includes(sourceYear) ? sourceYear : '';
+  content.append(make('div', 'editorial-pick__genre', [category, year].filter(Boolean).join(' · ')));
   content.append(make('p', 'editorial-pick__synopsis', item.description));
   if (extraText) content.append(make('p', 'editorial-pick__why', extraText));
   const meta = make('div', 'editorial-pick__meta');

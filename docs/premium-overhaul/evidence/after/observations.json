@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-18T14:30:17.122Z",
+  "capturedAt": "2026-10-18T15:12:34.824Z",
   "environment": "headless Chromium against local dist; not hosted preview",
   "observations": [
     {
@@ -184,11 +184,6 @@
         {
           "alt": "",
           "src": "http://127.0.0.1:4173/assets/page-title-tv-shows.png",
-          "loaded": true
-        },
-        {
-          "alt": "",
-          "src": "http://127.0.0.1:4173/assets/frightertainment-f.png",
           "loaded": true
         }
       ],

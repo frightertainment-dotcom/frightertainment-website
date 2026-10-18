@@ -1,0 +1,102 @@
+{
+  "capturedAt": "2026-10-18T15:03:16.792Z",
+  "environment": "headless Chromium against local dist, not hosted",
+  "observations": [
+    {
+      "name": "tv",
+      "width": 320,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "featureTitle": "The Fall of the House of Usher",
+      "featureLabel": "GOTHIC · FAMILY HORROR · 2023",
+      "titleBottom": 446,
+      "dockTop": 665
+    },
+    {
+      "name": "tv",
+      "width": 390,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 390,
+      "viewportWidth": 390,
+      "featureTitle": "The Fall of the House of Usher",
+      "featureLabel": "GOTHIC · FAMILY HORROR · 2023",
+      "titleBottom": 406,
+      "dockTop": 665
+    },
+    {
+      "name": "tv",
+      "width": 768,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 768,
+      "viewportWidth": 768,
+      "featureTitle": "The Fall of the House of Usher",
+      "featureLabel": "GOTHIC · FAMILY HORROR · 2023",
+      "titleBottom": 522,
+      "dockTop": 1000
+    },
+    {
+      "name": "tv",
+      "width": 1440,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "featureTitle": "The Fall of the House of Usher",
+      "featureLabel": "GOTHIC · FAMILY HORROR · 2023",
+      "titleBottom": 656,
+      "dockTop": 900
+    },
+    {
+      "name": "indie",
+      "width": 320,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 320,
+      "viewportWidth": 320,
+      "featureTitle": "Buddy",
+      "featureLabel": "SOURCE-CHECKED INDIE · 2026",
+      "titleBottom": 412,
+      "dockTop": 665
+    },
+    {
+      "name": "indie",
+      "width": 390,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 390,
+      "viewportWidth": 390,
+      "featureTitle": "Buddy",
+      "featureLabel": "SOURCE-CHECKED INDIE · 2026",
+      "titleBottom": 404,
+      "dockTop": 665
+    },
+    {
+      "name": "indie",
+      "width": 768,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 768,
+      "viewportWidth": 768,
+      "featureTitle": "Buddy",
+      "featureLabel": "SOURCE-CHECKED INDIE · 2026",
+      "titleBottom": 581,
+      "dockTop": 1000
+    },
+    {
+      "name": "indie",
+      "width": 1440,
+      "status": 200,
+      "errors": [],
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "featureTitle": "Buddy",
+      "featureLabel": "SOURCE-CHECKED INDIE · 2026",
+      "titleBottom": 585,
+      "dockTop": 900
+    }
+  ]
+}

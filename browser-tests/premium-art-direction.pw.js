@@ -167,7 +167,7 @@ test('Cinema prioritises real coming-attractions rows above the desktop fold', a
   expect(visual.horizontalOverflow).toBeLessThanOrEqual(2);
 });
 
-test('Mobile editorial story starts alongside the actual poster, not in a dead band', async ({ page }) => {
+test('Mobile editorial story and art occupy a deliberate readable composition', async ({ page }) => {
   await page.setViewportSize({width:390,height:900});
   for (const route of ['/movies.html','/tv-shows.html','/indie-movies.html','/podcasts.html']) {
     await page.goto(route);
@@ -182,10 +182,16 @@ test('Mobile editorial story starts alongside the actual poster, not in a dead b
         article:host.getBoundingClientRect(),
         viewport:innerWidth,overflow:document.documentElement.scrollWidth};
     });
-    expect(layout.grid, route).toBe(2);
+    const typeFirst = route === '/tv-shows.html' || route === '/indie-movies.html';
+    expect(layout.grid, route).toBe(typeFirst ? 1 : 2);
     expect(layout.poster.width, route).toBeGreaterThan(115);
-    expect(layout.content.top, route).toBeLessThan(layout.poster.bottom);
-    expect(layout.synopsis.top, route).toBeLessThan(layout.poster.bottom + 55);
+    if (typeFirst) {
+      expect(layout.content.bottom, route).toBeLessThanOrEqual(layout.poster.top + 2);
+      expect(layout.synopsis.top, route).toBeLessThan(550);
+    } else {
+      expect(layout.content.top, route).toBeLessThan(layout.poster.bottom);
+      expect(layout.synopsis.top, route).toBeLessThan(layout.poster.bottom + 55);
+    }
     expect(layout.synopsis.right, route).toBeLessThanOrEqual(layout.article.right + 1);
     expect(layout.overflow, route).toBeLessThanOrEqual(layout.viewport + 2);
   }

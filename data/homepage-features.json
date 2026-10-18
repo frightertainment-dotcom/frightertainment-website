@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "weekOf": "2026-10-16",
-  "policy": "Friday homepage editorial recommendations are source-backed selections, not claims of streaming availability, audience trends, partnerships, rights or film showtimes. Rotate six categories from verified candidates. Never imply licence to reproduce a film poster.",
+  "policy": "Friday homepage editorial recommendations are source-backed selections, not claims of streaming availability, audience trends, partnerships, rights or film showtimes. Rotate five editorial categories from verified candidates. The separate Cinema diary note reads date-safe UK entries from cinema-screenings.json. Never imply licence to reproduce a film poster.",
   "features": {
     "movie": {
       "title": "Heretic",
@@ -45,17 +45,6 @@
       "sourceUrl": "https://www.kineticgames.co.uk/phasmophobia",
       "sourceName": "Kinetic Games",
       "checkedAt": "2026-10-16"
-    },
-    "cinema": {
-      "title": "Clayface",
-      "year": 2026,
-      "description": "UK cinemas from 23 October 2026. A body-horror transformation emerges from Gotham's shadows; check local showtimes.",
-      "href": "/films/clayface/",
-      "sourceUrl": "https://www.bbfc.co.uk/release/clayface-q29sbgvjdglvbjpwwc0xmte2ndmx",
-      "sourceName": "BBFC UK release classification",
-      "checkedAt": "2026-10-16",
-      "territory": "GB",
-      "ukDate": "2026-10-23"
     }
   }
 }
