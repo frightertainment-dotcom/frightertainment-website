@@ -1,6 +1,6 @@
 # V2 implementation tracker — 18 October 2026
 
-Allowed states: `NOT_STARTED`, `IN_PROGRESS`, `IMPLEMENTED_UNVERIFIED`, `VERIFIED_PREVIEW`, `BLOCKED_EXTERNAL`, `APPROVED_LIVE`. No V2 route is `VERIFIED_PREVIEW` or `APPROVED_LIVE` at this checkpoint. Owner: Frightertainment Codex project; the named developer/agent changes with the continuing cloud session. Latest implementation source: `pat/seven-concepts-20261013` at `c18f52b2da00f94d0f1d0fd8c47046f8649dffd6`, based on `7575829` before V2 commits.
+Allowed states: `NOT_STARTED`, `IN_PROGRESS`, `IMPLEMENTED_UNVERIFIED`, `VERIFIED_PREVIEW`, `BLOCKED_EXTERNAL`, `APPROVED_LIVE`. No V2 route is `VERIFIED_PREVIEW` or `APPROVED_LIVE` at this checkpoint. Owner: Frightertainment Codex project; the named developer/agent changes with the continuing cloud session. Latest implementation source: `pat/seven-concepts-20261013` at `f1f9ed7b82fe07e7c786095204b2d012fcfff466`, based on `7575829` before V2 commits.
 
 | Surface | State | Work now / exact remaining verification |
 | --- | --- | --- |
@@ -14,7 +14,7 @@ Allowed states: `NOT_STARTED`, `IN_PROGRESS`, `IMPLEMENTED_UNVERIFIED`, `VERIFIE
 | Supporting routes, details, search, charts, 404 | IN_PROGRESS | Route inventory and local link check complete; no custom 404 found. Chart integrity, historical years, media detail and error states remain. |
 | Shared typography and neutral media | IMPLEMENTED_UNVERIFIED | Preview/production builders use versioned repository-local SIL OFL fonts; first-party fallback art names the appropriate file/cover type. All seven local first views have zero failed font requests. Hosted font loads, CLS and full media rights remain. |
 | Cancelled-product scope | IMPLEMENTED_UNVERIFIED | Existing source had no active references; V2 check now guards active source and preview/production bundle. Hosted old-route state remains unverified. Never revive as a streaming service or in the MOT. |
-| Private preview / release | BLOCKED_EXTERNAL | Cloudflare reports successful preview deployment `b0ae123c-ad7c-4243-93ff-82297d88fdc5` for source `c18f52b`; branch/Access/D1 separation verified by API. Hosted browser access is blocked at the cloud CONNECT tunnel (403), before Access. Served page bytes and rendered hosted state are unverified. Live remains at `7575829`. |
+| Private preview / release | BLOCKED_EXTERNAL | Cloudflare reports successful preview deployment `b58f2a27-38a8-44ac-aa10-3aa9189632ec` for source `f1f9ed7`; branch/Access/D1 separation verified by API. Hosted browser access is blocked at the cloud CONNECT tunnel (403), before Access. Served page bytes and rendered hosted state are unverified. Live remains at `7575829`. |
 
 ## Work queue
 
