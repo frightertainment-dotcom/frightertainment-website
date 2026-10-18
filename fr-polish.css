@@ -229,3 +229,28 @@ body.fr-v5 :is(.hub-tabs a,.fr-v5-mobile-dock a,.fr-v5-explore__tile,a,button,su
   transition:none!important;transform:none!important;
  }
 }
+
+/* Editorial pages: the legacy showcase still painted fictional world art via
+   a locally defined --pick-scene. The owner wants real posters or plain type. */
+body.fr-v5 .editorial-carousel { --pick-scene:none!important; }
+body.fr-v5 .editorial-pick {
+  background:linear-gradient(115deg,#1b121a,#0d0d13 75%)!important;
+  box-shadow:none!important;
+  border:0!important;
+}
+body.fr-v5 .editorial-pick__art-frame {
+  box-shadow:none!important;
+  border:0!important;
+}
+body.fr-v5 .editorial-pick__art-frame:not(.editorial-pick__art-frame--poster) {
+  background:linear-gradient(150deg,#24171e,#111016 73%)!important;
+}
+body.fr-v5 .editorial-pick__art-frame--poster img {
+  object-fit:contain!important;
+}
+@media(max-width:700px) {
+  body.fr-v5[data-theme] .editorial-pick {
+    min-height:0!important;
+    background:linear-gradient(135deg,#1a1119,#0e0d13 75%)!important;
+  }
+}
