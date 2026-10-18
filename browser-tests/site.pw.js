@@ -1473,8 +1473,8 @@ test('UK cinema diary orders months chronologically while ranking studio ahead o
  await page.locator('#cinema-country').selectOption('US');
  await expect(page.locator('#cinema-heading')).toHaveText('US CINEMA RELEASE DIARY.');
  await expect(listing).toContainText('Clayface');
- await expect(listing).toContainText('The Devils');
- await expect(listing).toContainText('RE-RELEASE SCREENINGS');
+ // A 16 October US screening is no longer an upcoming show on 18 October.
+ await expect(listing).not.toContainText('The Devils');
  await expect(listing).not.toContainText('Obsession');
  await expect(listing).not.toContainText('In the Grip of Terror');
  await page.locator('#cinema-country').selectOption('CA');
