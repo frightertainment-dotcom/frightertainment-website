@@ -271,7 +271,9 @@ body.fr-v5 .frightnews__row {
 
 /* Put actual cinema releases within the first desktop fold, not behind a hero. */
 @media(min-width:701px) {
+  /* The cinema release diary, not a tall empty masthead, is the first-fold priority. */
   body.fr-v5[data-theme='cinema'] .hub-page-intro {
+    min-height:clamp(305px,24vw,350px)!important;
     margin-bottom:10px!important;
   }
 }
