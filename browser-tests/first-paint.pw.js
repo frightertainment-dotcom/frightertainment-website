@@ -122,7 +122,7 @@ test('First-paint protection is enforced as CSP-compatible blocking CSS', async 
   await expect(page.locator('.fr-v5-front')).toBeVisible();
 });
 
-test('Below-fold mobile Home world art waits until its tile nears the viewport', async ({page}) => {
+test('Below-fold Home tile stays accessible without decorative world art', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/', {waitUntil:'domcontentloaded'});
   const target=page.locator('.hub-showcase__bottom .hub-tv').first();
@@ -131,5 +131,5 @@ test('Below-fold mobile Home world art waits until its tile nears the viewport',
   await target.scrollIntoViewIfNeeded();
   await expect(target).toHaveClass(/fr-image-visible/);
   const art=await target.evaluate(node=>getComputedStyle(node,'::before').backgroundImage);
-  expect(art).toContain('tv-wide.webp');
+  expect(art).not.toContain('tv-wide.webp');
 });
