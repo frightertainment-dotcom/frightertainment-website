@@ -254,3 +254,17 @@ body.fr-v5 .editorial-pick__art-frame--poster img {
     background:linear-gradient(135deg,#1a1119,#0e0d13 75%)!important;
   }
 }
+
+/* FrightNews should read as editorial journalism, not a boxed dashboard widget. */
+body.fr-v5 .frightnews__heading {
+  border-bottom:0!important;
+}
+body.fr-v5 .frightnews__panel {
+  border:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+  background:#100d12!important;
+}
+body.fr-v5 .frightnews__row {
+  border-bottom:1px solid #ffffff14!important;
+}
