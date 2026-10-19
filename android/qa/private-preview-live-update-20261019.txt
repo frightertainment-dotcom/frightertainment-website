@@ -1,0 +1,1 @@
+Isolated Frightertainment Android live-update proof branch. This file only triggers a private Cloudflare Pages preview build; public production content is unchanged.
