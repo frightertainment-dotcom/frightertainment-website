@@ -92,6 +92,13 @@ test('FrightNews adds new stories daily, retains earlier links, archives oldest 
   assert.equal(initial.total,250);
   assert.equal(initial.archiveTotal,0);
   assert.equal(db.articles.size,250);
+  const emptyArchiveResponse = await request('/api/frightnews?archive=1');
+  const emptyArchive = await emptyArchiveResponse.json();
+  assert.equal(emptyArchiveResponse.status, 200);
+  assert.equal(emptyArchive.status, 'empty');
+  assert.equal(emptyArchive.total, 0);
+  assert.equal(emptyArchive.archiveTotal, 0);
+  assert.deepEqual(emptyArchive.items, []);
 
   day=1;
   const second=await request('/api/frightnews');

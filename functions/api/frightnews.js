@@ -237,14 +237,15 @@ async function storedNews(context) {
     url:entry.url,title:entry.title,excerpt:entry.excerpt,
     category:entry.category,source:entry.source,publishedAt:entry.published_at
   }));
+  const hasSavedFeed = Boolean(state?.last_success_at);
   return responseJson({
-    status: total ? 'ok' : 'unavailable',
+    status: total ? 'ok' : hasSavedFeed ? 'empty' : 'unavailable',
     updatedAt:state?.last_success_at||null,
     sourceCount:Number(state?.last_source_count||0),
     storageMode:'persistent', archive, total, archiveTotal:Number(archivedCount?.total||0),
     offset, hasMore:offset+items.length<total,items,
-    ...(total ? {} : {message:'No saved publisher articles are available yet.'})
-  },total?200:503);
+    ...(total ? {} : {message:archive ? 'No headlines have reached the preserved archive yet.' : 'No saved publisher articles are available yet.'})
+  },total || hasSavedFeed ? 200 : 503);
 }
 
 export async function onRequestGet(context) {
