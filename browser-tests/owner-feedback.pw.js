@@ -108,7 +108,7 @@ test('Home destination copy stays level when real media fields arrive later', as
   await page.route('**/api/media?**', route => {
     const request = new URL(route.request().url());
     const tv = request.searchParams.get('type') === 'tv';
-    return route.fulfill({ json: { item: { title: tv ? 'Marianne' : 'Rabbit Trap',
+    return route.fulfill({ json: { item: { title: tv ? 'Archive 81' : 'Buddy',
       tmdbId: tv ? 120001 : 120002, type: tv ? 'tv' : 'movie',
       ratingKind: 'tmdb-community', voteAverage: 7.6, voteCount: 1287,
       sourceUrl: `https://www.themoviedb.org/${tv ? 'tv' : 'movie'}/${tv ? 120001 : 120002}`,
