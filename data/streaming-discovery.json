@@ -369,7 +369,8 @@
       "sourceName": "Shudder UK October 2026 film calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
       "synopsis": "A new Shudder Original horror premiere.",
-      "chartEligible": true
+      "chartEligible": true,
+      "checkedAt": "2026-10-23"
     },
     {
       "id": "shudder-gb-deviant-2017",
@@ -383,7 +384,8 @@
       ],
       "premiereKind": "new-to-platform",
       "sourceName": "Shudder UK October 2026 film calendar",
-      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "checkedAt": "2026-10-23"
     },
     {
       "id": "shudder-gb-the-r-i-p-man-2025",
@@ -397,7 +399,8 @@
       ],
       "premiereKind": "new-to-platform",
       "sourceName": "Shudder UK October 2026 film calendar",
-      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/"
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "checkedAt": "2026-10-23"
     },
     {
       "id": "shudder-gb-big-baby-2025",
@@ -412,7 +415,8 @@
       "premiereKind": "platform-exclusive",
       "sourceName": "Shudder UK October 2026 film calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "synopsis": "A 2025 horror film receiving a 2026 Shudder Exclusive release."
+      "synopsis": "A 2025 horror film receiving a 2026 Shudder Exclusive release.",
+      "checkedAt": "2026-10-23"
     },
     {
       "id": "shudder-gb-hunting-matthew-nichols-2024",
@@ -427,7 +431,8 @@
       "premiereKind": "platform-exclusive",
       "sourceName": "Shudder UK October 2026 film calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "synopsis": "A found-footage mystery receiving its Shudder Exclusive release."
+      "synopsis": "A found-footage mystery receiving its Shudder Exclusive release.",
+      "checkedAt": "2026-10-23"
     },
     {
       "id": "shudder-us-infirmary",
