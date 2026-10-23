@@ -310,12 +310,14 @@ test('expanded TV, podcast, game and indie listings have source-linked cards', a
 });
 
 test('upcoming release calendar excludes historical and already released films',async({page})=>{
+  // These assertions use dated catalogue fixtures, so keep their reference date stable.
+  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00Z'));
   await navigateLegacy(page,'/movies.html');
   const calendar=page.locator('#hub-release-list');
   await expect(calendar.locator('.hub-release-row').first()).toBeVisible();
   const rows=await calendar.locator('.hub-release-row').evaluateAll(nodes=>
     nodes.map(row=>({title:row.querySelector('div>a')?.textContent||'',date:row.querySelector('time')?.getAttribute('datetime')||'',url:row.querySelector('.hub-release-row__sources a')?.getAttribute('href')||''})));
-  const today=new Date().toISOString().slice(0,10);
+  const today=await page.evaluate(()=>new Date().toISOString().slice(0,10));
   expect(rows.length).toBeGreaterThan(0);
   expect(rows.every(row=>row.date>today&&row.url.startsWith('https://'))).toBe(true);
   expect(rows.map(row=>row.title)).not.toContain('28 Weeks Later');
@@ -804,6 +806,8 @@ test('Movies has a compact secondary tools drawer, deep-linked cinema tools expa
 });
 
 test('optional homepage discovery still shows real UK editorial release notices with provider APIs offline',async({page})=>{
+  // These assertions use dated catalogue fixtures, so keep their reference date stable.
+  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00Z'));
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
   await navigateLegacy(page,'/');
@@ -817,6 +821,8 @@ test('optional homepage discovery still shows real UK editorial release notices 
   await expect(page.locator('#home-attribution')).toContainText('Shudder UK release calendar');
 });
 test('opened Movies discovery links source-checked current and future horror even if licensed feeds are disabled',async({page})=>{
+  // These assertions use dated catalogue fixtures, so keep their reference date stable.
+  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00Z'));
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
   await navigateLegacy(page,'/movies.html#discovery');
@@ -1344,6 +1350,8 @@ test('failed anonymous form preserves message and warns that direct email reveal
 
 
 test('Straight to Stream shows sourced Infirmary and clearly separates subscription, free, and rent/buy',async({page})=>{
+  // These assertions use dated catalogue fixtures, so keep their reference date stable.
+  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00Z'));
   await page.setViewportSize({width:390,height:820});
   await navigateLegacy(page,'/movies.html');
   const stream=page.locator('#straight-to-stream');
