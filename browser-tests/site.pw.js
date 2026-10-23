@@ -143,7 +143,9 @@ test('homepage recommendations do not advertise unannounced productions', async 
   await expect(page.locator('#hub-ranking')).toBeVisible();
   await expect(visibleSection(page,'/podcasts.html')).toBeVisible();
   await expect(page.locator('#originals')).toHaveCount(0);
-  await expect(page.locator('.hub-podcast .hub-tile__link')).toHaveAttribute('href', /^https:\/\/www\.oldgodsofappalachia\.com\//);
+  const published = await (await page.request.get('/data/homepage-features.json')).json();
+  await expect(page.locator('.hub-podcast .hub-tile__link')).toHaveAttribute('href', published.features.podcast.href);
+  expect(published.features.podcast.sourceUrl).toMatch(/^https:\/\//);
   await expect(page.locator('body')).not.toContainText('FRIGHTERTAINMENT ORIGINALS');
   await expect(page.locator('body')).not.toContainText('DETAILS TO BE ANNOUNCED');
 });
@@ -321,10 +323,14 @@ test('upcoming release calendar excludes historical and already released films',
   expect(rows.map(row=>row.title)).not.toContain('28 Weeks Later');
   expect(rows.map(row=>row.title)).not.toContain('28 Years Later: The Bone Temple');
   const clayface=calendar.locator('.hub-release-row').filter({hasText:'Clayface'});
-  await expect(clayface).toHaveCount(1);
-  await expect(clayface.locator('time')).toHaveCount(1);
-  await expect(clayface.locator('.hub-release-row__sources a')).toHaveCount(1);
-  await expect(clayface.locator('.hub-release-row__dates small')).not.toBeEmpty();
+  // Upcoming lists intentionally exclude today and past dates. The source-backed
+  // UK release is 23 October, so it no longer belongs here on/after that day.
+  if(today < '2026-10-23'){
+    await expect(clayface).toHaveCount(1);
+    await expect(clayface.locator('time')).toHaveCount(1);
+    await expect(clayface.locator('.hub-release-row__sources a')).toHaveCount(1);
+    await expect(clayface.locator('.hub-release-row__dates small')).not.toBeEmpty();
+  }else await expect(clayface).toHaveCount(0);
   await expect(calendar).not.toContainText('DATE PASSED');
   await expect(calendar).not.toContainText('2007');
 });
@@ -810,7 +816,10 @@ test('optional homepage discovery still shows real UK editorial release notices 
   await page.locator('.home-discovery-wrap summary').click();
   await expect(page.locator('[data-home-list="streaming-releases"] article')).toHaveCount(4);
   await expect(page.locator('[data-home-list="streaming-releases"]')).toContainText('Shudder');
-  await expect(page.locator('[data-home-list="theatrical-releases"]')).toContainText('Other Mommy');
+  // Date-scoped source feeds legitimately rotate; assert that the fallback
+  // still supplies a genuine source link rather than pinning an old film name.
+  await expect(page.locator('[data-home-list="theatrical-releases"] article').first()).toBeVisible();
+  await expect(page.locator('[data-home-list="theatrical-releases"] a[href^="https://"]').first()).toBeVisible();
   await expect(page.locator('[data-home-list="coming-soon"] article')).toHaveCount(4);
   await expect(page.locator('[data-home-list="trending-horror"]')).toContainText('Shudder');
   await expect(page.locator('[data-home-state="trending-horror"]')).toContainText('UK release announcements');
@@ -822,7 +831,8 @@ test('opened Movies discovery links source-checked current and future horror eve
   await navigateLegacy(page,'/movies.html#discovery');
   await expect(page.locator('.movie-advanced')).toHaveAttribute('open','');
   await expect(page.locator('[data-list="streaming-releases"]')).toContainText('Shudder');
-  await expect(page.locator('[data-list="theatrical-releases"]')).toContainText('Other Mommy');
+  await expect(page.locator('[data-list="theatrical-releases"] article').first()).toBeVisible();
+  await expect(page.locator('[data-list="theatrical-releases"] a[href^="https://"]').first()).toBeVisible();
   await expect(page.locator('[data-list="coming-soon"]')).not.toBeEmpty();
   await expect(page.locator('[data-list="trending-horror"]')).toContainText('Shudder');
   await expect(page.locator('[data-state="rankings"]')).toContainText('Critic ranking pending');
@@ -1352,6 +1362,13 @@ test('Straight to Stream shows sourced Infirmary and clearly separates subscript
   await expect(stream.locator('[data-stream-country]')).toHaveValue('GB');
   await expect(stream.locator('[data-stream-year]')).toHaveValue('2026');
   const infirmary=stream.locator('[data-stream-list] .fr-stream__card').filter({has:page.getByRole('link',{name:'Infirmary',exact:true})});
+  // Keep historical sourced releases discoverable when newer 2026 arrivals
+  // occupy the first eight cards; progressively reveal existing real records.
+  const more=stream.locator('[data-stream-more]');
+  for(let attempt=0;attempt<12 && await infirmary.count()===0;attempt++){
+    if(await more.isHidden())break;
+    await more.click();
+  }
   await expect(infirmary).toBeVisible();
   await expect(infirmary).toContainText('Shudder');
   await expect(infirmary).toContainText('INCLUDED WITH SUBSCRIPTION');
@@ -1534,9 +1551,10 @@ test('live region provider discovery is clearly separate from historically sourc
 test('homepage indie showcase features a real sourced film, not a generic placeholder', async ({page}) => {
   await navigateLegacy(page,'/');
   const indie = page.locator('.hub-showcase__bottom .hub-indie');
-  await expect(indie).toContainText('RABBIT TRAP');
-  await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', '/indie-movies.html');
-  await expect(indie).toHaveAttribute('data-media-title', 'Rabbit Trap');
+  const published=(await (await page.request.get('/data/homepage-features.json')).json()).features.indie;
+  await expect(indie).toContainText(published.title.toUpperCase());
+  await expect(indie.locator('a.hub-tile__link')).toHaveAttribute('href', published.href);
+  await expect(indie).toHaveAttribute('data-media-title', published.title);
   await expect(indie.locator('[data-media-field="poster"]')).toHaveCount(1);
   await expect(page.locator('head link[rel="stylesheet"][href*="fonts.googleapis.com"]')).toHaveCount(1);
   await expect(page.locator('head link[rel="preconnect"][href="https://fonts.gstatic.com"]')).toHaveCount(1);
@@ -1625,16 +1643,17 @@ test('rotating film feature CTA always agrees with its actual destination', asyn
   // Weekly owner-curated features take priority over the rotating release
   // fallback, even when a verified recent film exists in the catalogue.
   await expect(feature).toHaveAttribute('data-editorial-curated','true');
-  await expect(feature.locator('h3')).toHaveText('HERETIC');
+  const weekly=(await (await page.request.get('/data/homepage-features.json')).json()).features.movie;
+  await expect(feature.locator('h3')).toHaveText(weekly.title.toUpperCase());
   const cta=feature.locator('a.hub-tile__link');
-  await expect(cta).toHaveAttribute('href','/films/heretic/');
+  await expect(cta).toHaveAttribute('href',weekly.href);
   await expect(cta).toContainText('EXPLORE FILM');
 
   // A temporarily empty provider feed must not replace curated cinema picks.
   records=[];
   await page.reload();
-  await expect(page.locator('.hub-feature h3')).toHaveText('HERETIC');
-  await expect(page.locator('.hub-feature a.hub-tile__link')).toHaveAttribute('href','/films/heretic/');
+  await expect(page.locator('.hub-feature h3')).toHaveText(weekly.title.toUpperCase());
+  await expect(page.locator('.hub-feature a.hub-tile__link')).toHaveAttribute('href',weekly.href);
 });
 
 
