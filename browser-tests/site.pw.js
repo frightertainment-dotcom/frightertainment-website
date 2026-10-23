@@ -807,7 +807,7 @@ test('Movies has a compact secondary tools drawer, deep-linked cinema tools expa
 
 test('optional homepage discovery still shows real UK editorial release notices with provider APIs offline',async({page})=>{
   // These assertions use dated catalogue fixtures, so keep their reference date stable.
-  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00Z'));
+  await page.clock.setFixedTime(new Date('2026-10-16T12:00:00Z'));
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
   await navigateLegacy(page,'/');
@@ -822,7 +822,7 @@ test('optional homepage discovery still shows real UK editorial release notices 
 });
 test('opened Movies discovery links source-checked current and future horror even if licensed feeds are disabled',async({page})=>{
   // These assertions use dated catalogue fixtures, so keep their reference date stable.
-  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00Z'));
+  await page.clock.setFixedTime(new Date('2026-10-16T12:00:00Z'));
   await page.route('**/api/discovery?country=GB',route=>route.fulfill({status:503,body:'Unavailable'}));
   await page.route('**/api/rankings?year=*',route=>route.fulfill({status:503,body:'Unavailable'}));
   await navigateLegacy(page,'/movies.html#discovery');
