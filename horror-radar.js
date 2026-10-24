@@ -23,7 +23,8 @@
     'dated-release':'OFFICIAL RELEASE DATE',
     'dated-episode':'DATED EPISODE / PREMIERE',
     'announced-undated':'DIGITAL RELEASE · DATE TBC',
-    'provider-spotlight':'PLATFORM EDITORIAL PICK'
+    'provider-spotlight':'PLATFORM EDITORIAL PICK',
+    'available-now':'AVAILABLE NOW · CHECK PROVIDER'
   };
   const categoryLabels={tv:'TV & SERIES',game:'GAMES',podcast:'PODCASTS',
     vod:'BUY OR RENT',streaming:'STREAMING SPOTLIGHT'};
@@ -32,7 +33,7 @@
     typeof x.summary==='string'&&x.summary.length<450&&safeUrl(x.sourceUrl)&&
     validDay(x.checkedAt)&&(x.date===null||validDay(x.date))&&
     Object.hasOwn(statusText,x.status)&&
-    (x.date!==null||['announced-undated','provider-spotlight'].includes(x.status));
+      (x.date!==null||['announced-undated','provider-spotlight','available-now'].includes(x.status));
   const sort=(a,b)=>{
     const at=a.date||a.checkedAt,bt=b.date||b.checkedAt;
     return bt.localeCompare(at)||a.title.localeCompare(b.title);

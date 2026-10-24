@@ -61,7 +61,7 @@ for(const item of radar.items||[]){
  if(!['tv','game','podcast','vod','streaming'].includes(item.category)||!url(item.sourceUrl)||!Number.isFinite(day(item.checkedAt)))
    fail('Invalid Radar entry: '+item.id);
  if(item.date!==null&&!Number.isFinite(day(item.date)))fail('Invalid Radar release date: '+item.id);
- if(item.date===null&&!['provider-spotlight','announced-undated'].includes(item.status))fail('Undated Radar item presented as a premiere: '+item.id);
+ if(item.date===null&&!['provider-spotlight','announced-undated','available-now'].includes(item.status))fail('Undated Radar item presented as a premiere: '+item.id);
  if(age(item.checkedAt)>28)warn('Radar publisher source due for recheck: '+item.title);
 }
 const clay=ledger.territories?.GB?.screenings?.find(x=>x.id==='clayface-2026-uk');

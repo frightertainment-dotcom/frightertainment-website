@@ -78,3 +78,6 @@
   white-space:normal;max-width:100%;
  }
 }
+
+/* Small editorial posters keep their original aspect and artwork uncropped. */
+.tmdb-poster,.home-discovery__poster{object-fit:contain;background-color:#171112}

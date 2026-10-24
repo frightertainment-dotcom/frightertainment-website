@@ -1776,3 +1776,6 @@ body[data-theme="games"] .fr-game-spotlight__media .fr-player-gate { width:100%;
     padding-block:9px;
   }
 }
+
+/* Keep source poster proportions consistent without cropping genuine artwork. */
+.hub-feature__poster,.hub-chart-poster,.ranking-row__poster,.tmdb-card-poster,.fr-media-card__poster img,.release-brief__poster,.fr-stream__poster,.fr-cinema-diary__poster{object-fit:contain!important;object-position:center;background-color:#130e10}

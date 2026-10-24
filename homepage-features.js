@@ -33,6 +33,15 @@
       const poster=article.querySelector('.hub-editorial-poster');
       if(poster)poster.alt=feature.title+' poster';
     }
+    if(key==='movie'&&Number.isInteger(feature.year)){
+      article.dataset.mediaType='movie';
+      article.dataset.mediaTitle=feature.title;
+      article.dataset.mediaYear=String(feature.year);
+      article.dataset.mediaEager='true';
+      let poster=article.querySelector('.hub-feature__poster');
+      if(!poster){poster=document.createElement('img');poster.className='hub-feature__poster';poster.dataset.mediaField='poster';poster.hidden=true;article.prepend(poster);}
+      poster.alt=feature.title+' poster';
+    }
     const existing=article.querySelector('.fr-home-feature-source');
     if(existing)existing.remove();
     if(source){

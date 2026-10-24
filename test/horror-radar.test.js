@@ -16,7 +16,7 @@ test('Radar stories have individually source-checked dates and country/provider 
   assert.ok(['GB','GLOBAL'].includes(x.country));
   assert.ok(x.title&&x.summary&&x.channel);
   assert.ok(date(x.checkedAt));
-  if(x.date===null)assert.ok(['provider-spotlight','announced-undated'].includes(x.status));
+  if(x.date===null)assert.ok(['provider-spotlight','announced-undated','available-now'].includes(x.status));
   else assert.ok(date(x.date));
   assert.match(x.sourceUrl,/^https:\/\/[^\/]+/);
   assert.equal(x.rating,undefined);assert.equal(x.poster,undefined);
@@ -28,6 +28,9 @@ test('Premieres, platforms and undated UK digital rentals stay separate',()=>{
  assert(data.items.some(x=>x.category==='podcast'&&x.title==='Heart'&&x.date==='2026-10-19'));
  assert(data.items.some(x=>x.category==='vod'&&x.date===null));
  assert(data.items.some(x=>x.category==='streaming'&&x.date===null));
+ for(const id of ['prime-insidious-further-digital','disney-ready-or-not-2-uk','disney-predator-badlands-uk'])
+  assert.equal(data.items.find(x=>x.id===id)?.status,'available-now','Source-confirmed current UK availability must not appear as Date TBC');
+ assert.equal(data.items.find(x=>x.id==='prime-practical-magic2-digital')?.status,'announced-undated','Keep unsupported UK date claims unconfirmed');
  const p=b.items.filter(x=>x.category==='streaming').map(x=>x.service);
  assert(p.includes('Shudder'));assert(p.includes('Disney+'));
  for(const x of b.items.filter(x=>x.service==='Disney+'))
