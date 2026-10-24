@@ -1,21 +1,21 @@
 {
   "tv-shows": [
     {
-      "id": "tv-shows-0",
-      "title": "Marianne",
-      "category": "SUPERNATURAL · FRENCH HORROR",
-      "description": "When a successful horror novelist returns to her hometown, the terrifying woman from her books seems to have stepped into the real world. As people close to her are drawn into the nightmare, she must confront the origin of a presence she thought existed only on the page.",
-      "sourceName": "Netflix",
-      "sourceUrl": "https://www.netflix.com/gb/title/80217779",
-      "checkedAt": "2026-10-08"
-    },
-    {
       "id": "tv-shows-1",
       "title": "Archive 81",
       "category": "FOUND FOOTAGE · MYSTERY",
       "description": "An archivist is hired to restore a collection of damaged videotapes made by a documentary filmmaker. What starts as a painstaking restoration becomes an obsession with the filmmaker's disappearance, a mysterious apartment building and a story that seems to reach across time.",
       "sourceName": "Netflix",
       "sourceUrl": "https://www.netflix.com/gb/title/80222802",
+      "checkedAt": "2026-10-23"
+    },
+    {
+      "id": "tv-shows-0",
+      "title": "Marianne",
+      "category": "SUPERNATURAL · FRENCH HORROR",
+      "description": "When a successful horror novelist returns to her hometown, the terrifying woman from her books seems to have stepped into the real world. As people close to her are drawn into the nightmare, she must confront the origin of a presence she thought existed only on the page.",
+      "sourceName": "Netflix",
+      "sourceUrl": "https://www.netflix.com/gb/title/80217779",
       "checkedAt": "2026-10-08"
     },
     {
@@ -75,21 +75,21 @@
   ],
   "podcasts": [
     {
-      "id": "podcasts-0",
-      "title": "Old Gods of Appalachia",
-      "category": "FOLK HORROR · ANTHOLOGY",
-      "description": "Ancient dread beneath the Appalachian mountains.",
-      "sourceName": "DeepNerd Media",
-      "sourceUrl": "https://podcasts.apple.com/gb/podcast/old-gods-of-appalachia/id1485435369",
-      "checkedAt": "2026-10-08"
-    },
-    {
       "id": "podcasts-1",
       "title": "The Silt Verses",
       "category": "WEIRD FICTION · AUDIO DRAMA",
       "description": "Rogue worshippers travel a river haunted by strange gods.",
       "sourceName": "The Silt Verses",
       "sourceUrl": "https://www.thesiltverses.com/listen-now",
+      "checkedAt": "2026-10-23"
+    },
+    {
+      "id": "podcasts-0",
+      "title": "Old Gods of Appalachia",
+      "category": "FOLK HORROR · ANTHOLOGY",
+      "description": "Ancient dread beneath the Appalachian mountains.",
+      "sourceName": "DeepNerd Media",
+      "sourceUrl": "https://podcasts.apple.com/gb/podcast/old-gods-of-appalachia/id1485435369",
       "checkedAt": "2026-10-08"
     },
     {
@@ -157,6 +157,16 @@
     }
   ],
   "games": [
+    {
+      "id": "games-expanded-8",
+      "title": "Still Wakes the Deep",
+      "category": "NARRATIVE · COSMIC HORROR",
+      "description": "Survive an impossible terror aboard a collapsing North Sea oil rig.",
+      "sourceName": "The Chinese Room / Steam",
+      "sourceUrl": "https://store.steampowered.com/app/1622910/Still_Wakes_the_Deep/",
+      "checkedAt": "2026-10-23",
+      "steamId": 1622910
+    },
     {
       "id": "games-0",
       "title": "Phasmophobia",
@@ -235,28 +245,9 @@
       "sourceUrl": "https://store.steampowered.com/app/1295920/The_Mortuary_Assistant/",
       "checkedAt": "2026-10-09",
       "steamId": 1295920
-    },
-    {
-      "id": "games-expanded-8",
-      "title": "Still Wakes the Deep",
-      "category": "NARRATIVE · COSMIC HORROR",
-      "description": "Survive an impossible terror aboard a collapsing North Sea oil rig.",
-      "sourceName": "The Chinese Room / Steam",
-      "sourceUrl": "https://store.steampowered.com/app/1622910/Still_Wakes_the_Deep/",
-      "checkedAt": "2026-10-09",
-      "steamId": 1622910
     }
   ],
   "indie-movies": [
-    {
-      "id": "indie-movies-0",
-      "title": "Buddy",
-      "category": "SOURCE-CHECKED INDIE · 2026",
-      "description": "A children's TV world becomes a surreal nightmare.",
-      "sourceName": "Sundance",
-      "sourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/",
-      "checkedAt": "2026-10-14"
-    },
     {
       "id": "indie-movies-1",
       "title": "The Ugly Stepsister",
@@ -264,6 +255,15 @@
       "description": "A savage fairy-tale nightmare about beauty and obsession.",
       "sourceName": "Sundance",
       "sourceUrl": "https://www.sundance.org/blogs/2025-sundance-film-festival-reveals-93-projects-for-feature-film-and-episodic-programs/",
+      "checkedAt": "2026-10-23"
+    },
+    {
+      "id": "indie-movies-0",
+      "title": "Buddy",
+      "category": "SOURCE-CHECKED INDIE · 2026",
+      "description": "A children's TV world becomes a surreal nightmare.",
+      "sourceName": "Sundance",
+      "sourceUrl": "https://www.sundance.org/blogs/2026-sundance-film-festival-unveils-97-projects-selected-for-the-feature-film-and-episodic-program/",
       "checkedAt": "2026-10-14"
     },
     {

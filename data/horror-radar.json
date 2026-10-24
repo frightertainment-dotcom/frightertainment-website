@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-10-16",
+  "checkedAt": "2026-10-23",
   "country": "GB",
   "coverage": "Editorial discovery notices based on linked publisher/platform announcements. Dates are never inferred, streaming provider spotlight is not a guarantee of current subscription access, and undated VOD is labelled as such.",
   "items": [
@@ -41,7 +41,7 @@
       "sourceUrl": "https://www.netflix.com/tudum/articles/new-on-netflix"
     },
     {
-      "checkedAt": "2026-10-16",
+      "checkedAt": "2026-10-23",
       "id": "apple-nocturne-2026",
       "category": "tv",
       "title": "Nocturne",
@@ -195,6 +195,42 @@
       "status": "provider-spotlight",
       "summary": "The Disney+ UK editorial title guide says the 2025 creature feature can be streamed on Disney+.",
       "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/predator-badlands-movie"
+    },
+    {
+      "id": "shudder-uk-the-cycle-2026-10-23",
+      "category": "streaming",
+      "title": "The Cycle",
+      "date": "2026-10-23",
+      "country": "GB",
+      "channel": "Shudder UK",
+      "status": "dated-premiere",
+      "summary": "Shudder's source-listed UK October schedule identifies The Cycle as a Shudder Original release dated 2026-10-23; availability is subject to the provider.",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "checkedAt": "2026-10-23"
+    },
+    {
+      "id": "shudder-uk-big-baby-2026-10-30",
+      "category": "streaming",
+      "title": "Big Baby",
+      "date": "2026-10-30",
+      "country": "GB",
+      "channel": "Shudder UK",
+      "status": "dated-premiere",
+      "summary": "Shudder's source-listed UK October schedule identifies Big Baby as a Shudder Exclusive release dated 2026-10-30; availability is subject to the provider.",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "checkedAt": "2026-10-23"
+    },
+    {
+      "id": "shudder-uk-hunting-matthew-nichols-2026-10-31",
+      "category": "streaming",
+      "title": "Hunting Matthew Nichols",
+      "date": "2026-10-31",
+      "country": "GB",
+      "channel": "Shudder UK",
+      "status": "dated-premiere",
+      "summary": "Shudder's source-listed UK October schedule identifies Hunting Matthew Nichols as a Shudder Exclusive release dated 2026-10-31; availability is subject to the provider.",
+      "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
+      "checkedAt": "2026-10-23"
     }
   ]
 }

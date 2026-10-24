@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-16T05:30:00Z",
+  "updatedAt": "2026-10-23T02:22:39.882Z",
   "country": "GB",
   "coverage": "Source-checked editorial release notices, not a licensed real-time availability feed or proof of remaining on platform Provider spotlight rows carry dateIsSourceCheck=true; these are source-check dates, never invented streaming premieres.",
   "items": [
@@ -328,7 +328,7 @@
       "date": "2026-10-23",
       "sourceName": "Shudder UK release calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "checkedAt": "2026-10-09",
+      "checkedAt": "2026-10-23",
       "availability": "announced-arrival"
     },
     {
@@ -341,7 +341,7 @@
       "date": "2026-10-26",
       "sourceName": "Shudder UK release calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "checkedAt": "2026-10-09",
+      "checkedAt": "2026-10-23",
       "availability": "announced-arrival"
     },
     {
@@ -354,7 +354,7 @@
       "date": "2026-10-28",
       "sourceName": "Shudder UK release calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "checkedAt": "2026-10-09",
+      "checkedAt": "2026-10-23",
       "availability": "announced-arrival"
     },
     {
@@ -367,7 +367,7 @@
       "date": "2026-10-30",
       "sourceName": "Shudder UK release calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "checkedAt": "2026-10-09",
+      "checkedAt": "2026-10-23",
       "availability": "announced-arrival"
     },
     {
@@ -380,7 +380,7 @@
       "date": "2026-10-31",
       "sourceName": "Shudder UK release calendar",
       "sourceUrl": "https://embed.letterboxd.com/shudder/list/october-2026-horror-films-coming-to-shudder-1/detail/",
-      "checkedAt": "2026-10-09",
+      "checkedAt": "2026-10-23",
       "availability": "announced-arrival"
     },
     {
