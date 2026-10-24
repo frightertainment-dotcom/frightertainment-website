@@ -460,15 +460,15 @@
       "title": "SOULM8TE",
       "year": 2026,
       "service": "Disney+",
-      "sourceName": "Disney+ UK home page",
-      "sourceUrl": "https://www.disneyplus.com/en-gb",
+      "sourceName": "Disney+ UK title page",
+      "sourceUrl": "https://www.disneyplus.com/en-gb/browse/entity-8ebf08eb-8cb3-4d6e-a2fb-208812b3204d",
       "category": "streaming",
       "country": "GB",
       "date": "2026-10-24",
       "dateIsSourceCheck": true,
       "checkedAt": "2026-10-24",
       "availability": "listed-now",
-      "sourceScope": "Date is the editorial verification date, not the streaming arrival date; the title appeared on the Disney+ UK home page when checked. Availability can change."
+      "sourceScope": "Date is the editorial verification date, not the streaming arrival date; the UK Disney+ title page was live when checked. Availability can change."
     },
     {
       "id": "disney-uk-cradle-20261016",
