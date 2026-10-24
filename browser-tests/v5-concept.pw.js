@@ -644,23 +644,26 @@ test('TV editorial requests title and original air year and displays exact match
  expect(queries.some(q=>q.type==='tv'&&q.title&&/^20[0-2][0-9]$/.test(q.year))).toBe(true);
 });
 
-test('Friday homepage features show all six source-backed selections, with no stale TV or game headline',async({page})=>{
+test('Friday homepage features show six source-backed selections matching the current data',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/');
- const expected=[
-  ['.hub-feature','HERETIC'],
-  ['.hub-tv','MARIANNE'],
-  ['.hub-indie','RABBIT TRAP'],
-  ['.hub-podcast','OLD GODS OF APPALACHIA'],
-  ['.hub-games','PHASMOPHOBIA'],
-  ['.hub-cinema','CLAYFACE']
- ];
- for(const [selector,title] of expected){
-  await expect(page.locator(selector+' h3')).toHaveText(title);
-  await expect(page.locator(selector+' .hub-tile__link')).toHaveAttribute('href',/\S+/);
- }
  const feed=await page.request.get('/data/homepage-features.json');
  expect(feed.ok()).toBe(true);
  const payload=await feed.json();
  expect(Object.keys(payload.features).sort()).toEqual(['cinema','games','indie','movie','podcast','tv']);
+ const expected=[
+  ['.hub-feature',payload.features.movie],
+  ['.hub-tv',payload.features.tv],
+  ['.hub-indie',payload.features.indie],
+  ['.hub-podcast',payload.features.podcast],
+  ['.hub-games',payload.features.games],
+  ['.hub-cinema',payload.features.cinema]
+ ];
+ for(const [selector,item] of expected){
+  expect(item.title).toBeTruthy();
+  expect(item.checkedAt).toBeTruthy();
+  expect(item.sourceUrl.startsWith('https://')).toBe(true);
+  await expect(page.locator(selector+' h3')).toHaveText(item.title.toUpperCase());
+  await expect(page.locator(selector+' .hub-tile__link')).toHaveAttribute('href',item.href);
+ }
 });
