@@ -77,7 +77,7 @@
       box.append(card);
     }
   }
-  fetch('/data/horror-radar.json',{headers:{accept:'application/json'}})
+  fetch('/data/horror-radar-v2.json',{headers:{accept:'application/json'}})
     .then(r=>r.ok?r.json():Promise.reject(new Error('Editorial feed missing')))
     .then(data=>mounts.forEach(m=>render(m,data)))
     .catch(()=>mounts.forEach(m=>{

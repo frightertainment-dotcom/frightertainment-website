@@ -20,6 +20,7 @@ for (const directory of ['assets', 'films', 'top-20']) {
 await mkdir(new URL('data/', destination));
 await cp(new URL('data/movies.js', root), new URL('data/movies.js', destination));
 await cp(new URL('data/horror-radar.json', root), new URL('data/horror-radar.json', destination));
+await cp(new URL('data/horror-radar-v2.json', root), new URL('data/horror-radar-v2.json', destination));
 await cp(new URL('data/editorial-releases.json', root), new URL('data/editorial-releases.json', destination));
 await cp(new URL('data/editorial.json', root), new URL('data/editorial.json', destination));
 await cp(new URL('data/homepage-features.json', root), new URL('data/homepage-features.json', destination));

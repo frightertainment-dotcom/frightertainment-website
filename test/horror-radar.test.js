@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 
 const root=new URL('../',import.meta.url);
-const data=JSON.parse(await readFile(new URL('data/horror-radar.json',root),'utf8'));
+const data=JSON.parse(await readFile(new URL('data/horror-radar-v2.json',root),'utf8'));
+const legacy=JSON.parse(await readFile(new URL('data/horror-radar.json',root),'utf8'));
 const b=JSON.parse(await readFile(new URL('data/editorial-releases.json',root),'utf8'));
 const date=x=>/^\d{4}-\d{2}-\d{2}$/.test(x||'')&&
  Number.isFinite(Date.parse(x+'T00:00:00Z'))&&new Date(x+'T00:00:00Z').toISOString().slice(0,10)===x;
@@ -36,6 +37,16 @@ test('Premieres, platforms and undated UK digital rentals stay separate',()=>{
  for(const x of b.items.filter(x=>x.service==='Disney+'))
   assert.equal(x.dateIsSourceCheck,true,'Provider spotlight must not be misrepresented as platform arrival');
 });
+test('Existing Play app receives only status values it understands',()=>{
+ assert.equal(legacy.schemaVersion,1);
+ assert.ok(legacy.items.length>=10);
+ for(const x of legacy.items){
+  assert.ok(['dated-premiere','dated-release','dated-episode','announced-undated','provider-spotlight'].includes(x.status));
+  assert.notEqual(x.status,'available-now');
+ }
+ for(const x of data.items.filter(x=>x.status==='available-now'))
+  assert.equal(legacy.items.some(y=>y.id===x.id),false,'Do not show a false Date TBC in the existing app: '+x.id);
+});
 test('All five new radar landing pages and preview + production bundle include every asset',async()=>{
  const pages=['index.html','movies.html','tv-shows.html','games.html','podcasts.html'];
  for(const page of pages){
@@ -45,7 +56,7 @@ test('All five new radar landing pages and preview + production bundle include e
  }
  for(const script of ['scripts/build-preview.mjs','scripts/build-production.mjs']){
   const content=await readFile(new URL(script,root),'utf8');
-  for(const asset of ['horror-radar.css','horror-radar.js','data/horror-radar.json'])
+  for(const asset of ['horror-radar.css','horror-radar.js','data/horror-radar.json','data/horror-radar-v2.json'])
    assert(content.includes(asset),script+' missing '+asset);
  }
 });

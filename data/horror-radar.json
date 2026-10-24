@@ -137,42 +137,6 @@
       "sourceUrl": "https://www.aboutamazon.co.uk/news/entertainment/whats-on-prime-video-uk-october-2026"
     },
     {
-      "checkedAt": "2026-10-24",
-      "id": "prime-insidious-further-digital",
-      "category": "vod",
-      "title": "Insidious: Out of the Further",
-      "date": null,
-      "country": "GB",
-      "channel": "Sony Pictures UK · buy or rent",
-      "status": "available-now",
-      "summary": "Sony Pictures UK currently lists the film as buy or rent now. No specific digital launch date is claimed.",
-      "sourceUrl": "https://www.sonypictures.co.uk/movies/insidious-out-further"
-    },
-    {
-      "checkedAt": "2026-10-24",
-      "id": "disney-ready-or-not-2-uk",
-      "category": "streaming",
-      "title": "Ready or Not 2: Here I Come",
-      "date": null,
-      "country": "GB",
-      "channel": "Disney+ UK",
-      "status": "available-now",
-      "summary": "The UK Disney+ title page is live. Availability can change; check the provider before watching.",
-      "sourceUrl": "https://www.disneyplus.com/en-gb/browse/entity-30e4c038-d7be-4e17-b19c-77aeed3fbd92"
-    },
-    {
-      "checkedAt": "2026-10-24",
-      "id": "disney-soulm8te-uk",
-      "category": "streaming",
-      "title": "SOULM8TE",
-      "date": null,
-      "country": "GB",
-      "channel": "Disney+ UK",
-      "status": "available-now",
-      "summary": "Listed on the current Disney+ UK home page. Availability can change; check the provider before watching.",
-      "sourceUrl": "https://www.disneyplus.com/en-gb"
-    },
-    {
       "checkedAt": "2026-10-16",
       "id": "disney-hand-rocks-cradle-uk",
       "category": "streaming",
@@ -183,18 +147,6 @@
       "status": "provider-spotlight",
       "summary": "Psychological home-invasion horror highlighted by Disney+ UK; availability can change.",
       "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/best-halloween-movies"
-    },
-    {
-      "checkedAt": "2026-10-24",
-      "id": "disney-predator-badlands-uk",
-      "category": "streaming",
-      "title": "Predator: Badlands",
-      "date": null,
-      "country": "GB",
-      "channel": "Disney+ UK",
-      "status": "available-now",
-      "summary": "The Disney+ UK editorial title guide says the 2025 creature feature can be streamed on Disney+.",
-      "sourceUrl": "https://www.disneyplus.com/en-gb/explore/articles/predator-badlands-movie"
     }
   ]
 }

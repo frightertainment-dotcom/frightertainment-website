@@ -15,7 +15,7 @@ const publicFiles = [
 ];
 const publicDirectories = ['assets', 'films', 'top-20'];
 const publicDataFiles = [
-  'data/movies.js', 'data/horror-radar.json', 'data/editorial-releases.json', 'data/editorial.json', 'data/homepage-features.json', 'data/editorial-spotlight-overrides.json', 'data/movie-editorial-overviews.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json', 'data/indie-archive.json',
+  'data/movies.js', 'data/horror-radar.json', 'data/horror-radar-v2.json', 'data/editorial-releases.json', 'data/editorial.json', 'data/homepage-features.json', 'data/editorial-spotlight-overrides.json', 'data/movie-editorial-overviews.json', 'data/cinema-screenings.json', 'data/streaming-discovery.json', 'data/indie-archive.json',
   'data/archive/horror-films.json', 'data/archive/profiles.json'
 ];
 

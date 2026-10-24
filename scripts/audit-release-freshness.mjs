@@ -15,7 +15,7 @@ const day=iso=>{
 const age=iso=>Math.round((start-day(iso))/86400000);
 const url=u=>{try{const t=new URL(u);return t.protocol==='https:'&&!t.username&&!t.password}catch{return false}};
 const errors=[],warnings=[],fail=s=>errors.push(s),warn=s=>warnings.push(s);
-const ledger=await load('data/cinema-screenings.json'),bulletin=await load('data/editorial-releases.json'),radar=await load('data/horror-radar.json');
+const ledger=await load('data/cinema-screenings.json'),bulletin=await load('data/editorial-releases.json'),radar=await load('data/horror-radar-v2.json');
 if(ledger.schemaVersion!==2||!ledger.territories?.GB?.screenings)fail('GB cinema diary missing or unsupported');
 if(!Number.isFinite(day(ledger.checkedAt)))fail('Cinema checkedAt invalid');
 else if(age(ledger.checkedAt)>14)fail('Cinema diary review is '+age(ledger.checkedAt)+' days old (>14)');
